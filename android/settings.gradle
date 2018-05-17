@@ -1,0 +1,3 @@
+rootProject.name = 'orbitingapp'
+
+include ':app'
