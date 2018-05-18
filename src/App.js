@@ -1,11 +1,42 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Dimensions, PushNotificationIOS, AppState } from 'react-native';
 import CodePush from "react-native-code-push";
+import PushNotification from 'react-native-push-notification';
 
 class App extends Component {
   constructor() {
     super();
     this.state = { restartAllowed: true };
+  }
+
+  componentDidMount() {
+    PushNotification.configure({
+     onRegister: function(token) {
+       //process token
+     },
+     onNotification: function(notification) {
+       // process the notification
+       // required on iOS only
+       notification.finish(PushNotificationIOS.FetchResult.NoData);
+     },
+     permissions: {
+       alert: true,
+       badge: true,
+       sound: true
+     },
+     popInitialNotification: true,
+     requestPermissions: true,
+   });
+
+    AppState.addEventListener('change', this.handleAppStateChange);
+  }
+
+  componentWillUnmount() {
+    AppState.removeEventListener('change', this.handleAppStateChange);
+  }
+
+  codePushDownloadDidProgress(progress) {
+    this.setState({ progress });
   }
 
   codePushStatusDidChange(syncStatus) {
@@ -37,19 +68,16 @@ class App extends Component {
     }
   }
 
-  codePushDownloadDidProgress(progress) {
-    this.setState({ progress });
+  handleAppStateChange = (appState) => {
+    if (appState === 'background') {
+      PushNotification.localNotificationSchedule({
+        message: "Test!!",
+        date: new Date(Date.now() + 1000),
+      })
+    }
   }
 
-  toggleAllowRestart() {
-    this.state.restartAllowed
-      ? CodePush.disallowRestart()
-      : CodePush.allowRestart();
-
-    this.setState({ restartAllowed: !this.state.restartAllowed });
-  }
-
-  getUpdateMetadata() {
+  getUpdateMetadata = () => {
     CodePush.getUpdateMetadata(CodePush.UpdateState.RUNNING)
       .then((metadata: LocalPackage) => {
         this.setState({ syncMessage: metadata ? JSON.stringify(metadata) : "Running binary version", progress: false });
@@ -59,7 +87,7 @@ class App extends Component {
   }
 
   /** Update is downloaded silently, and applied on restart (recommended) */
-  sync() {
+  sync = () => {
     CodePush.sync(
       {},
       this.codePushStatusDidChange.bind(this),
@@ -68,7 +96,7 @@ class App extends Component {
   }
 
   /** Update pops a confirmation dialog, and then immediately reboots the app */
-  syncImmediate() {
+  syncImmediate = () => {
     CodePush.sync(
       { installMode: CodePush.InstallMode.IMMEDIATE, updateDialog: true },
       this.codePushStatusDidChange.bind(this),
@@ -93,17 +121,14 @@ class App extends Component {
         <Text style={styles.welcome}>
           Welcome to CodePush!
         </Text>
-        <TouchableOpacity onPress={this.sync.bind(this)}>
+        <TouchableOpacity onPress={this.sync}>
           <Text style={styles.syncButton}>Press for background sync</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={this.syncImmediate.bind(this)}>
+        <TouchableOpacity onPress={this.syncImmediate}>
           <Text style={styles.syncButton}>Press for dialog-driven sync</Text>
         </TouchableOpacity>
         {progressView}
-        <TouchableOpacity onPress={this.toggleAllowRestart.bind(this)}>
-          <Text style={styles.restartToggleButton}>Restart { this.state.restartAllowed ? "allowed" : "forbidden"}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={this.getUpdateMetadata.bind(this)}>
+        <TouchableOpacity onPress={this.getUpdateMetadata}>
           <Text style={styles.syncButton}>Press for Update Metadata</Text>
         </TouchableOpacity>
         <Text style={styles.messages}>{this.state.syncMessage || ""}</Text>
