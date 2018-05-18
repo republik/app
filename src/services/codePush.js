@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { compose } from 'recompose';
 import CodePush from "react-native-code-push";
+import { compose } from 'recompose';
 
 const codePushWrapper = WrappedComponent => (
   class extends Component {
@@ -83,7 +83,9 @@ const codePushWrapper = WrappedComponent => (
   }
 )
 
-const codePushOptions = { checkFrequency: CodePush.CheckFrequency.MANUAL };
+const codePushOptions = {
+  checkFrequency: CodePush.CheckFrequency.MANUAL
+};
 
 export default compose(
   codePushWrapper,

@@ -1,28 +1,10 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Dimensions, AppState } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, AppState } from 'react-native';
+import { compose } from 'recompose';
 import codePush from './services/codePush';
 import pushNotifications from './services/pushNotifications';
 
 class App extends Component {
-  componentDidMount() {
-    pushNotifications.configure();
-
-    AppState.addEventListener('change', this.handleAppStateChange);
-  }
-
-  componentWillUnmount() {
-    AppState.removeEventListener('change', this.handleAppStateChange);
-  }
-
-  handleAppStateChange = (appState) => {
-    if (appState === 'background') {
-      pushNotifications.localNotification({
-        seconds: 1,
-        message: 'Test',
-      })
-    }
-  }
-
   render() {
     let progressView;
 
@@ -63,10 +45,6 @@ const styles = StyleSheet.create({
     marginTop: 30,
     textAlign: "center",
   },
-  restartToggleButton: {
-    color: "blue",
-    fontSize: 17
-  },
   syncButton: {
     color: "red",
     fontSize: 17
@@ -74,4 +52,7 @@ const styles = StyleSheet.create({
 });
 
 
-export default codePush(App);
+export default compose(
+  codePush,
+  pushNotifications,
+)(App);

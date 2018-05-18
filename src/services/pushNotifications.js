@@ -1,5 +1,6 @@
-import { PushNotificationIOS } from 'react-native';
+import { AppState, PushNotificationIOS } from 'react-native';
 import PushNotification from 'react-native-push-notification';
+import { lifecycle } from 'recompose';
 
 const configure = () => {
   PushNotification.configure({
@@ -18,7 +19,23 @@ const localNotification = ({ message = '', seconds = 0 }) => {
   })
 }
 
-export default {
-  configure,
-  localNotification
-};
+const handleAppStateChange = (appState) => {
+  if (appState === 'background') {
+    localNotification({
+      seconds: 1,
+      message: 'Test',
+    })
+  }
+}
+
+function componentDidMount() {
+  configure();
+
+  AppState.addEventListener('change', handleAppStateChange);
+}
+
+function componentWillUnmount() {
+  AppState.removeEventListener('change', handleAppStateChange);
+}
+
+export default lifecycle({ componentDidMount, componentWillUnmount });
