@@ -1,14 +1,9 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Dimensions, AppState } from 'react-native';
-import CodePush from "react-native-code-push";
+import codePush from './services/codePush';
 import pushNotifications from './services/pushNotifications';
 
 class App extends Component {
-  constructor() {
-    super();
-    this.state = { restartAllowed: true };
-  }
-
   componentDidMount() {
     pushNotifications.configure();
 
@@ -17,39 +12,6 @@ class App extends Component {
 
   componentWillUnmount() {
     AppState.removeEventListener('change', this.handleAppStateChange);
-  }
-
-  codePushDownloadDidProgress(progress) {
-    this.setState({ progress });
-  }
-
-  codePushStatusDidChange(syncStatus) {
-    switch(syncStatus) {
-      case CodePush.SyncStatus.CHECKING_FOR_UPDATE:
-        this.setState({ syncMessage: "Checking for update." });
-        break;
-      case CodePush.SyncStatus.DOWNLOADING_PACKAGE:
-        this.setState({ syncMessage: "Downloading package." });
-        break;
-      case CodePush.SyncStatus.AWAITING_USER_ACTION:
-        this.setState({ syncMessage: "Awaiting user action." });
-        break;
-      case CodePush.SyncStatus.INSTALLING_UPDATE:
-        this.setState({ syncMessage: "Installing update." });
-        break;
-      case CodePush.SyncStatus.UP_TO_DATE:
-        this.setState({ syncMessage: "App up to date.", progress: false });
-        break;
-      case CodePush.SyncStatus.UPDATE_IGNORED:
-        this.setState({ syncMessage: "Update cancelled by user.", progress: false });
-        break;
-      case CodePush.SyncStatus.UPDATE_INSTALLED:
-        this.setState({ syncMessage: "Update installed and will be applied on restart.", progress: false });
-        break;
-      case CodePush.SyncStatus.UNKNOWN_ERROR:
-        this.setState({ syncMessage: "An unknown error occurred.", progress: false });
-        break;
-    }
   }
 
   handleAppStateChange = (appState) => {
@@ -61,58 +23,30 @@ class App extends Component {
     }
   }
 
-  getUpdateMetadata = () => {
-    CodePush.getUpdateMetadata(CodePush.UpdateState.RUNNING)
-      .then((metadata: LocalPackage) => {
-        this.setState({ syncMessage: metadata ? JSON.stringify(metadata) : "Running binary version", progress: false });
-      }, (error: any) => {
-        this.setState({ syncMessage: "Error: " + error, progress: false });
-      });
-  }
-
-  /** Update is downloaded silently, and applied on restart (recommended) */
-  sync = () => {
-    CodePush.sync(
-      {},
-      this.codePushStatusDidChange.bind(this),
-      this.codePushDownloadDidProgress.bind(this)
-    );
-  }
-
-  /** Update pops a confirmation dialog, and then immediately reboots the app */
-  syncImmediate = () => {
-    CodePush.sync(
-      { installMode: CodePush.InstallMode.IMMEDIATE, updateDialog: true },
-      this.codePushStatusDidChange.bind(this),
-      this.codePushDownloadDidProgress.bind(this)
-    );
-  }
-
   render() {
     let progressView;
-    const { progress, syncMessage } = this.state;
 
-    if (progress) {
+    if (this.props.progress) {
       progressView = (
         <Text style={styles.messages}>
-          {progress.receivedBytes} of {progress.totalBytes} bytes received
+          {this.props.progress.receivedBytes} of {this.props.progress.totalBytes} bytes received
         </Text>
       );
     }
 
     return (
       <View style={styles.container}>
-        <TouchableOpacity onPress={this.sync}>
+        <TouchableOpacity onPress={this.props.sync}>
           <Text style={styles.syncButton}>Press for background sync</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={this.syncImmediate}>
+        <TouchableOpacity onPress={this.props.syncImmediate}>
           <Text style={styles.syncButton}>Press for dialog-driven sync</Text>
         </TouchableOpacity>
         {progressView}
-        <TouchableOpacity onPress={this.getUpdateMetadata}>
+        <TouchableOpacity onPress={this.props.getUpdateMetadata}>
           <Text style={styles.syncButton}>Press for Update Metadata</Text>
         </TouchableOpacity>
-        <Text style={styles.messages}>{this.state.syncMessage || ""}</Text>
+        <Text style={styles.messages}>{this.props.syncMessage || ""}</Text>
       </View>
     );
   }
@@ -124,11 +58,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#F5FCFF",
     paddingTop: 50
-  },
-  image: {
-    margin: 30,
-    width: Dimensions.get("window").width - 100,
-    height: 365 * (Dimensions.get("window").width - 100) / 651,
   },
   messages: {
     marginTop: 30,
@@ -144,7 +73,5 @@ const styles = StyleSheet.create({
   }
 });
 
-// MANUAL set only for dev
-const codePushOptions = { checkFrequency: CodePush.CheckFrequency.MANUAL };
 
-export default CodePush(codePushOptions)(App);
+export default codePush(App);
