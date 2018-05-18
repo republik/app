@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Dimensions, PushNotificationIOS, AppState } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Dimensions, AppState } from 'react-native';
 import CodePush from "react-native-code-push";
-import PushNotification from 'react-native-push-notification';
+import pushNotifications from './services/pushNotifications';
 
 class App extends Component {
   constructor() {
@@ -10,23 +10,7 @@ class App extends Component {
   }
 
   componentDidMount() {
-    PushNotification.configure({
-     onRegister: function(token) {
-       //process token
-     },
-     onNotification: function(notification) {
-       // process the notification
-       // required on iOS only
-       notification.finish(PushNotificationIOS.FetchResult.NoData);
-     },
-     permissions: {
-       alert: true,
-       badge: true,
-       sound: true
-     },
-     popInitialNotification: true,
-     requestPermissions: true,
-   });
+    pushNotifications.configure();
 
     AppState.addEventListener('change', this.handleAppStateChange);
   }
@@ -70,9 +54,9 @@ class App extends Component {
 
   handleAppStateChange = (appState) => {
     if (appState === 'background') {
-      PushNotification.localNotificationSchedule({
-        message: "Test!!",
-        date: new Date(Date.now() + 1000),
+      pushNotifications.localNotification({
+        seconds: 1,
+        message: 'Test',
       })
     }
   }
@@ -118,9 +102,6 @@ class App extends Component {
 
     return (
       <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to CodePush!
-        </Text>
         <TouchableOpacity onPress={this.sync}>
           <Text style={styles.syncButton}>Press for background sync</Text>
         </TouchableOpacity>
@@ -160,12 +141,7 @@ const styles = StyleSheet.create({
   syncButton: {
     color: "red",
     fontSize: 17
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: "center",
-    margin: 20
-  },
+  }
 });
 
 // MANUAL set only for dev
