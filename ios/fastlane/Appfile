@@ -1,0 +1,3 @@
+app_identifier "org.reactjs.native.example.orbitingapp" # The bundle identifier of your app
+apple_id "diego_muracciole@hotmail.com" # Your Apple email address
+team_id "N8WUQQ36D7"  # Developer Portal Team ID
