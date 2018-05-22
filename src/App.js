@@ -3,8 +3,10 @@ import { StyleSheet, View } from 'react-native';
 import { compose } from 'recompose';
 import WebView from './components/WebView';
 import codePush from './services/codePush';
+import deepLinking from './services/deepLinking';
 import pushNotifications from './services/pushNotifications';
 
+// TODO: Add this as an env variable
 const LOGIN_URL = 'https://www.republik.ch/anmelden';
 
 class App extends Component {
@@ -35,5 +37,6 @@ var styles = StyleSheet.create({
 
 export default compose(
   codePush,
+  deepLinking,
   pushNotifications,
 )(App);
