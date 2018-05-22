@@ -11,7 +11,7 @@ import pushNotifications from './services/pushNotifications';
 const LOGIN_URL = 'https://www.republik.ch/anmelden';
 
 class App extends Component {
-  componentDidMount() {
+  hideSplashScreen = () => {
     SplashScreen.hide()
   }
 
@@ -21,6 +21,7 @@ class App extends Component {
         automaticallyAdjustContentInsets={false}
         style={styles.webView}
         source={{uri: LOGIN_URL}}
+        onLoadEnd={this.hideSplashScreen}
         javaScriptEnabled
         startInLoadingState
         scalesPageToFit
