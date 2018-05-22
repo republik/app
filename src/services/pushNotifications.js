@@ -5,8 +5,10 @@ import { lifecycle } from 'recompose';
 const configure = () => {
   PushNotification.configure({
     requestPermissions: true,
-   onRegister: function(token) {},
-   onNotification: function(notification) {
+   onRegister: (token) => {
+     // Push token to server
+   },
+   onNotification: (notification) => {
      notification.finish(PushNotificationIOS.FetchResult.NoData);
    },
  });
