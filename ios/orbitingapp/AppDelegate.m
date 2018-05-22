@@ -86,5 +86,4 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
                      restorationHandler:restorationHandler];
 }
 
-
 @end
