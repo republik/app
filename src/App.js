@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { StyleSheet, View } from 'react-native';
+import SplashScreen from 'react-native-splash-screen';
 import { compose } from 'recompose';
 import WebView from './components/WebView';
 import codePush from './services/codePush';
@@ -10,6 +11,10 @@ import pushNotifications from './services/pushNotifications';
 const LOGIN_URL = 'https://www.republik.ch/anmelden';
 
 class App extends Component {
+  componentDidMount() {
+    SplashScreen.hide()
+  }
+
   render() {
     return (
       <WebView
@@ -25,10 +30,6 @@ class App extends Component {
 }
 
 var styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F5FCFF',
-  },
   webView: {
     flex: 1,
     marginTop: 20,
