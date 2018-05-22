@@ -1,7 +1,5 @@
 import React from 'React';
-import { View, Image, WebView , StyleSheet, Dimensions } from 'react-native';
-
-const logoDimension = Dimensions.get("window").width * 0.2;
+import { View, Image, WebView , StyleSheet } from 'react-native';
 
 const styles = {
   container: {
@@ -10,8 +8,9 @@ const styles = {
     justifyContent: 'center'
   },
   loadingLogo: {
-    width: logoDimension,
-    height: logoDimension,
+    width: 90,
+    height: 90,
+    marginBottom: 20,
   }
 }
 
