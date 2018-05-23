@@ -1,43 +1,31 @@
 import React, { Component } from 'react';
-import { StyleSheet, View } from 'react-native';
 import SplashScreen from 'react-native-splash-screen';
+import { SwitchNavigator } from 'react-navigation';
 import { compose } from 'recompose';
-import WebView from './components/WebView';
+import Web from './screens/Web';
+import withApollo from './services/apollo';
 import codePush from './services/codePush';
 import deepLinking from './services/deepLinking';
 import pushNotifications from './services/pushNotifications';
 
-// TODO: Add this as an env variable
-const LOGIN_URL = 'https://www.republik.ch/anmelden';
+const Router = SwitchNavigator({
+  Web: { screen: Web }
+});
 
 class App extends Component {
   hideSplashScreen = () => {
-    SplashScreen.hide()
+    SplashScreen.hide();
   }
 
   render() {
     return (
-      <WebView
-        automaticallyAdjustContentInsets={false}
-        style={styles.webView}
-        source={{uri: LOGIN_URL}}
-        onLoadEnd={this.hideSplashScreen}
-        javaScriptEnabled
-        startInLoadingState
-        scalesPageToFit
-      />
+      <Router screenProps={{ onLoadEnd: this.hideSplashScreen }} />
     );
   }
 }
 
-var styles = StyleSheet.create({
-  webView: {
-    flex: 1,
-    marginTop: 20,
-  }
-});
-
 export default compose(
+  withApollo,
   codePush,
   deepLinking,
   pushNotifications,
