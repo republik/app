@@ -1,42 +1,57 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
 import gql from 'graphql-tag';
+import { parseURL } from '../utils/url';
 import WebView from '../components/WebView';
 import { FEED_URL } from '../constants';
 
 class Web extends Component {
-  componentDidMount() {
-    if (this.props.data.loggedIn) {
-      this.goToFeed();
+  state = { loading: true };
+
+  onNavigationStateChange = (data) => {
+    console.log(data.url);
+    const url = parseURL(data.url);
+
+    // Redirect to feed before login
+    if (url.path === 'mitteilung') {
+      if (url.params.type === 'email-confirmed') {
+        this.props.setUrl({ variables: { url: FEED_URL } });
+        this.setState({ loading: false });
+      } else {
+        this.setState({ loading: true });
+      }
+    }
+
+  }
+
+  onLoadStart = () => {
+    this.setState({ loading: true });
+
+    if (this.props.screenProps.onLoadStart) {
+      this.props.screenProps.onLoadStart();
     }
   }
 
-  componentWillReceiveProps(nextProps){
-    console.log(nextProps);
-  }
+  onLoadEnd = () => {
+    this.setState({ loading: false });
 
-  goToFeed = () => {
-    this.props.setUrl({
-      variables: { url: FEED_URL }
-    });
-  }
-
-  onNavigationStateChange = ({ url }) => {
-    console.log(url);
-    // Sync url with global state
-    this.props.setUrl({ variables: { url } });
+    if (this.props.screenProps.onLoadEnd) {
+      this.props.screenProps.onLoadEnd();
+    }
   }
 
   render() {
-    const { screenProps, data } = this.props;
+    const { screenProps, setUrl, data } = this.props;
 
     return (
       <WebView
         style={styles.webView}
         source={{uri: data.url}}
-        onLoadEnd={screenProps.onLoadEnd}
+        loading={this.state.loading}
+        onLoadEnd={this.onLoadEnd}
+        onLoadStart={this.onLoadStart}
         automaticallyAdjustContentInsets={false}
         onNavigationStateChange={this.onNavigationStateChange}
         javaScriptEnabled
