@@ -1,7 +1,8 @@
 import React from 'React';
-import { View, Image, WebView , StyleSheet } from 'react-native';
+import { View, Image, StyleSheet } from 'react-native';
+import WebView from 'react-native-wkwebview-reborn';
 
-const styles = {
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
@@ -12,7 +13,7 @@ const styles = {
     height: 90,
     marginBottom: 20,
   }
-}
+});
 
 const LoadingState = () => (
   <View style={styles.container}>
@@ -28,6 +29,7 @@ const CustomWebView = props => (
     {...props}
     startInLoadingState
     renderLoading={LoadingState}
+    allowsBackForwardNavigationGestures
   />
 );
 
