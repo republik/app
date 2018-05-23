@@ -1,4 +1,4 @@
-import React from 'React';
+import React, { Fragment } from 'React';
 import { View, Image, StyleSheet } from 'react-native';
 import WebView from 'react-native-wkwebview-reborn';
 import { listenHistory } from '../utils/webHistory';
@@ -6,6 +6,12 @@ import { listenHistory } from '../utils/webHistory';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    top: 0,
+    left: 0,
+    zIndex: 100,
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'white'
@@ -32,24 +38,27 @@ class CustomWebView extends React.Component {
   // We call onNavigationStateChange either when the native calls, or onMessage
   onNavigationStateChange = ({ url }) => {
     if (this.state.source !== url) {
-      this.props.onNavigationStateChange({ url });
-      this.setState({ source: url });
+      this.setState({ source: url }, () => {
+        this.props.onNavigationStateChange({ url });
+      });
     }
   }
 
   render() {
-    const { onNavigationStateChange, ...props } = this.props;
+    const { loading, onNavigationStateChange, ...props } = this.props;
 
     return (
-      <WebView
-        {...this.props}
-        startInLoadingState
-        renderLoading={LoadingState}
-        injectedJavaScript={listenHistory}
-        onNavigationStateChange={this.onNavigationStateChange}
-        onMessage={e => this.onNavigationStateChange({ url: e.nativeEvent.data })}
-        allowsBackForwardNavigationGestures
-      />
+      <Fragment>
+        { loading && <LoadingState /> }
+        <WebView
+          {...this.props}
+          onNavigationStateChange={this.onNavigationStateChange}
+          onMessage={e => this.onNavigationStateChange({ url: e.nativeEvent.data.url })}
+          injectedJavaScript={listenHistory}
+          allowsBackForwardNavigationGestures
+          startInLoadingState
+        />
+      </Fragment>
     )
   }
 };

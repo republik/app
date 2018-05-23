@@ -6,13 +6,13 @@ const icons = {
   hamburger: require('../assets/images/hamburger-icon.png'),
 }
 
-const TitleButton = ({ type, side }) => {
+const TitleButton = ({ type, side, onPress }) => {
   const style = side === 'left'
     ? { marginLeft: 10 }
     : { marginRight: 10 };
 
   return (
-    <TouchableOpacity style={style}>
+    <TouchableOpacity style={style} onPress={onPress}>
       <Image
         source={icons[type]}
         style={{ width: 25, height: 25 }}

@@ -5,8 +5,6 @@ import { compose } from 'recompose';
 import { parseURL } from '../utils/url';
 import { FRONTEND_URL } from '../constants';
 
-
-
 const deepLinkingWrapper = WrappedComponent => (
   class extends Component {
     componentDidMount() {
@@ -18,12 +16,12 @@ const deepLinkingWrapper = WrappedComponent => (
     }
 
     handleOpenURL = (event) => {
-      const { route, params } = parseURL(event.url);
+      const { path, params } = parseURL(event.url);
 
       // When deep/universal link opened, we edit
       //   the global url state to show correct page
       this.props.client.writeData({ data: {
-        url: `${FRONTEND_URL}/${route}?${params}`
+        url: `${FRONTEND_URL}/${path}?${params.toString()}`
       } });
     }
 
