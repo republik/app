@@ -14,12 +14,7 @@ class Web extends Component {
   }
 
   componentWillReceiveProps(nextProps){
-    if (
-      nextProps.data.loggedIn &&
-      !this.props.data.loggedIn
-    ) {
-      this.goToFeed();
-    }
+    console.log(nextProps);
   }
 
   goToFeed = () => {
@@ -29,9 +24,9 @@ class Web extends Component {
   }
 
   onNavigationStateChange = ({ url }) => {
-    if (this.props.data.url !== url) {
-      this.props.setUrl({ variables: { url } });
-    }
+    console.log(url);
+    // Sync url with global state
+    this.props.setUrl({ variables: { url } });
   }
 
   render() {
