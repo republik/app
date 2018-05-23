@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import SplashScreen from 'react-native-splash-screen';
 import { createStackNavigator } from 'react-navigation';
+import CookieManager from 'react-native-cookies';
 import { compose } from 'recompose';
 import Web from './screens/Web';
 import TitleLogo from './components/TitleLogo';
@@ -9,6 +10,7 @@ import withApollo from './services/apollo';
 import codePush from './services/codePush';
 import deepLinking from './services/deepLinking';
 import pushNotifications from './services/pushNotifications';
+import { FRONTEND_URL } from './constants';
 
 const Router = createStackNavigator({
   Web: { screen: Web }

@@ -21,7 +21,7 @@ const typeDefs = `
 
   type Query {
     url: String
-    loggedIn: Boolean
+    loggedIn: Boolean,
   }
 `;
 
@@ -40,8 +40,7 @@ export const resolvers = {
       return false;
     },
     setUrl: async (_, { url }, context) => {
-      const loggedIn = await isUserLoggedIn();
-      context.cache.writeData({ data: { url, loggedIn }});
+      context.cache.writeData({ data: { url }});
       return url;
     },
   },

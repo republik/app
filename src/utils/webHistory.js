@@ -3,51 +3,45 @@
 // so we inject code that enables to spy on changes, sending messages.
 export const listenHistoryImpl = function() {
   var pushState = window.history.pushState;
+  var replaceState = window.history.replaceState;
   var back = window.history.back;
 
-  function updateNavState(currTitle) {
-    setTimeout(function() {
-      window.postMessage(
-        location.protocol + '//' + location.host + location.pathname
-      );
-    }, 100);
+  function updateNavState(type, url) {
+    let hash = location.hash !== "" ? "?" + location.hash : "";
+    let prefix = location.protocol + "//" + location.host;
+
+    window.postMessage({
+      type,
+      url: url ? (prefix + url) : (prefix + location.pathname + hash)
+    });
   };
 
   window.history.pushState = function(state) {
-    updateNavState();
+    updateNavState('pushState');
     return pushState.apply(window.history, arguments);
   };
 
+  window.history.replaceState = function() {
+    updateNavState('replaceState', arguments[2]);
+    return replaceState.apply(window.history, arguments);
+  };
+
   window.history.back = function() {
-    updateNavState();
+    updateNavState('back');
     return back.apply(window.history);
   };
 
   window.onload = function() {
-    updateNavState();
+    updateNavState('onload');
   };
 
   window.onpopstate = function() {
-    updateNavState();
+    updateNavState('onpopstate');
   };
 
   window.onhashchange = function() {
-    updateNavState();
+    updateNavState('onhashchange');
   };
-
-  new MutationObserver(function(mutations) {
-    updateNavState(mutations[0].target.text);
-  }).observe(
-    document.querySelector('title'),
-    { attributes: true, childList: true }
-  );
-
-  new WebKitMutationObserver(function(mutations) {
-    updateNavState(mutations[0].target.text);
-  }).observe(
-    document.querySelector('title'),
-    { attributes: true, childList: true }
-  );
 };
 
 // Implementation IIFE ready to inject
