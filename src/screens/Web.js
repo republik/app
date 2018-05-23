@@ -55,7 +55,6 @@ class Web extends Component {
 var styles = StyleSheet.create({
   webView: {
     flex: 1,
-    marginTop: 20,
   }
 });
 
