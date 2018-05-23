@@ -2,9 +2,10 @@ import React, { Component } from 'react';
 import { Linking } from 'react-native';
 import { withApollo } from 'react-apollo';
 import { compose } from 'recompose';
+import { parseURL } from '../utils/url';
 import { FRONTEND_URL } from '../constants';
 
-const URL_REGEX = /(.*?:\/\/)(.*)\?(.*)/g;
+
 
 const deepLinkingWrapper = WrappedComponent => (
   class extends Component {
@@ -17,7 +18,7 @@ const deepLinkingWrapper = WrappedComponent => (
     }
 
     handleOpenURL = (event) => {
-      const [url, protocol, route, params] = URL_REGEX.exec(event.url);
+      const { route, params } = parseURL(event.url);
 
       // When deep/universal link opened, we edit
       //   the global url state to show correct page
