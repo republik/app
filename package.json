@@ -11,13 +11,22 @@
     "build:ios": "react-native bundle --entry-file='index.js' --bundle-output='./ios/build/Build/Products/Release-iphoneos/orbitingapp.app/main.jsbundle' --dev=false --platform='ios' --assets-dest='./ios/build/Build/Products/Release-iphoneos/orbitingapp.app'"
   },
   "dependencies": {
+    "apollo-boost": "^0.1.6",
+    "apollo-cache-inmemory": "^1.2.1",
+    "apollo-cache-persist": "^0.1.1",
+    "graphql": "^0.13.2",
+    "graphql-tag": "^2.9.2",
     "react": "16.3.1",
+    "react-apollo": "^2.1.4",
     "react-json-tree": "^0.11.0",
     "react-native": "0.55.4",
     "react-native-code-push": "^5.3.3",
+    "react-native-cookies": "^3.3.0",
     "react-native-push-notification": "^3.0.2",
     "react-native-splash-screen": "^3.0.6",
     "react-native-wkwebview-reborn": "^1.20.0",
+    "react-navigation": "^2.0.1",
+    "react-redux": "^5.0.7",
     "recompose": "^0.27.0"
   }
 }
