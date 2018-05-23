@@ -1,6 +1,7 @@
 import React from 'React';
 import { View, Image, StyleSheet } from 'react-native';
 import WebView from 'react-native-wkwebview-reborn';
+import { listenHistory } from '../utils/webHistory';
 
 const styles = StyleSheet.create({
   container: {
@@ -24,13 +25,33 @@ const LoadingState = () => (
   </View>
 );
 
-const CustomWebView = props => (
-  <WebView
-    {...props}
-    startInLoadingState
-    renderLoading={LoadingState}
-    allowsBackForwardNavigationGestures
-  />
-);
+class CustomWebView extends React.Component {
+  state = { source: '' };
+
+  // Native onNavigationStateChange method shim.
+  // We call onNavigationStateChange either when the native calls, or onMessage
+  onNavigationStateChange = ({ url }) => {
+    if (this.state.source !== url) {
+      this.props.onNavigationStateChange({ url });
+      this.setState({ source: url });
+    }
+  }
+
+  render() {
+    const { onNavigationStateChange, ...props } = this.props;
+
+    return (
+      <WebView
+        {...this.props}
+        startInLoadingState
+        renderLoading={LoadingState}
+        injectedJavaScript={listenHistory}
+        onNavigationStateChange={this.onNavigationStateChange}
+        onMessage={e => this.onNavigationStateChange({ url: e.nativeEvent.data })}
+        allowsBackForwardNavigationGestures
+      />
+    )
+  }
+};
 
 export default CustomWebView;
