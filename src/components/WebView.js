@@ -6,12 +6,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    backgroundColor: 'white'
   },
   loadingLogo: {
     width: 90,
     height: 90,
-    marginBottom: 20,
   }
 });
 
