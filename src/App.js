@@ -10,7 +10,6 @@ import withApollo from './services/apollo';
 import codePush from './services/codePush';
 import deepLinking from './services/deepLinking';
 import pushNotifications from './services/pushNotifications';
-import { FRONTEND_URL } from './constants';
 
 const Router = createStackNavigator({
   Web: { screen: Web }
