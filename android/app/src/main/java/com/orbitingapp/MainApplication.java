@@ -3,6 +3,7 @@ package com.orbitingapp;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
 import com.react.rnspinkit.RNSpinkitPackage;
 import com.psykar.cookiemanager.CookieManagerPackage;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
@@ -34,6 +35,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new ReactNativeConfigPackage(),
             new RNSpinkitPackage(),
             new CookieManagerPackage(),
             new SplashScreenReactPackage(),
