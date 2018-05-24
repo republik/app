@@ -3712,6 +3712,10 @@ react-native-code-push@^5.3.3:
     plist "1.2.0"
     xcode "0.9.2"
 
+react-native-config@^0.11.5:
+  version "0.11.5"
+  resolved "https://registry.yarnpkg.com/react-native-config/-/react-native-config-0.11.5.tgz#516cb7b6ec437c7739236ca075971db3aabdcb95"
+
 react-native-cookies@^3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/react-native-cookies/-/react-native-cookies-3.3.0.tgz#527f65eb2d8a7a000107706bb11beb57f511e701"
