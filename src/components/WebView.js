@@ -42,15 +42,11 @@ const LoadingState = () => (
 );
 
 class CustomWebView extends React.Component {
-  state = { source: '' };
-
   // Native onNavigationStateChange method shim.
   // We call onNavigationStateChange either when the native calls, or onMessage
   onNavigationStateChange = ({ url }) => {
-    if (this.state.source !== url) {
-      this.setState({ source: url }, () => {
-        this.props.onNavigationStateChange({ url });
-      });
+    if (this.props.source !== url) {
+      this.props.onNavigationStateChange({ url });
     }
   }
 
