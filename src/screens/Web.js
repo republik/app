@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
 import gql from 'graphql-tag';
+import debounce from 'lodash.debounce';
 import { parseURL } from '../utils/url';
 import WebView from '../components/WebView';
 import { FEED_URL } from '../constants';
@@ -10,24 +11,27 @@ import { FEED_URL } from '../constants';
 class Web extends Component {
   state = { loading: true };
 
+  setLoading = debounce(value => {
+    this.setState({ loading: value });
+  }, 150);
+
   onNavigationStateChange = (data) => {
-    console.log(data.url);
     const url = parseURL(data.url);
 
     // Redirect to feed before login
     if (url.path === 'mitteilung') {
       if (url.params.type === 'email-confirmed') {
+        this.setLoading(false);
         this.props.setUrl({ variables: { url: FEED_URL } });
-        this.setState({ loading: false });
       } else {
-        this.setState({ loading: true });
+        this.setLoading(true);
       }
     }
 
   }
 
   onLoadStart = () => {
-    this.setState({ loading: true });
+    this.setLoading(true);
 
     if (this.props.screenProps.onLoadStart) {
       this.props.screenProps.onLoadStart();
@@ -35,7 +39,7 @@ class Web extends Component {
   }
 
   onLoadEnd = () => {
-    this.setState({ loading: false });
+    this.setLoading(false);
 
     if (this.props.screenProps.onLoadEnd) {
       this.props.screenProps.onLoadEnd();
