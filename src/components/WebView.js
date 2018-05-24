@@ -1,6 +1,7 @@
 import React, { Fragment } from 'React';
 import { View, Image, StyleSheet } from 'react-native';
 import WebView from 'react-native-wkwebview-reborn';
+import Spinner from 'react-native-spinkit';
 import { listenHistory } from '../utils/webHistory';
 
 const styles = StyleSheet.create({
@@ -16,18 +17,27 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: 'white'
   },
+  spinnerContainer: {
+    position: 'relative',
+  },
   loadingLogo: {
     width: 90,
     height: 90,
+    top: 20,
+    left: 20,
+    position: 'absolute'
   }
 });
 
 const LoadingState = () => (
   <View style={styles.container}>
-    <Image
-      style={styles.loadingLogo}
-      source={require('../assets/images/icon.png')}
-    />
+    <View styles={styles.spinnerContainer}>
+      <Spinner isVisible size={130} type="Arc" color="#DDDDDD" />
+      <Image
+        style={styles.loadingLogo}
+        source={require('../assets/images/icon.png')}
+      />
+    </View>
   </View>
 );
 
