@@ -5,11 +5,11 @@ import { ApolloProvider } from 'react-apollo';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { persistCache } from 'apollo-cache-persist'
 import { isUserLoggedIn } from './authentication';
-import { LOGIN_URL } from '../constants';
+import { FEED_URL } from '../constants';
 
 const defaults = {
   loggedIn: false,
-  url: LOGIN_URL,
+  url: FEED_URL,
 };
 
 const typeDefs = `
