@@ -45,8 +45,20 @@ class CustomWebView extends React.Component {
   // Native onNavigationStateChange method shim.
   // We call onNavigationStateChange either when the native calls, or onMessage
   onNavigationStateChange = ({ url }) => {
-    if (this.props.source !== url) {
-      this.props.onNavigationStateChange({ url });
+    const {
+      source,
+      webViewWillTransition,
+      onNavigationStateChange,
+    } = this.props;
+
+    if (source.uri !== url && onNavigationStateChange) {
+      if(webViewWillTransition(source.uri, url)) {
+        onNavigationStateChange({ url });
+      } else {
+        // Native WebView does not have a way of preventing a page to load
+        // so we go back into the webview's history that has the same effect.
+        this.webview.goBack();
+      }
     }
   }
 
@@ -58,11 +70,17 @@ class CustomWebView extends React.Component {
         { loading && <LoadingState /> }
         <WebView
           {...this.props}
+          onMessage={e => {
+            this.onNavigationStateChange(JSON.parse(e.nativeEvent.data))
+          }}
           onNavigationStateChange={this.onNavigationStateChange}
-          onMessage={e => this.onNavigationStateChange({ url: e.nativeEvent.data.url })}
+          automaticallyAdjustContentInsets={false}
+          ref={node => { this.webview = node; }}
           injectedJavaScript={listenHistory}
           allowsBackForwardNavigationGestures
           startInLoadingState
+          javaScriptEnabled
+          scalesPageToFit
         />
       </Fragment>
     )

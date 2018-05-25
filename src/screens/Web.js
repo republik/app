@@ -1,12 +1,17 @@
 import React, { Component, Fragment } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Linking } from 'react-native';
 import { graphql } from 'react-apollo';
 import { compose } from 'recompose';
 import gql from 'graphql-tag';
 import debounce from 'lodash.debounce';
 import { parseURL } from '../utils/url';
 import WebView from '../components/WebView';
-import { FEED_URL } from '../constants';
+import { FEED_URL, OFFERS_PATH, NOTIFICATIONS_PATH } from '../constants';
+
+const RESTRICTED_PATHS = [
+  // LOGIN_PATH,
+  OFFERS_PATH,
+];
 
 class Web extends Component {
   state = { loading: true };
@@ -18,16 +23,18 @@ class Web extends Component {
   onNavigationStateChange = (data) => {
     const url = parseURL(data.url);
 
-    // Redirect to feed before login
-    if (url.path === 'mitteilung') {
+    // Redirect to feed after login
+    if (url.path === NOTIFICATIONS_PATH) {
       if (url.params.type === 'email-confirmed') {
         this.setLoading(false);
         this.props.setUrl({ variables: { url: FEED_URL } });
       } else {
         this.setLoading(true);
       }
+      return;
     }
 
+    this.props.setUrl({ variables: { url: data.url } });
   }
 
   onLoadStart = () => {
@@ -46,6 +53,18 @@ class Web extends Component {
     }
   }
 
+  webViewWillTransition = (from, to) => {
+    const fromUrl = parseURL(from);
+    const toUrl = parseURL(to);
+
+    if (RESTRICTED_PATHS.includes(toUrl.path)) {
+      Linking.openURL(to);
+      return false;
+    }
+
+    return true;
+  }
+
   render() {
     const { screenProps, setUrl, data } = this.props;
 
@@ -56,11 +75,8 @@ class Web extends Component {
         loading={this.state.loading}
         onLoadEnd={this.onLoadEnd}
         onLoadStart={this.onLoadStart}
-        automaticallyAdjustContentInsets={false}
+        webViewWillTransition={this.webViewWillTransition}
         onNavigationStateChange={this.onNavigationStateChange}
-        javaScriptEnabled
-        startInLoadingState
-        scalesPageToFit
       />
     );
   }

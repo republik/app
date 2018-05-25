@@ -10,10 +10,10 @@ export const listenHistoryImpl = function() {
     let hash = location.hash !== "" ? "?" + location.hash : "";
     let prefix = location.protocol + "//" + location.host;
 
-    window.postMessage({
+    window.postMessage(JSON.stringify({
       type,
       url: url ? (prefix + url) : (prefix + location.pathname + hash)
-    });
+    }));
   };
 
   window.history.pushState = function(state) {
