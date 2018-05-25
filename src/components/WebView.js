@@ -70,7 +70,9 @@ class CustomWebView extends React.Component {
         { loading && <LoadingState /> }
         <WebView
           {...this.props}
-          onMessage={e => this.onNavigationStateChange({ url: e.nativeEvent.data.url })}
+          onMessage={e => {
+            this.onNavigationStateChange(JSON.parse(e.nativeEvent.data))
+          }}
           onNavigationStateChange={this.onNavigationStateChange}
           automaticallyAdjustContentInsets={false}
           ref={node => { this.webview = node; }}
