@@ -73,21 +73,26 @@ class Web extends Component {
     const { data } = this.props
 
     return (
-      <WebView
-        style={styles.webView}
-        source={{uri: data.url}}
-        loading={this.state.loading}
-        onLoadEnd={this.onLoadEnd}
-        onLoadStart={this.onLoadStart}
-        onNavigationStateChange={this.onNavigationStateChange}
-      />
-    )
+      <Fragment>
+        <Menu active={screenProps.menuActive} />
+        <WebView
+          style={styles.webView}
+          source={{uri: data.url}}
+          loading={this.state.loading}
+          onLoadEnd={this.onLoadEnd}
+          onLoadStart={this.onLoadStart}
+          webViewWillTransition={this.webViewWillTransition}
+          onNavigationStateChange={this.onNavigationStateChange}
+        />
+      </Fragment>
+    );
   }
 }
 
 var styles = StyleSheet.create({
   webView: {
-    flex: 1
+    flex: 1,
+    zIndex: 100,
   }
 })
 

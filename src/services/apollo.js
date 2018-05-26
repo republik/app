@@ -7,9 +7,9 @@ import { persistCache } from 'apollo-cache-persist'
 import { LOGIN_URL } from '../constants'
 
 const defaults = {
+  url: LOGIN_URL,
   loggedIn: false,
-  url: LOGIN_URL
-}
+};
 
 const typeDefs = `
   type Mutation {

@@ -14,24 +14,45 @@ const Router = createStackNavigator({
   Web: { screen: Web }
 }, {
   initialRouteName: 'Web',
-  navigationOptions: {
+  navigationOptions: ({ screenProps }) => ({
     headerTitle: <TitleLogo />,
-    headerLeft: <TitleButton side="left" type="profile" />,
-    headerRight: <TitleButton side="right" type="hamburger" />,
+    headerLeft: (
+      <TitleButton
+        side="left"
+        type="profile"
+      />
+    ),
+    headerRight: (
+      <TitleButton
+        side="right"
+        type="hamburger"
+        onPress={screenProps.toggleMenu}
+      />
+    ),
     headerStyle: {
       backgroundColor: '#FFFFFF'
     }
-  }
+  })
 })
 
 class App extends Component {
+  state = { menuActive: false };
+
   hideSplashScreen = () => {
     SplashScreen.hide()
   }
 
+  toggleMenu = () => {
+    this.setState(state => ({ menuActive: !state.menuActive }))
+  }
+
   render () {
     return (
-      <Router screenProps={{ onLoadEnd: this.hideSplashScreen }} />
+      <Router screenProps={{
+        onLoadEnd: this.hideSplashScreen,
+        menuActive: this.state.menuActive,
+        toggleMenu: this.toggleMenu
+      }} />
     )
   }
 }

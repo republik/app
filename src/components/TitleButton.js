@@ -7,14 +7,19 @@ const icons = {
   hamburger: require('../assets/images/hamburger-icon.png')
 }
 
-const TitleButton = ({ type, side, onPress }) => {
+const TitleButton = ({ type, side, active, onPress }) => {
   const style = side === 'left'
     ? { marginLeft: 15 }
     : { marginRight: 15 }
 
   if (type === 'hamburger') {
     return (
-      <HamburgerButton style={style} color='#000' />
+      <HamburgerButton
+        style={style}
+        color="#000"
+        active={active}
+        onPress={onPress}
+      />
     )
   }
 
