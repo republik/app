@@ -6,6 +6,7 @@ import { compose } from 'recompose';
 import Web from './screens/Web';
 import TitleLogo from './components/TitleLogo';
 import TitleButton from './components/TitleButton';
+import HamburgerButton from './components/HamburgerButton';
 import withApollo from './services/apollo';
 import codePush from './services/codePush';
 import deepLinking from './services/deepLinking';
