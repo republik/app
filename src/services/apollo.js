@@ -4,11 +4,11 @@ import ApolloClient from 'apollo-boost'
 import { ApolloProvider } from 'react-apollo'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import { persistCache } from 'apollo-cache-persist'
-import { FEED_URL } from '../constants'
+import { LOGIN_URL } from '../constants'
 
 const defaults = {
   loggedIn: false,
-  url: FEED_URL
+  url: LOGIN_URL
 }
 
 const typeDefs = `

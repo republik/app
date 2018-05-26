@@ -57,6 +57,7 @@ buck-out/
 
 # Certs
 *.cer
+api*.json
 
 # Env
 .env

@@ -6,12 +6,15 @@ import gql from 'graphql-tag'
 import debounce from 'lodash.debounce'
 import { parseURL } from '../utils/url'
 import WebView from '../components/WebView'
-import { FEED_URL, OFFERS_PATH, NOTIFICATIONS_PATH } from '../constants'
+import { FRONTEND_BASE_URL, FEED_URL, OFFERS_PATH, NOTIFICATIONS_PATH } from '../constants'
 
 const RESTRICTED_PATHS = [
-  // LOGIN_PATH,
   OFFERS_PATH
 ]
+
+const isExternalURL = ({ host }) => {
+  return host !== parseURL(FRONTEND_BASE_URL).host
+}
 
 class Web extends Component {
   state = { loading: true }
@@ -23,7 +26,20 @@ class Web extends Component {
   onNavigationStateChange = (data) => {
     const url = parseURL(data.url)
 
-    // Redirect to feed after login
+    // External URLs will natively be opened in system browser.
+    // No need to call Linking.openURL. Just preven the webview to go there.
+    if (isExternalURL(url)) {
+      return false
+    }
+
+    // If user goes to a restricted path, we open it in system browser
+    // and prevent webview to go there.
+    if (RESTRICTED_PATHS.includes(url.path)) {
+      Linking.openURL(data.url)
+      return false
+    }
+
+    // Handle auth flow and redirect to feed after login
     if (url.path === NOTIFICATIONS_PATH) {
       if (url.params.type === 'email-confirmed') {
         this.setLoading(false)
@@ -31,15 +47,15 @@ class Web extends Component {
       } else {
         this.setLoading(true)
       }
-      return
+      return true
     }
 
+    // Update global URL to keep record of current path
     this.props.setUrl({ variables: { url: data.url } })
+    return true
   }
 
   onLoadStart = () => {
-    this.setLoading(true)
-
     if (this.props.screenProps.onLoadStart) {
       this.props.screenProps.onLoadStart()
     }
@@ -53,17 +69,6 @@ class Web extends Component {
     }
   }
 
-  webViewWillTransition = (from, to) => {
-    const toUrl = parseURL(to)
-
-    if (RESTRICTED_PATHS.includes(toUrl.path)) {
-      Linking.openURL(to)
-      return false
-    }
-
-    return true
-  }
-
   render () {
     const { data } = this.props
 
@@ -74,7 +79,6 @@ class Web extends Component {
         loading={this.state.loading}
         onLoadEnd={this.onLoadEnd}
         onLoadStart={this.onLoadStart}
-        webViewWillTransition={this.webViewWillTransition}
         onNavigationStateChange={this.onNavigationStateChange}
       />
     )
