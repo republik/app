@@ -27,7 +27,7 @@ class Web extends Component {
     const url = parseURL(data.url)
 
     // External URLs will natively be opened in system browser.
-    // No need to call Linking.openURL. Just preven the webview to go there.
+    // No need to call Linking.openURL. Just prevent the webview to go there.
     if (isExternalURL(url)) {
       return false
     }

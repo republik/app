@@ -52,13 +52,12 @@ class CustomWebView extends React.Component {
     } = this.props
 
     if (source.uri !== url && onNavigationStateChange) {
+      const shouldFollowRedirect = onNavigationStateChange({ url });
+
       // Native WebView does not have a way of preventing a page to load
       // so we go back into the webview's history that has the same effect.
-      if(
-        this.webview.canGoBack() &&
-        !onNavigationStateChange({ url })
-      ) {
-        this.webview.goBack()
+      if(!shouldFollowRedirect && this.webview.canGoBack()) {
+        this.webview.goBack();
       }
     }
   }
