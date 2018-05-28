@@ -10,6 +10,12 @@
     "deploy-ios-beta": "fastlane ios beta",
     "build:ios": "react-native bundle --entry-file='index.js' --bundle-output='./ios/build/Build/Products/Release-iphoneos/orbitingapp.app/main.jsbundle' --dev=false --platform='ios' --assets-dest='./ios/build/Build/Products/Release-iphoneos/orbitingapp.app'"
   },
+  "lint-staged": {
+    "*.js": [
+      "standard --fix",
+      "git add"
+    ]
+  },
   "dependencies": {
     "apollo-boost": "^0.1.6",
     "apollo-cache-inmemory": "^1.2.1",
@@ -30,5 +36,19 @@
     "react-native-wkwebview-reborn": "^1.20.0",
     "react-navigation": "^2.0.1",
     "recompose": "^0.27.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "^8.2.3",
+    "eslint": "^4.17.0",
+    "eslint-config-standard": "^11.0.0-beta.0",
+    "eslint-config-standard-react": "^5.0.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-node": "^6.0.0",
+    "eslint-plugin-promise": "^3.6.0",
+    "eslint-plugin-react": "^7.6.1",
+    "eslint-plugin-standard": "^3.0.1",
+    "husky": "^0.14.3",
+    "lint-staged": "^6.1.0",
+    "standard": "^10.0.3"
   }
 }

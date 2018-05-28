@@ -1,51 +1,51 @@
-import React, { Component } from 'react';
-import { Animated, TouchableWithoutFeedback } from 'react-native';
+import React, { Component } from 'react'
+import { Animated, TouchableWithoutFeedback } from 'react-native'
 
 class Hamburger extends Component {
-  constructor(props) {
-    super(props);
+  constructor (props) {
+    super(props)
 
-    this.state = { active: false };
+    this.state = { active: false }
 
-    const { active } = props;
+    const { active } = props
 
-    this.width = new Animated.Value(active ? 12 : 22);
-    this.topBar = new Animated.Value(active ? 1 : 0);
-    this.bottomBar = new Animated.Value(active ? 1 : 0);
-    this.marginLeft = new Animated.Value(active ? -13 : 0);
-    this.topBarMargin = new Animated.Value(active ? -2 : 0);
-    this.bottomBarMargin = new Animated.Value(active ? 2 : 4);
-    this.middleBarOpacity = new Animated.Value(active ? 0 : 1);
+    this.width = new Animated.Value(active ? 12 : 22)
+    this.topBar = new Animated.Value(active ? 1 : 0)
+    this.bottomBar = new Animated.Value(active ? 1 : 0)
+    this.marginLeft = new Animated.Value(active ? -13 : 0)
+    this.topBarMargin = new Animated.Value(active ? -2 : 0)
+    this.bottomBarMargin = new Animated.Value(active ? 2 : 4)
+    this.middleBarOpacity = new Animated.Value(active ? 0 : 1)
   }
 
-  animate() {
+  animate () {
     if (this.state.active) {
-      Animated.spring(this.topBar, { toValue: 0 }).start();
-      Animated.spring(this.bottomBar, { toValue: 0 }).start();
-      Animated.spring(this.bottomBarMargin, { toValue: 4 }).start();
+      Animated.spring(this.topBar, { toValue: 0 }).start()
+      Animated.spring(this.bottomBar, { toValue: 0 }).start()
+      Animated.spring(this.bottomBarMargin, { toValue: 4 }).start()
       Animated.spring(this.middleBarOpacity, {
         toValue: 1,
         duration: 1200
-      }).start();
+      }).start()
     } else {
-      Animated.spring(this.topBar, { toValue: 0.9 }).start();
-      Animated.spring(this.bottomBar, { toValue: 0.9 }).start();
-      Animated.spring(this.bottomBarMargin, { toValue: -8 }).start();
+      Animated.spring(this.topBar, { toValue: 0.9 }).start()
+      Animated.spring(this.bottomBar, { toValue: 0.9 }).start()
+      Animated.spring(this.bottomBarMargin, { toValue: -8 }).start()
       Animated.timing(this.middleBarOpacity, {
         toValue: 0,
         duration: 30
-      }).start();
+      }).start()
     }
   }
 
   onPress = () => {
     this.setState(state => ({
       active: !state.active
-    }), this.animate);
+    }), this.animate)
   }
 
-  render() {
-    const { color, style } = this.props;
+  render () {
+    const { color, style } = this.props
 
     return (
       <TouchableWithoutFeedback onPress={this.onPress}>
@@ -64,14 +64,14 @@ class Hamburger extends Component {
                 })
               }
             ]
-          }}/>
+          }} />
           <Animated.View style={{
             height: 2,
             width: 22,
             marginTop: 4,
             backgroundColor: color,
-            opacity: this.middleBarOpacity,
-          }}/>
+            opacity: this.middleBarOpacity
+          }} />
           <Animated.View style={{
             height: 2,
             width: this.width,
@@ -86,11 +86,11 @@ class Hamburger extends Component {
                 })
               }
             ]
-          }}/>
+          }} />
         </Animated.View>
       </TouchableWithoutFeedback>
-    );
+    )
   }
 }
 
-export default Hamburger;
+export default Hamburger

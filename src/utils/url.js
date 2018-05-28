@@ -1,21 +1,21 @@
 const parseParams = params => {
-  if (!params || params === "") {
-    return {};
+  if (!params || params === '') {
+    return {}
   }
 
   return params.split('&').reduce((acc, param) => {
-    const paramData = param.split('=');
+    const paramData = param.split('=')
 
     return {
       ...acc,
       [paramData[0]]: paramData[1]
     }
-  }, {});
+  }, {})
 }
 
 export const parseURL = value => {
-  const URL_REGEX = /(.*?):\/\/(.+\/)?([^?]*)\??(.*)/g;
-  const match = URL_REGEX.exec(value);
+  const URL_REGEX = /(.*?):\/\/(.+\/)?([^?]*)\??(.*)/g
+  const match = URL_REGEX.exec(value)
 
   if (!match) {
     return {
@@ -24,9 +24,9 @@ export const parseURL = value => {
       host: null,
       path: null,
       params: {
-        toString: () => '',
-      },
-    };
+        toString: () => ''
+      }
+    }
   }
 
   return {
@@ -36,7 +36,7 @@ export const parseURL = value => {
     path: match[3],
     params: {
       ...parseParams(match[4]),
-      toString: () => match[4],
+      toString: () => match[4]
     }
-  };
+  }
 }
