@@ -1,54 +1,54 @@
-import React, { Component } from 'react';
-import CodePush from "react-native-code-push";
-import { compose } from 'recompose';
+import React, { Component } from 'react'
+import CodePush from 'react-native-code-push'
+import { compose } from 'recompose'
 
 const codePushWrapper = WrappedComponent => (
   class extends Component {
     state = {
       progress: null,
-      syncMessage: null,
+      syncMessage: null
     }
 
-    codePushStatusDidChange(syncStatus) {
-      switch(syncStatus) {
+    codePushStatusDidChange (syncStatus) {
+      switch (syncStatus) {
         case CodePush.SyncStatus.CHECKING_FOR_UPDATE:
-          this.setState({ syncMessage: "Checking for update." });
-          break;
+          this.setState({ syncMessage: 'Checking for update.' })
+          break
         case CodePush.SyncStatus.DOWNLOADING_PACKAGE:
-          this.setState({ syncMessage: "Downloading package." });
-          break;
+          this.setState({ syncMessage: 'Downloading package.' })
+          break
         case CodePush.SyncStatus.AWAITING_USER_ACTION:
-          this.setState({ syncMessage: "Awaiting user action." });
-          break;
+          this.setState({ syncMessage: 'Awaiting user action.' })
+          break
         case CodePush.SyncStatus.INSTALLING_UPDATE:
-          this.setState({ syncMessage: "Installing update." });
-          break;
+          this.setState({ syncMessage: 'Installing update.' })
+          break
         case CodePush.SyncStatus.UP_TO_DATE:
-          this.setState({ syncMessage: "App up to date.", progress: false });
-          break;
+          this.setState({ syncMessage: 'App up to date.', progress: false })
+          break
         case CodePush.SyncStatus.UPDATE_IGNORED:
-          this.setState({ syncMessage: "Update cancelled by user.", progress: false });
-          break;
+          this.setState({ syncMessage: 'Update cancelled by user.', progress: false })
+          break
         case CodePush.SyncStatus.UPDATE_INSTALLED:
-          this.setState({ syncMessage: "Update installed and will be applied on restart.", progress: false });
-          break;
+          this.setState({ syncMessage: 'Update installed and will be applied on restart.', progress: false })
+          break
         case CodePush.SyncStatus.UNKNOWN_ERROR:
-          this.setState({ syncMessage: "An unknown error occurred.", progress: false });
-          break;
+          this.setState({ syncMessage: 'An unknown error occurred.', progress: false })
+          break
       }
     }
 
-    codePushDownloadDidProgress(progress) {
-      this.setState({ progress });
+    codePushDownloadDidProgress (progress) {
+      this.setState({ progress })
     }
 
     getUpdateMetadata = () => {
       CodePush.getUpdateMetadata(CodePush.UpdateState.RUNNING)
-        .then((metadata: LocalPackage) => {
-          this.setState({ syncMessage: metadata ? JSON.stringify(metadata) : "Running binary version", progress: false });
+        .then((metadata) => {
+          this.setState({ syncMessage: metadata ? JSON.stringify(metadata) : 'Running binary version', progress: false })
         }, (error: any) => {
-          this.setState({ syncMessage: "Error: " + error, progress: false });
-        });
+          this.setState({ syncMessage: 'Error: ' + error, progress: false })
+        })
     }
 
     /** Update is downloaded silently, and applied on restart (recommended) */
@@ -57,7 +57,7 @@ const codePushWrapper = WrappedComponent => (
         {},
         this.codePushStatusDidChange.bind(this),
         this.codePushDownloadDidProgress.bind(this)
-      );
+      )
     }
 
     /** Update pops a confirmation dialog, and then immediately reboots the app */
@@ -66,10 +66,10 @@ const codePushWrapper = WrappedComponent => (
         { installMode: CodePush.InstallMode.IMMEDIATE, updateDialog: true },
         this.codePushStatusDidChange.bind(this),
         this.codePushDownloadDidProgress.bind(this)
-      );
+      )
     }
 
-    render() {
+    render () {
       return (
         <WrappedComponent
           sync={this.sync}
@@ -85,9 +85,9 @@ const codePushWrapper = WrappedComponent => (
 
 const codePushOptions = {
   checkFrequency: CodePush.CheckFrequency.MANUAL
-};
+}
 
 export default compose(
   codePushWrapper,
-  CodePush(codePushOptions),
-);
+  CodePush(codePushOptions)
+)

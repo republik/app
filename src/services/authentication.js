@@ -1,9 +1,9 @@
-import CookieManager from 'react-native-cookies';
-import { FRONTEND_BASE_URL } from '../constants';
+import CookieManager from 'react-native-cookies'
+import { FRONTEND_BASE_URL } from '../constants'
 
-const SESSION_COOKIE = 'connect.sid';
+const SESSION_COOKIE = 'connect.sid'
 
 export const isUserLoggedIn = async () => {
-  const cookie = await CookieManager.get(FRONTEND_BASE_URL);
-  return cookie && cookie.hasOwnProperty(SESSION_COOKIE);
-};
+  const cookie = await CookieManager.get(FRONTEND_BASE_URL)
+  return cookie && cookie.hasOwnProperty(SESSION_COOKIE)
+}

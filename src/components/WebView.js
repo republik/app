@@ -1,8 +1,8 @@
-import React, { Fragment } from 'React';
-import { View, Image, StyleSheet } from 'react-native';
-import WebView from 'react-native-wkwebview-reborn';
-import Spinner from 'react-native-spinkit';
-import { listenHistory } from '../utils/webHistory';
+import React, { Fragment } from 'React'
+import { View, Image, StyleSheet } from 'react-native'
+import WebView from 'react-native-wkwebview-reborn'
+import Spinner from 'react-native-spinkit'
+import { listenHistory } from '../utils/webHistory'
 
 const styles = StyleSheet.create({
   container: {
@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white'
   },
   spinnerContainer: {
-    position: 'relative',
+    position: 'relative'
   },
   loadingLogo: {
     width: 90,
@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
     left: 20,
     position: 'absolute'
   }
-});
+})
 
 const LoadingState = () => (
   <View style={styles.container}>
@@ -39,7 +39,7 @@ const LoadingState = () => (
       />
     </View>
   </View>
-);
+)
 
 class CustomWebView extends React.Component {
   // Native onNavigationStateChange method shim.
@@ -48,22 +48,22 @@ class CustomWebView extends React.Component {
     const {
       source,
       webViewWillTransition,
-      onNavigationStateChange,
-    } = this.props;
+      onNavigationStateChange
+    } = this.props
 
     if (source.uri !== url && onNavigationStateChange) {
-      if(webViewWillTransition(source.uri, url)) {
-        onNavigationStateChange({ url });
+      if (webViewWillTransition(source.uri, url)) {
+        onNavigationStateChange({ url })
       } else {
         // Native WebView does not have a way of preventing a page to load
         // so we go back into the webview's history that has the same effect.
-        this.webview.goBack();
+        this.webview.goBack()
       }
     }
   }
 
-  render() {
-    const { loading, onNavigationStateChange, ...props } = this.props;
+  render () {
+    const { loading } = this.props
 
     return (
       <Fragment>
@@ -75,7 +75,7 @@ class CustomWebView extends React.Component {
           }}
           onNavigationStateChange={this.onNavigationStateChange}
           automaticallyAdjustContentInsets={false}
-          ref={node => { this.webview = node; }}
+          ref={node => { this.webview = node }}
           injectedJavaScript={listenHistory}
           allowsBackForwardNavigationGestures
           startInLoadingState
@@ -87,4 +87,4 @@ class CustomWebView extends React.Component {
   }
 };
 
-export default CustomWebView;
+export default CustomWebView
