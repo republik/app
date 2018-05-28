@@ -38,14 +38,8 @@ const Router = createStackNavigator({
 })
 
 class App extends Component {
-  state = { menuActive: false };
-
   hideSplashScreen = () => {
     SplashScreen.hide()
-  }
-
-  toggleMenu = () => {
-    this.setState(state => ({ menuActive: !state.menuActive }))
   }
 
   render () {
