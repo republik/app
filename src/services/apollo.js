@@ -1,16 +1,15 @@
-import React from 'react';
-import { AsyncStorage } from 'react-native';
-import ApolloClient from 'apollo-boost';
-import { ApolloProvider } from 'react-apollo';
-import { InMemoryCache } from 'apollo-cache-inmemory';
+import React from 'react'
+import { AsyncStorage } from 'react-native'
+import ApolloClient from 'apollo-boost'
+import { ApolloProvider } from 'react-apollo'
+import { InMemoryCache } from 'apollo-cache-inmemory'
 import { persistCache } from 'apollo-cache-persist'
-import { isUserLoggedIn } from './authentication';
-import { FEED_URL } from '../constants';
+import { FEED_URL } from '../constants'
 
 const defaults = {
   loggedIn: false,
-  url: FEED_URL,
-};
+  url: FEED_URL
+}
 
 const typeDefs = `
   type Mutation {
@@ -23,48 +22,48 @@ const typeDefs = `
     url: String
     loggedIn: Boolean,
   }
-`;
+`
 
 export const resolvers = {
   Mutation: {
     login: (_, variables, context) => {
       context.cache.writeData({ data: {
         loggedIn: true
-      }});
-      return true;
+      }})
+      return true
     },
     logout: (_, variables, context) => {
       context.cache.writeData({ data: {
         loggedIn: false
-      }});
-      return false;
+      }})
+      return false
     },
     setUrl: async (_, { url }, context) => {
-      context.cache.writeData({ data: { url }});
-      return url;
-    },
-  },
-};
+      context.cache.writeData({ data: { url } })
+      return url
+    }
+  }
+}
 
 const withApollo = WrappedComponent => () => {
-  const cache = new InMemoryCache();
+  const cache = new InMemoryCache()
 
-  persistCache({ cache, storage: AsyncStorage, debug: true });
+  persistCache({ cache, storage: AsyncStorage, debug: true })
 
   const client = new ApolloClient({
     cache,
     clientState: {
       defaults,
       typeDefs,
-      resolvers,
+      resolvers
     }
-  });
+  })
 
-  return(
+  return (
     <ApolloProvider client={client}>
       <WrappedComponent {...this.props} />
     </ApolloProvider>
-  );
-};
+  )
+}
 
-export default withApollo;
+export default withApollo
