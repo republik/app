@@ -1,12 +1,19 @@
 import React, { Component } from 'react'
-import { Animated, TouchableWithoutFeedback } from 'react-native'
+import { StyleSheet, Animated, TouchableWithoutFeedback } from 'react-native'
+
+const styles = StyleSheet.create({
+  container: {
+    width: 22,
+    height: 22,
+    alignItems: 'center',
+    justifyContent: 'center'
+  }
+})
 
 class Hamburger extends Component {
   constructor (props) {
     super(props)
 
-    this.state = { active: false }
-    this.width = new Animated.Value(22)
     this.topBar = new Animated.Value(0)
     this.bottomBar = new Animated.Value(0)
     this.marginLeft = new Animated.Value(0)
@@ -15,8 +22,8 @@ class Hamburger extends Component {
     this.middleBarOpacity = new Animated.Value(1)
   }
 
-  animate () {
-    if (this.state.active) {
+  componentWillReceiveProps(newProps) {
+    if (newProps.active) {
       Animated.parallel([
         Animated.spring(this.topBar, { toValue: 0.9 }),
         Animated.spring(this.bottomBar, { toValue: 0.9 }),
@@ -33,26 +40,15 @@ class Hamburger extends Component {
     }
   }
 
-  onPress = () => {
-    if (this.props.onPress) {
-      this.props.onPress()
-
-      this.setState(state => ({
-        active: !state.active
-      }), this.animate)
-    }
-
-  }
-
-  render () {
+  render() {
     const { color, style } = this.props
 
     return (
-      <TouchableWithoutFeedback onPress={this.onPress}>
-        <Animated.View style={style}>
+      <TouchableWithoutFeedback onPress={() => this.props.onPress()}>
+        <Animated.View style={[style, styles.container]}>
           <Animated.View style={{
             height: 2,
-            width: this.width,
+            width: 22,
             backgroundColor: color,
             marginLeft: this.marginLeft,
             marginBottom: this.topBarMargin,
@@ -74,7 +70,7 @@ class Hamburger extends Component {
           }} />
           <Animated.View style={{
             height: 2,
-            width: this.width,
+            width: 22,
             backgroundColor: color,
             marginLeft: this.marginLeft,
             marginTop: this.bottomBarMargin,

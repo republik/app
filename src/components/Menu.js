@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableWithoutFeedback, Text, Animated, StyleSheet } from 'react-native';
+import { Text, Animated, StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
   container: {
@@ -32,14 +32,12 @@ class Menu extends React.Component {
 
   render() {
     return (
-      <TouchableWithoutFeedback onPress={this.onPress}>
-        <Animated.View style={[
-          styles.container,
-          { opacity: this.opacity, zIndex: this.zIndex }
-        ]}>
-          <Text>Menu</Text>
-        </Animated.View>
-      </TouchableWithoutFeedback>
+      <Animated.View style={[
+        styles.container,
+        { opacity: this.opacity, zIndex: this.zIndex }
+      ]}>
+        <Text>Menu</Text>
+      </Animated.View>
     );
   }
 };

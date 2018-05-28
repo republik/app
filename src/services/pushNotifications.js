@@ -22,12 +22,7 @@ const localNotification = ({ message = '', seconds = 0 }) => {
 }
 
 const handleAppStateChange = (appState) => {
-  if (appState === 'background') {
-    localNotification({
-      seconds: 1,
-      message: 'Test'
-    })
-  }
+
 }
 
 function componentDidMount () {
