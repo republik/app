@@ -7,7 +7,8 @@ import debounce from 'lodash.debounce'
 import { parseURL } from '../utils/url'
 import Menu from '../components/Menu'
 import WebView from '../components/WebView'
-import { FRONTEND_BASE_URL, FEED_URL, OFFERS_PATH, NOTIFICATIONS_PATH } from '../constants'
+import { me, login, logout } from '../apollo';
+import { FRONTEND_BASE_URL, OFFERS_PATH } from '../constants'
 
 const RESTRICTED_PATHS = [
   OFFERS_PATH
@@ -40,20 +41,21 @@ class Web extends Component {
       return false
     }
 
-    // Handle auth flow and redirect to feed after login
-    if (url.path === NOTIFICATIONS_PATH) {
-      if (url.params.type === 'email-confirmed') {
-        this.setLoading(false)
-        this.props.setUrl({ variables: { url: FEED_URL } })
-      } else {
-        this.setLoading(true)
-      }
-      return true
-    }
-
-    // Update global URL to keep record of current path
-    this.props.setUrl({ variables: { url: data.url } })
     return true
+  }
+
+  onMessage = (message) => {
+    const { me, login, logout } = this.props;
+
+    if (message.type === 'session') {
+      if (message.data && !me) {
+        login({ variables: { user: message.data } })
+      }
+
+      if (!message.data && me) {
+        logout()
+      }
+    }
   }
 
   onLoadStart = () => {
@@ -80,6 +82,7 @@ class Web extends Component {
           style={styles.webView}
           source={{uri: data.url}}
           loading={this.state.loading}
+          onMessage={this.onMessage}
           onLoadEnd={this.onLoadEnd}
           onLoadStart={this.onLoadStart}
           webViewWillTransition={this.webViewWillTransition}
@@ -100,14 +103,7 @@ var styles = StyleSheet.create({
 const getData = graphql(gql`
   query GetData {
     url @client
-    loggedIn @client
   }
 `)
 
-const setUrl = graphql(gql`
-  mutation SetUrl($url: String!) {
-    setUrl(url: $url) @client
-  }
-`, { name: 'setUrl' })
-
-export default compose(getData, setUrl)(Web)
+export default compose(me, login, logout, getData)(Web)

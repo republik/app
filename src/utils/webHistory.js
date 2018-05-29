@@ -7,41 +7,41 @@ export const listenHistoryImpl = function () {
   var replaceState = window.history.replaceState
   var back = window.history.back
 
-  function updateNavState (type, url) {
+  function updateNavState (url) {
     let hash = location.hash !== '' ? '?' + location.hash : ''
     let prefix = location.protocol + '//' + location.host
 
     window.postMessage(JSON.stringify({
-      type,
+      type: 'navigation',
       url: url ? (prefix + url) : (prefix + location.pathname + hash)
     }))
   };
 
   window.history.pushState = function () {
-    updateNavState('pushState', arguments[2])
+    updateNavState(arguments[2])
     return pushState.apply(window.history, arguments)
   }
 
   window.history.replaceState = function () {
-    updateNavState('replaceState', arguments[2])
+    updateNavState(arguments[2])
     return replaceState.apply(window.history, arguments)
   }
 
   window.history.back = function () {
-    updateNavState('back')
+    updateNavState()
     return back.apply(window.history)
   }
 
   window.onload = function () {
-    updateNavState('onload')
+    updateNavState()
   }
 
   window.onpopstate = function () {
-    updateNavState('onpopstate')
+    updateNavState()
   }
 
   window.onhashchange = function () {
-    updateNavState('onhashchange')
+    updateNavState()
   }
 }
 

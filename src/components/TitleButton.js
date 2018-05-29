@@ -1,11 +1,12 @@
 import React from 'react'
 import { Image, TouchableOpacity } from 'react-native'
+import ProfileButton from './ProfileButton'
 import HamburgerButton from './HamburgerButton'
 import { getMenuState } from '../apollo'
 
-const icons = {
-  profile: require('../assets/images/profile-icon.png'),
-  hamburger: require('../assets/images/hamburger-icon.png')
+const buttons = {
+  profile: ProfileButton,
+  hamburger: HamburgerButton
 }
 
 const TitleButton = ({ type, side, menuActive, onPress }) => {
@@ -13,24 +14,14 @@ const TitleButton = ({ type, side, menuActive, onPress }) => {
     ? { marginLeft: 15 }
     : { marginRight: 15 }
 
-  if (type === 'hamburger') {
-    return (
-      <HamburgerButton
-        style={style}
-        color="#000"
-        active={menuActive}
-        onPress={onPress}
-      />
-    )
-  }
+  const Button = buttons[type]
 
   return (
-    <TouchableOpacity style={style} onPress={() => onPress() }>
-      <Image
-        source={icons[type]}
-        style={{ width: 25, height: 25 }}
-      />
-    </TouchableOpacity>
+    <Button
+      style={style}
+      active={menuActive}
+      onPress={onPress}
+    />
   )
 }
 
