@@ -7,7 +7,8 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "deploy-ios": "fastlane ios release",
-    "deploy-ios-beta": "fastlane ios beta",
+    "deploy-ios-beta": "cd ./ios && fastlane beta && cd -",
+    "deploy-android-alpha": "cd ./android && fastlane alpha && cd -",
     "build:ios": "react-native bundle --entry-file='index.js' --bundle-output='./ios/build/Build/Products/Release-iphoneos/orbitingapp.app/main.jsbundle' --dev=false --platform='ios' --assets-dest='./ios/build/Build/Products/Release-iphoneos/orbitingapp.app'"
   },
   "dependencies": {
