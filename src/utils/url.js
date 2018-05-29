@@ -1,3 +1,5 @@
+import parse from 'url-parse'
+
 const parseParams = params => {
   if (!params || params === '') {
     return {}
@@ -13,9 +15,10 @@ const parseParams = params => {
   }, {})
 }
 
+const normalize = url => url.replace('www.', '')
+
 export const parseURL = value => {
-  const URL_REGEX = /(.*?):\/\/(.+\/)?([^?]*)\??(.*)/g
-  const match = URL_REGEX.exec(value)
+  const match = parse(value)
 
   if (!match) {
     return {
@@ -29,14 +32,16 @@ export const parseURL = value => {
     }
   }
 
+  const params = match.query.substring(1)
+
   return {
-    url: match[0],
-    protocol: match[1],
-    host: match[2],
-    path: match[3],
+    url: normalize(match.href),
+    protocol: match.protocol,
+    host: normalize(match.hostname),
+    path: match.pathname,
     params: {
-      ...parseParams(match[4]),
-      toString: () => match[4]
+      ...parseParams(params),
+      toString: () => params
     }
   }
 }

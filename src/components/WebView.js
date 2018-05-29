@@ -52,35 +52,37 @@ class CustomWebView extends React.Component {
     } = this.props
 
     if (source.uri !== url && onNavigationStateChange) {
-      if (webViewWillTransition(source.uri, url)) {
-        onNavigationStateChange({ url })
-      } else {
-        // Native WebView does not have a way of preventing a page to load
-        // so we go back into the webview's history that has the same effect.
-        this.webview.goBack()
+      const shouldFollowRedirect = onNavigationStateChange({ url });
+
+      // Native WebView does not have a way of preventing a page to load
+      // so we go back into the webview's history that has the same effect.
+      if(!shouldFollowRedirect && this.webview.canGoBack()) {
+        this.webview.goBack();
       }
     }
   }
 
-  render () {
-    const { loading } = this.props
+  onMessage = e => {
+    this.onNavigationStateChange(JSON.parse(e.nativeEvent.data))
+  }
+
+  render() {
+    const { loading, onNavigationStateChange, ...props } = this.props;
 
     return (
       <Fragment>
         { loading && <LoadingState /> }
         <WebView
           {...this.props}
-          onMessage={e => {
-            this.onNavigationStateChange(JSON.parse(e.nativeEvent.data))
-          }}
+          ref={node => { this.webview = node; }}
+          onMessage={this.onMessage}
           onNavigationStateChange={this.onNavigationStateChange}
           automaticallyAdjustContentInsets={false}
-          ref={node => { this.webview = node }}
           injectedJavaScript={listenHistory}
           allowsBackForwardNavigationGestures
+          scalesPageToFit={false}
           startInLoadingState
           javaScriptEnabled
-          scalesPageToFit
         />
       </Fragment>
     )
