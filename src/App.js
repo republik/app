@@ -9,19 +9,32 @@ import withApollo from './services/apollo'
 import codePush from './services/codePush'
 import deepLinking from './services/deepLinking'
 import pushNotifications from './services/pushNotifications'
+import { getMenuState, toggleMenu } from './apollo'
 
 const Router = createStackNavigator({
   Web: { screen: Web }
 }, {
   initialRouteName: 'Web',
-  navigationOptions: {
+  navigationOptions: ({ screenProps }) => ({
     headerTitle: <TitleLogo />,
-    headerLeft: <TitleButton side="left" type="profile" />,
-    headerRight: <TitleButton side="right" type="hamburger" />,
+    headerLeft: (
+      <TitleButton
+        side="left"
+        type="profile"
+        onPress={screenProps.toggleMenu}
+      />
+    ),
+    headerRight: (
+      <TitleButton
+        side="right"
+        type="hamburger"
+        onPress={screenProps.toggleMenu}
+      />
+    ),
     headerStyle: {
       backgroundColor: '#FFFFFF'
     }
-  }
+  })
 })
 
 class App extends Component {
@@ -31,7 +44,11 @@ class App extends Component {
 
   render () {
     return (
-      <Router screenProps={{ onLoadEnd: this.hideSplashScreen }} />
+      <Router screenProps={{
+        onLoadEnd: this.hideSplashScreen,
+        menuActive: this.props.menuActive,
+        toggleMenu: this.props.toggleMenu
+      }} />
     )
   }
 }
@@ -40,5 +57,7 @@ export default compose(
   withApollo,
   codePush,
   deepLinking,
-  pushNotifications
+  pushNotifications,
+  getMenuState,
+  toggleMenu
 )(App)
