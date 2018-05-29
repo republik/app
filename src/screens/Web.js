@@ -1,10 +1,11 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import { StyleSheet, Linking } from 'react-native'
 import { graphql } from 'react-apollo'
 import { compose } from 'recompose'
 import gql from 'graphql-tag'
 import debounce from 'lodash.debounce'
 import { parseURL } from '../utils/url'
+import Menu from '../components/Menu'
 import WebView from '../components/WebView'
 import { FRONTEND_BASE_URL, FEED_URL, OFFERS_PATH, NOTIFICATIONS_PATH } from '../constants'
 
@@ -70,24 +71,29 @@ class Web extends Component {
   }
 
   render () {
-    const { data } = this.props
+    const { data, screenProps } = this.props
 
     return (
-      <WebView
-        style={styles.webView}
-        source={{uri: data.url}}
-        loading={this.state.loading}
-        onLoadEnd={this.onLoadEnd}
-        onLoadStart={this.onLoadStart}
-        onNavigationStateChange={this.onNavigationStateChange}
-      />
-    )
+      <Fragment>
+        <Menu active={screenProps.menuActive} />
+        <WebView
+          style={styles.webView}
+          source={{uri: data.url}}
+          loading={this.state.loading}
+          onLoadEnd={this.onLoadEnd}
+          onLoadStart={this.onLoadStart}
+          webViewWillTransition={this.webViewWillTransition}
+          onNavigationStateChange={this.onNavigationStateChange}
+        />
+      </Fragment>
+    );
   }
 }
 
 var styles = StyleSheet.create({
   webView: {
-    flex: 1
+    flex: 1,
+    zIndex: 100,
   }
 })
 

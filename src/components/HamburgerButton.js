@@ -1,58 +1,54 @@
 import React, { Component } from 'react'
-import { Animated, TouchableWithoutFeedback } from 'react-native'
+import { StyleSheet, Animated, TouchableWithoutFeedback } from 'react-native'
+
+const styles = StyleSheet.create({
+  container: {
+    width: 22,
+    height: 22,
+    alignItems: 'center',
+    justifyContent: 'center'
+  }
+})
 
 class Hamburger extends Component {
   constructor (props) {
     super(props)
 
-    this.state = { active: false }
-
-    const { active } = props
-
-    this.width = new Animated.Value(active ? 12 : 22)
-    this.topBar = new Animated.Value(active ? 1 : 0)
-    this.bottomBar = new Animated.Value(active ? 1 : 0)
-    this.marginLeft = new Animated.Value(active ? -13 : 0)
-    this.topBarMargin = new Animated.Value(active ? -2 : 0)
-    this.bottomBarMargin = new Animated.Value(active ? 2 : 4)
-    this.middleBarOpacity = new Animated.Value(active ? 0 : 1)
+    this.topBar = new Animated.Value(0)
+    this.bottomBar = new Animated.Value(0)
+    this.marginLeft = new Animated.Value(0)
+    this.topBarMargin = new Animated.Value(0)
+    this.bottomBarMargin = new Animated.Value(4)
+    this.middleBarOpacity = new Animated.Value(1)
   }
 
-  animate () {
-    if (this.state.active) {
-      Animated.spring(this.topBar, { toValue: 0 }).start()
-      Animated.spring(this.bottomBar, { toValue: 0 }).start()
-      Animated.spring(this.bottomBarMargin, { toValue: 4 }).start()
-      Animated.spring(this.middleBarOpacity, {
-        toValue: 1,
-        duration: 1200
-      }).start()
+  componentWillReceiveProps(newProps) {
+    if (newProps.active) {
+      Animated.parallel([
+        Animated.spring(this.topBar, { toValue: 0.9 }),
+        Animated.spring(this.bottomBar, { toValue: 0.9 }),
+        Animated.spring(this.bottomBarMargin, { toValue: -8 }),
+        Animated.timing(this.middleBarOpacity, { toValue: 0, duration: 30 })
+      ]).start()
     } else {
-      Animated.spring(this.topBar, { toValue: 0.9 }).start()
-      Animated.spring(this.bottomBar, { toValue: 0.9 }).start()
-      Animated.spring(this.bottomBarMargin, { toValue: -8 }).start()
-      Animated.timing(this.middleBarOpacity, {
-        toValue: 0,
-        duration: 30
-      }).start()
+      Animated.parallel([
+        Animated.spring(this.topBar, { toValue: 0 }),
+        Animated.spring(this.bottomBar, { toValue: 0 }),
+        Animated.spring(this.bottomBarMargin, { toValue: 4 }),
+        Animated.spring(this.middleBarOpacity, { toValue: 1, duration: 1200 })
+      ]).start()
     }
   }
 
-  onPress = () => {
-    this.setState(state => ({
-      active: !state.active
-    }), this.animate)
-  }
-
-  render () {
+  render() {
     const { color, style } = this.props
 
     return (
-      <TouchableWithoutFeedback onPress={this.onPress}>
-        <Animated.View style={style}>
+      <TouchableWithoutFeedback onPress={() => this.props.onPress()}>
+        <Animated.View style={[style, styles.container]}>
           <Animated.View style={{
             height: 2,
-            width: this.width,
+            width: 22,
             backgroundColor: color,
             marginLeft: this.marginLeft,
             marginBottom: this.topBarMargin,
@@ -74,7 +70,7 @@ class Hamburger extends Component {
           }} />
           <Animated.View style={{
             height: 2,
-            width: this.width,
+            width: 22,
             backgroundColor: color,
             marginLeft: this.marginLeft,
             marginTop: this.bottomBarMargin,
