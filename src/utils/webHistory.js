@@ -17,7 +17,7 @@ export const listenHistoryImpl = function () {
     }))
   };
 
-  window.history.pushState = function (state) {
+  window.history.pushState = function () {
     updateNavState('pushState', arguments[2])
     return pushState.apply(window.history, arguments)
   }
