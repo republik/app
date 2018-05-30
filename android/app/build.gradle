@@ -16,8 +16,8 @@ def getPassword(String keyChain) {
    stdout.toString().trim()
 }
 
-def releasekeypass = getPassword("orbitingapp")
-def releasekeyalias = getPassword("orbitingapp")
+def releasekeypass = getPassword("republik")
+def releasekeyalias = getPassword("republik")
 
 /**
  * The react.gradle file registers a task for each build variant (e.g. bundleDebugJsAndAssets
