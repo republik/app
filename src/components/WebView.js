@@ -63,7 +63,15 @@ class CustomWebView extends React.Component {
   }
 
   onMessage = e => {
-    this.onNavigationStateChange(JSON.parse(e.nativeEvent.data))
+    const message = JSON.parse(e.nativeEvent.data)
+
+    if (message.type === 'navigation') {
+      return this.onNavigationStateChange(message)
+    }
+
+    if (this.props.onMessage) {
+      this.props.onMessage(message)
+    }
   }
 
   render() {

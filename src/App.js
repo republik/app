@@ -5,11 +5,10 @@ import { compose } from 'recompose'
 import Web from './screens/Web'
 import TitleLogo from './components/TitleLogo'
 import TitleButton from './components/TitleButton'
-import withApollo from './services/apollo'
 import codePush from './services/codePush'
 import deepLinking from './services/deepLinking'
 import pushNotifications from './services/pushNotifications'
-import { getMenuState, toggleMenu } from './apollo'
+import withApollo, { getMenuState, toggleMenu } from './apollo'
 
 const Router = createStackNavigator({
   Web: { screen: Web }
