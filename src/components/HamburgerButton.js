@@ -10,7 +10,7 @@ const styles = StyleSheet.create({
   }
 })
 
-class Hamburger extends Component {
+class HamburgerButton extends Component {
   constructor (props) {
     super(props)
 
@@ -41,7 +41,7 @@ class Hamburger extends Component {
   }
 
   render() {
-    const { color, style } = this.props
+    const { style } = this.props
 
     return (
       <TouchableWithoutFeedback onPress={() => this.props.onPress()}>
@@ -49,7 +49,7 @@ class Hamburger extends Component {
           <Animated.View style={{
             height: 2,
             width: 22,
-            backgroundColor: color,
+            backgroundColor: '#000',
             marginLeft: this.marginLeft,
             marginBottom: this.topBarMargin,
             transform: [
@@ -65,13 +65,13 @@ class Hamburger extends Component {
             height: 2,
             width: 22,
             marginTop: 4,
-            backgroundColor: color,
+            backgroundColor: '#000',
             opacity: this.middleBarOpacity
           }} />
           <Animated.View style={{
             height: 2,
             width: 22,
-            backgroundColor: color,
+            backgroundColor: '#000',
             marginLeft: this.marginLeft,
             marginTop: this.bottomBarMargin,
             transform: [
@@ -89,4 +89,4 @@ class Hamburger extends Component {
   }
 }
 
-export default Hamburger
+export default HamburgerButton
