@@ -25,7 +25,7 @@
 		<dict>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>orbitingapp</string>
+				<string>republik</string>
 			</array>
 		</dict>
 	</array>
