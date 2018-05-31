@@ -7,7 +7,7 @@ import debounce from 'lodash.debounce'
 import { parseURL } from '../utils/url'
 import Menu from '../components/Menu'
 import WebView from '../components/WebView'
-import { me, login, logout } from '../apollo';
+import { me, login, logout } from '../apollo'
 import { FRONTEND_BASE_URL, OFFERS_PATH } from '../constants'
 
 const RESTRICTED_PATHS = [
@@ -45,7 +45,8 @@ class Web extends Component {
   }
 
   onMessage = (message) => {
-    const { me, login, logout } = this.props;
+    console.log(message)
+    const { me, login, logout } = this.props
 
     if (message.type === 'session') {
       if (message.data && !me) {
@@ -89,14 +90,14 @@ class Web extends Component {
           onNavigationStateChange={this.onNavigationStateChange}
         />
       </Fragment>
-    );
+    )
   }
 }
 
 var styles = StyleSheet.create({
   webView: {
     flex: 1,
-    zIndex: 100,
+    zIndex: 100
   }
 })
 

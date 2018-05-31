@@ -20,4 +20,6 @@ As a first step we'll customized the web frame based on user agent detection, se
 
 In a second step we might want to integrate deeply. Hide the whole frame via user agent detection and do a native frame.
 
-[## Publishing](docs/publishing.md)
+## Publishing
+
+[Refer to publishing docs](docs/publishing.md)
