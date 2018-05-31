@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react'
 import { StyleSheet, Linking } from 'react-native'
+import Config from 'react-native-config'
 import { graphql } from 'react-apollo'
 import { compose } from 'recompose'
 import gql from 'graphql-tag'
@@ -45,7 +46,6 @@ class Web extends Component {
   }
 
   onMessage = (message) => {
-    console.log(message)
     const { me, login, logout } = this.props
 
     if (message.type === 'session') {
@@ -75,13 +75,14 @@ class Web extends Component {
 
   render () {
     const { data, screenProps } = this.props
+    const headers = { Authorization: `Basic ${Config.FRONTEND_AUTH_TOKEN}` }
 
     return (
       <Fragment>
         <Menu active={screenProps.menuActive} />
         <WebView
+          source={{uri: data.url, headers}}
           style={styles.webView}
-          source={{uri: data.url}}
           loading={this.state.loading}
           onMessage={this.onMessage}
           onLoadEnd={this.onLoadEnd}
