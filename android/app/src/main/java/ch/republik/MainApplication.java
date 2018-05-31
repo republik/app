@@ -1,9 +1,10 @@
-package com.orbitingapp;
+package ch.republik;
 
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
 import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
+import ch.republik.BuildConfig;
 import com.react.rnspinkit.RNSpinkitPackage;
 import com.psykar.cookiemanager.CookieManagerPackage;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;

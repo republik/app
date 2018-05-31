@@ -16,8 +16,8 @@ def getPassword(String keyChain) {
    stdout.toString().trim()
 }
 
-def releasekeypass = getPassword("orbitingapp")
-def releasekeyalias = getPassword("orbitingapp")
+def releasekeypass = getPassword("republik")
+def releasekeyalias = getPassword("republik")
 
 /**
  * The react.gradle file registers a task for each build variant (e.g. bundleDebugJsAndAssets
@@ -116,11 +116,11 @@ android {
     buildToolsVersion "23.0.1"
 
     defaultConfig {
-        applicationId "com.orbitingapp"
+        applicationId "ch.republik"
         minSdkVersion 19
         targetSdkVersion 26
-        versionCode 13
-        versionName "0.0.7"
+        versionCode 1
+        versionName "0.0.1"
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }

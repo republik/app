@@ -45,19 +45,15 @@ class CustomWebView extends React.Component {
   // Native onNavigationStateChange method shim.
   // We call onNavigationStateChange either when the native calls, or onMessage
   onNavigationStateChange = ({ url }) => {
-    const {
-      source,
-      webViewWillTransition,
-      onNavigationStateChange
-    } = this.props
+    const { source, onNavigationStateChange } = this.props
 
     if (source.uri !== url && onNavigationStateChange) {
-      const shouldFollowRedirect = onNavigationStateChange({ url });
+      const shouldFollowRedirect = onNavigationStateChange({ url })
 
       // Native WebView does not have a way of preventing a page to load
       // so we go back into the webview's history that has the same effect.
-      if(!shouldFollowRedirect && this.webview.canGoBack()) {
-        this.webview.goBack();
+      if (!shouldFollowRedirect && this.webview.canGoBack()) {
+        this.webview.goBack()
       }
     }
   }
@@ -74,21 +70,22 @@ class CustomWebView extends React.Component {
     }
   }
 
-  render() {
-    const { loading, onNavigationStateChange, ...props } = this.props;
+  render () {
+    const { loading } = this.props
 
     return (
       <Fragment>
         { loading && <LoadingState /> }
         <WebView
           {...this.props}
-          ref={node => { this.webview = node; }}
+          ref={node => { this.webview = node }}
           onMessage={this.onMessage}
           onNavigationStateChange={this.onNavigationStateChange}
           automaticallyAdjustContentInsets={false}
           injectedJavaScript={listenHistory}
           allowsBackForwardNavigationGestures
           scalesPageToFit={false}
+          userAgent="RepublikApp"
           startInLoadingState
           javaScriptEnabled
         />
