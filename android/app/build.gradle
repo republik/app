@@ -116,11 +116,11 @@ android {
     buildToolsVersion "23.0.1"
 
     defaultConfig {
-        applicationId "ch.republik"
+        applicationId "app.republik"
         minSdkVersion 19
         targetSdkVersion 26
-        versionCode 1
-        versionName "0.0.1"
+        versionCode 2
+        versionName "0.0.2"
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
