@@ -19,23 +19,25 @@ platform :ios do
   desc "Submit a new Beta Build to Apple TestFlight"
   desc "This will also make sure the profile is up to date"
   lane :beta do
+    increment_build_number
     match(
       type: "appstore",
-      git_url: "git@github.com:diegomura/TestAppCerts.git"
+      git_url: "git@github.com:orbiting/app-certificates.git"
     ) # more information: https://codesigning.guide
     gym(scheme: "orbitingapp") # Build your app - more options available
     pilot
+    slack(
+     message: "New beta version successfully uploaded to the Apple TestFlight.",
+     success: true,
+     slack_url: ENV["SLACK_URL"],
+     attachment_properties: {
+       fields: [
+         {
+           title: "Build code",
+           value: lane_context[SharedValues::BUILD_NUMBER],
+         },
+       ]
+     }
+   )
   end
-
-  desc "Deploy a new version to the App Store"
-  lane :release do
-    match(
-      type: "appstore",
-      git_url: "git@github.com:diegomura/TestAppCerts.git"
-    )
-    # snapshot
-    gym(scheme: "orbitingapp") # Build your app - more options available
-    deliver(force: true)
-  end
-
 end

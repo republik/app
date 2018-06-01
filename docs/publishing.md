@@ -4,7 +4,23 @@ This project uses [Fastlane](https://docs.fastlane.tools/) to automate deploymen
 
 ## iOS
 
-> TODO
+### Setup
+
+To set up the certificates and provisioning profiles on a new machine, you just run the same command using on the `./ios` directory:
+
+```
+fastlane match development
+```
+
+### Publish
+
+#### Beta version
+
+Just run
+
+```sh
+yarn deploy-ios-beta
+```
 
 ## Android
 
