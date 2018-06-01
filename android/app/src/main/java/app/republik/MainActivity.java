@@ -1,4 +1,4 @@
-package ch.republik;
+package app.republik;
 
 import android.os.Bundle;
 import com.facebook.react.ReactActivity;
