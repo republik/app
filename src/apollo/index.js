@@ -6,11 +6,11 @@ import { ApolloLink } from 'apollo-link'
 import { withClientState } from 'apollo-link-state'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import { persistCache } from 'apollo-cache-persist'
-import { INITIAL_URL, FEED_URL } from '../constants'
+import { LOGIN_URL, FEED_URL } from '../constants'
 import { getMenuStateQuery } from './queries'
 
 const defaults = {
-  url: INITIAL_URL,
+  url: LOGIN_URL,
   user: null,
   menuActive: false
 }
