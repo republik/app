@@ -15,8 +15,11 @@ const RESTRICTED_PATHS = [
   OFFERS_PATH
 ]
 
-const isExternalURL = ({ host }) => {
-  return host !== parseURL(FRONTEND_BASE_URL).host
+const isExternalURL = ({ host, protocol }) => {
+  return (
+    host !== parseURL(FRONTEND_BASE_URL).host &&
+    !protocol.match(/react-js-navigation/)
+  )
 }
 
 class Web extends Component {

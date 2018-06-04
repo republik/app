@@ -52,7 +52,7 @@ class CustomWebView extends React.Component {
 
       // Native WebView does not have a way of preventing a page to load
       // so we go back into the webview's history that has the same effect.
-      if (!shouldFollowRedirect && this.webview.canGoBack()) {
+      if (!shouldFollowRedirect) {
         this.webview.goBack()
       }
     }
@@ -88,6 +88,7 @@ class CustomWebView extends React.Component {
           userAgent="RepublikApp"
           startInLoadingState
           javaScriptEnabled
+          sendCookies
         />
       </Fragment>
     )
