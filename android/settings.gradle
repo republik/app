@@ -1,10 +1,10 @@
 rootProject.name = 'republik'
+include ':react-native-cookies'
+project(':react-native-cookies').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-cookies/android')
 include ':react-native-config'
 project(':react-native-config').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-config/android')
 include ':react-native-spinkit'
 project(':react-native-spinkit').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-spinkit/android')
-include ':react-native-cookies'
-project(':react-native-cookies').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-cookies/android')
 include ':react-native-splash-screen'
 project(':react-native-splash-screen').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-splash-screen/android')
 include ':react-native-splash-screen'

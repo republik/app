@@ -4,10 +4,14 @@
   "private": true,
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
-    "android": "react-native run-android",
-    "ios": "react-native run-ios",
-    "deploy-ios": "fastlane ios release",
-    "deploy-ios-beta": "cd ./ios && fastlane beta && cd -",
+    "run-android": "node ./scripts/run-android.js",
+    "run-ios": "node ./scripts/run-ios.js",
+    "run-android-dev": "react-native run-android --variant devDebug",
+    "run-android-staging": "react-native run-android --variant stagingDebug",
+    "run-android-production": "react-native run-android --variant productionDebug",
+    "run-ios-dev": "react-native run-ios --scheme 'orbitingapp (dev)'",
+    "run-ios-staging": "react-native run-ios --scheme 'orbitingapp (staging)'",
+    "run-ios-production": "react-native run-ios --scheme 'orbitingapp (production)'",
     "deploy-android-alpha": "cd ./android && fastlane alpha && cd -",
     "deploy-ios-beta": "cd ./ios && fastlane ios beta && cd -"
   },
@@ -52,6 +56,7 @@
     "eslint-plugin-react": "^7.6.1",
     "eslint-plugin-standard": "^3.0.1",
     "husky": "^0.14.3",
+    "inquirer": "^5.2.0",
     "lint-staged": "^6.1.0",
     "standard": "^10.0.3"
   }
