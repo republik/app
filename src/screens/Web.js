@@ -78,13 +78,12 @@ class Web extends Component {
 
   render () {
     const { data, screenProps } = this.props
-    const headers = { Authorization: `Basic ${Config.FRONTEND_AUTH_TOKEN}` }
 
     return (
       <Fragment>
         <Menu active={screenProps.menuActive} />
         <WebView
-          source={{uri: data.url, headers}}
+          source={{uri: data.url}}
           style={styles.webView}
           loading={this.state.loading}
           onMessage={this.onMessage}
