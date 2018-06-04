@@ -1,5 +1,5 @@
 import React, { Fragment } from 'React'
-import { View, Image, StyleSheet } from 'react-native'
+import { Text, View, Image, StyleSheet, TouchableOpacity } from 'react-native'
 import WebView from 'react-native-wkwebview-reborn'
 import Spinner from 'react-native-spinkit'
 import { parse } from 'graphql'
@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'white'
+    backgroundColor: '#FFF'
   },
   spinnerContainer: {
     position: 'relative'
@@ -29,6 +29,24 @@ const styles = StyleSheet.create({
     top: 20,
     left: 20,
     position: 'absolute'
+  },
+  errorContainer: {
+    padding: 20,
+    backgroundColor: '#E9A733'
+  },
+  errorText: {
+    color: '#FFF',
+    fontSize: 20,
+    textAlign: 'center',
+    marginBottom: 20
+  },
+  button: {
+    color: '#FFF',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    fontSize: 20,
+    borderColor: 'white',
+    borderWidth: 1
   }
 })
 
@@ -41,6 +59,16 @@ const LoadingState = () => (
         source={require('../assets/images/icon.png')}
       />
     </View>
+  </View>
+)
+
+const ErrorState = ({ onReload }) => (
+  <View style={[styles.container, styles.errorContainer]}>
+    <Text style={styles.errorText}>Unable to load contents.</Text>
+    <Text style={styles.errorText}>Please check your network connection.</Text>
+    <TouchableOpacity onPress={onReload} >
+      <Text style={styles.button}>Reload</Text>
+    </TouchableOpacity>
   </View>
 )
 
@@ -129,6 +157,11 @@ class CustomWebView extends React.Component {
     }
   }
 
+  onReload = () => {
+    console.log(this.webview)
+    this.webview.reload()
+  }
+
   render () {
     const { loading } = this.props
 
@@ -140,6 +173,7 @@ class CustomWebView extends React.Component {
           ref={node => { this.instance = node }}
           onMessage={this.onMessage}
           onNavigationStateChange={this.onNavigationStateChange}
+          renderError={() => <ErrorState onReload={this.onReload} />}
           automaticallyAdjustContentInsets={false}
           injectedJavaScript={listenHistory}
           allowsBackForwardNavigationGestures
