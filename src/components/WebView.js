@@ -158,7 +158,6 @@ class CustomWebView extends React.Component {
   }
 
   onReload = () => {
-    console.log(this.webview)
     this.webview.reload()
   }
 
