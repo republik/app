@@ -159,6 +159,10 @@ class CustomWebView extends React.Component {
   }
 
   onReload = () => {
+<<<<<<< fb43c55c1c1ff28695b08d031f707d42d1572a4d
+=======
+    console.log(this.webview)
+>>>>>>> Network error view
     this.webview.reload()
   }
 
