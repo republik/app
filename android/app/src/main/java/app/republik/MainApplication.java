@@ -3,10 +3,10 @@ package app.republik;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.psykar.cookiemanager.CookieManagerPackage;
 import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
 import app.republik.BuildConfig;
 import com.react.rnspinkit.RNSpinkitPackage;
-import com.psykar.cookiemanager.CookieManagerPackage;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import com.microsoft.codepush.react.CodePush;
@@ -36,9 +36,9 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new CookieManagerPackage(),
             new ReactNativeConfigPackage(),
             new RNSpinkitPackage(),
-            new CookieManagerPackage(),
             new SplashScreenReactPackage(),
           new ReactNativePushNotificationPackage(),
           new CodePush(null, getApplicationContext(), BuildConfig.DEBUG)

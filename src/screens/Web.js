@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react'
 import { StyleSheet, Linking } from 'react-native'
+import Config from 'react-native-config'
 import { graphql } from 'react-apollo'
 import { compose } from 'recompose'
 import gql from 'graphql-tag'
@@ -14,8 +15,11 @@ const RESTRICTED_PATHS = [
   OFFERS_PATH
 ]
 
-const isExternalURL = ({ host }) => {
-  return host !== parseURL(FRONTEND_BASE_URL).host
+const isExternalURL = ({ host, protocol }) => {
+  return (
+    host !== parseURL(FRONTEND_BASE_URL).host &&
+    !protocol.match(/react-js-navigation/)
+  )
 }
 
 class Web extends Component {
@@ -45,7 +49,6 @@ class Web extends Component {
   }
 
   onMessage = (message) => {
-    console.log(message)
     const { me, login, logout } = this.props
 
     if (message.type === 'session') {
@@ -80,8 +83,8 @@ class Web extends Component {
       <Fragment>
         <Menu active={screenProps.menuActive} />
         <WebView
-          style={styles.webView}
           source={{uri: data.url}}
+          style={styles.webView}
           loading={this.state.loading}
           onMessage={this.onMessage}
           onLoadEnd={this.onLoadEnd}
