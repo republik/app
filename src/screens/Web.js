@@ -1,6 +1,5 @@
 import React, { Component, Fragment } from 'react'
 import { StyleSheet, Linking } from 'react-native'
-import Config from 'react-native-config'
 import { graphql } from 'react-apollo'
 import { compose } from 'recompose'
 import gql from 'graphql-tag'
@@ -8,7 +7,7 @@ import debounce from 'lodash.debounce'
 import { parseURL } from '../utils/url'
 import Menu from '../components/Menu'
 import WebView from '../components/WebView'
-import { me, login, logout } from '../apollo'
+import { me, signIn, login, logout } from '../apollo'
 import { FRONTEND_BASE_URL, OFFERS_PATH } from '../constants'
 
 const RESTRICTED_PATHS = [
@@ -49,17 +48,32 @@ class Web extends Component {
   }
 
   onMessage = (message) => {
+    switch (message.type) {
+      case 'signin':
+        return this.handleSignInMessages(message)
+      case 'session':
+        return this.handleSessionMessages(message)
+      default:
+        console.warn(`Unhandled message of type: ${message.type}`)
+    }
+  }
+
+  handleSessionMessages = (message) => {
     const { me, login, logout } = this.props
 
-    if (message.type === 'session') {
-      if (message.data && !me) {
-        login({ variables: { user: message.data } })
-      }
-
-      if (!message.data && me) {
-        logout()
-      }
+    if (message.data && !me) {
+      login({ variables: { user: message.data } })
     }
+
+    if (!message.data && me) {
+      logout()
+    }
+  }
+
+  handleSignInMessages = async (message) => {
+    const res = await this.props.signIn({ variables: { email: message.email } })
+    this.webview.instance.postMessage(res.data.signIn.phrase)
+    this.webview.syncCookies()
   }
 
   onLoadStart = () => {
@@ -77,12 +91,16 @@ class Web extends Component {
   }
 
   render () {
-    const { data, screenProps } = this.props
+    const { data, screenProps, logout } = this.props
 
     return (
       <Fragment>
-        <Menu active={screenProps.menuActive} />
+        <Menu
+          onLogout={() => logout()}
+          active={screenProps.menuActive}
+        />
         <WebView
+          ref={node => { this.webview = node }}
           source={{uri: data.url}}
           style={styles.webView}
           loading={this.state.loading}
@@ -110,4 +128,4 @@ const getData = graphql(gql`
   }
 `)
 
-export default compose(me, login, logout, getData)(Web)
+export default compose(me, login, signIn, logout, getData)(Web)

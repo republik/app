@@ -1,5 +1,6 @@
 import Config from 'react-native-config'
 
+export const API_URL = Config.API_URL
 export const FRONTEND_BASE_URL = Config.FRONTEND_BASE_URL
 export const CURTAIN_BACKDOOR_PATH = `/${Config.CURTAIN_BACKDOOR_PATH}`
 export const FEED_PATH = `/feed`

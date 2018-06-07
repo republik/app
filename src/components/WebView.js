@@ -1,6 +1,7 @@
 import React, { Fragment } from 'React'
 import { View, Image, StyleSheet } from 'react-native'
 import WebView from 'react-native-wkwebview-reborn'
+import CookieManager from 'react-native-cookies'
 import Spinner from 'react-native-spinkit'
 import { listenHistory } from '../utils/webHistory'
 
@@ -53,7 +54,7 @@ class CustomWebView extends React.Component {
       // Native WebView does not have a way of preventing a page to load
       // so we go back into the webview's history that has the same effect.
       if (!shouldFollowRedirect) {
-        this.webview.goBack()
+        this.instance.goBack()
       }
     }
   }
@@ -70,6 +71,16 @@ class CustomWebView extends React.Component {
     }
   }
 
+  // Sync native cookie store with webview JS runtime
+  syncCookies = () => {
+    CookieManager.getAll().then(res => {
+      for (let key in res) {
+        const { name, value } = res[key]
+        this.instance.evaluateJavaScript(`document.cookie="${name}=${value}"`)
+      }
+    })
+  }
+
   render () {
     const { loading } = this.props
 
@@ -78,7 +89,7 @@ class CustomWebView extends React.Component {
         { loading && <LoadingState /> }
         <WebView
           {...this.props}
-          ref={node => { this.webview = node }}
+          ref={node => { this.instance = node }}
           onMessage={this.onMessage}
           onNavigationStateChange={this.onNavigationStateChange}
           automaticallyAdjustContentInsets={false}

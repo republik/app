@@ -41,7 +41,7 @@ const Router = createStackNavigator({
 
 class App extends Component {
   componentDidMount () {
-    if (CURTAIN_BACKDOOR_PATH) {
+    if (CURTAIN_BACKDOOR_PATH && CURTAIN_BACKDOOR_PATH !== '') {
       let cookies = `OpenSesame=${encodeURIComponent(CURTAIN_BACKDOOR_PATH)}; Path=/; Expires=Thu, 01 Jan 2030 00:00:00 GMT; HttpOnly`
 
       if (Platform.OS === 'ios') {
