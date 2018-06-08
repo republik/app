@@ -71,7 +71,7 @@ class Web extends Component {
   }
 
   handleSignInMessages = async (message) => {
-    const res = await this.props.signIn({ variables: { email: message.email } })
+    const res = await this.props.signIn({ variables: message.data })
     this.webview.instance.postMessage(res.data.signIn.phrase)
     this.webview.syncCookies()
   }
