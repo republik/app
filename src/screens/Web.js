@@ -2,7 +2,6 @@ import React, { Component, Fragment } from 'react'
 import { StyleSheet, Linking } from 'react-native'
 import { graphql } from 'react-apollo'
 import { createApolloFetch } from 'apollo-fetch'
-import CookieManager from 'react-native-cookies'
 import { print } from 'graphql/language/printer'
 import { compose } from 'recompose'
 import gql from 'graphql-tag'
@@ -24,16 +23,12 @@ const isExternalURL = ({ host, protocol }) => {
   )
 }
 
-const customFetch = async (uri, options) => {
-  return fetch(uri, { ...options, credentials: 'include' })
-}
-
 class Web extends Component {
   constructor (props) {
     super(props)
 
     this.state = { loading: true }
-    this.apolloFetch = createApolloFetch({ uri: API_URL, customFetch })
+    this.apolloFetch = createApolloFetch({ uri: API_URL })
   }
 
   setLoading = debounce(value => {
