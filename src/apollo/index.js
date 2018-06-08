@@ -1,5 +1,5 @@
 import React from 'react'
-import { AsyncStorage } from 'react-native'
+import { AsyncStorage, Platform } from 'react-native'
 import { ApolloProvider } from 'react-apollo'
 import CookieManager from 'react-native-cookies'
 import ApolloClient from 'apollo-client'
@@ -10,9 +10,6 @@ import { InMemoryCache } from 'apollo-cache-inmemory'
 import { persistCache } from 'apollo-cache-persist'
 import { API_URL, FRONTEND_BASE_URL, LOGIN_URL, FEED_URL } from '../constants'
 import { getMenuStateQuery } from './queries'
-import { parseURL } from '../utils/url'
-
-const frontendUrl = parseURL(FRONTEND_BASE_URL)
 
 const defaults = {
   url: LOGIN_URL,
@@ -73,20 +70,15 @@ export const resolvers = {
 }
 
 const customFetch = async (uri, options) => {
-  const cookieRegex = /connect\.sid=([^;]*)/
   const res = await fetch(uri, options)
-  const sessionCookie = cookieRegex.exec(res.headers.get('set-cookie'))
+  let cookies = res.headers.get('set-cookie')
 
-  if (sessionCookie) {
-    await CookieManager.set({
-      name: 'connect.sid',
-      value: sessionCookie[1],
-      domain: frontendUrl.host,
-      origin: frontendUrl.host,
-      path: '/',
-      version: '1',
-      expiration: '2030-01-01T12:00:00.00-00:00'
-    })
+  if (cookies) {
+    if (Platform.OS === 'ios') {
+      cookies = { 'Set-Cookie': cookies }
+    }
+
+    CookieManager.setFromResponse(FRONTEND_BASE_URL, cookies)
   }
 
   return res
