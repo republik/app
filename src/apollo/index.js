@@ -1,5 +1,5 @@
 import React from 'react'
-import { AsyncStorage, Platform } from 'react-native'
+import { AsyncStorage } from 'react-native'
 import { ApolloProvider } from 'react-apollo'
 import CookieManager from 'react-native-cookies'
 import ApolloClient from 'apollo-client'
@@ -8,7 +8,7 @@ import { createHttpLink } from 'apollo-link-http'
 import { withClientState } from 'apollo-link-state'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import { persistCache } from 'apollo-cache-persist'
-import { API_URL, FRONTEND_BASE_URL, LOGIN_URL, FEED_URL } from '../constants'
+import { API_URL, LOGIN_URL, FEED_URL } from '../constants'
 import { getMenuStateQuery } from './queries'
 
 const defaults = {
@@ -70,18 +70,18 @@ export const resolvers = {
 }
 
 const customFetch = async (uri, options) => {
-  const res = await fetch(uri, options)
-  let cookies = res.headers.get('set-cookie')
+  // console.warn('TEST')
+  // let cookies = res.headers.get('set-cookie')
+  //
+  // if (cookies) {
+  //   if (Platform.OS === 'ios') {
+  //     cookies = { 'Set-Cookie': cookies }
+  //   }
+  //
+  //   CookieManager.setFromResponse(FRONTEND_BASE_URL, cookies)
+  // }
 
-  if (cookies) {
-    if (Platform.OS === 'ios') {
-      cookies = { 'Set-Cookie': cookies }
-    }
-
-    CookieManager.setFromResponse(FRONTEND_BASE_URL, cookies)
-  }
-
-  return res
+  return fetch(uri, options)
 }
 
 const withApollo = WrappedComponent => () => {
