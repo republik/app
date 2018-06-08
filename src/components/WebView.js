@@ -1,7 +1,6 @@
 import React, { Fragment } from 'React'
 import { View, Image, StyleSheet } from 'react-native'
 import WebView from 'react-native-wkwebview-reborn'
-import CookieManager from 'react-native-cookies'
 import Spinner from 'react-native-spinkit'
 import { listenHistory } from '../utils/webHistory'
 
@@ -69,16 +68,6 @@ class CustomWebView extends React.Component {
     if (this.props.onMessage) {
       this.props.onMessage(message)
     }
-  }
-
-  // Sync native cookie store with webview JS runtime
-  syncCookies = () => {
-    CookieManager.getAll().then(res => {
-      for (let key in res) {
-        const { name, value } = res[key]
-        this.instance.evaluateJavaScript(`document.cookie="${name}=${value}"`)
-      }
-    })
   }
 
   render () {

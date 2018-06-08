@@ -69,7 +69,9 @@ class Web extends Component {
 
     // Resolves call app side, and returns the response to web view
     return this.apolloFetch(request).then(data => {
-      this.webview.instance.postMessage(JSON.stringify(data))
+      this.webview.instance.postMessage(
+        JSON.stringify({ id: message.data.id, ...data })
+      )
     })
   }
 
