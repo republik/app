@@ -6,6 +6,7 @@ import { parse } from 'graphql'
 import { execute, makePromise } from 'apollo-link'
 import { listenHistory } from '../utils/webHistory'
 import { link } from '../apollo'
+import withT from '../utils/withT'
 
 const styles = StyleSheet.create({
   container: {
@@ -62,15 +63,15 @@ const LoadingState = () => (
   </View>
 )
 
-const ErrorState = ({ onReload }) => (
+const ErrorState = withT(({ t, onReload }) => (
   <View style={[styles.container, styles.errorContainer]}>
-    <Text style={styles.errorText}>Unable to load contents.</Text>
-    <Text style={styles.errorText}>Please check your network connection.</Text>
+    <Text style={styles.errorText}>{t('webview/error/title')}</Text>
+    <Text style={styles.errorText}>{t('webview/error/description')}</Text>
     <TouchableOpacity onPress={onReload} >
-      <Text style={styles.button}>Reload</Text>
+      <Text style={styles.button}>{t('webview/error/reload')}</Text>
     </TouchableOpacity>
   </View>
-)
+))
 
 class CustomWebView extends React.Component {
   subscriptions = {}
