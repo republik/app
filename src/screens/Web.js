@@ -1,6 +1,8 @@
 import React, { Component, Fragment } from 'react'
 import { StyleSheet, Linking } from 'react-native'
 import { graphql } from 'react-apollo'
+import { createApolloFetch } from 'apollo-fetch'
+import { print } from 'graphql/language/printer'
 import { compose } from 'recompose'
 import gql from 'graphql-tag'
 import debounce from 'lodash.debounce'
@@ -8,7 +10,7 @@ import { parseURL } from '../utils/url'
 import Menu from '../components/Menu'
 import WebView from '../components/WebView'
 import { me, signIn, login, logout } from '../apollo'
-import { FRONTEND_BASE_URL, OFFERS_PATH } from '../constants'
+import { API_URL, FRONTEND_BASE_URL, OFFERS_PATH } from '../constants'
 
 const RESTRICTED_PATHS = [
   OFFERS_PATH
@@ -23,6 +25,7 @@ const isExternalURL = ({ host, protocol }) => {
 
 class Web extends Component {
   state = { loading: true }
+  apolloFetch = createApolloFetch({ uri: API_URL })
 
   setLoading = debounce(value => {
     this.setState({ loading: value })
@@ -49,13 +52,25 @@ class Web extends Component {
 
   onMessage = (message) => {
     switch (message.type) {
-      case 'signin':
-        return this.handleSignInMessages(message)
       case 'session':
         return this.handleSessionMessages(message)
+      case 'graphql':
+        return this.handleGraphQLMessages(message)
       default:
         console.warn(`Unhandled message of type: ${message.type}`)
     }
+  }
+
+  handleGraphQLMessages = (message) => {
+    const request = {
+      ...message.data,
+      query: print(message.data.query)
+    }
+
+    // Resolves call app side, and returns the response to web view
+    return this.apolloFetch(request).then(data => {
+      this.webview.instance.postMessage(JSON.stringify(data))
+    })
   }
 
   handleSessionMessages = (message) => {
@@ -68,12 +83,6 @@ class Web extends Component {
     if (!message.data && me) {
       logout()
     }
-  }
-
-  handleSignInMessages = async (message) => {
-    const res = await this.props.signIn({ variables: message.data })
-    this.webview.instance.postMessage(res.data.signIn.phrase)
-    this.webview.syncCookies()
   }
 
   onLoadStart = () => {
