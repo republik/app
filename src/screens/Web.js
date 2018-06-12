@@ -1,34 +1,49 @@
 import React, { Component, Fragment } from 'react'
 import { StyleSheet, Linking } from 'react-native'
 import { graphql } from 'react-apollo'
-import { createApolloFetch } from 'apollo-fetch'
-import { print } from 'graphql/language/printer'
-import { compose } from 'recompose'
+import { parse } from 'graphql'
+import { ApolloLink, execute, makePromise } from 'apollo-link'
+import { HttpLink } from 'apollo-link-http'
+import { WebSocketLink } from 'apollo-link-ws'
+import {compose} from 'recompose'
 import gql from 'graphql-tag'
 import debounce from 'lodash.debounce'
-import { parseURL } from '../utils/url'
+import {parseURL} from '../utils/url'
 import Menu from '../components/Menu'
 import WebView from '../components/WebView'
-import { me, signIn, login, logout } from '../apollo'
-import { API_URL, FRONTEND_BASE_URL, OFFERS_PATH } from '../constants'
+import {me, signIn, login, logout} from '../apollo'
+import { API_URL, API_WS_URL, FRONTEND_BASE_URL, OFFERS_PATH, DISCUSSIONS_URL } from '../constants'
 
-const RESTRICTED_PATHS = [
-  OFFERS_PATH
-]
+const RESTRICTED_PATHS = [OFFERS_PATH]
 
-const isExternalURL = ({ host, protocol }) => {
-  return (
-    host !== parseURL(FRONTEND_BASE_URL).host &&
-    !protocol.match(/react-js-navigation/)
-  )
+const isExternalURL = ({host, protocol}) => {
+  return (host !== parseURL(FRONTEND_BASE_URL).host && !protocol.match(/react-js-navigation/))
 }
+
+const hasSubscriptionOperation = ({ query }) => (
+  query.definitions.some(
+    ({ kind, operation }) =>
+      kind === 'OperationDefinition' && operation === 'subscription'
+  )
+)
+
+const link = ApolloLink.split(
+  hasSubscriptionOperation,
+  new WebSocketLink({
+    uri: API_WS_URL,
+    options: {
+      reconnect: true,
+      timeout: 50000
+    }
+  }),
+  new HttpLink({ uri: API_URL })
+)
 
 class Web extends Component {
   constructor (props) {
     super(props)
 
     this.state = { loading: true }
-    this.apolloFetch = createApolloFetch({ uri: API_URL })
   }
 
   setLoading = debounce(value => {
@@ -60,30 +75,65 @@ class Web extends Component {
         return this.handleSessionMessages(message)
       case 'graphql':
         return this.handleGraphQLMessages(message)
+      case 'start':
+        return this.handleGraphQLSubscription(message)
       default:
+        console.log(message)
         console.warn(`Unhandled message of type: ${message.type}`)
     }
   }
 
   handleGraphQLMessages = (message) => {
-    const request = {
-      ...message.data,
-      query: print(message.data.query)
+    const operation = {
+      query: message.data.payload.query,
+      operationName: message.data.payload.operationName,
+      variables: message.data.payload.variables,
+      extensions: message.data.payload.extensions
     }
 
-    // Resolves call app side, and returns the response to web view
-    return this.apolloFetch(request).then(data => {
-      this.webview.instance.postMessage(
-        JSON.stringify({ id: message.data.id, ...data })
-      )
+    return makePromise(execute(link, operation)).then(data => {
+      this.webview.instance.postMessage(JSON.stringify({
+        id: message.data.id,
+        ...data
+      }))
     })
   }
 
+  handleGraphQLSubscription = (message) => {
+    switch (message.type) {
+      case 'start':
+        const query = typeof message.payload.query === 'string'
+          ? parse(message.payload.query)
+          : message.payload.query
+
+        const operation = {
+          query,
+          operationName: message.payload.operationName,
+          variables: message.payload.variables,
+          extensions: message.payload.extensions
+        }
+
+        execute(link, operation).subscribe({
+          next: data => {
+            this.webview.instance.postMessage(JSON.stringify({
+              id: message.id,
+              type: 'data',
+              payload: data
+            }))
+          }
+        })
+    }
+  }
+
   handleSessionMessages = (message) => {
-    const { me, login, logout } = this.props
+    const {me, login, logout} = this.props
 
     if (message.data && !me) {
-      login({ variables: { user: message.data } })
+      login({
+        variables: {
+          user: message.data
+        }
+      })
     }
 
     if (!message.data && me) {
@@ -106,7 +156,7 @@ class Web extends Component {
   }
 
   render () {
-    const { data, screenProps, logout } = this.props
+    const { screenProps, logout } = this.props
 
     return (
       <Fragment>
@@ -116,7 +166,7 @@ class Web extends Component {
         />
         <WebView
           ref={node => { this.webview = node }}
-          source={{uri: data.url}}
+          source={{ uri: DISCUSSIONS_URL }}
           style={styles.webView}
           loading={this.state.loading}
           onMessage={this.onMessage}
