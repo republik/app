@@ -10,7 +10,7 @@ import {parseURL} from '../utils/url'
 import Menu from '../components/Menu'
 import WebView from '../components/WebView'
 import { link, me, signIn, login, logout } from '../apollo'
-import { FRONTEND_BASE_URL, OFFERS_PATH, DISCUSSIONS_URL } from '../constants'
+import { FRONTEND_BASE_URL, OFFERS_PATH } from '../constants'
 
 const RESTRICTED_PATHS = [OFFERS_PATH]
 
@@ -130,7 +130,7 @@ class Web extends Component {
   }
 
   render () {
-    const { screenProps, logout } = this.props
+    const { data, screenProps, logout } = this.props
 
     return (
       <Fragment>
@@ -140,7 +140,7 @@ class Web extends Component {
         />
         <WebView
           ref={node => { this.webview = node }}
-          source={{ uri: DISCUSSIONS_URL }}
+          source={{ uri: data.url }}
           style={styles.webView}
           loading={this.state.loading}
           onMessage={this.onMessage}

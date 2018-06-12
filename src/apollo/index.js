@@ -9,7 +9,7 @@ import { InMemoryCache } from 'apollo-cache-inmemory'
 import { persistCache } from 'apollo-cache-persist'
 import { LOGIN_URL } from '../constants'
 import { getMenuStateQuery } from './queries'
-import { httpLink } from './link'
+import { link } from './link'
 
 const defaults = {
   url: LOGIN_URL,
@@ -75,8 +75,8 @@ const withApollo = WrappedComponent => () => {
 
   persistCache({ cache, storage: AsyncStorage, debounce: 500 })
 
-  const link = ApolloLink.from([stateLink, httpLink])
-  const client = new ApolloClient({ cache, link })
+  const composedLink = ApolloLink.from([stateLink, link])
+  const client = new ApolloClient({ cache, link: composedLink })
 
   return (
     <ApolloProvider client={client}>

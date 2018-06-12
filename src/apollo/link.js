@@ -10,9 +10,9 @@ const hasSubscriptionOperation = ({ query }) => (
   )
 )
 
-export const httpLink = new HttpLink({ uri: API_URL })
+const httpLink = new HttpLink({ uri: API_URL })
 
-export const wsLink = new WebSocketLink({
+const wsLink = new WebSocketLink({
   uri: API_WS_URL,
   options: {
     reconnect: true,
