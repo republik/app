@@ -4,15 +4,15 @@ import { ApolloProvider } from 'react-apollo'
 import CookieManager from 'react-native-cookies'
 import ApolloClient from 'apollo-client'
 import { ApolloLink } from 'apollo-link'
-import { createHttpLink } from 'apollo-link-http'
 import { withClientState } from 'apollo-link-state'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import { persistCache } from 'apollo-cache-persist'
-import { API_URL, DISCUSSIONS_URL } from '../constants'
+import { LOGIN_URL } from '../constants'
 import { getMenuStateQuery } from './queries'
+import { httpLink } from './link'
 
 const defaults = {
-  url: DISCUSSIONS_URL,
+  url: LOGIN_URL,
   user: null,
   menuActive: false
 }
@@ -75,8 +75,7 @@ const withApollo = WrappedComponent => () => {
 
   persistCache({ cache, storage: AsyncStorage, debounce: 500 })
 
-  const http = createHttpLink({ uri: API_URL })
-  const link = ApolloLink.from([stateLink, http])
+  const link = ApolloLink.from([stateLink, httpLink])
   const client = new ApolloClient({ cache, link })
 
   return (
@@ -86,6 +85,7 @@ const withApollo = WrappedComponent => () => {
   )
 }
 
+export * from './link'
 export * from './queries'
 export * from './mutations'
 

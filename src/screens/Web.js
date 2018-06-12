@@ -2,17 +2,15 @@ import React, { Component, Fragment } from 'react'
 import { StyleSheet, Linking } from 'react-native'
 import { graphql } from 'react-apollo'
 import { parse } from 'graphql'
-import { ApolloLink, execute, makePromise } from 'apollo-link'
-import { HttpLink } from 'apollo-link-http'
-import { WebSocketLink } from 'apollo-link-ws'
+import { execute, makePromise } from 'apollo-link'
 import {compose} from 'recompose'
 import gql from 'graphql-tag'
 import debounce from 'lodash.debounce'
 import {parseURL} from '../utils/url'
 import Menu from '../components/Menu'
 import WebView from '../components/WebView'
-import {me, signIn, login, logout} from '../apollo'
-import { API_URL, API_WS_URL, FRONTEND_BASE_URL, OFFERS_PATH, DISCUSSIONS_URL } from '../constants'
+import { link, me, signIn, login, logout } from '../apollo'
+import { FRONTEND_BASE_URL, OFFERS_PATH, DISCUSSIONS_URL } from '../constants'
 
 const RESTRICTED_PATHS = [OFFERS_PATH]
 
@@ -20,31 +18,8 @@ const isExternalURL = ({host, protocol}) => {
   return (host !== parseURL(FRONTEND_BASE_URL).host && !protocol.match(/react-js-navigation/))
 }
 
-const hasSubscriptionOperation = ({ query }) => (
-  query.definitions.some(
-    ({ kind, operation }) =>
-      kind === 'OperationDefinition' && operation === 'subscription'
-  )
-)
-
-const link = ApolloLink.split(
-  hasSubscriptionOperation,
-  new WebSocketLink({
-    uri: API_WS_URL,
-    options: {
-      reconnect: true,
-      timeout: 50000
-    }
-  }),
-  new HttpLink({ uri: API_URL })
-)
-
 class Web extends Component {
-  constructor (props) {
-    super(props)
-
-    this.state = { loading: true }
-  }
+  state = { loading: true }
 
   setLoading = debounce(value => {
     this.setState({ loading: value })
@@ -74,16 +49,15 @@ class Web extends Component {
       case 'session':
         return this.handleSessionMessages(message)
       case 'graphql':
-        return this.handleGraphQLMessages(message)
+        return this.handleGraphQLRequest(message)
       case 'start':
         return this.handleGraphQLSubscription(message)
       default:
-        console.log(message)
         console.warn(`Unhandled message of type: ${message.type}`)
     }
   }
 
-  handleGraphQLMessages = (message) => {
+  handleGraphQLRequest = (message) => {
     const operation = {
       query: message.data.payload.query,
       operationName: message.data.payload.operationName,
