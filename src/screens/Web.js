@@ -19,11 +19,20 @@ const isExternalURL = ({host, protocol}) => {
 }
 
 class Web extends Component {
-  state = { loading: true }
+  constructor (props) {
+    super(props)
+
+    this.state = { loading: true }
+    this.postMessage = this.postMessage.bind(this)
+  }
 
   setLoading = debounce(value => {
     this.setState({ loading: value })
   }, 150)
+
+  postMessage (message) {
+    this.webview.instance.postMessage(JSON.stringify(message))
+  }
 
   onNavigationStateChange = (data) => {
     const url = parseURL(data.url)
@@ -66,10 +75,7 @@ class Web extends Component {
     }
 
     return makePromise(execute(link, operation)).then(data => {
-      this.webview.instance.postMessage(JSON.stringify({
-        id: message.data.id,
-        ...data
-      }))
+      this.postMessage({ id: message.data.id, ...data })
     })
   }
 
@@ -89,11 +95,13 @@ class Web extends Component {
 
         execute(link, operation).subscribe({
           next: data => {
-            this.webview.instance.postMessage(JSON.stringify({
-              id: message.id,
-              type: 'data',
-              payload: data
-            }))
+            this.postMessage({ id: message.id, type: 'data', payload: data })
+          },
+          error: error => {
+            this.postMessage({ id: message.id, type: 'error', payload: error })
+          },
+          complete: () => {
+            this.postMessage({ id: message.id, type: 'complete' })
           }
         })
     }
