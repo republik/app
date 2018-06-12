@@ -8,11 +8,11 @@ import { createHttpLink } from 'apollo-link-http'
 import { withClientState } from 'apollo-link-state'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import { persistCache } from 'apollo-cache-persist'
-import { API_URL, LOGIN_URL, FEED_URL } from '../constants'
+import { API_URL, DISCUSSIONS_URL } from '../constants'
 import { getMenuStateQuery } from './queries'
 
 const defaults = {
-  url: LOGIN_URL,
+  url: DISCUSSIONS_URL,
   user: null,
   menuActive: false
 }
@@ -46,7 +46,6 @@ export const resolvers = {
   Mutation: {
     login: (_, { user }, context) => {
       context.cache.writeData({ data: {
-        url: FEED_URL,
         user: { ...user, __typename: 'User' }
       } })
       return true
@@ -69,21 +68,6 @@ export const resolvers = {
   }
 }
 
-const customFetch = async (uri, options) => {
-  // console.warn('TEST')
-  // let cookies = res.headers.get('set-cookie')
-  //
-  // if (cookies) {
-  //   if (Platform.OS === 'ios') {
-  //     cookies = { 'Set-Cookie': cookies }
-  //   }
-  //
-  //   CookieManager.setFromResponse(FRONTEND_BASE_URL, cookies)
-  // }
-
-  return fetch(uri, options)
-}
-
 const withApollo = WrappedComponent => () => {
   const clientState = { defaults, typeDefs, resolvers }
   const cache = new InMemoryCache()
@@ -91,7 +75,7 @@ const withApollo = WrappedComponent => () => {
 
   persistCache({ cache, storage: AsyncStorage, debounce: 500 })
 
-  const http = createHttpLink({ uri: API_URL, fetch: customFetch })
+  const http = createHttpLink({ uri: API_URL })
   const link = ApolloLink.from([stateLink, http])
   const client = new ApolloClient({ cache, link })
 
