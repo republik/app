@@ -1,12 +1,12 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { Image, TouchableOpacity } from 'react-native'
 import ProfileIcon from '../assets/images/profile-icon.png'
 import ProfilePlaceholder from '../assets/images/profile-placeholder.png'
 import { me } from '../apollo'
 
-const ProfileButton  = ({ onPress, style, me }) => {
-  let image;
-  let imageSize;
+const ProfileButton = ({ onPress, style, me }) => {
+  let image
+  let imageSize
 
   if (!me) {
     imageSize = 25
@@ -17,7 +17,7 @@ const ProfileButton  = ({ onPress, style, me }) => {
   }
 
   return (
-    <TouchableOpacity style={style} onPress={() => onPress() }>
+    <TouchableOpacity style={style} onPress={() => onPress()}>
       <Image
         source={image}
         style={{ width: imageSize, height: imageSize }}

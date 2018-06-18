@@ -1,5 +1,4 @@
 import React from 'react'
-import { Image, TouchableOpacity } from 'react-native'
 import ProfileButton from './ProfileButton'
 import HamburgerButton from './HamburgerButton'
 import { getMenuState } from '../apollo'

@@ -14,6 +14,7 @@ const handleEnv = value => {
   return value
 }
 
+export const ENV = handleEnv(Config.ENV)
 export const API_URL = handleEnv(Config.API_URL)
 export const API_WS_URL = handleEnv(Config.API_WS_URL)
 export const FRONTEND_BASE_URL = handleEnv(Config.FRONTEND_BASE_URL)
