@@ -44,7 +44,7 @@
     "react-native-push-notification": "^3.0.2",
     "react-native-spinkit": "^1.1.1",
     "react-native-splash-screen": "^3.0.6",
-    "react-native-wkwebview-reborn": "^1.20.0",
+    "react-native-wkwebview-reborn": "https://github.com/orbiting/react-native-wkwebview",
     "react-navigation": "^2.0.1",
     "recompose": "^0.27.0",
     "subscriptions-transport-ws": "^0.9.10",
