@@ -8,11 +8,11 @@ import {parseURL} from '../utils/url'
 import Menu from '../components/Menu'
 import WebView from '../components/WebView'
 import { me, login, logout } from '../apollo'
-import { FRONTEND_BASE_URL, OFFERS_PATH, LOGIN_URL, HOME_URL } from '../constants'
+import { ENV, FRONTEND_BASE_URL, OFFERS_PATH, LOGIN_URL, FEED_URL, HOME_URL } from '../constants'
 
 const RESTRICTED_PATHS = [OFFERS_PATH]
 
-const isExternalURL = ({host, protocol}) => {
+const isExternalURL = ({ host, protocol }) => {
   return (host !== parseURL(FRONTEND_BASE_URL).host && !protocol.match(/react-js-navigation/))
 }
 
@@ -78,7 +78,8 @@ class Web extends Component {
 
   render () {
     const { me, screenProps, logout } = this.props
-    const uri = me ? HOME_URL : LOGIN_URL
+    const loggedUrl = ENV === 'staging' ? FEED_URL : HOME_URL
+    const uri = me ? loggedUrl : LOGIN_URL
 
     return (
       <Fragment>
