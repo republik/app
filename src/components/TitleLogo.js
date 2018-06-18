@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Image, StyleSheet } from 'react-native'
+import { View, Image, TouchableOpacity, StyleSheet } from 'react-native'
 
 const styles = StyleSheet.create({
   container: {
@@ -16,10 +16,12 @@ const styles = StyleSheet.create({
 
 const TitleLogo = () => (
   <View style={styles.container}>
-    <Image
-      source={require('../assets/images/logo-title.png')}
-      style={styles.logo}
-    />
+    <TouchableOpacity>
+      <Image
+        source={require('../assets/images/logo-title.png')}
+        style={styles.logo}
+      />
+    </TouchableOpacity>
   </View>
 )
 

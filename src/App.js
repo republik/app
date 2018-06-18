@@ -40,7 +40,13 @@ const Router = createStackNavigator({
 })
 
 class App extends Component {
+  state = { cacheLoaded: false }
+
   componentDidMount () {
+    this.props.persistor.restore().then(() => {
+      this.setState({ cacheLoaded: true })
+    })
+
     if (CURTAIN_BACKDOOR_PATH) {
       let cookies = `OpenSesame=${encodeURIComponent(CURTAIN_BACKDOOR_PATH)}; Path=/; Expires=Thu, 01 Jan 2030 00:00:00 GMT; HttpOnly`
 
@@ -57,6 +63,8 @@ class App extends Component {
   }
 
   render () {
+    if (!this.state.cacheLoaded) return null
+
     return (
       <Router screenProps={{
         onLoadEnd: this.hideSplashScreen,

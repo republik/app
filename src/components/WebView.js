@@ -2,7 +2,10 @@ import React, { Fragment } from 'React'
 import { View, Image, StyleSheet } from 'react-native'
 import WebView from 'react-native-wkwebview-reborn'
 import Spinner from 'react-native-spinkit'
+import { parse } from 'graphql'
+import { execute, makePromise } from 'apollo-link'
 import { listenHistory } from '../utils/webHistory'
+import { link } from '../apollo'
 
 const styles = StyleSheet.create({
   container: {
@@ -42,6 +45,12 @@ const LoadingState = () => (
 )
 
 class CustomWebView extends React.Component {
+  subscriptions = {}
+
+  postMessage = message => {
+    this.instance.postMessage(JSON.stringify(message))
+  }
+
   // Native onNavigationStateChange method shim.
   // We call onNavigationStateChange either when the native calls, or onMessage
   onNavigationStateChange = ({ url }) => {
@@ -53,7 +62,7 @@ class CustomWebView extends React.Component {
       // Native WebView does not have a way of preventing a page to load
       // so we go back into the webview's history that has the same effect.
       if (!shouldFollowRedirect) {
-        this.webview.goBack()
+        this.instance.goBack()
       }
     }
   }
@@ -61,12 +70,62 @@ class CustomWebView extends React.Component {
   onMessage = e => {
     const message = JSON.parse(e.nativeEvent.data)
 
-    if (message.type === 'navigation') {
-      return this.onNavigationStateChange(message)
+    switch (message.type) {
+      case 'navigation':
+        return this.onNavigationStateChange(message)
+      case 'graphql':
+        return this.handleGraphQLRequest(message)
+      case 'start':
+      case 'stop':
+        return this.handleGraphQLSubscription(message)
+      case 'log':
+        console.log('Webview >>>', message.data)
+        break
+      default:
+        console.log(message)
+        console.warn(`Unhandled message of type: ${message.type}`)
+    }
+  }
+
+  handleGraphQLRequest = async (message) => {
+    const { onNetwork } = this.props
+    const data = await makePromise(execute(link, message.data.payload))
+
+    if (onNetwork) {
+      await onNetwork({ ...message.data.payload, data })
     }
 
-    if (this.props.onMessage) {
-      this.props.onMessage(message)
+    this.postMessage({ id: message.data.id, payload: data })
+  }
+
+  handleGraphQLSubscription = (message) => {
+    switch (message.type) {
+      case 'stop':
+        this.subscriptions[message.id].unsubscribe()
+        break
+      case 'start':
+        const query = typeof message.payload.query === 'string'
+          ? parse(message.payload.query)
+          : message.payload.query
+
+        const operation = {
+          query,
+          operationName: message.payload.operationName,
+          variables: message.payload.variables,
+          extensions: message.payload.extensions
+        }
+
+        this.subscriptions[message.id] = execute(link, operation).subscribe({
+          next: data => {
+            this.postMessage({ id: message.id, type: 'data', payload: data })
+          },
+          error: error => {
+            this.postMessage({ id: message.id, type: 'error', payload: error })
+          },
+          complete: () => {
+            this.postMessage({ id: message.id, type: 'complete' })
+          }
+        })
     }
   }
 
@@ -78,7 +137,7 @@ class CustomWebView extends React.Component {
         { loading && <LoadingState /> }
         <WebView
           {...this.props}
-          ref={node => { this.webview = node }}
+          ref={node => { this.instance = node }}
           onMessage={this.onMessage}
           onNavigationStateChange={this.onNavigationStateChange}
           automaticallyAdjustContentInsets={false}
