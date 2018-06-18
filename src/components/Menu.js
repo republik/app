@@ -1,7 +1,7 @@
 import React from 'react'
 import { Text, TouchableOpacity, Animated, StyleSheet } from 'react-native'
 import { compose } from 'react-apollo'
-import { toggleMenu, signOut } from '../apollo'
+import { closeMenu, signOut } from '../apollo'
 
 const styles = StyleSheet.create({
   container: {
@@ -35,7 +35,7 @@ class Menu extends React.Component {
   onLogout = () => {
     this.props.signOut()
     this.props.onLogout()
-    this.props.toggleMenu()
+    this.props.closeMenu()
   }
 
   render () {
@@ -54,5 +54,5 @@ class Menu extends React.Component {
 
 export default compose(
   signOut,
-  toggleMenu
+  closeMenu
 )(Menu)
