@@ -77,6 +77,7 @@ const codePushWrapper = WrappedComponent => (
           getUpdateMetadata={this.getUpdateMetadata}
           syncMessage={this.state.syncMessage}
           progress={this.state.progress}
+          {...this.props}
         />
       )
     }

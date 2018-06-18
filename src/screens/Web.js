@@ -1,25 +1,19 @@
 import React, { Component, Fragment } from 'react'
 import { StyleSheet, Linking } from 'react-native'
-import Config from 'react-native-config'
 import { graphql } from 'react-apollo'
 import { compose } from 'recompose'
 import gql from 'graphql-tag'
 import debounce from 'lodash.debounce'
-import { parseURL } from '../utils/url'
+import {parseURL} from '../utils/url'
 import Menu from '../components/Menu'
 import WebView from '../components/WebView'
 import { me, login, logout } from '../apollo'
-import { FRONTEND_BASE_URL, OFFERS_PATH } from '../constants'
+import { FRONTEND_BASE_URL, OFFERS_PATH, LOGIN_URL, HOME_URL } from '../constants'
 
-const RESTRICTED_PATHS = [
-  OFFERS_PATH
-]
+const RESTRICTED_PATHS = [OFFERS_PATH]
 
-const isExternalURL = ({ host, protocol }) => {
-  return (
-    host !== parseURL(FRONTEND_BASE_URL).host &&
-    !protocol.match(/react-js-navigation/)
-  )
+const isExternalURL = ({host, protocol}) => {
+  return (host !== parseURL(FRONTEND_BASE_URL).host && !protocol.match(/react-js-navigation/))
 }
 
 class Web extends Component {
@@ -48,20 +42,6 @@ class Web extends Component {
     return true
   }
 
-  onMessage = (message) => {
-    const { me, login, logout } = this.props
-
-    if (message.type === 'session') {
-      if (message.data && !me) {
-        login({ variables: { user: message.data } })
-      }
-
-      if (!message.data && me) {
-        logout()
-      }
-    }
-  }
-
   onLoadStart = () => {
     if (this.props.screenProps.onLoadStart) {
       this.props.screenProps.onLoadStart()
@@ -76,17 +56,41 @@ class Web extends Component {
     }
   }
 
+  onNetwork = async ({ query, data }) => {
+    const { me, login, logout } = this.props
+    const { definitions } = query
+    const operations = definitions.map(definition => definition.name.value)
+
+    if (operations.includes('me')) {
+      if (data.data.me && !me) {
+        await login({
+          variables: {
+            user: data.data.me
+          }
+        })
+      }
+
+      if (!data.data.me && me) {
+        await logout()
+      }
+    }
+  }
+
   render () {
-    const { data, screenProps } = this.props
+    const { me, screenProps, logout } = this.props
+    const uri = me ? HOME_URL : LOGIN_URL
 
     return (
       <Fragment>
-        <Menu active={screenProps.menuActive} />
+        <Menu
+          onLogout={() => logout()}
+          active={screenProps.menuActive}
+        />
         <WebView
-          source={{uri: data.url}}
+          source={{ uri }}
           style={styles.webView}
           loading={this.state.loading}
-          onMessage={this.onMessage}
+          onNetwork={this.onNetwork}
           onLoadEnd={this.onLoadEnd}
           onLoadStart={this.onLoadStart}
           webViewWillTransition={this.webViewWillTransition}
