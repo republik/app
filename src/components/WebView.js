@@ -1,11 +1,12 @@
 import React, { Fragment } from 'React'
-import { View, Image, StyleSheet } from 'react-native'
+import { Text, View, Image, StyleSheet, TouchableOpacity } from 'react-native'
 import WebView from 'react-native-wkwebview-reborn'
 import Spinner from 'react-native-spinkit'
 import { parse } from 'graphql'
 import { execute, makePromise } from 'apollo-link'
 import { listenHistory } from '../utils/webHistory'
 import { link } from '../apollo'
+import withT from '../utils/withT'
 
 const styles = StyleSheet.create({
   container: {
@@ -18,7 +19,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'white'
+    backgroundColor: '#FFF'
   },
   spinnerContainer: {
     position: 'relative'
@@ -29,6 +30,24 @@ const styles = StyleSheet.create({
     top: 20,
     left: 20,
     position: 'absolute'
+  },
+  errorContainer: {
+    padding: 20,
+    backgroundColor: '#E9A733'
+  },
+  errorText: {
+    color: '#FFF',
+    fontSize: 20,
+    textAlign: 'center',
+    marginBottom: 20
+  },
+  button: {
+    color: '#FFF',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    fontSize: 20,
+    borderColor: 'white',
+    borderWidth: 1
   }
 })
 
@@ -43,6 +62,16 @@ const LoadingState = () => (
     </View>
   </View>
 )
+
+const ErrorState = withT(({ t, onReload }) => (
+  <View style={[styles.container, styles.errorContainer]}>
+    <Text style={styles.errorText}>{t('webview/error/title')}</Text>
+    <Text style={styles.errorText}>{t('webview/error/description')}</Text>
+    <TouchableOpacity onPress={onReload} >
+      <Text style={styles.button}>{t('webview/error/reload')}</Text>
+    </TouchableOpacity>
+  </View>
+))
 
 class CustomWebView extends React.Component {
   subscriptions = {}
@@ -129,6 +158,10 @@ class CustomWebView extends React.Component {
     }
   }
 
+  onReload = () => {
+    this.instance.reload()
+  }
+
   render () {
     const { loading } = this.props
 
@@ -140,6 +173,7 @@ class CustomWebView extends React.Component {
           ref={node => { this.instance = node }}
           onMessage={this.onMessage}
           onNavigationStateChange={this.onNavigationStateChange}
+          renderError={() => <ErrorState onReload={this.onReload} />}
           automaticallyAdjustContentInsets={false}
           injectedJavaScript={listenHistory}
           allowsBackForwardNavigationGestures
