@@ -7,8 +7,8 @@ import debounce from 'lodash.debounce'
 import {parseURL} from '../utils/url'
 import Menu from '../components/Menu'
 import WebView from '../components/WebView'
-import { me, login, logout } from '../apollo'
-import { ENV, FRONTEND_BASE_URL, OFFERS_PATH, LOGIN_URL, FEED_URL, HOME_URL } from '../constants'
+import { me, login, logout, setUrl } from '../apollo'
+import { FRONTEND_BASE_URL, OFFERS_PATH } from '../constants'
 
 const RESTRICTED_PATHS = [OFFERS_PATH]
 
@@ -38,6 +38,8 @@ class Web extends Component {
       Linking.openURL(data.url)
       return false
     }
+
+    this.props.setUrl({ variables: { url: data.url } })
 
     return true
   }
@@ -77,9 +79,9 @@ class Web extends Component {
   }
 
   render () {
-    const { me, screenProps, logout } = this.props
-    const loggedUrl = ENV === 'staging' ? FEED_URL : HOME_URL
-    const uri = me ? loggedUrl : LOGIN_URL
+    const { data, screenProps, logout } = this.props
+
+    console.log(data.url)
 
     return (
       <Fragment>
@@ -88,7 +90,7 @@ class Web extends Component {
           active={screenProps.menuActive}
         />
         <WebView
-          source={{ uri }}
+          source={{ uri: data.url }}
           style={styles.webView}
           loading={this.state.loading}
           onNetwork={this.onNetwork}
@@ -115,4 +117,4 @@ const getData = graphql(gql`
   }
 `)
 
-export default compose(me, login, logout, getData)(Web)
+export default compose(me, login, logout, getData, setUrl)(Web)

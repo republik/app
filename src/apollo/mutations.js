@@ -25,18 +25,16 @@ const logout = graphql(gql`
   }
 `, { name: 'logout' })
 
-const signIn = graphql(gql`
-  mutation SignIn($email: String!, $context: String, $consents: [String!]) {
-    signIn(email: $email, context: $context, consents: $consents) {
-      phrase
-    }
-  }
-`, { name: 'signIn' })
-
 const signOut = graphql(gql`
   mutation SignOut {
     signOut
   }
 `, { name: 'signOut' })
 
-export { toggleMenu, closeMenu, login, logout, signIn, signOut }
+const setUrl = graphql(gql`
+  mutation setUrl($url: String!) {
+    setUrl(url: $url) @client
+  }
+`, { name: 'setUrl' })
+
+export { toggleMenu, closeMenu, login, logout, signOut, setUrl }
