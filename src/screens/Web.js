@@ -11,10 +11,17 @@ import { me, login, logout, setUrl } from '../apollo'
 import { FRONTEND_BASE_URL, OFFERS_PATH } from '../constants'
 
 const RESTRICTED_PATHS = [OFFERS_PATH]
+const PERMITTED_PROTOCOLS = [/react-js-navigation/]
+const PERMITTED_HOSTS = [
+  new RegExp(PDF_BASE_URL),
+  new RegExp(FRONTEND_BASE_URL),
+  /youtube.*\.com/
+]
 
-const isExternalURL = ({ host, protocol }) => {
-  return (host !== parseURL(FRONTEND_BASE_URL).host && !protocol.match(/react-js-navigation/))
-}
+const isExternalURL = ({ host, protocol }) => (
+  PERMITTED_HOSTS.every(p => !host.match(p)) &&
+  PERMITTED_PROTOCOLS.every(p => !protocol.match(p))
+)
 
 class Web extends Component {
   state = { loading: true }
