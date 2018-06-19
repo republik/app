@@ -1,18 +1,44 @@
 import React from 'react'
-import { Text, TouchableOpacity, Animated, StyleSheet } from 'react-native'
+import { View, Text, TouchableOpacity, Animated, StyleSheet } from 'react-native'
 import { compose } from 'react-apollo'
 import { closeMenu, signOut } from '../apollo'
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFF',
-    position: 'absolute',
+    top: 0,
+    left: 0,
     width: '100%',
     height: '100%',
-    top: 0,
-    left: 0
+    position: 'absolute',
+    paddingVertical: 40,
+    paddingHorizontal: 20,
+    backgroundColor: '#FFF'
+  },
+  separator: {
+    height: 1,
+    marginVertical: 20,
+    backgroundColor: '#DADDDC'
+  },
+  itemContainer: {
+    marginBottom: 10
+  },
+  itemText: {
+    fontSize: 21
   }
 })
+
+const MenuItem = ({ onPress, children }) => (
+  <TouchableOpacity
+    onPress={onPress}
+    style={styles.itemContainer}
+  >
+    <Text style={styles.itemText}>{children}</Text>
+  </TouchableOpacity>
+)
+
+const Separator = () => (
+  <View style={styles.separator} />
+)
 
 class Menu extends React.Component {
   zIndex = new Animated.Value(0);
@@ -44,9 +70,28 @@ class Menu extends React.Component {
         styles.container,
         { opacity: this.opacity, zIndex: this.zIndex }
       ]}>
-        <TouchableOpacity onPress={this.onLogout}>
-          <Text>abmelden</Text>
-        </TouchableOpacity>
+        <MenuItem>
+          Konto
+        </MenuItem>
+        <MenuItem>
+          Profil
+        </MenuItem>
+        <MenuItem onPress={this.onLogout}>
+          abmelden
+        </MenuItem>
+        <Separator />
+        <MenuItem>
+          Feed
+        </MenuItem>
+        <MenuItem>
+          Rubriken
+        </MenuItem>
+        <MenuItem>
+          Veranstaltungen
+        </MenuItem>
+        <MenuItem>
+          Community
+        </MenuItem>
       </Animated.View>
     )
   }
