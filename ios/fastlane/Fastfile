@@ -24,7 +24,10 @@ platform :ios do
       type: "appstore",
       git_url: "git@github.com:orbiting/app-certificates.git"
     ) # more information: https://codesigning.guide
-    gym(scheme: "orbitingapp (staging)") # Build your app - more options available
+    gym(
+      scheme: "orbitingapp (staging)",
+      skip_waiting_for_build_processing: true
+    ) # Build your app - more options available
     pilot
     slack(
      message: "New beta version successfully uploaded to the Apple TestFlight.",
