@@ -8,7 +8,7 @@ import {parseURL} from '../utils/url'
 import Menu from '../components/Menu'
 import WebView from '../components/WebView'
 import { me, login, logout, setUrl } from '../apollo'
-import { FRONTEND_BASE_URL, OFFERS_PATH } from '../constants'
+import { PDF_BASE_URL, FRONTEND_BASE_URL, OFFERS_PATH } from '../constants'
 
 const RESTRICTED_PATHS = [OFFERS_PATH]
 const PERMITTED_PROTOCOLS = [/react-js-navigation/]
