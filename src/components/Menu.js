@@ -1,7 +1,8 @@
 import React from 'react'
 import { View, Text, TouchableOpacity, Animated, StyleSheet } from 'react-native'
 import { compose } from 'react-apollo'
-import { closeMenu, signOut } from '../apollo'
+import { me, setUrl, closeMenu, signOut } from '../apollo'
+import { FRONTEND_BASE_URL, ACCOUNT_URL, FEED_URL, FORMATS_URL, EVENTS_URL, COMMUNITY_URL } from '../constants'
 
 const styles = StyleSheet.create({
   container: {
@@ -58,38 +59,45 @@ class Menu extends React.Component {
     }
   }
 
-  onLogout = () => {
+  onItemClick = url => {
+    this.props.setUrl({ variables: { url } })
+    this.props.closeMenu()
+  }
+
+  onLogoutClick = () => {
     this.props.signOut()
     this.props.onLogout()
     this.props.closeMenu()
   }
 
   render () {
+    const { id } = this.props.me
+
     return (
       <Animated.View style={[
         styles.container,
         { opacity: this.opacity, zIndex: this.zIndex }
       ]}>
-        <MenuItem>
+        <MenuItem onPress={() => this.onItemClick(ACCOUNT_URL)}>
           Konto
         </MenuItem>
-        <MenuItem>
+        <MenuItem onPress={() => this.onItemClick(`${FRONTEND_BASE_URL}/~${id}`)}>
           Profil
         </MenuItem>
-        <MenuItem onPress={this.onLogout}>
+        <MenuItem onPress={this.onLogoutClick}>
           abmelden
         </MenuItem>
         <Separator />
-        <MenuItem>
+        <MenuItem onPress={() => this.onItemClick(FEED_URL)}>
           Feed
         </MenuItem>
-        <MenuItem>
+        <MenuItem onPress={() => this.onItemClick(FORMATS_URL)}>
           Rubriken
         </MenuItem>
-        <MenuItem>
+        <MenuItem onPress={() => this.onItemClick(EVENTS_URL)}>
           Veranstaltungen
         </MenuItem>
-        <MenuItem>
+        <MenuItem onPress={() => this.onItemClick(COMMUNITY_URL)}>
           Community
         </MenuItem>
       </Animated.View>
@@ -98,6 +106,8 @@ class Menu extends React.Component {
 };
 
 export default compose(
+  me,
+  setUrl,
   signOut,
   closeMenu
 )(Menu)
