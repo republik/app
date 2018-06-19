@@ -26,15 +26,9 @@ class Web extends Component {
   onNavigationStateChange = (data) => {
     const url = parseURL(data.url)
 
-    // External URLs will natively be opened in system browser.
-    // No need to call Linking.openURL. Just prevent the webview to go there.
-    if (isExternalURL(url)) {
-      return false
-    }
-
-    // If user goes to a restricted path, we open it in system browser
+    // If user goes to a external or restricted path, we open it in system browser
     // and prevent webview to go there.
-    if (RESTRICTED_PATHS.includes(url.path)) {
+    if (isExternalURL(url) || RESTRICTED_PATHS.includes(url.path)) {
       Linking.openURL(data.url)
       return false
     }
