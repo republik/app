@@ -71,7 +71,7 @@ class Menu extends React.Component {
   }
 
   render () {
-    const { id } = this.props.me
+    const id = this.props.me && this.props.me
 
     return (
       <Animated.View style={[

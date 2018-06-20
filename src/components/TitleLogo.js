@@ -1,7 +1,7 @@
 import React from 'react'
 import { View, Image, TouchableOpacity, StyleSheet } from 'react-native'
 import { setUrl } from '../apollo'
-import { FEED_URL } from '../constants'
+import { HOME_URL } from '../constants'
 
 const styles = StyleSheet.create({
   container: {
@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
 
 const TitleLogo = ({ setUrl }) => (
   <View style={styles.container}>
-    <TouchableOpacity onPress={() => setUrl({ variables: { url: FEED_URL } })}>
+    <TouchableOpacity onPress={() => setUrl({ variables: { url: HOME_URL } })}>
       <Image
         source={require('../assets/images/logo-title.png')}
         style={styles.logo}
