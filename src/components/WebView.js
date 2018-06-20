@@ -1,5 +1,5 @@
 import React, { Fragment } from 'React'
-import { Text, View, Image, StyleSheet, TouchableOpacity } from 'react-native'
+import { Text, View, Image, StyleSheet, TouchableOpacity, Platform, BackHandler } from 'react-native'
 import WebView from 'react-native-wkwebview-reborn'
 import Spinner from 'react-native-spinkit'
 import { parse } from 'graphql'
@@ -75,23 +75,40 @@ const ErrorState = withT(({ t, onReload }) => (
 
 class CustomWebView extends React.PureComponent {
   subscriptions = {}
+  webview = { ref: null, canGoBack: false }
+
+  componentWillMount () {
+    if (Platform.OS === 'android') {
+      BackHandler.addEventListener('hardwareBackPress', this.onAndroidBackPress)
+    }
+  }
+
+  componentWillUnmount () {
+    if (Platform.OS === 'android') {
+      BackHandler.removeEventListener('hardwareBackPress')
+    }
+  }
 
   postMessage = message => {
-    this.instance.postMessage(JSON.stringify(message))
+    this.webview.ref.postMessage(JSON.stringify(message))
   }
 
   // Native onNavigationStateChange method shim.
   // We call onNavigationStateChange either when the native calls, or onMessage
-  onNavigationStateChange = ({ url }) => {
+  onNavigationStateChange = ({ url, canGoBack }) => {
     const { source, onNavigationStateChange } = this.props
 
-    if (source.uri !== url && onNavigationStateChange) {
-      const shouldFollowRedirect = onNavigationStateChange({ url })
+    if (source.uri !== url) {
+      this.webview.canGoBack = canGoBack !== false
 
-      // Native WebView does not have a way of preventing a page to load
-      // so we go back into the webview's history that has the same effect.
-      if (!shouldFollowRedirect) {
-        this.instance.goBack()
+      if (onNavigationStateChange) {
+        const shouldFollowRedirect = onNavigationStateChange({ url })
+
+        // Native WebView does not have a way of preventing a page to load
+        // so we go back into the webview's history that has the same effect.
+        if (!shouldFollowRedirect) {
+          this.webview.ref.goBack()
+        }
       }
     }
   }
@@ -130,7 +147,7 @@ class CustomWebView extends React.PureComponent {
   handleGraphQLSubscription = (message) => {
     switch (message.type) {
       case 'stop':
-        this.subscriptions[message.id].unsubscribe()
+        this.subscriptions[message.id] && this.subscriptions[message.id].unsubscribe()
         break
       case 'start':
         const query = typeof message.payload.query === 'string'
@@ -159,7 +176,15 @@ class CustomWebView extends React.PureComponent {
   }
 
   onReload = () => {
-    this.instance.reload()
+    this.webview.ref.reload()
+  }
+
+  onAndroidBackPress = () => {
+    if (this.webview.canGoBack) {
+      this.webview.ref.goBack()
+      return true
+    }
+    return false
   }
 
   render () {
@@ -170,7 +195,7 @@ class CustomWebView extends React.PureComponent {
         { loading && <LoadingState /> }
         <WebView
           {...this.props}
-          ref={node => { this.instance = node }}
+          ref={node => { this.webview.ref = node }}
           onMessage={this.onMessage}
           onNavigationStateChange={this.onNavigationStateChange}
           renderError={() => <ErrorState onReload={this.onReload} />}
