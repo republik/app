@@ -7,7 +7,7 @@ import { ApolloLink } from 'apollo-link'
 import { withClientState } from 'apollo-link-state'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import { CachePersistor } from 'apollo-cache-persist'
-import { LOGIN_URL } from '../constants'
+import { ENV, FEED_URL, HOME_URL, LOGIN_URL } from '../constants'
 import { getMenuStateQuery } from './queries'
 import { link } from './link'
 
@@ -32,6 +32,7 @@ const typeDefs = `
     logout(): Boolean
     toggleMenu(): Boolean
     login(user: User!): Boolean
+    setUrl(url: String!): Boolean
   }
 
   type Query {
@@ -45,6 +46,7 @@ export const resolvers = {
   Mutation: {
     login: (_, { user }, context) => {
       context.cache.writeData({ data: {
+        url: ENV === 'staging' ? FEED_URL : HOME_URL,
         user: { ...user, __typename: 'User' }
       } })
       return true
@@ -63,6 +65,10 @@ export const resolvers = {
     closeMenu: async (_, variables, context) => {
       context.cache.writeData({ data: { menuActive: false } })
       return false
+    },
+    setUrl: async (_, { url }, context) => {
+      context.cache.writeData({ data: { url } })
+      return true
     }
   }
 }

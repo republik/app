@@ -73,7 +73,7 @@ const ErrorState = withT(({ t, onReload }) => (
   </View>
 ))
 
-class CustomWebView extends React.Component {
+class CustomWebView extends React.PureComponent {
   subscriptions = {}
 
   postMessage = message => {
