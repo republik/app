@@ -14,7 +14,8 @@ import { link } from './link'
 const defaults = {
   url: LOGIN_URL,
   user: null,
-  menuActive: false
+  menuActive: false,
+  article: null
 }
 
 const typeDefs = `
@@ -28,17 +29,24 @@ const typeDefs = `
     portrait: String
   }
 
+  type Article {
+    id: String
+    color: String
+  }
+
   type Mutation {
     logout(): Boolean
     toggleMenu(): Boolean
     login(user: User!): Boolean
     setUrl(url: String!): Boolean
+    setArticle(article: Article!): Boolean
   }
 
   type Query {
     me: User
     url: String
     menuActive: Boolean,
+    currentArticle: Article
   }
 `
 
@@ -71,6 +79,17 @@ export const resolvers = {
     },
     setUrl: async (_, { url }, context) => {
       context.cache.writeData({ data: { url } })
+      return true
+    },
+    setArticle: async (_, { article }, context) => {
+      const format = article ? article.meta.format : null
+      const value = article ? {
+        id: article.id,
+        color: format ? format.meta.color : null,
+        __typename: 'Article'
+      } : null
+
+      context.cache.writeData({ data: { article: value } })
       return true
     }
   }
