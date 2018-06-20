@@ -7,9 +7,23 @@ const getMenuStateQuery = gql`
   }
 `
 
-const getMenuState = graphql(getMenuStateQuery, {
+const getCurrentArticleQuery = gql`
+  query GetCurrentArticle {
+    article @client {
+      color
+    }
+  }
+`
+
+const withMenuState = graphql(getMenuStateQuery, {
   props: ({ data: { menuActive } }) => ({
     menuActive
+  })
+})
+
+const withCurrentArticle = graphql(getCurrentArticleQuery, {
+  props: ({ data: { article } }) => ({
+    article
   })
 })
 
@@ -29,4 +43,4 @@ const me = graphql(gql`
   }
 })
 
-export { me, getMenuState, getMenuStateQuery }
+export { me, withMenuState, getMenuStateQuery, withCurrentArticle }

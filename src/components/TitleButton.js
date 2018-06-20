@@ -1,7 +1,7 @@
 import React from 'react'
 import ProfileButton from './ProfileButton'
 import HamburgerButton from './HamburgerButton'
-import { getMenuState } from '../apollo'
+import { withMenuState } from '../apollo'
 
 const buttons = {
   profile: ProfileButton,
@@ -24,4 +24,4 @@ const TitleButton = ({ type, side, menuActive, onPress }) => {
   )
 }
 
-export default getMenuState(TitleButton)
+export default withMenuState(TitleButton)
