@@ -114,6 +114,7 @@ class CustomWebView extends React.PureComponent {
   }
 
   onMessage = e => {
+    const { onMessage } = this.props
     const message = JSON.parse(e.nativeEvent.data)
 
     switch (message.type) {
@@ -128,8 +129,7 @@ class CustomWebView extends React.PureComponent {
         console.log('Webview >>>', message.data)
         break
       default:
-        console.log(message)
-        console.warn(`Unhandled message of type: ${message.type}`)
+        onMessage && onMessage(message)
     }
   }
 
