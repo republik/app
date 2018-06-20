@@ -81,8 +81,6 @@ class Web extends Component {
   render () {
     const { data, screenProps, logout } = this.props
 
-    console.log(data.url)
-
     return (
       <Fragment>
         <Menu
