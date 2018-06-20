@@ -7,7 +7,7 @@ import debounce from 'lodash.debounce'
 import {parseURL} from '../utils/url'
 import Menu from '../components/Menu'
 import WebView from '../components/WebView'
-import { me, login, logout, setUrl } from '../apollo'
+import { me, login, logout, setUrl, setArticle } from '../apollo'
 import { FRONTEND_BASE_URL, OFFERS_PATH } from '../constants'
 
 const RESTRICTED_PATHS = [OFFERS_PATH]
@@ -58,6 +58,18 @@ class Web extends Component {
     }
   }
 
+  onMessage = message => {
+    switch (message.type) {
+      case 'article-opened':
+        return this.props.setArticle({ variables: { article: message.payload } })
+      case 'article-closed':
+        return this.props.setArticle({ variables: { article: null } })
+      default:
+        console.log(message)
+        console.warn(`Unhandled message of type: ${message.type}`)
+    }
+  }
+
   onNetwork = async ({ query, data }) => {
     const { me, login, logout } = this.props
     const { definitions } = query
@@ -92,6 +104,7 @@ class Web extends Component {
           style={styles.webView}
           loading={this.state.loading}
           onNetwork={this.onNetwork}
+          onMessage={this.onMessage}
           onLoadEnd={this.onLoadEnd}
           onLoadStart={this.onLoadStart}
           webViewWillTransition={this.webViewWillTransition}
@@ -115,4 +128,4 @@ const getData = graphql(gql`
   }
 `)
 
-export default compose(me, login, logout, getData, setUrl)(Web)
+export default compose(me, login, logout, getData, setUrl, setArticle)(Web)
