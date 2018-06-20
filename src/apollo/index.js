@@ -53,7 +53,10 @@ export const resolvers = {
     },
     logout: (_, variables, context) => {
       CookieManager.clearAll()
-      context.cache.writeData({ data: { user: null } })
+      context.cache.writeData({ data: {
+        url: LOGIN_URL,
+        user: null
+      } })
       return false
     },
     toggleMenu: async (_, variables, context) => {
