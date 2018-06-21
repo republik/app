@@ -15,6 +15,8 @@ const defaults = {
   url: LOGIN_URL,
   user: null,
   menuActive: false,
+  secondaryMenuActive: false,
+  secondaryMenuVisible: false,
   article: null
 }
 
@@ -32,21 +34,24 @@ const typeDefs = `
   type Article {
     id: String
     color: String
+    series: String
   }
 
   type Mutation {
     logout(): Boolean
     toggleMenu(): Boolean
+    closeMenu(): Boolean
     login(user: User!): Boolean
     setUrl(url: String!): Boolean
     setArticle(article: Article!): Boolean
+    toggleSecondayMenu(): Boolean
+    enableSecondaryMenu(open: Boolean!): Boolean
   }
 
   type Query {
     me: User
-    url: String
-    menuActive: Boolean,
-    currentArticle: Article
+    withMenuState: Boolean
+    withCurrentArticle: Article
   }
 `
 
@@ -82,15 +87,28 @@ export const resolvers = {
       return true
     },
     setArticle: async (_, { article }, context) => {
-      const format = article ? article.meta.format : null
+      const meta = article ? article.meta : {}
+      const format = article ? meta.format : null
       const value = article ? {
         id: article.id,
         color: format ? format.meta.color : null,
+        series: meta.series ? meta.series.title : null,
         __typename: 'Article'
       } : null
 
       context.cache.writeData({ data: { article: value } })
       return true
+    },
+    enableSecondaryMenu: async (_, { open }, context) => {
+      const active = !open ? { secondaryMenuActive: false } : {}
+      context.cache.writeData({ data: { ...active, secondaryMenuVisible: open } })
+      return true
+    },
+    toggleSecondaryMenu: async (_, variables, context) => {
+      const previous = await context.cache.readQuery({ query: getMenuStateQuery })
+      const next = !previous.secondaryMenuActive
+      context.cache.writeData({ data: { secondaryMenuActive: next } })
+      return next
     }
   }
 }

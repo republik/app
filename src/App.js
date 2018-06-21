@@ -9,7 +9,7 @@ import Header from './components/Header'
 import codePush from './services/codePush'
 import deepLinking from './services/deepLinking'
 import pushNotifications from './services/pushNotifications'
-import withApollo, { withMenuState, toggleMenu } from './apollo'
+import withApollo from './apollo'
 import { FRONTEND_BASE_URL, CURTAIN_BACKDOOR_PATH } from './constants'
 
 const Router = createStackNavigator({
@@ -49,11 +49,7 @@ class App extends Component {
     if (!this.state.cacheLoaded) return null
 
     return (
-      <Router screenProps={{
-        onLoadEnd: this.hideSplashScreen,
-        menuActive: this.props.menuActive,
-        toggleMenu: this.props.toggleMenu
-      }} />
+      <Router screenProps={{ onLoadEnd: this.hideSplashScreen }} />
     )
   }
 }
@@ -62,7 +58,5 @@ export default compose(
   withApollo,
   codePush,
   deepLinking,
-  pushNotifications,
-  withMenuState,
-  toggleMenu
+  pushNotifications
 )(App)
