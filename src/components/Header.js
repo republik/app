@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
 
 const Header = ({ article, setUrl, toggleMenu }) => {
   const borderBottomColor = (article && article.color) || 'transparent'
-  console.log(article)
+
   return (
     <View style={[styles.container, { borderBottomColor }]}>
       <TitleButton
