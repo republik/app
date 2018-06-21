@@ -3,18 +3,24 @@ import { Image, TouchableOpacity } from 'react-native'
 import ProfileButton from './ProfileButton'
 import HamburgerButton from './HamburgerButton'
 import { withMenuState } from '../apollo'
+import PDF from '../assets/images/pdf.png'
+import Share from '../assets/images/share.png'
+import Audio from '../assets/images/audio.png'
 import ChevronUp from '../assets/images/chevron-up.png'
 import ChevronDown from '../assets/images/chevron-down.png'
 
 const buttons = {
+  pdf: PDF,
+  audio: Audio,
+  share: Share,
   chevronUp: ChevronUp,
   chevronDown: ChevronDown,
   profile: ProfileButton,
   hamburger: HamburgerButton
 }
 
-const TitleButton = ({ type, side, size, menuActive, onPress }) => {
-  const style = side === 'left'
+const TitleButton = ({ type, side, size, menuActive, onPress, style }) => {
+  const margins = side === 'left'
     ? { marginLeft: 15 }
     : { marginRight: 15 }
 
@@ -25,7 +31,7 @@ const TitleButton = ({ type, side, size, menuActive, onPress }) => {
       <Wrapper onPress={onPress}>
         <Image
           source={buttons[type]}
-          style={{ width: size, height: size }}
+          style={{ ...margins, ...style, width: size, height: size }}
         />
       </Wrapper>
     )
@@ -35,7 +41,7 @@ const TitleButton = ({ type, side, size, menuActive, onPress }) => {
 
   return (
     <Button
-      style={style}
+      style={[margins, style]}
       active={menuActive}
       onPress={onPress}
     />
