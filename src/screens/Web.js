@@ -4,7 +4,7 @@ import { graphql } from 'react-apollo'
 import { compose } from 'recompose'
 import gql from 'graphql-tag'
 import debounce from 'lodash.debounce'
-import {parseURL} from '../utils/url'
+import { parseURL } from '../utils/url'
 import WebView from '../components/WebView'
 import { FRONTEND_BASE_URL, OFFERS_PATH } from '../constants'
 import { me, login, logout, setUrl, setArticle, enableSecondaryMenu, closeMenu, withMenuState } from '../apollo'
@@ -12,7 +12,7 @@ import { me, login, logout, setUrl, setArticle, enableSecondaryMenu, closeMenu, 
 const RESTRICTED_PATHS = [OFFERS_PATH]
 const PERMITTED_PROTOCOLS = ['react-js-navigation']
 const PERMITTED_HOSTS = [
-  FRONTEND_BASE_URL,
+  parseURL(FRONTEND_BASE_URL).host,
   'youtube.com',
   'youtube-nocookie.com',
   'player.vimeo.com'

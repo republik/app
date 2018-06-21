@@ -33,8 +33,12 @@ const typeDefs = `
 
   type Article {
     id: String
+    path: String
+    title: String
     color: String
     series: String
+    template: String
+    audioSource: String
   }
 
   type Mutation {
@@ -89,10 +93,16 @@ export const resolvers = {
     setArticle: async (_, { article }, context) => {
       const meta = article ? article.meta : {}
       const format = article ? meta.format : null
+      const audioSource = article ? meta.audioSource || {} : {}
+
       const value = article ? {
         id: article.id,
+        path: meta.path,
+        title: meta.title,
+        template: meta.template,
         color: format ? format.meta.color : null,
         series: meta.series ? meta.series.title : null,
+        audioSource: audioSource.mp3 || audioSource.ogg || audioSource.aac || null,
         __typename: 'Article'
       } : null
 

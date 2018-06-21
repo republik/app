@@ -12,8 +12,13 @@ const getMenuStateQuery = gql`
 const getCurrentArticleQuery = gql`
   query GetCurrentArticle {
     article @client {
+      id
+      path
       color
+      title
       series
+      template
+      audioSource
     }
   }
 `

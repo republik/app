@@ -14,11 +14,14 @@ const handleEnv = value => {
   return value
 }
 
+// Base urls
 export const ENV = handleEnv(Config.ENV)
 export const API_URL = handleEnv(Config.API_URL)
 export const API_WS_URL = handleEnv(Config.API_WS_URL)
 export const FRONTEND_BASE_URL = handleEnv(Config.FRONTEND_BASE_URL)
-export const CURTAIN_BACKDOOR_PATH = `/${Config.CURTAIN_BACKDOOR_PATH}`
+export const ASSETS_SERVER_BASE_URL = handleEnv(Config.ASSETS_SERVER_BASE_URL)
+
+// App paths
 export const HOME_PATH = `/`
 export const FEED_PATH = `/feed`
 export const ACCOUNT_PATH = '/konto'
@@ -29,6 +32,9 @@ export const COMMUNITY_PATH = '/community'
 export const EVENTS_PATH = '/veranstaltungen'
 export const DISCUSSIONS_PATH = '/diskussion'
 export const NOTIFICATIONS_PATH = '/mitteilung'
+export const CURTAIN_BACKDOOR_PATH = `/${Config.CURTAIN_BACKDOOR_PATH}`
+
+// App urls
 export const HOME_URL = `${FRONTEND_BASE_URL}${HOME_PATH}`
 export const FEED_URL = `${FRONTEND_BASE_URL}${FEED_PATH}`
 export const LOGIN_URL = `${FRONTEND_BASE_URL}${LOGIN_PATH}`
