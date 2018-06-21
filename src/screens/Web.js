@@ -5,9 +5,8 @@ import { compose } from 'recompose'
 import gql from 'graphql-tag'
 import debounce from 'lodash.debounce'
 import {parseURL} from '../utils/url'
-import Menu from '../components/Menu'
 import WebView from '../components/WebView'
-import { me, login, logout, setUrl, setArticle } from '../apollo'
+import { me, login, logout, setUrl, setArticle, closeMenu } from '../apollo'
 import { FRONTEND_BASE_URL, OFFERS_PATH } from '../constants'
 
 const RESTRICTED_PATHS = [OFFERS_PATH]
@@ -18,6 +17,16 @@ const isExternalURL = ({ host, protocol }) => {
 
 class Web extends Component {
   state = { loading: true }
+
+  componentWillReceiveProps (nextProps) {
+    if (!this.props.screenProps.menuActive && nextProps.screenProps.menuActive) {
+      this.webview.postMessage({ type: 'open-menu' })
+    }
+
+    if (this.props.screenProps.menuActive && !nextProps.screenProps.menuActive) {
+      this.webview.postMessage({ type: 'close-menu' })
+    }
+  }
 
   setLoading = debounce(value => {
     this.setState({ loading: value })
@@ -39,6 +48,7 @@ class Web extends Component {
       return false
     }
 
+    this.props.closeMenu()
     this.props.setUrl({ variables: { url: data.url } })
 
     return true
@@ -91,14 +101,10 @@ class Web extends Component {
   }
 
   render () {
-    const { data, screenProps, logout } = this.props
+    const { data } = this.props
 
     return (
       <Fragment>
-        <Menu
-          onLogout={() => logout()}
-          active={screenProps.menuActive}
-        />
         <WebView
           source={{ uri: data.url }}
           style={styles.webView}
@@ -109,6 +115,7 @@ class Web extends Component {
           onLoadStart={this.onLoadStart}
           webViewWillTransition={this.webViewWillTransition}
           onNavigationStateChange={this.onNavigationStateChange}
+          ref={node => { this.webview = node }}
         />
       </Fragment>
     )
@@ -128,4 +135,4 @@ const getData = graphql(gql`
   }
 `)
 
-export default compose(me, login, logout, getData, setUrl, setArticle)(Web)
+export default compose(me, login, logout, getData, setUrl, setArticle, closeMenu)(Web)
