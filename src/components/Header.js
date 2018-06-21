@@ -11,40 +11,33 @@ const styles = StyleSheet.create({
     height: '100%',
     flexDirection: 'row',
     alignItems: 'center',
-    borderBottomWidth: 3,
-    justifyContent: 'space-between',
-    borderBottomColor: 'transparent'
+    justifyContent: 'space-between'
   },
   logo: {
     width: 150,
     height: 25
-
   }
 })
 
-const Header = ({ article, setUrl, toggleMenu }) => {
-  const borderBottomColor = (article && article.color) || 'transparent'
-
-  return (
-    <View style={[styles.container, { borderBottomColor }]}>
-      <TitleButton
-        side="left"
-        type="profile"
-        onPress={toggleMenu}
+const Header = ({ setUrl, toggleMenu }) => (
+  <View style={styles.container}>
+    <TitleButton
+      side="left"
+      type="profile"
+      onPress={toggleMenu}
+    />
+    <TouchableOpacity onPress={() => setUrl({ variables: { url: HOME_URL } })}>
+      <Image
+        source={require('../assets/images/logo-title.png')}
+        style={styles.logo}
       />
-      <TouchableOpacity onPress={() => setUrl({ variables: { url: HOME_URL } })}>
-        <Image
-          source={require('../assets/images/logo-title.png')}
-          style={styles.logo}
-        />
-      </TouchableOpacity>
-      <TitleButton
-        side="right"
-        type="hamburger"
-        onPress={toggleMenu}
-      />
-    </View>
-  )
-}
+    </TouchableOpacity>
+    <TitleButton
+      side="right"
+      type="hamburger"
+      onPress={toggleMenu}
+    />
+  </View>
+)
 
 export default compose(setUrl, withCurrentArticle)(Header)
