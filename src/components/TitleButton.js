@@ -1,27 +1,55 @@
 import React from 'react'
+import { Image, TouchableOpacity } from 'react-native'
 import ProfileButton from './ProfileButton'
 import HamburgerButton from './HamburgerButton'
-import { getMenuState } from '../apollo'
+import { withMenuState } from '../apollo'
+import PDF from '../assets/images/pdf.png'
+import Share from '../assets/images/share.png'
+import Audio from '../assets/images/audio.png'
+import ChevronUp from '../assets/images/chevron-up.png'
+import ChevronDown from '../assets/images/chevron-down.png'
 
 const buttons = {
+  pdf: PDF,
+  audio: Audio,
+  share: Share,
+  chevronUp: ChevronUp,
+  chevronDown: ChevronDown,
   profile: ProfileButton,
   hamburger: HamburgerButton
 }
 
-const TitleButton = ({ type, side, menuActive, onPress }) => {
-  const style = side === 'left'
+const TitleButton = ({ type, side, size, menuActive, onPress, style }) => {
+  const margins = side === 'left'
     ? { marginLeft: 15 }
     : { marginRight: 15 }
+
+  if (typeof buttons[type] === 'number') {
+    const Wrapper = onPress ? TouchableOpacity : ({ children }) => children
+
+    return (
+      <Wrapper onPress={onPress}>
+        <Image
+          source={buttons[type]}
+          style={{ ...margins, ...style, width: size, height: size }}
+        />
+      </Wrapper>
+    )
+  }
 
   const Button = buttons[type]
 
   return (
     <Button
-      style={style}
+      style={[margins, style]}
       active={menuActive}
       onPress={onPress}
     />
   )
 }
 
-export default getMenuState(TitleButton)
+TitleButton.defaultProps = {
+  size: 25
+}
+
+export default withMenuState(TitleButton)

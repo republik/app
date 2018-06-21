@@ -32,9 +32,37 @@ const signOut = graphql(gql`
 `, { name: 'signOut' })
 
 const setUrl = graphql(gql`
-  mutation setUrl($url: String!) {
+  mutation SetUrl($url: String!) {
     setUrl(url: $url) @client
   }
 `, { name: 'setUrl' })
 
-export { toggleMenu, closeMenu, login, logout, signOut, setUrl }
+const setArticle = graphql(gql`
+  mutation SetArticle($article: Article!) {
+    setArticle(article: $article) @client
+  }
+`, { name: 'setArticle' })
+
+const enableSecondaryMenu = graphql(gql`
+  mutation enableSecondaryMenu($open: Boolean) {
+    enableSecondaryMenu(open: $open) @client
+  }
+`, { name: 'enableSecondaryMenu' })
+
+const toggleSecondaryMenu = graphql(gql`
+  mutation ToggleSecondaryMenu {
+    toggleSecondaryMenu @client
+  }
+`, { name: 'toggleSecondaryMenu' })
+
+export {
+  toggleMenu,
+  closeMenu,
+  login,
+  logout,
+  signOut,
+  setUrl,
+  setArticle,
+  enableSecondaryMenu,
+  toggleSecondaryMenu
+}

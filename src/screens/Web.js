@@ -4,17 +4,15 @@ import { graphql } from 'react-apollo'
 import { compose } from 'recompose'
 import gql from 'graphql-tag'
 import debounce from 'lodash.debounce'
-import {parseURL} from '../utils/url'
-import Menu from '../components/Menu'
+import { parseURL } from '../utils/url'
 import WebView from '../components/WebView'
-import { me, login, logout, setUrl } from '../apollo'
-import { PDF_BASE_URL, FRONTEND_BASE_URL, OFFERS_PATH } from '../constants'
+import { FRONTEND_BASE_URL, OFFERS_PATH } from '../constants'
+import { me, login, logout, setUrl, setArticle, enableSecondaryMenu, closeMenu, withMenuState } from '../apollo'
 
 const RESTRICTED_PATHS = [OFFERS_PATH]
 const PERMITTED_PROTOCOLS = ['react-js-navigation']
 const PERMITTED_HOSTS = [
-  PDF_BASE_URL,
-  FRONTEND_BASE_URL,
+  parseURL(FRONTEND_BASE_URL).host,
   'youtube.com',
   'youtube-nocookie.com',
   'player.vimeo.com'
@@ -28,8 +26,32 @@ const isExternalURL = ({ host, protocol }) => (
 class Web extends Component {
   state = { loading: true }
 
+  componentWillReceiveProps (nextProps) {
+    // Toggle primary menu on webview
+    if (!this.props.menuActive && nextProps.menuActive) {
+      this.webview.postMessage({ type: 'open-menu' })
+    }
+
+    if (this.props.menuActive && !nextProps.menuActive) {
+      this.webview.postMessage({ type: 'close-menu' })
+    }
+
+    // Toggle secondary menu on webview
+    if (!this.props.secondaryMenuActive && nextProps.secondaryMenuActive) {
+      this.webview.postMessage({ type: 'open-secondary-menu' })
+    }
+
+    if (this.props.secondaryMenuActive && !nextProps.secondaryMenuActive) {
+      this.webview.postMessage({ type: 'close-secondary-menu' })
+    }
+  }
+
   setLoading = debounce(value => {
     this.setState({ loading: value })
+  }, 150)
+
+  enableSecondaryMenuState = debounce(value => {
+    this.props.enableSecondaryMenu({ variables: { open: value } })
   }, 150)
 
   onNavigationStateChange = (data) => {
@@ -42,7 +64,9 @@ class Web extends Component {
       return false
     }
 
+    this.props.closeMenu()
     this.props.setUrl({ variables: { url: data.url } })
+    this.enableSecondaryMenuState(false)
 
     return true
   }
@@ -58,6 +82,22 @@ class Web extends Component {
 
     if (this.props.screenProps.onLoadEnd) {
       this.props.screenProps.onLoadEnd()
+    }
+  }
+
+  onMessage = message => {
+    switch (message.type) {
+      case 'article-opened':
+        return this.props.setArticle({ variables: { article: message.payload } })
+      case 'article-closed':
+        return this.props.setArticle({ variables: { article: null } })
+      case 'show-secondary-nav':
+        return this.enableSecondaryMenuState(true)
+      case 'hide-secondary-nav':
+        return this.enableSecondaryMenuState(false)
+      default:
+        console.log(message)
+        console.warn(`Unhandled message of type: ${message.type}`)
     }
   }
 
@@ -82,23 +122,21 @@ class Web extends Component {
   }
 
   render () {
-    const { data, screenProps, logout } = this.props
+    const { data } = this.props
 
     return (
       <Fragment>
-        <Menu
-          onLogout={() => logout()}
-          active={screenProps.menuActive}
-        />
         <WebView
           source={{ uri: data.url }}
           style={styles.webView}
           loading={this.state.loading}
           onNetwork={this.onNetwork}
+          onMessage={this.onMessage}
           onLoadEnd={this.onLoadEnd}
           onLoadStart={this.onLoadStart}
           webViewWillTransition={this.webViewWillTransition}
           onNavigationStateChange={this.onNavigationStateChange}
+          ref={node => { this.webview = node }}
         />
       </Fragment>
     )
@@ -118,4 +156,14 @@ const getData = graphql(gql`
   }
 `)
 
-export default compose(me, login, logout, getData, setUrl)(Web)
+export default compose(
+  me,
+  login,
+  logout,
+  getData,
+  setUrl,
+  setArticle,
+  withMenuState,
+  enableSecondaryMenu,
+  closeMenu
+)(Web)
