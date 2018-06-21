@@ -17,7 +17,7 @@ import {
 
 const styles = StyleSheet.create({
   container: {
-    zIndex: 100,
+    zIndex: 150,
     width: '100%',
     height: '100%',
     flexDirection: 'row',
@@ -79,9 +79,14 @@ const onPDFClick = (article) => {
 }
 
 const onShareClick = (article) => {
+  const url = `${FRONTEND_BASE_URL}${article.path}`
+
   Share.share({
+    url,
+    message: url,
     title: article.title,
-    message: `${FRONTEND_BASE_URL}${article.path}`
+    subject: article.title,
+    dialogTitle: article.title
   })
 }
 

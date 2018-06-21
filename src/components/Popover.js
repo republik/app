@@ -11,33 +11,27 @@ const styles = StyleSheet.create({
   }
 })
 
+const DURATION = 300
+
 class Popover extends Component {
-  zIndex = new Animated.Value(0);
   opacity = new Animated.Value(0);
 
   componentWillReceiveProps (newProps) {
     if (newProps.active) {
-      Animated.sequence([
-        Animated.timing(this.zIndex, { toValue: 200, duration: 100 }),
-        Animated.timing(this.opacity, { toValue: 1, duration: 250 })
-      ]).start()
+      Animated.timing(this.opacity, { toValue: 1, duration: DURATION }).start()
     } else {
-      Animated.sequence([
-        Animated.timing(this.opacity, { toValue: 0, duration: 250 }),
-        Animated.timing(this.zIndex, { toValue: 0, duration: 100 })
-      ]).start()
+      Animated.timing(this.opacity, { toValue: 0, duration: DURATION }).start()
     }
   }
 
   render () {
-    const { style, children } = this.props
+    const { active, style, children } = this.props
 
     return (
-      <Animated.View style={[
-        style,
-        styles.container,
-        { opacity: this.opacity, zIndex: this.zIndex }
-      ]}>
+      <Animated.View
+        pointerEvents={active ? 'auto' : 'none'}
+        style={[style, styles.container, { opacity: this.opacity }]}
+      >
         {children}
       </Animated.View>
     )
