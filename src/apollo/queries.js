@@ -4,6 +4,8 @@ import { graphql } from 'react-apollo'
 const getMenuStateQuery = gql`
   query GetMenuState {
     menuActive @client
+    secondaryMenuActive @client
+    secondaryMenuVisible @client
   }
 `
 
@@ -11,13 +13,16 @@ const getCurrentArticleQuery = gql`
   query GetCurrentArticle {
     article @client {
       color
+      series
     }
   }
 `
 
 const withMenuState = graphql(getMenuStateQuery, {
-  props: ({ data: { menuActive } }) => ({
-    menuActive
+  props: ({ data: { menuActive, secondaryMenuVisible, secondaryMenuActive } }) => ({
+    menuActive,
+    secondaryMenuActive,
+    secondaryMenuVisible
   })
 })
 
@@ -43,4 +48,9 @@ const me = graphql(gql`
   }
 })
 
-export { me, withMenuState, getMenuStateQuery, withCurrentArticle }
+export {
+  me,
+  withMenuState,
+  getMenuStateQuery,
+  withCurrentArticle
+}
