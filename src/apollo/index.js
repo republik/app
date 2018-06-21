@@ -54,6 +54,7 @@ const typeDefs = `
 
   type Query {
     me: User
+    withCurrentUrl: String
     withMenuState: Boolean
     withCurrentArticle: Article
   }

@@ -23,6 +23,12 @@ const getCurrentArticleQuery = gql`
   }
 `
 
+const getCurrentUrlQuery = gql`
+  query GetCurrentUrl {
+    url @client
+  }
+`
+
 const withMenuState = graphql(getMenuStateQuery, {
   props: ({ data: { menuActive, secondaryMenuVisible, secondaryMenuActive } }) => ({
     menuActive,
@@ -34,6 +40,12 @@ const withMenuState = graphql(getMenuStateQuery, {
 const withCurrentArticle = graphql(getCurrentArticleQuery, {
   props: ({ data: { article } }) => ({
     article
+  })
+})
+
+const withCurrentUrl: String = graphql(getCurrentUrlQuery, {
+  props: ({ data: { url } }) => ({
+    currentUrl: url
   })
 })
 
@@ -56,6 +68,7 @@ const me = graphql(gql`
 export {
   me,
   withMenuState,
+  withCurrentUrl,
   getMenuStateQuery,
   withCurrentArticle
 }
