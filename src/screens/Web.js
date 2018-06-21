@@ -6,8 +6,8 @@ import gql from 'graphql-tag'
 import debounce from 'lodash.debounce'
 import {parseURL} from '../utils/url'
 import WebView from '../components/WebView'
-import { me, login, logout, setUrl, setArticle, closeMenu } from '../apollo'
 import { PDF_BASE_URL, FRONTEND_BASE_URL, OFFERS_PATH } from '../constants'
+import { me, login, logout, setUrl, setArticle, enableSecondaryMenu, closeMenu, withMenuState } from '../apollo'
 
 const RESTRICTED_PATHS = [OFFERS_PATH]
 const PERMITTED_PROTOCOLS = ['react-js-navigation']
@@ -28,17 +28,31 @@ class Web extends Component {
   state = { loading: true }
 
   componentWillReceiveProps (nextProps) {
-    if (!this.props.screenProps.menuActive && nextProps.screenProps.menuActive) {
+    // Toggle primary menu on webview
+    if (!this.props.menuActive && nextProps.menuActive) {
       this.webview.postMessage({ type: 'open-menu' })
     }
 
-    if (this.props.screenProps.menuActive && !nextProps.screenProps.menuActive) {
+    if (this.props.menuActive && !nextProps.menuActive) {
       this.webview.postMessage({ type: 'close-menu' })
+    }
+
+    // Toggle secondary menu on webview
+    if (!this.props.secondaryMenuActive && nextProps.secondaryMenuActive) {
+      this.webview.postMessage({ type: 'open-secondary-menu' })
+    }
+
+    if (this.props.secondaryMenuActive && !nextProps.secondaryMenuActive) {
+      this.webview.postMessage({ type: 'close-secondary-menu' })
     }
   }
 
   setLoading = debounce(value => {
     this.setState({ loading: value })
+  }, 150)
+
+  enableSecondaryMenuState = debounce(value => {
+    this.props.enableSecondaryMenu({ variables: { open: value } })
   }, 150)
 
   onNavigationStateChange = (data) => {
@@ -53,6 +67,7 @@ class Web extends Component {
 
     this.props.closeMenu()
     this.props.setUrl({ variables: { url: data.url } })
+    this.enableSecondaryMenuState(false)
 
     return true
   }
@@ -77,6 +92,10 @@ class Web extends Component {
         return this.props.setArticle({ variables: { article: message.payload } })
       case 'article-closed':
         return this.props.setArticle({ variables: { article: null } })
+      case 'show-secondary-nav':
+        return this.enableSecondaryMenuState(true)
+      case 'hide-secondary-nav':
+        return this.enableSecondaryMenuState(false)
       default:
         console.log(message)
         console.warn(`Unhandled message of type: ${message.type}`)
@@ -138,4 +157,14 @@ const getData = graphql(gql`
   }
 `)
 
-export default compose(me, login, logout, getData, setUrl, setArticle, closeMenu)(Web)
+export default compose(
+  me,
+  login,
+  logout,
+  getData,
+  setUrl,
+  setArticle,
+  withMenuState,
+  enableSecondaryMenu,
+  closeMenu
+)(Web)
