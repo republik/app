@@ -141,7 +141,7 @@ class CustomWebView extends React.PureComponent {
       await onNetwork({ ...message.data.payload, data })
     }
 
-    this.postMessage({ id: message.data.id, payload: data })
+    this.postMessage({ id: message.data.id, type: 'graphql', payload: data })
   }
 
   handleGraphQLSubscription = (message) => {
