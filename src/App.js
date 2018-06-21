@@ -5,12 +5,11 @@ import { createStackNavigator } from 'react-navigation'
 import CookieManager from 'react-native-cookies'
 import { compose } from 'recompose'
 import Web from './screens/Web'
-import TitleLogo from './components/TitleLogo'
-import TitleButton from './components/TitleButton'
+import Header from './components/Header'
 import codePush from './services/codePush'
 import deepLinking from './services/deepLinking'
 import pushNotifications from './services/pushNotifications'
-import withApollo, { getMenuState, toggleMenu } from './apollo'
+import withApollo from './apollo'
 import { FRONTEND_BASE_URL, CURTAIN_BACKDOOR_PATH } from './constants'
 
 const Router = createStackNavigator({
@@ -18,24 +17,8 @@ const Router = createStackNavigator({
 }, {
   initialRouteName: 'Web',
   navigationOptions: ({ screenProps }) => ({
-    headerTitle: <TitleLogo />,
-    headerLeft: (
-      <TitleButton
-        side="left"
-        type="profile"
-        onPress={screenProps.toggleMenu}
-      />
-    ),
-    headerRight: (
-      <TitleButton
-        side="right"
-        type="hamburger"
-        onPress={screenProps.toggleMenu}
-      />
-    ),
-    headerStyle: {
-      backgroundColor: '#FFFFFF'
-    }
+    headerTitle: <Header {...screenProps} />,
+    headerStyle: { backgroundColor: '#FFFFFF' }
   })
 })
 
@@ -66,11 +49,7 @@ class App extends Component {
     if (!this.state.cacheLoaded) return null
 
     return (
-      <Router screenProps={{
-        onLoadEnd: this.hideSplashScreen,
-        menuActive: this.props.menuActive,
-        toggleMenu: this.props.toggleMenu
-      }} />
+      <Router screenProps={{ onLoadEnd: this.hideSplashScreen }} />
     )
   }
 }
@@ -79,7 +58,5 @@ export default compose(
   withApollo,
   codePush,
   deepLinking,
-  pushNotifications,
-  getMenuState,
-  toggleMenu
+  pushNotifications
 )(App)
