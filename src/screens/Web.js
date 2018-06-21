@@ -8,13 +8,22 @@ import {parseURL} from '../utils/url'
 import Menu from '../components/Menu'
 import WebView from '../components/WebView'
 import { me, login, logout, setUrl } from '../apollo'
-import { FRONTEND_BASE_URL, OFFERS_PATH } from '../constants'
+import { PDF_BASE_URL, FRONTEND_BASE_URL, OFFERS_PATH } from '../constants'
 
 const RESTRICTED_PATHS = [OFFERS_PATH]
+const PERMITTED_PROTOCOLS = ['react-js-navigation']
+const PERMITTED_HOSTS = [
+  PDF_BASE_URL,
+  FRONTEND_BASE_URL,
+  'youtube.com',
+  'youtube-nocookie.com',
+  'player.vimeo.com'
+]
 
-const isExternalURL = ({ host, protocol }) => {
-  return (host !== parseURL(FRONTEND_BASE_URL).host && !protocol.match(/react-js-navigation/))
-}
+const isExternalURL = ({ host, protocol }) => (
+  PERMITTED_HOSTS.every(p => !host.includes(p)) &&
+  PERMITTED_PROTOCOLS.every(p => !protocol.includes(p))
+)
 
 class Web extends Component {
   state = { loading: true }
@@ -26,15 +35,9 @@ class Web extends Component {
   onNavigationStateChange = (data) => {
     const url = parseURL(data.url)
 
-    // External URLs will natively be opened in system browser.
-    // No need to call Linking.openURL. Just prevent the webview to go there.
-    if (isExternalURL(url)) {
-      return false
-    }
-
-    // If user goes to a restricted path, we open it in system browser
+    // If user goes to a external or restricted path, we open it in system browser
     // and prevent webview to go there.
-    if (RESTRICTED_PATHS.includes(url.path)) {
+    if (isExternalURL(url) || RESTRICTED_PATHS.includes(url.path)) {
       Linking.openURL(data.url)
       return false
     }
