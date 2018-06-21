@@ -3,9 +3,17 @@ import { compose } from 'react-apollo'
 import { View, Text, Image, TouchableOpacity, Linking, Share, StyleSheet } from 'react-native'
 import Popover from './Popover'
 import TitleButton from './TitleButton'
-import { toggleMenu, setUrl, withCurrentArticle, withMenuState, toggleSecondaryMenu } from '../apollo'
-import { FRONTEND_BASE_URL, HOME_URL } from '../constants'
+import { parseURL } from '../utils/url'
 import { getPdfUrl } from '../utils/pdf'
+import { FRONTEND_BASE_URL, HOME_URL, FEED_URL } from '../constants'
+import {
+  setUrl,
+  toggleMenu,
+  withMenuState,
+  withCurrentUrl,
+  withCurrentArticle,
+  toggleSecondaryMenu
+} from '../apollo'
 
 const styles = StyleSheet.create({
   container: {
@@ -38,26 +46,33 @@ const styles = StyleSheet.create({
   }
 })
 
-const MainHeader = ({ toggleMenu, setUrl }) => (
-  <View style={styles.container}>
-    <TitleButton
-      side="left"
-      type="profile"
-      onPress={toggleMenu}
-    />
-    <TouchableOpacity onPress={() => setUrl({ variables: { url: HOME_URL } })}>
-      <Image
-        source={require('../assets/images/logo-title.png')}
-        style={styles.logo}
+const MainHeader = ({ toggleMenu, setUrl, currentUrl }) => {
+  const currentPath = parseURL(currentUrl).path
+  const onLogoClick = () => setUrl({ variables: {
+    url: currentPath === '/' ? FEED_URL : HOME_URL }
+  })
+
+  return (
+    <View style={styles.container}>
+      <TitleButton
+        side="left"
+        type="profile"
+        onPress={toggleMenu}
       />
-    </TouchableOpacity>
-    <TitleButton
-      side="right"
-      type="hamburger"
-      onPress={toggleMenu}
-    />
-  </View>
-)
+      <TouchableOpacity onPress={onLogoClick}>
+        <Image
+          source={require('../assets/images/logo-title.png')}
+          style={styles.logo}
+        />
+      </TouchableOpacity>
+      <TitleButton
+        side="right"
+        type="hamburger"
+        onPress={toggleMenu}
+      />
+    </View>
+  )
+}
 
 const onPDFClick = (article) => {
   Linking.openURL(getPdfUrl(article))
@@ -131,6 +146,7 @@ const SeriesHeader = ({
 const Header = ({
   article,
   setUrl,
+  currentUrl,
   toggleMenu,
   menuActive,
   secondaryMenuActive,
@@ -138,7 +154,11 @@ const Header = ({
   toggleSecondaryMenu
 }) => (
   <Fragment>
-    <MainHeader toggleMenu={toggleMenu} setUrl={setUrl} />
+    <MainHeader
+      setUrl={setUrl}
+      currentUrl={currentUrl}
+      toggleMenu={toggleMenu}
+    />
     <SeriesHeader
       article={article}
       toggleMenu={toggleMenu}
@@ -151,8 +171,9 @@ const Header = ({
 
 export default compose(
   setUrl,
-  withCurrentArticle,
-  withMenuState,
   toggleMenu,
+  withMenuState,
+  withCurrentUrl,
+  withCurrentArticle,
   toggleSecondaryMenu
 )(Header)
