@@ -17,7 +17,6 @@ const handleEnv = value => {
 export const ENV = handleEnv(Config.ENV)
 export const API_URL = handleEnv(Config.API_URL)
 export const API_WS_URL = handleEnv(Config.API_WS_URL)
-export const PDF_BASE_URL = handleEnv(Config.PDF_BASE_URL)
 export const FRONTEND_BASE_URL = handleEnv(Config.FRONTEND_BASE_URL)
 export const CURTAIN_BACKDOOR_PATH = `/${Config.CURTAIN_BACKDOOR_PATH}`
 export const HOME_PATH = `/`

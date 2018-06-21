@@ -6,13 +6,12 @@ import gql from 'graphql-tag'
 import debounce from 'lodash.debounce'
 import {parseURL} from '../utils/url'
 import WebView from '../components/WebView'
-import { PDF_BASE_URL, FRONTEND_BASE_URL, OFFERS_PATH } from '../constants'
+import { FRONTEND_BASE_URL, OFFERS_PATH } from '../constants'
 import { me, login, logout, setUrl, setArticle, enableSecondaryMenu, closeMenu, withMenuState } from '../apollo'
 
 const RESTRICTED_PATHS = [OFFERS_PATH]
 const PERMITTED_PROTOCOLS = ['react-js-navigation']
 const PERMITTED_HOSTS = [
-  PDF_BASE_URL,
   FRONTEND_BASE_URL,
   'youtube.com',
   'youtube-nocookie.com',
