@@ -21,7 +21,7 @@ const deepLinkingWrapper = WrappedComponent => (
       // When deep/universal link opened, we edit
       //   the global url state to show correct page
       this.props.client.writeData({ data: {
-        url: `${FRONTEND_BASE_URL}/${path}?${params.toString()}`
+        url: `${FRONTEND_BASE_URL}${path}?${params.toString()}`
       } })
     }
 
