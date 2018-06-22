@@ -9,17 +9,17 @@
   <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
   <application android:name="app.republik.MainApplication" android:label="@string/app_name" android:icon="@mipmap/ic_launcher" android:theme="@style/AppTheme">
-    <activity android:name="app.republik.MainActivity" android:label="@string/app_name" android:configChanges="keyboard|keyboardHidden|orientation|screenSize" android:windowSoftInputMode="adjustResize">
+    <activity android:name="app.republik.MainActivity" android:label="@string/app_name" android:configChanges="keyboard|keyboardHidden|orientation|screenSize" android:windowSoftInputMode="adjustResize" android:launchMode="singleTask">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>
         <category android:name="android.intent.category.LAUNCHER"/>
       </intent-filter>
-      <intent-filter android:label="filter_react_native">
+      <intent-filter android:label="@string/app_name" android:autoVerify="true">
         <action android:name="android.intent.action.VIEW"/>
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
-        <data android:scheme="republik" android:host="*"/>
-        <data android:scheme="https" android:host="republik.ch" android:pathPattern="*"/>
+        <data android:scheme="https" android:host="republik.ch" />
+        <data android:scheme="https" android:host="app.republik.black" />
       </intent-filter>
     </activity>
     <activity android:name="com.facebook.react.devsupport.DevSettingsActivity"/>
