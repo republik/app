@@ -7,18 +7,19 @@ export const listenHistoryImpl = function () {
   var replaceState = window.history.replaceState
   var back = window.history.back
 
-  function updateNavState (url) {
+  function updateNavState (url, canGoBack) {
     let hash = location.hash !== '' ? '?' + location.hash : ''
     let prefix = location.protocol + '//' + location.host
 
     window.postMessage(JSON.stringify({
       type: 'navigation',
-      url: url ? (prefix + url) : (prefix + location.pathname + hash)
+      url: url ? (prefix + url) : (prefix + location.pathname + hash),
+      canGoBack
     }))
   };
 
   window.history.pushState = function () {
-    updateNavState(arguments[2])
+    updateNavState(arguments[2], true)
     return pushState.apply(window.history, arguments)
   }
 

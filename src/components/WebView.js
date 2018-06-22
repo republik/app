@@ -75,7 +75,7 @@ const ErrorState = withT(({ t, onReload }) => (
 
 class CustomWebView extends React.PureComponent {
   subscriptions = {}
-  webview = { ref: null, canGoBack: false }
+  webview = { ref: null, url: null, canGoBack: false }
 
   componentWillMount () {
     if (Platform.OS === 'android') {
@@ -96,21 +96,24 @@ class CustomWebView extends React.PureComponent {
   // Native onNavigationStateChange method shim.
   // We call onNavigationStateChange either when the native calls, or onMessage
   onNavigationStateChange = ({ url, canGoBack }) => {
-    const { source, onNavigationStateChange } = this.props
+    const { onNavigationStateChange } = this.props
 
-    if (source.uri !== url) {
-      this.webview.canGoBack = canGoBack !== false
+    this.webview.canGoBack = this.webview.canGoBack || canGoBack
+
+    if (this.webview.url !== url) {
+      this.webview.url = url
 
       if (onNavigationStateChange) {
         const shouldFollowRedirect = onNavigationStateChange({ url })
 
-        // Native WebView does not have a way of preventing a page to load
-        // so we go back into the webview's history that has the same effect.
         if (!shouldFollowRedirect) {
-          this.webview.ref.goBack()
+          this.webview.ref.stopLoading()
+          return false
         }
       }
     }
+
+    return true
   }
 
   onMessage = e => {
@@ -182,8 +185,10 @@ class CustomWebView extends React.PureComponent {
   onAndroidBackPress = () => {
     if (this.webview.canGoBack) {
       this.webview.ref.goBack()
+      this.webview.canGoBack = undefined
       return true
     }
+
     return false
   }
 
