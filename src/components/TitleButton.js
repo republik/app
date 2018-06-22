@@ -6,6 +6,7 @@ import { withMenuState } from '../apollo'
 import PDF from '../assets/images/pdf.png'
 import Share from '../assets/images/share.png'
 import Audio from '../assets/images/audio.png'
+import Discussion from '../assets/images/discussion.png'
 import ChevronUp from '../assets/images/chevron-up.png'
 import ChevronDown from '../assets/images/chevron-down.png'
 
@@ -16,6 +17,7 @@ const buttons = {
   chevronUp: ChevronUp,
   chevronDown: ChevronDown,
   profile: ProfileButton,
+  discussion: Discussion,
   hamburger: HamburgerButton
 }
 

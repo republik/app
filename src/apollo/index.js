@@ -39,6 +39,7 @@ const typeDefs = `
     series: String
     template: String
     audioSource: String
+    discussion: String
   }
 
   type Mutation {
@@ -103,6 +104,7 @@ export const resolvers = {
         template: meta.template,
         color: format ? format.meta.color : null,
         series: meta.series ? meta.series.title : null,
+        discussion: meta.discussion ? meta.discussion.meta.path : null,
         audioSource: audioSource.mp3 || audioSource.ogg || audioSource.aac || null,
         __typename: 'Article'
       } : null

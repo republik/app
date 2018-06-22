@@ -91,16 +91,18 @@ const onShareClick = (article) => {
 }
 
 const SeriesHeader = ({
+  setUrl,
   article,
   active,
   menuOpened,
   toggleMenu,
   toggleSecondaryMenu
 }) => {
-  const icon = menuOpened ? 'chevronUp' : 'chevronDown'
   const name = article && article.series
   const audio = article && article.audioSource
-  const hasPdf = article && article.template === 'article'
+  const discussion = article && article.discussion
+  const pdf = article && article.template === 'article'
+  const icon = menuOpened ? 'chevronUp' : 'chevronDown'
 
   return (
     <Popover active={active} style={styles.container}>
@@ -120,7 +122,7 @@ const SeriesHeader = ({
           onPress={() => onShareClick(article)}
           style={{ marginRight: 5 }}
         />
-        { hasPdf && (
+        { pdf && (
           <TitleButton
             size={30}
             side="right"
@@ -135,6 +137,20 @@ const SeriesHeader = ({
             side="right"
             type="audio"
             style={{ marginRight: 5 }}
+          />
+        )}
+        { discussion && (
+          <TitleButton
+            size={30}
+            side="right"
+            type="discussion"
+            style={{ marginRight: 5 }}
+            onPress={() => {
+              console.log(`${FRONTEND_BASE_URL}${article.discussion}`)
+              setUrl({
+                variables: { url: `${FRONTEND_BASE_URL}${article.discussion}` }
+              })
+            }}
           />
         )}
       </View>
@@ -165,6 +181,7 @@ const Header = ({
       toggleMenu={toggleMenu}
     />
     <SeriesHeader
+      setUrl={setUrl}
       article={article}
       toggleMenu={toggleMenu}
       menuOpened={secondaryMenuActive}
