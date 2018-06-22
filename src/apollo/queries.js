@@ -18,6 +18,7 @@ const getCurrentArticleQuery = gql`
       title
       series
       template
+      discussion
       audioSource
     }
   }
