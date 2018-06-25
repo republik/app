@@ -197,6 +197,7 @@ class CustomWebView extends React.PureComponent {
   }
 
   render () {
+    const { uri } = this.webview
     const { loading } = this.props
 
     return (
@@ -204,6 +205,7 @@ class CustomWebView extends React.PureComponent {
         { loading && <LoadingState /> }
         <WebView
           {...this.props}
+          source={{ uri }}
           ref={node => { this.webview.ref = node }}
           onMessage={this.onMessage}
           onNavigationStateChange={this.onNavigationStateChange}

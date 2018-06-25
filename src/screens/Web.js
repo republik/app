@@ -76,6 +76,7 @@ class Web extends Component {
     this.lastUrl = data.url
     this.props.closeMenu()
     this.enableSecondaryMenuState(false)
+    this.props.setUrl({ variables: { url: data.url } })
 
     return true
   }
