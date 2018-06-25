@@ -124,6 +124,15 @@ class CustomWebView extends React.PureComponent {
     return true
   }
 
+  onScrollStateChange = ({ payload }) => {
+    if (this.props.onScroll) {
+      this.props.onScroll(payload)
+      return true
+    }
+
+    return false
+  }
+
   onMessage = e => {
     const { onMessage } = this.props
     const message = JSON.parse(e.nativeEvent.data)
@@ -131,6 +140,8 @@ class CustomWebView extends React.PureComponent {
     switch (message.type) {
       case 'navigation':
         return this.onNavigationStateChange(message)
+      case 'scroll':
+        return this.onScrollStateChange(message)
       case 'graphql':
         return this.handleGraphQLRequest(message)
       case 'start':
@@ -197,7 +208,6 @@ class CustomWebView extends React.PureComponent {
   }
 
   render () {
-    const { uri } = this.webview
     const { loading } = this.props
 
     return (
@@ -205,7 +215,6 @@ class CustomWebView extends React.PureComponent {
         { loading && <LoadingState /> }
         <WebView
           {...this.props}
-          source={{ uri }}
           ref={node => { this.webview.ref = node }}
           onMessage={this.onMessage}
           onNavigationStateChange={this.onNavigationStateChange}

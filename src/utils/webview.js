@@ -50,6 +50,21 @@ export const injectedJavaScriptImpl = function () {
 
   // Scrolling polyfills
 
+  function debounce (func, wait) {
+    var timeout
+
+    return function () {
+      var context = this
+      var args = arguments
+      var later = function () {
+        timeout = null
+        func.apply(context, args)
+      }
+      clearTimeout(timeout)
+      timeout = setTimeout(later, wait)
+    }
+  }
+
   document.addEventListener('message', function (event) {
     var message = JSON.parse(event.data)
 
@@ -57,6 +72,15 @@ export const injectedJavaScriptImpl = function () {
       window.scrollTo(0, 0)
     }
   })
+
+  var onScroll = debounce(function (scroll) {
+    window.postMessage(JSON.stringify({
+      type: 'scroll',
+      payload: { x: window.scrollX, y: window.scrollY }
+    }))
+  }, 150)
+
+  window.addEventListener('scroll', onScroll)
 }
 
 // Implementation IIFE ready to inject

@@ -1,10 +1,5 @@
-<<<<<<< 67f1785d2950dcb6e124e3faa88d453a406fc2bc
-import React, { Component, Fragment } from 'react'
-import { StyleSheet, Linking, AppState } from 'react-native'
-=======
 import React, { Component } from 'react'
-import { StyleSheet, Linking, ScrollView, RefreshControl } from 'react-native'
->>>>>>> Implement pull to refresh
+import { StyleSheet, Linking, ScrollView, AppState, RefreshControl } from 'react-native'
 import { graphql } from 'react-apollo'
 import { compose } from 'recompose'
 import gql from 'graphql-tag'
@@ -14,6 +9,7 @@ import WebView from '../components/WebView'
 import { FRONTEND_BASE_URL, OFFERS_PATH } from '../constants'
 import { me, login, logout, setUrl, setArticle, enableSecondaryMenu, closeMenu, withMenuState } from '../apollo'
 
+const RELOAD_OFFSET_HEIGHT = 15
 const RESTRICTED_PATHS = [OFFERS_PATH]
 const PERMITTED_PROTOCOLS = ['react-js-navigation']
 const PERMITTED_HOSTS = [
@@ -29,8 +25,16 @@ const isExternalURL = ({ host, protocol }) => (
 )
 
 class Web extends Component {
-  lastUrl = null
-  state = { loading: true, refreshing: false }
+  constructor (props) {
+    super(props)
+
+    this.lastUrl = props.data.url
+    this.state = {
+      loading: true,
+      refreshing: false,
+      refreshEnabled: true
+    }
+  }
 
   componentDidMount () {
     AppState.addEventListener('change', this.onAppStateChange)
@@ -58,6 +62,8 @@ class Web extends Component {
     if (this.props.secondaryMenuActive && !nextProps.secondaryMenuActive) {
       this.webview.postMessage({ type: 'close-secondary-menu' })
     }
+
+    this.lastUrl = nextProps.data.url
   }
 
   setLoading = debounce(value => {
@@ -81,7 +87,6 @@ class Web extends Component {
     this.lastUrl = data.url
     this.props.closeMenu()
     this.enableSecondaryMenuState(false)
-    this.props.setUrl({ variables: { url: data.url } })
 
     return true
   }
@@ -94,8 +99,11 @@ class Web extends Component {
 
   onLoadEnd = () => {
     this.setLoading(false)
-    this.setState({ refreshing: false })
-    this.webview.postMessage({ type: 'scroll-to-top' })
+
+    if (this.state.refreshing) {
+      this.setState({ refreshing: false })
+      this.webview.postMessage({ type: 'scroll-to-top' })
+    }
 
     if (this.props.screenProps.onLoadEnd) {
       this.props.screenProps.onLoadEnd()
@@ -140,7 +148,7 @@ class Web extends Component {
 
   onAppStateChange = nextState => {
     // Persist cache manually with correct url once app is closed
-    if (nextState.match(/inactive|background/)) {
+    if (this.lastUrl && nextState.match(/inactive|background/)) {
       this.props.setUrl({ variables: { url: this.lastUrl } }).then(() => {
         this.props.screenProps.persistor.persist()
       })
@@ -152,9 +160,13 @@ class Web extends Component {
     this.webview.reload()
   }
 
+  onWebViewScroll = ({ y }) => {
+    this.setState({ refreshEnabled: y < RELOAD_OFFSET_HEIGHT })
+  }
+
   render () {
     const { data } = this.props
-    const { loading, refreshing } = this.state
+    const { loading, refreshing, refreshEnabled } = this.state
 
     return (
       <ScrollView
@@ -163,6 +175,7 @@ class Web extends Component {
           <RefreshControl
             onRefresh={this.onRefresh}
             refreshing={this.state.refreshing}
+            enabled={refreshEnabled}
           />
         }
       >
@@ -173,6 +186,7 @@ class Web extends Component {
           onMessage={this.onMessage}
           onLoadEnd={this.onLoadEnd}
           onLoadStart={this.onLoadStart}
+          onScroll={this.onWebViewScroll}
           webViewWillTransition={this.webViewWillTransition}
           onNavigationStateChange={this.onNavigationStateChange}
           ref={node => { this.webview = node }}
