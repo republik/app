@@ -1,5 +1,10 @@
+<<<<<<< 67f1785d2950dcb6e124e3faa88d453a406fc2bc
 import React, { Component, Fragment } from 'react'
 import { StyleSheet, Linking, AppState } from 'react-native'
+=======
+import React, { Component } from 'react'
+import { StyleSheet, Linking, ScrollView, RefreshControl } from 'react-native'
+>>>>>>> Implement pull to refresh
 import { graphql } from 'react-apollo'
 import { compose } from 'recompose'
 import gql from 'graphql-tag'
@@ -24,8 +29,8 @@ const isExternalURL = ({ host, protocol }) => (
 )
 
 class Web extends Component {
-  state = { loading: true }
   lastUrl = null
+  state = { loading: true, refreshing: false }
 
   componentDidMount () {
     AppState.addEventListener('change', this.onAppStateChange)
@@ -89,6 +94,8 @@ class Web extends Component {
 
   onLoadEnd = () => {
     this.setLoading(false)
+    this.setState({ refreshing: false })
+    this.webview.postMessage({ type: 'scroll-to-top' })
 
     if (this.props.screenProps.onLoadEnd) {
       this.props.screenProps.onLoadEnd()
@@ -140,15 +147,28 @@ class Web extends Component {
     }
   }
 
+  onRefresh = () => {
+    this.setState({ refreshing: true })
+    this.webview.reload()
+  }
+
   render () {
     const { data } = this.props
+    const { loading, refreshing } = this.state
 
     return (
-      <Fragment>
+      <ScrollView
+        contentContainerStyle={styles.container}
+        refreshControl={
+          <RefreshControl
+            onRefresh={this.onRefresh}
+            refreshing={this.state.refreshing}
+          />
+        }
+      >
         <WebView
           source={{ uri: data.url }}
-          style={styles.webView}
-          loading={this.state.loading}
+          loading={loading || refreshing}
           onNetwork={this.onNetwork}
           onMessage={this.onMessage}
           onLoadEnd={this.onLoadEnd}
@@ -157,13 +177,13 @@ class Web extends Component {
           onNavigationStateChange={this.onNavigationStateChange}
           ref={node => { this.webview = node }}
         />
-      </Fragment>
+      </ScrollView>
     )
   }
 }
 
 var styles = StyleSheet.create({
-  webView: {
+  container: {
     flex: 1,
     zIndex: 100
   }

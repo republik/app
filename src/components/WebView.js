@@ -4,7 +4,7 @@ import WebView from 'react-native-wkwebview-reborn'
 import Spinner from 'react-native-spinkit'
 import { parse } from 'graphql'
 import { execute, makePromise } from 'apollo-link'
-import { listenHistory } from '../utils/webHistory'
+import { injectedJavaScript } from '../utils/webview'
 import { link } from '../apollo'
 import withT from '../utils/withT'
 
@@ -97,6 +97,10 @@ class CustomWebView extends React.PureComponent {
     this.webview.ref.postMessage(JSON.stringify(message))
   }
 
+  reload = () => {
+    this.webview.ref.reload()
+  }
+
   // Native onNavigationStateChange method shim.
   // We call onNavigationStateChange either when the native calls, or onMessage
   onNavigationStateChange = ({ url, canGoBack }) => {
@@ -182,10 +186,6 @@ class CustomWebView extends React.PureComponent {
     }
   }
 
-  onReload = () => {
-    this.webview.ref.reload()
-  }
-
   onAndroidBackPress = () => {
     if (this.webview.canGoBack) {
       this.webview.ref.goBack()
@@ -209,9 +209,9 @@ class CustomWebView extends React.PureComponent {
           ref={node => { this.webview.ref = node }}
           onMessage={this.onMessage}
           onNavigationStateChange={this.onNavigationStateChange}
-          renderError={() => <ErrorState onReload={this.onReload} />}
+          renderError={() => <ErrorState onReload={this.reload} />}
           automaticallyAdjustContentInsets={false}
-          injectedJavaScript={listenHistory}
+          injectedJavaScript={injectedJavaScript}
           allowsBackForwardNavigationGestures
           scalesPageToFit={false}
           userAgent="RepublikApp"
