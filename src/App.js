@@ -49,7 +49,10 @@ class App extends Component {
     if (!this.state.cacheLoaded) return null
 
     return (
-      <Router screenProps={{ onLoadEnd: this.hideSplashScreen }} />
+      <Router screenProps={{
+        persistor: this.props.persistor,
+        onLoadEnd: this.hideSplashScreen
+      }} />
     )
   }
 }

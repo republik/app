@@ -74,8 +74,12 @@ const ErrorState = withT(({ t, onReload }) => (
 ))
 
 class CustomWebView extends React.PureComponent {
-  subscriptions = {}
-  webview = { ref: null, url: null, canGoBack: false }
+  constructor (props) {
+    super(props)
+
+    this.subscriptions = {}
+    this.webview = { ref: null, uri: props.source.uri, canGoBack: false }
+  }
 
   componentWillMount () {
     if (Platform.OS === 'android') {
@@ -100,8 +104,8 @@ class CustomWebView extends React.PureComponent {
 
     this.webview.canGoBack = this.webview.canGoBack || canGoBack
 
-    if (this.webview.url !== url) {
-      this.webview.url = url
+    if (this.webview.uri !== url) {
+      this.webview.uri = url
 
       if (onNavigationStateChange) {
         const shouldFollowRedirect = onNavigationStateChange({ url })

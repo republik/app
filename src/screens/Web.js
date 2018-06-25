@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react'
-import { StyleSheet, Linking } from 'react-native'
+import { StyleSheet, Linking, AppState } from 'react-native'
 import { graphql } from 'react-apollo'
 import { compose } from 'recompose'
 import gql from 'graphql-tag'
@@ -25,6 +25,15 @@ const isExternalURL = ({ host, protocol }) => (
 
 class Web extends Component {
   state = { loading: true }
+  lastUrl = null
+
+  componentDidMount () {
+    AppState.addEventListener('change', this.onAppStateChange)
+  }
+
+  componentWillUnmount () {
+    AppState.removeEventListener('change', this.onAppStateChange)
+  }
 
   componentWillReceiveProps (nextProps) {
     // Toggle primary menu on webview
@@ -64,6 +73,7 @@ class Web extends Component {
       return false
     }
 
+    this.lastUrl = data.url
     this.props.closeMenu()
     this.enableSecondaryMenuState(false)
 
@@ -117,6 +127,15 @@ class Web extends Component {
       if (!data.data.me && me) {
         await logout()
       }
+    }
+  }
+
+  onAppStateChange = nextState => {
+    // Persist cache manually with correct url once app is closed
+    if (nextState.match(/inactive|background/)) {
+      this.props.setUrl({ variables: { url: this.lastUrl } }).then(() => {
+        this.props.screenProps.persistor.persist()
+      })
     }
   }
 
