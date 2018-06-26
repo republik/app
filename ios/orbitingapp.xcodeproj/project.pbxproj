@@ -5,6 +5,7 @@
 	};
 	objectVersion = 46;
 	objects = {
+
 /* Begin PBXBuildFile section */
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
@@ -653,7 +654,6 @@
 			children = (
 				EF7C1240FC7545B89A184D59 /* libCodePush.a */,
 				D9DCF50889F848AEA35ECCD6 /* libSplashScreen.a */,
-				3697202757DB46CA90D3B70D /* libRNSpinkit.a */,
 				C2E7A5C9E06848F5B7BC48FE /* libReactNativeConfig.a */,
 				45C734975C494B4EAF4E9EF6 /* libRNCookieManagerIOS.a */,
 				FA620E3D6E5347A3A43A5F7B /* libRCTWKWebView.a */,
@@ -1287,9 +1287,7 @@
 				INFOPLIST_FILE = orbitingappTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-lc++",
@@ -1317,9 +1315,7 @@
 				INFOPLIST_FILE = orbitingappTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-lc++",
@@ -1336,7 +1332,7 @@
 				CODE_SIGN_ENTITLEMENTS = orbitingapp/orbitingapp.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = 7MQXM58QM7;
 				HEADER_SEARCH_PATHS = (
@@ -1375,7 +1371,7 @@
 				CODE_SIGN_ENTITLEMENTS = orbitingapp/orbitingapp.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = 7MQXM58QM7;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
