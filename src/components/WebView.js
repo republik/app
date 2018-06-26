@@ -1,10 +1,8 @@
 import React, { Fragment } from 'React'
 import { Text, View, StyleSheet, TouchableOpacity, Platform, BackHandler, ActivityIndicator } from 'react-native'
-// import Spinner from 'react-native-loading-spinner-overlay'
 import WebView from 'react-native-wkwebview-reborn'
 import { parse } from 'graphql'
 import { execute, makePromise } from 'apollo-link'
-// import Spinner from './Spinner'
 import { injectedJavaScript } from '../utils/webview'
 import { link } from '../apollo'
 import withT from '../utils/withT'
@@ -196,7 +194,6 @@ class CustomWebView extends React.PureComponent {
 
   render () {
     const { loading } = this.props
-    console.log(loading)
 
     return (
       <Fragment>
