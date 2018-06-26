@@ -1,7 +1,6 @@
 import React, { Fragment } from 'React'
-import { Text, View, Image, StyleSheet, TouchableOpacity, Platform, BackHandler } from 'react-native'
+import { Text, View, StyleSheet, TouchableOpacity, Platform, BackHandler, ActivityIndicator } from 'react-native'
 import WebView from 'react-native-wkwebview-reborn'
-import Spinner from 'react-native-spinkit'
 import { parse } from 'graphql'
 import { execute, makePromise } from 'apollo-link'
 import { injectedJavaScript } from '../utils/webview'
@@ -20,16 +19,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#FFF'
-  },
-  spinnerContainer: {
-    position: 'relative'
-  },
-  loadingLogo: {
-    width: 90,
-    height: 90,
-    top: 20,
-    left: 20,
-    position: 'absolute'
   },
   errorContainer: {
     padding: 20,
@@ -51,15 +40,11 @@ const styles = StyleSheet.create({
   }
 })
 
-const LoadingState = () => (
+const LoadingState = ({ showSpinner }) => (
   <View style={styles.container}>
-    <View styles={styles.spinnerContainer}>
-      <Spinner isVisible size={130} type="Arc" color="#DDDDDD" />
-      <Image
-        style={styles.loadingLogo}
-        source={require('../assets/images/icon.png')}
-      />
-    </View>
+    {showSpinner && (
+      <ActivityIndicator color="#999" size="large" />
+    )}
   </View>
 )
 
@@ -212,7 +197,7 @@ class CustomWebView extends React.PureComponent {
 
     return (
       <Fragment>
-        { loading && <LoadingState /> }
+        { loading.status && <LoadingState {...loading} /> }
         <WebView
           {...this.props}
           ref={node => { this.webview.ref = node }}
