@@ -26,6 +26,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     justifyContent: 'space-between'
   },
+  logoContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
   logo: {
     width: 150,
     height: 25
@@ -59,7 +64,7 @@ const MainHeader = ({ toggleMenu, setUrl, currentUrl }) => {
         type="profile"
         onPress={toggleMenu}
       />
-      <TouchableOpacity onPress={onLogoClick}>
+      <TouchableOpacity onPress={onLogoClick} style={styles.logoContainer}>
         <Image
           source={require('../assets/images/logo-title.png')}
           style={styles.logo}

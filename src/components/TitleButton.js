@@ -22,10 +22,6 @@ const buttons = {
 }
 
 const TitleButton = ({ type, side, size, menuActive, onPress, style }) => {
-  const margins = side === 'left'
-    ? { marginLeft: 15 }
-    : { marginRight: 15 }
-
   if (typeof buttons[type] === 'number') {
     const Wrapper = onPress ? TouchableOpacity : ({ children }) => children
 
@@ -33,7 +29,7 @@ const TitleButton = ({ type, side, size, menuActive, onPress, style }) => {
       <Wrapper onPress={onPress}>
         <Image
           source={buttons[type]}
-          style={{ ...margins, ...style, width: size, height: size }}
+          style={[style, { margin: 30, backgroundColor: 'red' }]}
         />
       </Wrapper>
     )
@@ -43,7 +39,7 @@ const TitleButton = ({ type, side, size, menuActive, onPress, style }) => {
 
   return (
     <Button
-      style={[margins, style]}
+      style={[style, { padding: 15 }]}
       active={menuActive}
       onPress={onPress}
     />
