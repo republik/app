@@ -29,7 +29,7 @@ const TitleButton = ({ type, side, size, menuActive, onPress, style }) => {
       <Wrapper onPress={onPress}>
         <Image
           source={buttons[type]}
-          style={[style, { margin: 30, backgroundColor: 'red' }]}
+          style={[style, { padding: 15, width: size, height: size }]}
         />
       </Wrapper>
     )
