@@ -1,9 +1,10 @@
 import React, { Fragment } from 'React'
-import { Text, View, Image, StyleSheet, TouchableOpacity, Platform, BackHandler } from 'react-native'
+import { Text, View, StyleSheet, TouchableOpacity, Platform, BackHandler, ActivityIndicator } from 'react-native'
+// import Spinner from 'react-native-loading-spinner-overlay'
 import WebView from 'react-native-wkwebview-reborn'
-import Spinner from 'react-native-spinkit'
 import { parse } from 'graphql'
 import { execute, makePromise } from 'apollo-link'
+// import Spinner from './Spinner'
 import { injectedJavaScript } from '../utils/webview'
 import { link } from '../apollo'
 import withT from '../utils/withT'
@@ -20,16 +21,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#FFF'
-  },
-  spinnerContainer: {
-    position: 'relative'
-  },
-  loadingLogo: {
-    width: 90,
-    height: 90,
-    top: 20,
-    left: 20,
-    position: 'absolute'
   },
   errorContainer: {
     padding: 20,
@@ -53,13 +44,7 @@ const styles = StyleSheet.create({
 
 const LoadingState = () => (
   <View style={styles.container}>
-    <View styles={styles.spinnerContainer}>
-      <Spinner isVisible size={130} type="Arc" color="#DDDDDD" />
-      <Image
-        style={styles.loadingLogo}
-        source={require('../assets/images/icon.png')}
-      />
-    </View>
+    <ActivityIndicator color="#999" size="large" />
   </View>
 )
 
