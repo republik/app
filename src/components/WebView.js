@@ -42,9 +42,11 @@ const styles = StyleSheet.create({
   }
 })
 
-const LoadingState = () => (
+const LoadingState = ({ showSpinner }) => (
   <View style={styles.container}>
-    <ActivityIndicator color="#999" size="large" />
+    {showSpinner && (
+      <ActivityIndicator color="#999" size="large" />
+    )}
   </View>
 )
 
@@ -194,10 +196,11 @@ class CustomWebView extends React.PureComponent {
 
   render () {
     const { loading } = this.props
+    console.log(loading)
 
     return (
       <Fragment>
-        { loading && <LoadingState /> }
+        { loading.status && <LoadingState {...loading} /> }
         <WebView
           {...this.props}
           ref={node => { this.webview.ref = node }}
