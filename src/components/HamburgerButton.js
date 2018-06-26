@@ -3,8 +3,8 @@ import { StyleSheet, Animated, TouchableWithoutFeedback } from 'react-native'
 
 const styles = StyleSheet.create({
   container: {
-    width: 22,
-    height: 22,
+    width: 60,
+    height: 60,
     alignItems: 'center',
     justifyContent: 'center'
   }
