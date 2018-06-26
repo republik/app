@@ -181,7 +181,6 @@ class Web extends Component {
       >
         <WebView
           source={{ uri: data.url }}
-          loading={loading || refreshing}
           onNetwork={this.onNetwork}
           onMessage={this.onMessage}
           onLoadEnd={this.onLoadEnd}
@@ -189,6 +188,7 @@ class Web extends Component {
           onScroll={this.onWebViewScroll}
           webViewWillTransition={this.webViewWillTransition}
           onNavigationStateChange={this.onNavigationStateChange}
+          loading={{ status: loading || refreshing, showSpinner: !refreshing }}
           ref={node => { this.webview = node }}
         />
       </ScrollView>

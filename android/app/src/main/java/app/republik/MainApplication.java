@@ -6,7 +6,6 @@ import com.facebook.react.ReactApplication;
 import com.psykar.cookiemanager.CookieManagerPackage;
 import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
 import app.republik.BuildConfig;
-import com.react.rnspinkit.RNSpinkitPackage;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import com.microsoft.codepush.react.CodePush;
@@ -38,7 +37,6 @@ public class MainApplication extends Application implements ReactApplication {
           new MainReactPackage(),
             new CookieManagerPackage(),
             new ReactNativeConfigPackage(),
-            new RNSpinkitPackage(),
             new SplashScreenReactPackage(),
           new ReactNativePushNotificationPackage(),
           new CodePush(null, getApplicationContext(), BuildConfig.DEBUG)
