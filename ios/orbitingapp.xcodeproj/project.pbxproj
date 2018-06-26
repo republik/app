@@ -1415,6 +1415,7 @@
 				PRODUCT_NAME = orbitingapp;
 				PROVISIONING_PROFILE = "95f474a1-4b9b-40d9-b3ec-5b1e79f73f73";
 				PROVISIONING_PROFILE_SPECIFIER = "match AppStore app.republik";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -1453,6 +1454,7 @@
 				PRODUCT_NAME = orbitingapp;
 				PROVISIONING_PROFILE = "95f474a1-4b9b-40d9-b3ec-5b1e79f73f73";
 				PROVISIONING_PROFILE_SPECIFIER = "match AppStore app.republik";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
