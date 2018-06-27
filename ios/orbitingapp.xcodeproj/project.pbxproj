@@ -33,6 +33,7 @@
 		ED8DA9D14BEF48F79943F29F /* libRNCookieManagerIOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 45C734975C494B4EAF4E9EF6 /* libRNCookieManagerIOS.a */; };
 		F10990E620AF549000BD7DB0 /* libRCTPushNotification.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F10990E320AF548200BD7DB0 /* libRCTPushNotification.a */; };
 		F1D7887020E2906400006DA6 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = F1D7886F20E2906400006DA6 /* Settings.bundle */; };
+		F1D788A020E2961600006DA6 /* SettingsBundleHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1D7889F20E2961600006DA6 /* SettingsBundleHelper.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -398,6 +399,8 @@
 		F10990DD20AF548200BD7DB0 /* RCTPushNotification.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTPushNotification.xcodeproj; path = "../node_modules/react-native/Libraries/PushNotificationIOS/RCTPushNotification.xcodeproj"; sourceTree = "<group>"; };
 		F10990E720B31F4E00BD7DB0 /* orbitingapp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = orbitingapp.entitlements; path = orbitingapp/orbitingapp.entitlements; sourceTree = "<group>"; };
 		F1D7886F20E2906400006DA6 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
+		F1D7889E20E2961500006DA6 /* orbitingapp-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "orbitingapp-Bridging-Header.h"; sourceTree = "<group>"; };
+		F1D7889F20E2961600006DA6 /* SettingsBundleHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsBundleHelper.swift; sourceTree = "<group>"; };
 		FA620E3D6E5347A3A43A5F7B /* libRCTWKWebView.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRCTWKWebView.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -522,6 +525,7 @@
 		13B07FAE1A68108700A75B9A /* orbitingapp */ = {
 			isa = PBXGroup;
 			children = (
+				F1D7889F20E2961600006DA6 /* SettingsBundleHelper.swift */,
 				F10990E720B31F4E00BD7DB0 /* orbitingapp.entitlements */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
@@ -628,6 +632,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				F10990AF20AF529600BD7DB0 /* Recovered References */,
+				F1D7889E20E2961500006DA6 /* orbitingapp-Bridging-Header.h */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -769,6 +774,7 @@
 					};
 					13B07F861A680F5B00A75B9A = {
 						DevelopmentTeam = 7MQXM58QM7;
+						LastSwiftMigration = 0930;
 						ProvisioningStyle = Manual;
 						SystemCapabilities = {
 							com.apple.Push = {
@@ -1243,6 +1249,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
+				F1D788A020E2961600006DA6 /* SettingsBundleHelper.swift in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1273,6 +1280,7 @@
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				DEVELOPMENT_TEAM = N8WUQQ36D7;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1304,6 +1312,7 @@
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = N8WUQQ36D7;
@@ -1333,6 +1342,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = orbitingapp/orbitingapp.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
@@ -1363,6 +1373,9 @@
 				PRODUCT_NAME = orbitingapp;
 				PROVISIONING_PROFILE = "95f474a1-4b9b-40d9-b3ec-5b1e79f73f73";
 				PROVISIONING_PROFILE_SPECIFIER = "match AppStore app.republik";
+				SWIFT_OBJC_BRIDGING_HEADER = "orbitingapp-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -1372,6 +1385,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = orbitingapp/orbitingapp.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
@@ -1401,6 +1415,8 @@
 				PRODUCT_NAME = orbitingapp;
 				PROVISIONING_PROFILE = "95f474a1-4b9b-40d9-b3ec-5b1e79f73f73";
 				PROVISIONING_PROFILE_SPECIFIER = "match AppStore app.republik";
+				SWIFT_OBJC_BRIDGING_HEADER = "orbitingapp-Bridging-Header.h";
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};

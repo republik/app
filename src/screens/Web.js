@@ -1,13 +1,12 @@
 import React, { Component } from 'react'
 import { StyleSheet, Linking, ScrollView, AppState, RefreshControl } from 'react-native'
-import { graphql } from 'react-apollo'
 import { compose } from 'recompose'
-import gql from 'graphql-tag'
 import debounce from 'lodash.debounce'
+import CookieManager from 'react-native-cookies'
 import { parseURL } from '../utils/url'
 import WebView from '../components/WebView'
 import { FRONTEND_BASE_URL, OFFERS_PATH } from '../constants'
-import { me, login, logout, setUrl, setArticle, enableSecondaryMenu, closeMenu, withMenuState } from '../apollo'
+import { me, login, logout, setUrl, setArticle, enableSecondaryMenu, closeMenu, withMenuState, withCurrentUrl } from '../apollo'
 
 const RELOAD_OFFSET_HEIGHT = 15
 const RESTRICTED_PATHS = [OFFERS_PATH]
@@ -28,7 +27,7 @@ class Web extends Component {
   constructor (props) {
     super(props)
 
-    this.lastUrl = props.data.url
+    this.lastUrl = props.currentUrl
     this.state = {
       loading: true,
       refreshing: false,
@@ -63,7 +62,7 @@ class Web extends Component {
       this.webview.postMessage({ type: 'close-secondary-menu' })
     }
 
-    this.lastUrl = nextProps.data.url
+    this.lastUrl = nextProps.currentUrl
   }
 
   setLoading = debounce(value => {
@@ -142,6 +141,7 @@ class Web extends Component {
 
       if (!data.data.me && me) {
         await logout()
+        await CookieManager.clearAll()
       }
     }
   }
@@ -165,7 +165,7 @@ class Web extends Component {
   }
 
   render () {
-    const { data } = this.props
+    const { currentUrl } = this.props
     const { loading, refreshing, refreshEnabled } = this.state
 
     return (
@@ -180,7 +180,7 @@ class Web extends Component {
         }
       >
         <WebView
-          source={{ uri: data.url }}
+          source={{ uri: currentUrl }}
           onNetwork={this.onNetwork}
           onMessage={this.onMessage}
           onLoadEnd={this.onLoadEnd}
@@ -203,20 +203,14 @@ var styles = StyleSheet.create({
   }
 })
 
-const getData = graphql(gql`
-  query GetData {
-    url @client
-  }
-`)
-
 export default compose(
   me,
   login,
   logout,
-  getData,
   setUrl,
   setArticle,
   withMenuState,
+  withCurrentUrl,
   enableSecondaryMenu,
   closeMenu
 )(Web)

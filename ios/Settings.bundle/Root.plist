@@ -38,12 +38,50 @@
 			<key>AutocapitalizationType</key>
 			<string>None</string>
 		</dict>
+        <dict>
+            <key>Type</key>
+            <string>PSTextFieldSpecifier</string>
+            <key>Title</key>
+            <string>WS URL</string>
+            <key>Key</key>
+            <string>ws_url</string>
+            <key>KeyboardType</key>
+            <string>URL</string>
+            <key>DefaultValue</key>
+            <string></string>
+            <key>AutocapitalizationType</key>
+            <string>None</string>
+        </dict>
+        <dict>
+            <key>Type</key>
+            <string>PSTextFieldSpecifier</string>
+            <key>Title</key>
+            <string>Assets URL</string>
+            <key>Key</key>
+            <string>assets_url</string>
+            <key>KeyboardType</key>
+            <string>URL</string>
+            <key>DefaultValue</key>
+            <string></string>
+            <key>AutocapitalizationType</key>
+            <string>None</string>
+        </dict>
 		<dict>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 			<key>Title</key>
 			<string>APP INFO</string>
 		</dict>
+        <dict>
+            <key>Type</key>
+            <string>PSTitleValueSpecifier</string>
+            <key>Title</key>
+            <string>Environment</string>
+            <key>Key</key>
+            <string>environment_preference</string>
+            <key>DefaultValue</key>
+            <string>production</string>
+        </dict>
 		<dict>
 			<key>Type</key>
 			<string>PSTitleValueSpecifier</string>
@@ -64,6 +102,22 @@
 			<key>DefaultValue</key>
 			<string>1</string>
 		</dict>
+        <dict>
+            <key>Type</key>
+            <string>PSGroupSpecifier</string>
+            <key>Title</key>
+            <string></string>
+        </dict>
+        <dict>
+            <key>Type</key>
+            <string>PSTitleValueSpecifier</string>
+            <key>Title</key>
+            <string>Teapot</string>
+            <key>Key</key>
+            <string>teapot</string>
+            <key>DefaultValue</key>
+            <string>☕️</string>
+        </dict>
 	</array>
 </dict>
 </plist>
