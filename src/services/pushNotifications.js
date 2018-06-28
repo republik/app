@@ -1,38 +1,36 @@
-import { AppState, PushNotificationIOS } from 'react-native'
-import PushNotification from 'react-native-push-notification'
-import { lifecycle } from 'recompose'
+import React, { Component } from 'react'
+import firebase from 'react-native-firebase'
 
-const configure = () => {
-  PushNotification.configure({
-    requestPermissions: true,
-    onRegister: (token) => {
-      // Push token to server
-    },
-    onNotification: (notification) => {
-      notification.finish(PushNotificationIOS.FetchResult.NoData)
+const pustNotificationsWrapper = WrappedComponent => (
+  class extends Component {
+    componentDidMount () {
+      this.notificationDisplayedListener = firebase.notifications().onNotificationDisplayed((notification) => {
+        console.log('>>>>')
+        console.log(notification)
+      })
+
+      this.notificationListener = firebase.notifications().onNotification((notification) => {
+        console.log('>>>>')
+        console.log(notification)
+      })
+
+      this.notificationOpenedListener = firebase.notifications().onNotificationOpened((notificationOpen) => {
+        console.log(notificationOpen)
+      })
     }
-  })
-}
 
-const localNotification = ({ message = '', seconds = 0 }) => {
-  PushNotification.localNotificationSchedule({
-    message: message,
-    date: new Date(Date.now() + (seconds * 1000))
-  })
-}
+    componentWillUnmount () {
+      this.notificationDisplayedListener()
+      this.notificationListener()
+      this.notificationOpenedListener()
+    }
 
-const handleAppStateChange = (appState) => {
+    render () {
+      return (
+        <WrappedComponent {...this.props} />
+      )
+    }
+  }
+)
 
-}
-
-function componentDidMount () {
-  configure()
-
-  AppState.addEventListener('change', handleAppStateChange)
-}
-
-function componentWillUnmount () {
-  AppState.removeEventListener('change', handleAppStateChange)
-}
-
-export default lifecycle({ componentDidMount, componentWillUnmount })
+export default pustNotificationsWrapper

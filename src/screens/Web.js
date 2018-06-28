@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { StyleSheet, Linking, ScrollView, AppState, RefreshControl } from 'react-native'
-import { graphql } from 'react-apollo'
-import { compose } from 'recompose'
+import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'
 import debounce from 'lodash.debounce'
 import { parseURL } from '../utils/url'

@@ -28,7 +28,10 @@ platform :android do
     )
     gradle(
       task: "assemble",
-      build_type: "stagingRelease"
+      build_type: "Release",
+      system_properties: {
+        "ENVFILE": ".env.staging"
+      }
     )
     supply(
       track: "alpha",
