@@ -4,30 +4,32 @@ import firebase from 'react-native-firebase'
 const pustNotificationsWrapper = WrappedComponent => (
   class extends Component {
     componentDidMount () {
-      this.notificationDisplayedListener = firebase.notifications().onNotificationDisplayed((notification) => {
-        console.log('>>>>')
-        console.log(notification)
-      })
-
-      this.notificationListener = firebase.notifications().onNotification((notification) => {
-        console.log('>>>>')
-        console.log(notification)
-      })
-
-      this.notificationOpenedListener = firebase.notifications().onNotificationOpened((notificationOpen) => {
-        console.log(notificationOpen)
-      })
+      this.notificationListener = firebase.notifications().onNotification(this.onNotification)
     }
 
     componentWillUnmount () {
-      this.notificationDisplayedListener()
       this.notificationListener()
-      this.notificationOpenedListener()
+    }
+
+    askForNotificationPermission = async () => {
+      try {
+        await firebase.messaging().requestPermission()
+        return firebase.messaging().getToken()
+      } catch (error) {
+        console.warn(error.message)
+      }
+    }
+
+    onNotification = notification => {
+      console.warn('onNotification', notification)
     }
 
     render () {
       return (
-        <WrappedComponent {...this.props} />
+        <WrappedComponent
+          askForNotificationPermission={this.askForNotificationPermission}
+          {...this.props}
+        />
       )
     }
   }

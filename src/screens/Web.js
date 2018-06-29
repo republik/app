@@ -126,12 +126,14 @@ class Web extends Component {
   }
 
   onNetwork = async ({ query, data }) => {
-    const { me, login, logout } = this.props
+    const { me, login, logout, screenProps } = this.props
     const { definitions } = query
     const operations = definitions.map(definition => definition.name && definition.name.value)
 
     if (operations.includes('me')) {
       if (data.data.me && !me) {
+        const token = await screenProps.askForNotificationPermission()
+        console.warn(token)
         await login({
           variables: {
             user: data.data.me
