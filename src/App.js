@@ -48,13 +48,13 @@ class App extends Component {
   render () {
     if (!this.state.cacheLoaded) return null
 
-    const { askForNotificationPermission } = this.props
+    const { getNotificationsToken } = this.props
 
     return (
       <Router screenProps={{
         persistor: this.props.persistor,
         onLoadEnd: this.hideSplashScreen,
-        askForNotificationPermission
+        getNotificationsToken
       }} />
     )
   }

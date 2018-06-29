@@ -11,12 +11,12 @@ const pustNotificationsWrapper = WrappedComponent => (
       this.notificationListener()
     }
 
-    askForNotificationPermission = async () => {
+    getNotificationsToken = async () => {
       try {
         await firebase.messaging().requestPermission()
         return firebase.messaging().getToken()
       } catch (error) {
-        console.warn(error.message)
+        throw error
       }
     }
 
@@ -27,7 +27,7 @@ const pustNotificationsWrapper = WrappedComponent => (
     render () {
       return (
         <WrappedComponent
-          askForNotificationPermission={this.askForNotificationPermission}
+          getNotificationsToken={this.getNotificationsToken}
           {...this.props}
         />
       )

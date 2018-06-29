@@ -1,12 +1,13 @@
 import React, { Component } from 'react'
-import { StyleSheet, Linking, ScrollView, AppState, RefreshControl } from 'react-native'
+import { StyleSheet, Linking, ScrollView, AppState, RefreshControl, Platform } from 'react-native'
 import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'
 import debounce from 'lodash.debounce'
+import DeviceInfo from 'react-native-device-info'
 import { parseURL } from '../utils/url'
 import WebView from '../components/WebView'
 import { FRONTEND_BASE_URL, OFFERS_PATH } from '../constants'
-import { me, login, logout, setUrl, setArticle, enableSecondaryMenu, closeMenu, withMenuState } from '../apollo'
+import { me, login, logout, setUrl, setArticle, enableSecondaryMenu, closeMenu, withMenuState, upsertDevice } from '../apollo'
 
 const RELOAD_OFFSET_HEIGHT = 15
 const RESTRICTED_PATHS = [OFFERS_PATH]
@@ -128,18 +129,28 @@ class Web extends Component {
   }
 
   onNetwork = async ({ query, data }) => {
-    const { me, login, logout, screenProps } = this.props
+    const { me, login, logout, screenProps, upsertDevice } = this.props
     const { definitions } = query
     const operations = definitions.map(definition => definition.name && definition.name.value)
 
     if (operations.includes('me')) {
       if (data.data.me && !me) {
-        const token = await screenProps.askForNotificationPermission()
-        console.warn(token)
         await login({
           variables: {
             user: data.data.me
           }
+        })
+
+        screenProps.getNotificationsToken().then(token => {
+          upsertDevice({ variables: {
+            token,
+            information: {
+              os: Platform.OS,
+              osVersion: Platform.Version,
+              model: DeviceInfo.getModel(),
+              appVersion: DeviceInfo.getVersion()
+            }
+          }})
         })
       }
 
@@ -221,5 +232,6 @@ export default compose(
   setArticle,
   withMenuState,
   enableSecondaryMenu,
-  closeMenu
+  closeMenu,
+  upsertDevice
 )(Web)

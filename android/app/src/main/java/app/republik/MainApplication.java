@@ -9,6 +9,7 @@ import io.invertase.firebase.notifications.RNFirebaseNotificationsPackage;
 import com.psykar.cookiemanager.CookieManagerPackage;
 import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
 import app.republik.BuildConfig;
+import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import com.microsoft.codepush.react.CodePush;
 import com.facebook.react.ReactNativeHost;
@@ -37,6 +38,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+          new RNDeviceInfo(),
             new RNFirebasePackage(),
             new CookieManagerPackage(),
             new ReactNativeConfigPackage(),
