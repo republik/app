@@ -8,10 +8,4 @@ target 'orbitingapp' do
   # Pods for orbitingapp
   pod 'Firebase/Core'
   pod 'Firebase/Messaging'
-
-  target 'orbitingappTests' do
-    inherit! :search_paths
-    # Pods for testing
-  end
-
 end

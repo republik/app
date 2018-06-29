@@ -115,6 +115,8 @@ class Web extends Component {
         return this.props.setArticle({ variables: { article: message.payload } })
       case 'article-closed':
         return this.props.setArticle({ variables: { article: null } })
+      case 'close-menu':
+        return this.props.closeMenu()
       case 'show-secondary-nav':
         return this.enableSecondaryMenuState(true)
       case 'hide-secondary-nav':
