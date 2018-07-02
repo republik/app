@@ -63,6 +63,12 @@ const upsertDevice = graphql(gql`
   }
 `, { name: 'upsertDevice' })
 
+const rollDeviceToken = graphql(gql`
+  mutation RollDeviceToken($oldToken: String!, $newToken: String!) {
+    rollDeviceToken(oldToken: $oldToken, newToken: $newToken)
+  }
+`, { name: 'rollDeviceToken' })
+
 export {
   toggleMenu,
   closeMenu,
@@ -73,5 +79,6 @@ export {
   setArticle,
   enableSecondaryMenu,
   toggleSecondaryMenu,
-  upsertDevice
+  upsertDevice,
+  rollDeviceToken
 }

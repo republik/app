@@ -1,13 +1,12 @@
 import React, { Component } from 'react'
-import { StyleSheet, Linking, ScrollView, AppState, RefreshControl, Platform } from 'react-native'
+import { StyleSheet, Linking, ScrollView, AppState, RefreshControl } from 'react-native'
 import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'
 import debounce from 'lodash.debounce'
-import DeviceInfo from 'react-native-device-info'
 import { parseURL } from '../utils/url'
 import WebView from '../components/WebView'
 import { FRONTEND_BASE_URL, OFFERS_PATH } from '../constants'
-import { me, login, logout, setUrl, setArticle, enableSecondaryMenu, closeMenu, withMenuState, upsertDevice } from '../apollo'
+import { me, login, logout, setUrl, setArticle, enableSecondaryMenu, closeMenu, withMenuState } from '../apollo'
 
 const RELOAD_OFFSET_HEIGHT = 15
 const RESTRICTED_PATHS = [OFFERS_PATH]
@@ -129,7 +128,7 @@ class Web extends Component {
   }
 
   onNetwork = async ({ query, data }) => {
-    const { me, login, logout, screenProps, upsertDevice } = this.props
+    const { me, login, logout, screenProps } = this.props
     const { definitions } = query
     const operations = definitions.map(definition => definition.name && definition.name.value)
 
@@ -141,17 +140,7 @@ class Web extends Component {
           }
         })
 
-        screenProps.getNotificationsToken().then(token => {
-          upsertDevice({ variables: {
-            token,
-            information: {
-              os: Platform.OS,
-              osVersion: Platform.Version,
-              model: DeviceInfo.getModel(),
-              appVersion: DeviceInfo.getVersion()
-            }
-          }})
-        })
+        screenProps.getNotificationsToken()
       }
 
       if (!data.data.me && me) {
@@ -232,6 +221,5 @@ export default compose(
   setArticle,
   withMenuState,
   enableSecondaryMenu,
-  closeMenu,
-  upsertDevice
+  closeMenu
 )(Web)
