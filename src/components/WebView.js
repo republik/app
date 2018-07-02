@@ -1,6 +1,6 @@
 import React, { Fragment } from 'React'
 import { Text, View, StyleSheet, TouchableOpacity, Platform, BackHandler, ActivityIndicator } from 'react-native'
-import WebView from 'react-native-wkwebview-reborn'
+import NativeWebView from 'react-native-wkwebview-reborn'
 import { parse } from 'graphql'
 import { execute, makePromise } from 'apollo-link'
 import { injectedJavaScript } from '../utils/webview'
@@ -58,17 +58,27 @@ const ErrorState = withT(({ t, onReload }) => (
   </View>
 ))
 
-class CustomWebView extends React.PureComponent {
+class WebView extends React.PureComponent {
   constructor (props) {
     super(props)
 
     this.subscriptions = {}
+    this.state = { currentUrl: props.source.uri }
     this.webview = { ref: null, uri: props.source.uri, canGoBack: false }
   }
 
   componentWillMount () {
     if (Platform.OS === 'android') {
       BackHandler.addEventListener('hardwareBackPress', this.onAndroidBackPress)
+    }
+  }
+
+  componentWillReceiveProps (nextProps) {
+    if (
+      nextProps.source.uri !== this.props.source.uri &&
+      nextProps.source.uri !== this.webview.uri
+    ) {
+      this.postMessage({ type: 'goto', url: nextProps.source.uri })
     }
   }
 
@@ -195,12 +205,14 @@ class CustomWebView extends React.PureComponent {
 
   render () {
     const { loading } = this.props
+    const { currentUrl } = this.state
 
     return (
       <Fragment>
         { loading.status && <LoadingState {...loading} /> }
-        <WebView
+        <NativeWebView
           {...this.props}
+          source={{ uri: currentUrl }}
           ref={node => { this.webview.ref = node }}
           onMessage={this.onMessage}
           onNavigationStateChange={this.onNavigationStateChange}
@@ -219,4 +231,4 @@ class CustomWebView extends React.PureComponent {
   }
 };
 
-export default CustomWebView
+export default WebView
