@@ -70,6 +70,8 @@ export const injectedJavaScriptImpl = function () {
 
     if (message.type === 'scroll-to-top') {
       window.scrollTo(0, 0)
+    } else if (message.type === 'goto') {
+      window.location.href = message.url
     }
   })
 

@@ -7,6 +7,7 @@ import { parseURL } from '../utils/url'
 import { getPdfUrl } from '../utils/pdf'
 import { FRONTEND_BASE_URL, HOME_URL, FEED_URL } from '../constants'
 import {
+  me,
   setUrl,
   toggleMenu,
   withMenuState,
@@ -51,8 +52,9 @@ const styles = StyleSheet.create({
   }
 })
 
-const MainHeader = ({ toggleMenu, setUrl, currentUrl }) => {
+const MainHeader = ({ me, toggleMenu, setUrl, currentUrl }) => {
   const currentPath = parseURL(currentUrl).path
+  const LogoWrapper = me ? TouchableOpacity : View
   const onLogoClick = () => setUrl({ variables: {
     url: currentPath === '/' ? FEED_URL : HOME_URL }
   })
@@ -64,12 +66,12 @@ const MainHeader = ({ toggleMenu, setUrl, currentUrl }) => {
         type="profile"
         onPress={toggleMenu}
       />
-      <TouchableOpacity onPress={onLogoClick} style={styles.logoContainer}>
+      <LogoWrapper onPress={onLogoClick} style={styles.logoContainer}>
         <Image
           source={require('../assets/images/logo-title.png')}
           style={styles.logo}
         />
-      </TouchableOpacity>
+      </LogoWrapper>
       <TitleButton
         side="right"
         type="hamburger"
@@ -170,6 +172,7 @@ const SeriesHeader = ({
 }
 
 const Header = ({
+  me,
   article,
   setUrl,
   currentUrl,
@@ -181,6 +184,7 @@ const Header = ({
 }) => (
   <Fragment>
     <MainHeader
+      me={me}
       setUrl={setUrl}
       currentUrl={currentUrl}
       toggleMenu={toggleMenu}
@@ -197,6 +201,7 @@ const Header = ({
 )
 
 export default compose(
+  me,
   setUrl,
   toggleMenu,
   withMenuState,
