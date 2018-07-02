@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { StyleSheet, Linking, ScrollView, AppState, RefreshControl } from 'react-native'
+import { StyleSheet, Linking, ScrollView, RefreshControl } from 'react-native'
 import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'
 import debounce from 'lodash.debounce'
@@ -27,20 +27,11 @@ class Web extends Component {
   constructor (props) {
     super(props)
 
-    this.lastUrl = props.data.url
     this.state = {
       loading: true,
       refreshing: false,
       refreshEnabled: true
     }
-  }
-
-  componentDidMount () {
-    AppState.addEventListener('change', this.onAppStateChange)
-  }
-
-  componentWillUnmount () {
-    AppState.removeEventListener('change', this.onAppStateChange)
   }
 
   componentWillReceiveProps (nextProps) {
@@ -61,8 +52,6 @@ class Web extends Component {
     if (this.props.secondaryMenuActive && !nextProps.secondaryMenuActive) {
       this.webview.postMessage({ type: 'close-secondary-menu' })
     }
-
-    this.lastUrl = nextProps.data.url
   }
 
   setLoading = debounce(value => {
@@ -83,9 +72,9 @@ class Web extends Component {
       return false
     }
 
-    this.lastUrl = data.url
     this.props.closeMenu()
     this.enableSecondaryMenuState(false)
+    this.props.setUrl({ variables: { url: data.url } })
 
     return true
   }
@@ -146,15 +135,6 @@ class Web extends Component {
       if (!data.data.me && me) {
         await logout()
       }
-    }
-  }
-
-  onAppStateChange = nextState => {
-    // Persist cache manually with correct url once app is closed
-    if (this.lastUrl && nextState.match(/inactive|background/)) {
-      this.props.setUrl({ variables: { url: this.lastUrl } }).then(() => {
-        this.props.screenProps.persistor.persist()
-      })
     }
   }
 
