@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { StyleSheet, Linking, ScrollView, AppState, RefreshControl } from 'react-native'
-import { graphql } from 'react-apollo'
-import { compose } from 'recompose'
+import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'
 import debounce from 'lodash.debounce'
 import { parseURL } from '../utils/url'
@@ -116,6 +115,8 @@ class Web extends Component {
         return this.props.setArticle({ variables: { article: message.payload } })
       case 'article-closed':
         return this.props.setArticle({ variables: { article: null } })
+      case 'close-menu':
+        return this.props.closeMenu()
       case 'show-secondary-nav':
         return this.enableSecondaryMenuState(true)
       case 'hide-secondary-nav':
@@ -127,7 +128,7 @@ class Web extends Component {
   }
 
   onNetwork = async ({ query, data }) => {
-    const { me, login, logout } = this.props
+    const { me, login, logout, screenProps } = this.props
     const { definitions } = query
     const operations = definitions.map(definition => definition.name && definition.name.value)
 
@@ -138,6 +139,8 @@ class Web extends Component {
             user: data.data.me
           }
         })
+
+        screenProps.getNotificationsToken()
       }
 
       if (!data.data.me && me) {

@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { Linking } from 'react-native'
-import { withApollo } from 'react-apollo'
-import { compose } from 'recompose'
+import { withApollo, compose } from 'react-apollo'
 import { parseURL } from '../utils/url'
 import { FRONTEND_BASE_URL } from '../constants'
 

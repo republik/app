@@ -6,10 +6,10 @@
   <permission android:name="${applicationId}.permission.C2D_MESSAGE" android:protectionLevel="signature"/>
   <uses-permission android:name="${applicationId}.permission.C2D_MESSAGE"/>
   <uses-permission android:name="android.permission.VIBRATE"/>
-  <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+  <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
   <application android:name="app.republik.MainApplication" android:label="@string/app_name" android:icon="@mipmap/ic_launcher" android:theme="@style/AppTheme">
-    <activity android:name="app.republik.MainActivity" android:label="@string/app_name" android:configChanges="keyboard|keyboardHidden|orientation|screenSize" android:windowSoftInputMode="adjustResize" android:launchMode="singleTask">
+    <activity android:name="app.republik.MainActivity" android:label="@string/app_name" android:configChanges="keyboard|keyboardHidden|orientation|screenSize" android:windowSoftInputMode="adjustResize" android:launchMode="singleTop">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>
         <category android:name="android.intent.category.LAUNCHER"/>
@@ -23,24 +23,22 @@
       </intent-filter>
     </activity>
     <activity android:name="com.facebook.react.devsupport.DevSettingsActivity"/>
-    <receiver android:name="com.google.android.gms.gcm.GcmReceiver" android:exported="true" android:permission="com.google.android.c2dm.permission.SEND">
-      <intent-filter>
-        <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
-        <category android:name="${applicationId}"/>
-      </intent-filter>
-    </receiver>
 
-    <receiver android:name="com.dieam.reactnativepushnotification.modules.RNPushNotificationPublisher"/>
-    <receiver android:name="com.dieam.reactnativepushnotification.modules.RNPushNotificationBootEventReceiver">
+    <service android:name="io.invertase.firebase.messaging.RNFirebaseBackgroundMessagingService" />
+    <service android:name="io.invertase.firebase.messaging.RNFirebaseMessagingService">
       <intent-filter>
-        <action android:name="android.intent.action.BOOT_COMPLETED"/>
-      </intent-filter>
-    </receiver>
-    <service android:name="com.dieam.reactnativepushnotification.modules.RNPushNotificationRegistrationService"/>
-    <service android:name="com.dieam.reactnativepushnotification.modules.RNPushNotificationListenerService" android:exported="false">
-      <intent-filter>
-        <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
+        <action android:name="com.google.firebase.MESSAGING_EVENT" />
       </intent-filter>
     </service>
+    <service android:name="io.invertase.firebase.messaging.RNFirebaseInstanceIdService">
+      <intent-filter>
+        <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+      </intent-filter>
+    </service>
+    <meta-data
+        android:name="com.google.firebase.messaging.default_notification_icon"
+        android:resource="@mipmap/notification_icon" />
+    <meta-data android:name="com.google.firebase.messaging.default_notification_color"
+        android:resource="@color/primary_dark" />
   </application>
 </manifest>

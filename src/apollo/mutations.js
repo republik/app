@@ -55,6 +55,20 @@ const toggleSecondaryMenu = graphql(gql`
   }
 `, { name: 'toggleSecondaryMenu' })
 
+const upsertDevice = graphql(gql`
+  mutation UpsertDevice($token: ID!, $information: DeviceInformationInput!) {
+    upsertDevice(token: $token, information: $information) {
+      id
+    }
+  }
+`, { name: 'upsertDevice' })
+
+const rollDeviceToken = graphql(gql`
+  mutation RollDeviceToken($oldToken: String!, $newToken: String!) {
+    rollDeviceToken(oldToken: $oldToken, newToken: $newToken)
+  }
+`, { name: 'rollDeviceToken' })
+
 export {
   toggleMenu,
   closeMenu,
@@ -64,5 +78,7 @@ export {
   setUrl,
   setArticle,
   enableSecondaryMenu,
-  toggleSecondaryMenu
+  toggleSecondaryMenu,
+  upsertDevice,
+  rollDeviceToken
 }
