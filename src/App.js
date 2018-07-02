@@ -3,7 +3,7 @@ import { Platform } from 'react-native'
 import SplashScreen from 'react-native-splash-screen'
 import { createStackNavigator } from 'react-navigation'
 import CookieManager from 'react-native-cookies'
-import { compose } from 'recompose'
+import { compose } from 'react-apollo'
 import Web from './screens/Web'
 import Header from './components/Header'
 import codePush from './services/codePush'
@@ -48,10 +48,13 @@ class App extends Component {
   render () {
     if (!this.state.cacheLoaded) return null
 
+    const { getNotificationsToken } = this.props
+
     return (
       <Router screenProps={{
         persistor: this.props.persistor,
-        onLoadEnd: this.hideSplashScreen
+        onLoadEnd: this.hideSplashScreen,
+        getNotificationsToken
       }} />
     )
   }

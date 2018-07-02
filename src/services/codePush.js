@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import CodePush from 'react-native-code-push'
-import { compose } from 'recompose'
+import { compose } from 'react-apollo'
 
 const codePushWrapper = WrappedComponent => (
   class extends Component {

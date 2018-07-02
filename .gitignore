@@ -58,6 +58,11 @@ buck-out/
 # Certs
 *.cer
 api*.json
+google-services.json
+GoogleService-Info.plist
+
+# iOS
+Pods
 
 # Env
 .env

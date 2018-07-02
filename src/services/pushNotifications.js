@@ -1,38 +1,68 @@
-import { AppState, PushNotificationIOS } from 'react-native'
-import PushNotification from 'react-native-push-notification'
-import { lifecycle } from 'recompose'
+import React, { Component } from 'react'
+import { compose } from 'react-apollo'
+import { Platform, AsyncStorage } from 'react-native'
+import firebase from 'react-native-firebase'
+import DeviceInfo from 'react-native-device-info'
+import { upsertDevice, rollDeviceToken } from '../apollo'
 
-const configure = () => {
-  PushNotification.configure({
-    requestPermissions: true,
-    onRegister: (token) => {
-      // Push token to server
-    },
-    onNotification: (notification) => {
-      notification.finish(PushNotificationIOS.FetchResult.NoData)
+const TOKEN_KEY = 'notification_token'
+
+const pustNotificationsWrapper = WrappedComponent => (
+  class extends Component {
+    componentDidMount () {
+      this.notificationListener = firebase.notifications().onNotification(this.onNotification)
+      this.tokenRefreshListener = firebase.messaging().onTokenRefresh(this.onTokenRefresh)
     }
-  })
-}
 
-const localNotification = ({ message = '', seconds = 0 }) => {
-  PushNotification.localNotificationSchedule({
-    message: message,
-    date: new Date(Date.now() + (seconds * 1000))
-  })
-}
+    componentWillUnmount () {
+      this.notificationListener()
+      this.tokenRefreshListener()
+    }
 
-const handleAppStateChange = (appState) => {
+    getNotificationsToken = async () => {
+      try {
+        await firebase.messaging().requestPermission()
+        const token = await firebase.messaging().getToken()
 
-}
+        await AsyncStorage.setItem(TOKEN_KEY, token)
 
-function componentDidMount () {
-  configure()
+        this.props.upsertDevice({ variables: {
+          token,
+          information: {
+            os: Platform.OS,
+            osVersion: Platform.Version,
+            model: DeviceInfo.getModel(),
+            appVersion: DeviceInfo.getVersion()
+          }
+        }})
+      } catch (error) {
+        throw error
+      }
+    }
 
-  AppState.addEventListener('change', handleAppStateChange)
-}
+    onTokenRefresh = async newToken => {
+      const oldToken = await AsyncStorage.getItem(TOKEN_KEY)
+      this.props.rollDeviceToken({ variables: { newToken, oldToken } })
+      await AsyncStorage.setItem(TOKEN_KEY, newToken)
+    }
 
-function componentWillUnmount () {
-  AppState.removeEventListener('change', handleAppStateChange)
-}
+    onNotification = notification => {
+      console.warn('onNotification', notification)
+    }
 
-export default lifecycle({ componentDidMount, componentWillUnmount })
+    render () {
+      return (
+        <WrappedComponent
+          getNotificationsToken={this.getNotificationsToken}
+          {...this.props}
+        />
+      )
+    }
+  }
+)
+
+export default compose(
+  upsertDevice,
+  rollDeviceToken,
+  pustNotificationsWrapper
+)
