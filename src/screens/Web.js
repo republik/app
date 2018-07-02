@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { StyleSheet, Linking, ScrollView, RefreshControl } from 'react-native'
+import { StyleSheet, Linking, ScrollView, RefreshControl, Platform } from 'react-native'
 import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'
 import debounce from 'lodash.debounce'
@@ -23,8 +23,6 @@ const isExternalURL = ({ host, protocol }) => (
   PERMITTED_PROTOCOLS.every(p => !protocol.includes(p))
 )
 
-let visible = true
-
 class Web extends Component {
   constructor (props) {
     super(props)
@@ -38,8 +36,8 @@ class Web extends Component {
 
   componentDidMount () {
     setInterval(() => {
-      visible = !visible
-      this.props.navigation.setParams({ headerVisible: visible })
+      const params = this.props.navigation.state.params || {}
+      this.props.navigation.setParams({ headerVisible: !params.headerVisible })
     }, 2000)
   }
 
@@ -157,12 +155,15 @@ class Web extends Component {
   }
 
   render () {
-    const { data } = this.props
+    const { data, navigation } = this.props
     const { loading, refreshing, refreshEnabled } = this.state
+    const navParams = navigation.state.params || {}
+
+    console.log(navParams.headerVisible)
 
     return (
       <ScrollView
-        contentContainerStyle={styles.container}
+        contentContainerStyle={[styles.container, !navParams.headerVisible && styles.withoutHeader]}
         refreshControl={
           <RefreshControl
             onRefresh={this.onRefresh}
@@ -191,8 +192,17 @@ class Web extends Component {
 var styles = StyleSheet.create({
   container: {
     flex: 1,
-    zIndex: 100
-  }
+    zIndex: 100,
+    backgroundColor: '#FFF'
+  },
+  withoutHeader: Platform.select({
+    ios: {
+      paddingTop: 20
+    },
+    android: {
+      paddingTop: 0
+    }
+  })
 })
 
 const getData = graphql(gql`

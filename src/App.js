@@ -18,12 +18,11 @@ const Router = createStackNavigator({
   initialRouteName: 'Web',
   navigationOptions: ({ screenProps, navigation }) => {
     const params = navigation.state.params || {}
-    const headerVisible = params.headerVisible
 
     return {
       headerTitle: <Header {...screenProps} />,
       headerStyle: { backgroundColor: '#FFFFFF' },
-      header: headerVisible ? undefined : null
+      header: params.headerVisible ? undefined : null
     }
   }
 })
