@@ -75,12 +75,27 @@ export const injectedJavaScriptImpl = function () {
     }
   })
 
-  var onScroll = debounce(function (scroll) {
+  var scrollY = 0
+
+  var postScrollMessage = function () {
     window.postMessage(JSON.stringify({
       type: 'scroll',
       payload: { x: window.scrollX, y: window.scrollY }
     }))
-  }, 150)
+  }
+
+  var debouncedOnScroll = debounce(postScrollMessage, 150)
+
+  var onScroll = function () {
+    var oldScrollY = scrollY
+    scrollY = window.scrollY
+
+    if (window.scrollY === 0 || (oldScrollY === 0 && window.scrollY > 0)) {
+      return postScrollMessage()
+    }
+
+    return debouncedOnScroll()
+  }
 
   window.addEventListener('scroll', onScroll)
 }
