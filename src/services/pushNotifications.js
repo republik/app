@@ -12,11 +12,25 @@ const pustNotificationsWrapper = WrappedComponent => (
     componentDidMount () {
       this.notificationListener = firebase.notifications().onNotification(this.onNotification)
       this.tokenRefreshListener = firebase.messaging().onTokenRefresh(this.onTokenRefresh)
+      this.notificationOpenedListener = firebase.notifications().onNotificationOpened(this.onNotificationOpened)
     }
 
     componentWillUnmount () {
       this.notificationListener()
       this.tokenRefreshListener()
+    }
+
+    createDefaultNotificationChannelForAndroid () {
+      const channel = new firebase.notifications.Android.Channel(
+        'notifications',
+        'Notifications',
+        firebase.notifications.Android.Importance.Max
+      )
+      firebase.notifications().android.createChannel(channel)
+    }
+
+    onNotificationOpened = notification => {
+      console.log(notification)
     }
 
     getNotificationsToken = async () => {
@@ -25,6 +39,8 @@ const pustNotificationsWrapper = WrappedComponent => (
         const token = await firebase.messaging().getToken()
 
         await AsyncStorage.setItem(TOKEN_KEY, token)
+
+        this.createDefaultNotificationChannelForAndroid()
 
         this.props.upsertDevice({ variables: {
           token,
@@ -47,7 +63,13 @@ const pustNotificationsWrapper = WrappedComponent => (
     }
 
     onNotification = notification => {
-      console.warn('onNotification', notification)
+      // Open notification in foreground
+      if (Platform.OS === 'android') {
+        notification._android._channelId = 'notifications'
+        notification._android._smallIcon = { icon: 'notification_icon' }
+      }
+
+      firebase.notifications().displayNotification(notification)
     }
 
     render () {
