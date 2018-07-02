@@ -16,10 +16,16 @@ const Router = createStackNavigator({
   Web: { screen: Web }
 }, {
   initialRouteName: 'Web',
-  navigationOptions: ({ screenProps }) => ({
-    headerTitle: <Header {...screenProps} />,
-    headerStyle: { backgroundColor: '#FFFFFF' }
-  })
+  navigationOptions: ({ screenProps, navigation }) => {
+    const params = navigation.state.params || {}
+    const headerVisible = params.headerVisible
+
+    return {
+      headerTitle: <Header {...screenProps} />,
+      headerStyle: { backgroundColor: '#FFFFFF' },
+      header: headerVisible ? undefined : null
+    }
+  }
 })
 
 class App extends Component {

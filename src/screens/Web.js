@@ -23,6 +23,8 @@ const isExternalURL = ({ host, protocol }) => (
   PERMITTED_PROTOCOLS.every(p => !protocol.includes(p))
 )
 
+let visible = true
+
 class Web extends Component {
   constructor (props) {
     super(props)
@@ -32,6 +34,13 @@ class Web extends Component {
       refreshing: false,
       refreshEnabled: true
     }
+  }
+
+  componentDidMount () {
+    setInterval(() => {
+      visible = !visible
+      this.props.navigation.setParams({ headerVisible: visible })
+    }, 2000)
   }
 
   componentWillReceiveProps (nextProps) {
