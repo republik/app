@@ -13,11 +13,14 @@ const pustNotificationsWrapper = WrappedComponent => (
       this.notificationListener = firebase.notifications().onNotification(this.onNotification)
       this.tokenRefreshListener = firebase.messaging().onTokenRefresh(this.onTokenRefresh)
       this.notificationOpenedListener = firebase.notifications().onNotificationOpened(this.onNotificationOpened)
+      this.getInitialNotification = firebase.notifications().getInitialNotification(this.onNotificationOpened)
     }
 
     componentWillUnmount () {
       this.notificationListener()
       this.tokenRefreshListener()
+      this.notificationOpenedListener()
+      this.getInitialNotification()
     }
 
     createDefaultNotificationChannelForAndroid () {
