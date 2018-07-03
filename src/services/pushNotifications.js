@@ -3,7 +3,7 @@ import { compose } from 'react-apollo'
 import { Platform, AsyncStorage } from 'react-native'
 import firebase from 'react-native-firebase'
 import DeviceInfo from 'react-native-device-info'
-import { upsertDevice, rollDeviceToken } from '../apollo'
+import { setUrl, upsertDevice, rollDeviceToken } from '../apollo'
 
 const TOKEN_KEY = 'notification_token'
 
@@ -29,8 +29,13 @@ const pustNotificationsWrapper = WrappedComponent => (
       firebase.notifications().android.createChannel(channel)
     }
 
-    onNotificationOpened = notification => {
-      console.log(notification)
+    onNotificationOpened = ({ notification }) => {
+      const data = notification.data || {}
+
+      switch (data.type) {
+        case 'discussion':
+          return this.props.setUrl({ variables: { url: data.url } })
+      }
     }
 
     getNotificationsToken = async () => {
@@ -63,11 +68,9 @@ const pustNotificationsWrapper = WrappedComponent => (
     }
 
     onNotification = notification => {
-      // Open notification in foreground
-      if (Platform.OS === 'android') {
-        notification._android._channelId = 'notifications'
-        notification._android._smallIcon = { icon: 'notification_icon' }
-      }
+      notification.android.setAutoCancel(true)
+      notification.android.setChannelId('notifications')
+      notification.android.setSmallIcon('notification_icon')
 
       firebase.notifications().displayNotification(notification)
     }
@@ -84,6 +87,7 @@ const pustNotificationsWrapper = WrappedComponent => (
 )
 
 export default compose(
+  setUrl,
   upsertDevice,
   rollDeviceToken,
   pustNotificationsWrapper
