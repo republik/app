@@ -90,7 +90,7 @@ export const injectedJavaScriptImpl = function () {
     var oldScrollY = scrollY
     scrollY = window.scrollY
 
-    if (window.scrollY === 0 || (oldScrollY === 0 && window.scrollY > 0)) {
+    if (window.scrollY < 15 || (oldScrollY === 0 && window.scrollY > 0)) {
       return postScrollMessage()
     }
 
