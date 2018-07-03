@@ -3,6 +3,7 @@ import { Text, View, StyleSheet, TouchableOpacity, Platform, BackHandler, Activi
 import NativeWebView from 'react-native-wkwebview-reborn'
 import { parse } from 'graphql'
 import { execute, makePromise } from 'apollo-link'
+import { parseURL } from '../utils/url'
 import { injectedJavaScript } from '../utils/webview'
 import { link } from '../apollo'
 import withT from '../utils/withT'
@@ -74,6 +75,15 @@ class WebView extends React.PureComponent {
   }
 
   componentWillReceiveProps (nextProps) {
+    const nextUrl = parseURL(nextProps.source.uri)
+    const previousUrl = parseURL(this.props.source.uri)
+
+    // If url host changes, we force the redirect
+    // This might happen when user change settings in ios
+    if (nextUrl.host !== previousUrl.host) {
+      return this.setState({ currentUrl: nextProps.source.uri })
+    }
+
     if (
       nextProps.source.uri !== this.props.source.uri &&
       nextProps.source.uri !== this.webview.uri

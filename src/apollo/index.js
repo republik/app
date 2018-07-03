@@ -1,7 +1,6 @@
 import React from 'react'
 import { AsyncStorage } from 'react-native'
 import { ApolloProvider } from 'react-apollo'
-import CookieManager from 'react-native-cookies'
 import ApolloClient from 'apollo-client'
 import { ApolloLink } from 'apollo-link'
 import { withClientState } from 'apollo-link-state'
@@ -71,7 +70,6 @@ export const resolvers = {
       return true
     },
     logout: (_, variables, context) => {
-      CookieManager.clearAll()
       context.cache.writeData({ data: {
         url: LOGIN_URL,
         user: null
