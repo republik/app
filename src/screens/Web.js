@@ -8,7 +8,7 @@ import WebView from '../components/WebView'
 import { FRONTEND_BASE_URL, OFFERS_PATH } from '../constants'
 import { me, login, logout, setUrl, setArticle, enableSecondaryMenu, closeMenu, withMenuState } from '../apollo'
 
-const RELOAD_OFFSET_HEIGHT = 15
+const RELOAD_OFFSET_HEIGHT = 5
 const RESTRICTED_PATHS = [OFFERS_PATH]
 const PERMITTED_PROTOCOLS = ['react-js-navigation']
 const PERMITTED_HOSTS = [
