@@ -12,13 +12,45 @@
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
 #import "SplashScreen.h"
+#import "ReactNativeConfig.h"
 #import <Firebase.h>
 
 @implementation AppDelegate
 
+-(void)setupSettings
+{
+  NSDictionary *env = ReactNativeConfig.env;
+  NSString *appVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+  NSString *buildNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:(NSString *)kCFBundleVersionKey];
+  NSString *applicationUrl = [[NSUserDefaults standardUserDefaults] stringForKey:@"application_url"];
+  NSString *graphQLUrl = [[NSUserDefaults standardUserDefaults] stringForKey:@"graphql_url"];
+  NSString *wsUrl = [[NSUserDefaults standardUserDefaults] stringForKey:@"ws_url"];
+  NSString *assetsUrl = [[NSUserDefaults standardUserDefaults] stringForKey:@"assets_url"];
+  
+  [[NSUserDefaults standardUserDefaults] setObject:appVersion forKey:@"version_preference"];
+  [[NSUserDefaults standardUserDefaults] setObject:buildNumber forKey:@"build_preference"];
+  [[NSUserDefaults standardUserDefaults] setObject:[env objectForKey:@"ENV"] forKey:@"environment_preference"];
+  
+  if ([applicationUrl length] == 0) {
+    [[NSUserDefaults standardUserDefaults] setObject:[env objectForKey:@"FRONTEND_BASE_URL"] forKey:@"application_url"];
+  }
+  
+  if ([graphQLUrl length] == 0) {
+    [[NSUserDefaults standardUserDefaults] setObject:[env objectForKey:@"API_URL"] forKey:@"graphql_url"];
+  }
+  
+  if ([wsUrl length] == 0) {
+    [[NSUserDefaults standardUserDefaults] setObject:[env objectForKey:@"API_WS_URL"] forKey:@"ws_url"];
+  }
+  
+  if ([assetsUrl length] == 0) {
+    [[NSUserDefaults standardUserDefaults] setObject:[env objectForKey:@"ASSETS_SERVER_BASE_URL"] forKey:@"assets_url"];
+  }
+}
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-
+  [self setupSettings];
   [FIRApp configure];
   NSURL *jsCodeLocation;
 

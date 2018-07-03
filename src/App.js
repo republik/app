@@ -1,16 +1,15 @@
 import React, { Component } from 'react'
-import { Platform } from 'react-native'
 import SplashScreen from 'react-native-splash-screen'
 import { createStackNavigator } from 'react-navigation'
-import CookieManager from 'react-native-cookies'
 import { compose } from 'react-apollo'
 import Web from './screens/Web'
 import Header from './components/Header'
+import cookies from './services/cookies'
+import settings from './services/settings'
 import codePush from './services/codePush'
 import deepLinking from './services/deepLinking'
 import pushNotifications from './services/pushNotifications'
 import withApollo from './apollo'
-import { FRONTEND_BASE_URL, CURTAIN_BACKDOOR_PATH } from './constants'
 
 const Router = createStackNavigator({
   Web: { screen: Web }
@@ -29,16 +28,6 @@ class App extends Component {
     this.props.persistor.restore().then(() => {
       this.setState({ cacheLoaded: true })
     })
-
-    if (CURTAIN_BACKDOOR_PATH) {
-      let cookies = `OpenSesame=${encodeURIComponent(CURTAIN_BACKDOOR_PATH)}; Path=/; Expires=Thu, 01 Jan 2030 00:00:00 GMT; HttpOnly`
-
-      if (Platform.OS === 'ios') {
-        cookies = { 'Set-Cookie': cookies }
-      }
-
-      CookieManager.setFromResponse(FRONTEND_BASE_URL, cookies)
-    }
   }
 
   hideSplashScreen = () => {
@@ -64,5 +53,7 @@ export default compose(
   withApollo,
   codePush,
   deepLinking,
-  pushNotifications
+  pushNotifications,
+  cookies,
+  settings
 )(App)
