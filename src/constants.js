@@ -1,4 +1,4 @@
-import { Platform } from 'react-native'
+import { Platform, Settings } from 'react-native'
 import Config from 'react-native-config'
 
 // localhost does not work on Android.
@@ -15,11 +15,11 @@ const handleEnv = value => {
 }
 
 // Base urls
-export const ENV = handleEnv(Config.ENV)
-export const API_URL = handleEnv(Config.API_URL)
-export const API_WS_URL = handleEnv(Config.API_WS_URL)
-export const FRONTEND_BASE_URL = handleEnv(Config.FRONTEND_BASE_URL)
-export const ASSETS_SERVER_BASE_URL = handleEnv(Config.ASSETS_SERVER_BASE_URL)
+export const ENV = Settings.get('environment_preference') || Config.ENV
+export const API_URL = handleEnv(Settings.get('graphql_url') || Config.API_URL)
+export const API_WS_URL = handleEnv(Settings.get('ws_url') || Config.API_WS_URL)
+export const FRONTEND_BASE_URL = handleEnv(Settings.get('application_url') || Config.FRONTEND_BASE_URL)
+export const ASSETS_SERVER_BASE_URL = handleEnv(Settings.get('assets_url') || Config.ASSETS_SERVER_BASE_URL)
 
 // App paths
 export const HOME_PATH = `/`
