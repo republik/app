@@ -121,7 +121,6 @@ class WebView extends React.PureComponent {
 
         if (!shouldFollowRedirect) {
           this.webview.ref.stopLoading()
-          this.webview.ref.goBack()
           return false
         }
       }
