@@ -6,6 +6,7 @@ import { execute, makePromise } from 'apollo-link'
 import { parseURL } from '../utils/url'
 import { injectedJavaScript } from '../utils/webview'
 import { link } from '../apollo'
+import { USER_AGENT } from '../constants'
 import withT from '../utils/withT'
 
 const styles = StyleSheet.create({
@@ -230,7 +231,7 @@ class WebView extends React.PureComponent {
           injectedJavaScript={injectedJavaScript}
           allowsBackForwardNavigationGestures
           scalesPageToFit={false}
-          userAgent="RepublikApp"
+          userAgent={USER_AGENT}
           startInLoadingState
           javaScriptEnabled
           sendCookies

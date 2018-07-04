@@ -2,7 +2,7 @@ import { ApolloLink } from 'apollo-link'
 import { HttpLink } from 'apollo-link-http'
 import { WebSocketLink } from 'apollo-link-ws'
 import { InMemoryCache } from 'apollo-cache-inmemory'
-import { API_URL, API_WS_URL } from '../constants'
+import { API_URL, API_WS_URL, USER_AGENT } from '../constants'
 
 const hasSubscriptionOperation = ({ query }) => (
   query.definitions.some(
@@ -11,7 +11,13 @@ const hasSubscriptionOperation = ({ query }) => (
   )
 )
 
-const httpLink = new HttpLink({ uri: API_URL })
+const customFetch = (url, opts) => {
+  opts.headers = opts.headers || {}
+  opts.headers['User-Agent'] = USER_AGENT
+  return fetch(url, opts)
+}
+
+const httpLink = new HttpLink({ uri: API_URL, fetch: customFetch })
 
 const wsLink = new WebSocketLink({
   uri: API_WS_URL,
