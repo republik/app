@@ -1,12 +1,13 @@
 # Publishing
 
-This project uses [Fastlane](https://docs.fastlane.tools/) to automate deployment processes both for iOS and Android
+This project uses [Fastlane](https://docs.fastlane.tools/) to automate deployment processes both for iOS and Android.
+You can find the installation instructions [here](https://docs.fastlane.tools/#install-fastlane)
 
 ## iOS
 
 ### Setup
 
-To set up the certificates and provisioning profiles on a new machine, you just run the same command using on the `./ios` directory:
+To set up the certificates and provisioning profiles on a new machine, you will have torun the following command inside the `./ios` directory:
 
 ```
 fastlane match development
