@@ -8,6 +8,8 @@ Most, if not all views are provided by [republik-frontend](https://github.com/or
 1) Install NPM packages with your package manager of choice - i.e run yarn or npm install
 2) [iOS] cd ios and run pod install - if you don't have CocoaPods you can follow [these instructions](https://guides.cocoapods.org/using/getting-started.html#getting-started) to install it.
 3) [Android] No additional steps for android here
+4) Copy .env files into root project folder: `.env.dev`, `.env.staging`, `.env.production`
+5) Follow the notifications setup instructions below
 
 ## Table of Contents
 
