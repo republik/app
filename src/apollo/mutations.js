@@ -65,7 +65,9 @@ const upsertDevice = graphql(gql`
 
 const rollDeviceToken = graphql(gql`
   mutation RollDeviceToken($oldToken: String!, $newToken: String!) {
-    rollDeviceToken(oldToken: $oldToken, newToken: $newToken)
+    rollDeviceToken(oldToken: $oldToken, newToken: $newToken) {
+      id
+    }
   }
 `, { name: 'rollDeviceToken' })
 
