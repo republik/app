@@ -6,6 +6,6 @@ target 'orbitingapp' do
   use_frameworks!
 
   # Pods for orbitingapp
-  pod 'Firebase/Core'
+  pod 'Firebase/Core', '~> 4.13'
   pod 'Firebase/Messaging'
 end
