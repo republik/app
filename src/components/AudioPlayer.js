@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, StyleSheet, Animated, ActivityIndicator } from 'react-native'
+import { View, Text, StyleSheet, Animated, ActivityIndicator, PanResponder, Dimensions } from 'react-native'
 import TrackPlayer from 'react-native-track-player'
 import Icon from './Icon'
 import { setAudio } from '../apollo'
@@ -17,7 +17,6 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     top: 0,
-    height: 5,
     width: '100%',
     position: 'absolute',
     backgroundColor: '#e8e8ed'
@@ -25,14 +24,14 @@ const styles = StyleSheet.create({
   progressPosition: {
     top: 0,
     left: 0,
-    height: 5,
+    height: '100%',
     position: 'absolute',
     backgroundColor: '#3cad01'
   },
   progressBuffer: {
     top: 0,
     left: 0,
-    height: 5,
+    height: '100%',
     position: 'absolute',
     backgroundColor: '#bebdcc'
   },
@@ -61,6 +60,44 @@ const Time = ({ loading, duration, position }) => {
       {parseSeconds(position)} / {parseSeconds(duration)}
     </Text>
   )
+}
+
+const height = new Animated.Value(5)
+
+class ProgressBar extends React.Component {
+  constructor (props) {
+    super(props)
+
+    const SCREEN_WIDTH = Dimensions.get('window').width
+
+    this.pan = PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderGrant: (evt, gestureState) => {
+        Animated.timing(height, { toValue: 15, duration: 250 }).start()
+      },
+      onPanResponderMove: (evt, gestureState) => {
+        props.onPositionChange((gestureState.moveX / SCREEN_WIDTH) * this.props.duration)
+      },
+      onPanResponderRelease: (evt, gestureState) => {
+        props.onPositionReleased()
+        Animated.timing(height, { toValue: 5, duration: 250 }).start()
+      }
+    })
+  }
+
+  render () {
+    const { position, bufferedPosition, duration } = this.props
+    const progress = (position / duration) * 100
+    const buffered = (bufferedPosition / duration) * 100
+
+    return (
+      <Animated.View style={[styles.progressBar, { height }]} {...this.pan.panHandlers}>
+        <View style={[styles.progressBuffer, { width: `${buffered}%` }]} />
+        <View style={[styles.progressPosition, { width: `${progress}%` }]} />
+      </Animated.View>
+    )
+  }
 }
 
 class AudioPlayer extends React.Component {
@@ -133,6 +170,7 @@ class AudioPlayer extends React.Component {
         this.setState({ isPlaying: false })
         break
       case 'stopped':
+        this.props.setAudio({ variables: { audio: null } })
         setTimeout(() => { // Delay stte change to make animation nicer
           this.setState({ isPlaying: false, duration: null, position: 0 })
         }, 250)
@@ -158,6 +196,14 @@ class AudioPlayer extends React.Component {
     }
   }
 
+  onPositionChange = position => {
+    this.setState({ position })
+  }
+
+  onPositionReleased = () => {
+    TrackPlayer.seekTo(this.state.position)
+  }
+
   updateProgress = async () => {
     try {
       this.setState({ position: await TrackPlayer.getPosition() })
@@ -178,15 +224,16 @@ class AudioPlayer extends React.Component {
     const { setAudio } = this.props
     const { loading, isPlaying, duration, position, bufferedPosition } = this.state
     const icon = isPlaying ? 'pause' : 'play'
-    const progress = (position / duration) * 100
-    const buffered = (bufferedPosition / duration) * 100
 
     return (
       <Animated.View style={[styles.container, { bottom: this.bottom }]}>
-        <View style={styles.progressBar}>
-          <View style={[styles.progressBuffer, { width: `${buffered}%` }]} />
-          <View style={[styles.progressPosition, { width: `${progress}%` }]} />
-        </View>
+        <ProgressBar
+          position={position}
+          duration={duration}
+          bufferedPosition={bufferedPosition}
+          onPositionChange={this.onPositionChange}
+          onPositionReleased={this.onPositionReleased}
+        />
         <Icon
           type={icon}
           size={35}
