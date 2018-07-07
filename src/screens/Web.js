@@ -1,12 +1,13 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import { StyleSheet, Linking, ScrollView, RefreshControl } from 'react-native'
 import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'
 import debounce from 'lodash.debounce'
 import { parseURL } from '../utils/url'
 import WebView from '../components/WebView'
+import AudioPlayer from '../components/AudioPlayer'
 import { FRONTEND_BASE_URL, OFFERS_PATH } from '../constants'
-import { me, login, logout, setUrl, setArticle, enableSecondaryMenu, closeMenu, withMenuState } from '../apollo'
+import { me, login, logout, setUrl, setArticle, enableSecondaryMenu, closeMenu, withMenuState, withAudio } from '../apollo'
 
 const RELOAD_OFFSET_HEIGHT = 5
 const RESTRICTED_PATHS = [OFFERS_PATH]
@@ -148,33 +149,36 @@ class Web extends Component {
   }
 
   render () {
-    const { data } = this.props
+    const { data, audio } = this.props
     const { loading, refreshing, refreshEnabled } = this.state
 
     return (
-      <ScrollView
-        contentContainerStyle={styles.container}
-        refreshControl={
-          <RefreshControl
-            onRefresh={this.onRefresh}
-            refreshing={this.state.refreshing}
-            enabled={refreshEnabled}
+      <Fragment>
+        <ScrollView
+          contentContainerStyle={styles.container}
+          refreshControl={
+            <RefreshControl
+              onRefresh={this.onRefresh}
+              refreshing={this.state.refreshing}
+              enabled={refreshEnabled}
+            />
+          }
+        >
+          <WebView
+            source={{ uri: data.url }}
+            onNetwork={this.onNetwork}
+            onMessage={this.onMessage}
+            onLoadEnd={this.onLoadEnd}
+            onLoadStart={this.onLoadStart}
+            onScroll={this.onWebViewScroll}
+            webViewWillTransition={this.webViewWillTransition}
+            onNavigationStateChange={this.onNavigationStateChange}
+            loading={{ status: loading || refreshing, showSpinner: !refreshing }}
+            ref={node => { this.webview = node }}
           />
-        }
-      >
-        <WebView
-          source={{ uri: data.url }}
-          onNetwork={this.onNetwork}
-          onMessage={this.onMessage}
-          onLoadEnd={this.onLoadEnd}
-          onLoadStart={this.onLoadStart}
-          onScroll={this.onWebViewScroll}
-          webViewWillTransition={this.webViewWillTransition}
-          onNavigationStateChange={this.onNavigationStateChange}
-          loading={{ status: loading || refreshing, showSpinner: !refreshing }}
-          ref={node => { this.webview = node }}
-        />
-      </ScrollView>
+        </ScrollView>
+        <AudioPlayer url={audio} />
+      </Fragment>
     )
   }
 }
@@ -198,6 +202,7 @@ export default compose(
   logout,
   getData,
   setUrl,
+  withAudio,
   setArticle,
   withMenuState,
   enableSecondaryMenu,

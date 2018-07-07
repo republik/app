@@ -37,6 +37,12 @@ const setUrl = graphql(gql`
   }
 `, { name: 'setUrl' })
 
+const setAudio = graphql(gql`
+  mutation SetAudio($audio: String!) {
+    setAudio(audio: $audio) @client
+  }
+`, { name: 'setAudio' })
+
 const setArticle = graphql(gql`
   mutation SetArticle($article: Article!) {
     setArticle(article: $article) @client
@@ -78,6 +84,7 @@ export {
   logout,
   signOut,
   setUrl,
+  setAudio,
   setArticle,
   enableSecondaryMenu,
   toggleSecondaryMenu,

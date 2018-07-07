@@ -16,7 +16,8 @@ const defaults = {
   menuActive: false,
   secondaryMenuActive: false,
   secondaryMenuVisible: false,
-  article: null
+  article: null,
+  audio: null
 }
 
 const typeDefs = `
@@ -120,6 +121,10 @@ export const resolvers = {
       const next = !previous.secondaryMenuActive
       context.cache.writeData({ data: { secondaryMenuActive: next } })
       return next
+    },
+    setAudio: async (_, { audio }, context) => {
+      context.cache.writeData({ data: { audio } })
+      return true
     }
   }
 }

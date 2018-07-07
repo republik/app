@@ -30,6 +30,12 @@ const getCurrentUrlQuery = gql`
   }
 `
 
+const getCurrentAudioQuery = gql`
+  query GetCurrentAudio {
+    audio @client
+  }
+`
+
 const withMenuState = graphql(getMenuStateQuery, {
   props: ({ data: { menuActive, secondaryMenuVisible, secondaryMenuActive } }) => ({
     menuActive,
@@ -44,9 +50,15 @@ const withCurrentArticle = graphql(getCurrentArticleQuery, {
   })
 })
 
-const withCurrentUrl: String = graphql(getCurrentUrlQuery, {
+const withCurrentUrl = graphql(getCurrentUrlQuery, {
   props: ({ data: { url } }) => ({
     currentUrl: url
+  })
+})
+
+const withAudio = graphql(getCurrentAudioQuery, {
+  props: ({ data: { audio } }) => ({
+    audio
   })
 })
 
@@ -68,6 +80,7 @@ const me = graphql(gql`
 
 export {
   me,
+  withAudio,
   withMenuState,
   withCurrentUrl,
   getMenuStateQuery,
