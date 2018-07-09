@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react'
-import { StyleSheet, Linking, ScrollView, RefreshControl } from 'react-native'
+import { StyleSheet, Linking, ScrollView, RefreshControl, AppState, NetInfo } from 'react-native'
 import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'
 import debounce from 'lodash.debounce'
@@ -42,8 +42,13 @@ class Web extends Component {
     this.state = {
       loading: true,
       refreshing: false,
-      refreshEnabled: true
+      refreshEnabled: true,
+      appState: AppState.currentState
     }
+  }
+
+  componentDidMount () {
+    AppState.addEventListener('change', this.handleAppStateChange)
   }
 
   componentWillReceiveProps (nextProps) {
@@ -64,6 +69,25 @@ class Web extends Component {
     if (this.props.secondaryMenuActive && !nextProps.secondaryMenuActive) {
       this.webview.postMessage({ type: 'close-secondary-menu' })
     }
+  }
+
+  componentWillUnmount () {
+    AppState.removeEventListener('change', this.handleAppStateChange)
+  }
+
+  handleAppStateChange = async (nextAppState) => {
+    const isConnected = await NetInfo.isConnected.fetch()
+
+    if (
+      isConnected &&
+      nextAppState === 'active' &&
+      this.state.appState.match(/inactive|background/)
+    ) {
+      this.setState({ loading: true })
+      this.webview.reload()
+    }
+
+    this.setState({ appState: nextAppState })
   }
 
   setLoading = debounce(value => {
