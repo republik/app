@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Animated, ActivityIndicator, PanResponder, Dime
 import TrackPlayer from 'react-native-track-player'
 import Icon from './Icon'
 import { setAudio } from '../apollo'
+import Logo from '../assets/images/playlist-logo.png'
 
 const AUDIO_PLAYER_HEIGHT = 60
 
@@ -74,6 +75,7 @@ class ProgressBar extends React.Component {
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: () => true,
       onPanResponderGrant: (evt, gestureState) => {
+        props.onPositionStart()
         Animated.timing(height, { toValue: 15, duration: 250 }).start()
       },
       onPanResponderMove: (evt, gestureState) => {
@@ -113,18 +115,25 @@ class AudioPlayer extends React.Component {
     }
   }
 
-  componentDidMount () {
-    TrackPlayer.setupPlayer()
-    TrackPlayer.registerEventHandler(this.onEvent)
+  async componentDidMount () {
+    await TrackPlayer.setupPlayer()
+    await TrackPlayer.updateOptions({
+      capabilities: [
+        TrackPlayer.CAPABILITY_PLAY,
+        TrackPlayer.CAPABILITY_PAUSE,
+        TrackPlayer.CAPABILITY_STOP
+      ]
+    })
   }
 
   async componentWillReceiveProps (nextProps) {
     if (!this.props.url && nextProps.url) {
       await TrackPlayer.add({
-        id: 'republik',
+        id: nextProps.title,
         url: nextProps.url,
-        title: 'Track Title',
-        artist: 'Track Artist'
+        title: nextProps.title,
+        artist: 'Republik',
+        artwork: Logo
       })
       this.startIntervals()
       this.setState({ loading: true })
@@ -136,46 +145,13 @@ class AudioPlayer extends React.Component {
       Animated.timing(this.bottom, {
         toValue: -AUDIO_PLAYER_HEIGHT, duration: 250
       }).start()
+    } else if (this.props.playbackState !== nextProps.playbackState) {
+      await this.onPlaybackStateChange(nextProps.playbackState)
     }
   }
 
   componentWillUnmount () {
     this.stopIntervals()
-  }
-
-  onEvent = async event => {
-    switch (event.type) {
-      case 'playback-state':
-        return this.onPlaybackStateChange(event)
-    }
-  }
-
-  onPlaybackStateChange = async event => {
-    switch (event.state) {
-      case 'playing':
-        if (this.state.loading) {
-          this.setState({
-            loading: false,
-            duration: await TrackPlayer.getDuration()
-          })
-          TrackPlayer.pause()
-        } else {
-          this.setState({
-            isPlaying: true,
-            duration: await TrackPlayer.getDuration()
-          })
-        }
-        break
-      case 'paused':
-        this.setState({ isPlaying: false })
-        break
-      case 'stopped':
-        this.props.setAudio({ variables: { audio: null } })
-        setTimeout(() => { // Delay stte change to make animation nicer
-          this.setState({ isPlaying: false, duration: null, position: 0 })
-        }, 250)
-        break
-    }
   }
 
   startIntervals = () => {
@@ -196,12 +172,51 @@ class AudioPlayer extends React.Component {
     }
   }
 
+  onPlaybackStateChange = async state => {
+    console.log(state)
+    switch (state) {
+      case TrackPlayer.STATE_PLAYING:
+        if (this.state.loading) {
+          this.setState({
+            loading: false,
+            duration: await TrackPlayer.getDuration()
+          })
+          TrackPlayer.pause()
+        } else {
+          this.setState({
+            isPlaying: true,
+            duration: await TrackPlayer.getDuration()
+          })
+        }
+        break
+      case TrackPlayer.STATE_PAUSED:
+        this.setState({ isPlaying: false })
+        break
+      case TrackPlayer.STATE_STOPPED:
+        this.props.setAudio({ variables: { audio: null } })
+        setTimeout(() => { // Delay stte change to make animation nicer
+          this.setState({ isPlaying: false, duration: null, position: 0 })
+        }, 250)
+        break
+      case TrackPlayer.STATE_NONE:
+        this.setState({ isPlaying: false, duration: null, position: 0 })
+        break
+    }
+  }
+
   onPositionChange = position => {
     this.setState({ position })
   }
 
+  onPositionStart = () => {
+    this.stopIntervals()
+  }
+
   onPositionReleased = () => {
     TrackPlayer.seekTo(this.state.position)
+    setTimeout(() => {
+      this.startIntervals()
+    }, 250)
   }
 
   updateProgress = async () => {
@@ -232,6 +247,7 @@ class AudioPlayer extends React.Component {
           duration={duration}
           bufferedPosition={bufferedPosition}
           onPositionChange={this.onPositionChange}
+          onPositionStart={this.onPositionStart}
           onPositionReleased={this.onPositionReleased}
         />
         <Icon

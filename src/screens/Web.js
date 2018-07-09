@@ -7,7 +7,18 @@ import { parseURL } from '../utils/url'
 import WebView from '../components/WebView'
 import AudioPlayer from '../components/AudioPlayer'
 import { FRONTEND_BASE_URL, OFFERS_PATH } from '../constants'
-import { me, login, logout, setUrl, setArticle, enableSecondaryMenu, closeMenu, withMenuState, withAudio } from '../apollo'
+import {
+  me,
+  login,
+  logout,
+  setUrl,
+  setArticle,
+  enableSecondaryMenu,
+  closeMenu,
+  withMenuState,
+  withAudio,
+  withCurrentArticle
+} from '../apollo'
 
 const RELOAD_OFFSET_HEIGHT = 5
 const RESTRICTED_PATHS = [OFFERS_PATH]
@@ -149,8 +160,9 @@ class Web extends Component {
   }
 
   render () {
-    const { data, audio } = this.props
+    const { data, audio, playbackState, article } = this.props
     const { loading, refreshing, refreshEnabled } = this.state
+    const audioTitle = article ? article.title : ''
 
     return (
       <Fragment>
@@ -177,7 +189,11 @@ class Web extends Component {
             ref={node => { this.webview = node }}
           />
         </ScrollView>
-        <AudioPlayer url={audio} />
+        <AudioPlayer
+          url={audio}
+          title={audioTitle}
+          playbackState={playbackState}
+        />
       </Fragment>
     )
   }
@@ -205,6 +221,7 @@ export default compose(
   withAudio,
   setArticle,
   withMenuState,
+  withCurrentArticle,
   enableSecondaryMenu,
   closeMenu
 )(Web)

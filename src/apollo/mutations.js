@@ -77,6 +77,12 @@ const rollDeviceToken = graphql(gql`
   }
 `, { name: 'rollDeviceToken' })
 
+const setPlaybackStateMutation = gql`
+  mutation SetPlaybackState($state: String!) {
+    setPlaybackState(state: $state) @client
+  }
+`
+
 export {
   toggleMenu,
   closeMenu,
@@ -89,5 +95,6 @@ export {
   enableSecondaryMenu,
   toggleSecondaryMenu,
   upsertDevice,
-  rollDeviceToken
+  rollDeviceToken,
+  setPlaybackStateMutation
 }
