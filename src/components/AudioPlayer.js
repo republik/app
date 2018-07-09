@@ -173,7 +173,6 @@ class AudioPlayer extends React.Component {
   }
 
   onPlaybackStateChange = async state => {
-    console.log(state)
     switch (state) {
       case TrackPlayer.STATE_PLAYING:
         if (this.state.loading) {
