@@ -2,13 +2,14 @@ import React, { Fragment } from 'react'
 import { compose } from 'react-apollo'
 import { View, Text, Image, TouchableOpacity, Linking, Share, StyleSheet } from 'react-native'
 import Popover from './Popover'
-import TitleButton from './TitleButton'
+import Icon from './Icon'
 import { parseURL } from '../utils/url'
 import { getPdfUrl } from '../utils/pdf'
 import { FRONTEND_BASE_URL, HOME_URL, FEED_URL } from '../constants'
 import {
   me,
   setUrl,
+  setAudio,
   toggleMenu,
   withMenuState,
   withCurrentUrl,
@@ -61,7 +62,7 @@ const MainHeader = ({ me, toggleMenu, setUrl, currentUrl }) => {
 
   return (
     <View style={styles.container}>
-      <TitleButton
+      <Icon
         side="left"
         type="profile"
         onPress={toggleMenu}
@@ -72,7 +73,7 @@ const MainHeader = ({ me, toggleMenu, setUrl, currentUrl }) => {
           style={styles.logo}
         />
       </LogoWrapper>
-      <TitleButton
+      <Icon
         side="right"
         type="hamburger"
         onPress={toggleMenu}
@@ -98,9 +99,10 @@ const onShareClick = (article) => {
 }
 
 const SeriesHeader = ({
+  active,
   setUrl,
   article,
-  active,
+  setAudio,
   menuOpened,
   toggleMenu,
   toggleSecondaryMenu
@@ -118,11 +120,11 @@ const SeriesHeader = ({
           <TouchableOpacity style={styles.series} onPress={() => toggleSecondaryMenu()}>
             <Fragment>
               <Text style={styles.seriesName}>{name}</Text>
-              <TitleButton type={icon} />
+              <Icon type={icon} />
             </Fragment>
           </TouchableOpacity>
         )}
-        <TitleButton
+        <Icon
           size={30}
           side="right"
           type="share"
@@ -130,7 +132,7 @@ const SeriesHeader = ({
           style={{ marginRight: 5 }}
         />
         { pdf && (
-          <TitleButton
+          <Icon
             size={30}
             side="right"
             type="pdf"
@@ -139,21 +141,21 @@ const SeriesHeader = ({
           />
         )}
         { audio && (
-          <TitleButton
+          <Icon
             size={30}
             side="right"
             type="audio"
             style={{ marginRight: 5 }}
+            onPress={() => setAudio({ variables: { audio } })}
           />
         )}
         { discussion && (
-          <TitleButton
+          <Icon
             size={30}
             side="right"
             type="discussion"
             style={{ marginRight: 5 }}
             onPress={() => {
-              console.log(`${FRONTEND_BASE_URL}${article.discussion}`)
               setUrl({
                 variables: { url: `${FRONTEND_BASE_URL}${article.discussion}` }
               })
@@ -161,7 +163,7 @@ const SeriesHeader = ({
           />
         )}
       </View>
-      <TitleButton
+      <Icon
         side="right"
         type="hamburger"
         onPress={toggleMenu}
@@ -175,6 +177,7 @@ const Header = ({
   me,
   article,
   setUrl,
+  setAudio,
   currentUrl,
   toggleMenu,
   menuActive,
@@ -192,6 +195,7 @@ const Header = ({
     <SeriesHeader
       setUrl={setUrl}
       article={article}
+      setAudio={setAudio}
       toggleMenu={toggleMenu}
       menuOpened={secondaryMenuActive}
       toggleSecondaryMenu={toggleSecondaryMenu}
@@ -203,6 +207,7 @@ const Header = ({
 export default compose(
   me,
   setUrl,
+  setAudio,
   toggleMenu,
   withMenuState,
   withCurrentUrl,

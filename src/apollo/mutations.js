@@ -37,6 +37,12 @@ const setUrl = graphql(gql`
   }
 `, { name: 'setUrl' })
 
+const setAudio = graphql(gql`
+  mutation SetAudio($audio: String!) {
+    setAudio(audio: $audio) @client
+  }
+`, { name: 'setAudio' })
+
 const setArticle = graphql(gql`
   mutation SetArticle($article: Article!) {
     setArticle(article: $article) @client
@@ -71,6 +77,12 @@ const rollDeviceToken = graphql(gql`
   }
 `, { name: 'rollDeviceToken' })
 
+const setPlaybackStateMutation = gql`
+  mutation SetPlaybackState($state: String!) {
+    setPlaybackState(state: $state) @client
+  }
+`
+
 export {
   toggleMenu,
   closeMenu,
@@ -78,9 +90,11 @@ export {
   logout,
   signOut,
   setUrl,
+  setAudio,
   setArticle,
   enableSecondaryMenu,
   toggleSecondaryMenu,
   upsertDevice,
-  rollDeviceToken
+  rollDeviceToken,
+  setPlaybackStateMutation
 }
