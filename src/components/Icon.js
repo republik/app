@@ -5,6 +5,9 @@ import HamburgerButton from './HamburgerButton'
 import { withMenuState } from '../apollo'
 import PDF from '../assets/images/pdf.png'
 import Share from '../assets/images/share.png'
+import Play from '../assets/images/play.png'
+import Pause from '../assets/images/pause.png'
+import Close from '../assets/images/close.png'
 import Audio from '../assets/images/audio.png'
 import Discussion from '../assets/images/discussion.png'
 import ChevronUp from '../assets/images/chevron-up.png'
@@ -14,6 +17,9 @@ const buttons = {
   pdf: PDF,
   audio: Audio,
   share: Share,
+  play: Play,
+  pause: Pause,
+  close: Close,
   chevronUp: ChevronUp,
   chevronDown: ChevronDown,
   profile: ProfileButton,
@@ -21,7 +27,7 @@ const buttons = {
   hamburger: HamburgerButton
 }
 
-const TitleButton = ({ type, side, size, menuActive, onPress, style }) => {
+const Icon = ({ type, side, size, menuActive, onPress, style }) => {
   if (typeof buttons[type] === 'number') {
     const Wrapper = onPress ? TouchableOpacity : ({ children }) => children
 
@@ -46,8 +52,8 @@ const TitleButton = ({ type, side, size, menuActive, onPress, style }) => {
   )
 }
 
-TitleButton.defaultProps = {
+Icon.defaultProps = {
   size: 25
 }
 
-export default withMenuState(TitleButton)
+export default withMenuState(Icon)

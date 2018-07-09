@@ -1,6 +1,7 @@
 import React from 'react'
 import { AsyncStorage } from 'react-native'
 import { ApolloProvider } from 'react-apollo'
+import TrackPlayer from 'react-native-track-player'
 import ApolloClient from 'apollo-client'
 import { ApolloLink } from 'apollo-link'
 import { withClientState } from 'apollo-link-state'
@@ -16,7 +17,9 @@ const defaults = {
   menuActive: false,
   secondaryMenuActive: false,
   secondaryMenuVisible: false,
-  article: null
+  article: null,
+  audio: null,
+  playbackState: TrackPlayer.STATE_NONE
 }
 
 const typeDefs = `
@@ -120,18 +123,29 @@ export const resolvers = {
       const next = !previous.secondaryMenuActive
       context.cache.writeData({ data: { secondaryMenuActive: next } })
       return next
+    },
+    setAudio: async (_, { audio }, context) => {
+      const data = audio ? { audio } : { audio, playbackState: TrackPlayer.STATE_NONE }
+      context.cache.writeData({ data })
+      return true
+    },
+    setPlaybackState: async (_, { state }, context) => {
+      context.cache.writeData({ data: { playbackState: state } })
+      return true
     }
   }
 }
 
-const withApollo = WrappedComponent => () => {
-  const clientState = { defaults, typeDefs, resolvers }
-  const cache = new InMemoryCache()
-  const persistor = new CachePersistor({ cache, storage: AsyncStorage })
-  const stateLink = withClientState({ ...clientState, cache })
-  const composedLink = ApolloLink.from([stateLink, link])
-  const client = new ApolloClient({ cache, link: composedLink })
+const clientState = { defaults, typeDefs, resolvers }
+const cache = new InMemoryCache()
+const persistor = new CachePersistor({ cache, storage: AsyncStorage })
+const stateLink = withClientState({ ...clientState, cache })
+const composedLink = ApolloLink.from([stateLink, link])
 
+// Create apollo client and export it
+export const client = new ApolloClient({ cache, link: composedLink })
+
+const withApollo = WrappedComponent => () => {
   return (
     <ApolloProvider client={client}>
       <WrappedComponent {...this.props} persistor={persistor} />
