@@ -50,10 +50,6 @@ class Web extends Component {
 
   componentDidMount () {
     AppState.addEventListener('change', this.handleAppStateChange)
-
-    setTimeout(() => {
-      this.props.navigation.navigate('Login')
-    }, 2000)
   }
 
   componentWillReceiveProps (nextProps) {

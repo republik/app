@@ -7,6 +7,7 @@ import Login from './screens/Login'
 import cookies from './services/cookies'
 import settings from './services/settings'
 import codePush from './services/codePush'
+import navigator from './services/navigation'
 import deepLinking from './services/deepLinking'
 import pushNotifications from './services/pushNotifications'
 import withApollo from './apollo'
@@ -45,11 +46,13 @@ class App extends Component {
     const { getNotificationsToken } = this.props
 
     return (
-      <Router screenProps={{
-        persistor: this.props.persistor,
-        onLoadEnd: this.hideSplashScreen,
-        getNotificationsToken
-      }} />
+      <Router
+        ref={navigatorRef => navigator.setContainer(navigatorRef)}
+        screenProps={{
+          persistor: this.props.persistor,
+          onLoadEnd: this.hideSplashScreen,
+          getNotificationsToken
+        }} />
     )
   }
 }

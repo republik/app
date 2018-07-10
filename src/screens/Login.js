@@ -6,10 +6,12 @@ import Logo from '../assets/images/logo-title.png'
 
 class Login extends Component {
   render () {
+    const uri = this.props.navigation.getParam('url')
+
     return (
       <WebView
         style={styles.container}
-        source={{ uri: 'https://www.google.com' }}
+        source={{ uri }}
         ref={node => { this.webview = node }}
       />
     )
