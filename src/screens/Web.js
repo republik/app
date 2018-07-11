@@ -6,7 +6,7 @@ import debounce from 'lodash.debounce'
 import { parseURL } from '../utils/url'
 import WebView from '../components/WebView'
 import AudioPlayer from '../components/AudioPlayer'
-import { FRONTEND_BASE_URL, OFFERS_PATH } from '../constants'
+import { FRONTEND_BASE_URL, OFFERS_PATH, LOGIN_PATH } from '../constants'
 import {
   me,
   login,
@@ -76,11 +76,15 @@ class Web extends Component {
   }
 
   handleAppStateChange = async (nextAppState) => {
+    const url = parseURL(this.props.data.url)
     const isConnected = await NetInfo.isConnected.fetch()
+
+    console.log(url)
 
     if (
       isConnected &&
       nextAppState === 'active' &&
+      url.path !== LOGIN_PATH &&
       this.state.appState.match(/inactive|background/)
     ) {
       this.setState({ loading: true })
