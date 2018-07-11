@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { StyleSheet, Image, View } from 'react-native'
 import { compose } from 'react-apollo'
 import WebView from '../components/WebView'
+import navigator from '../services/navigation'
 import { handleEnv } from '../utils/url'
 import Logo from '../assets/images/logo-title.png'
 
@@ -12,13 +13,21 @@ const LoginHeader = () => (
 )
 
 class Login extends Component {
+  onMessage = message => {
+    switch (message.type) {
+      case 'close-auth-overlay':
+        return navigator.goBack()
+    }
+  }
+
   render () {
     const uri = handleEnv(this.props.navigation.getParam('url'))
 
     return (
       <WebView
-        style={styles.container}
         source={{ uri }}
+        onMessage={this.onMessage}
+        style={styles.container}
         ref={node => { this.webview = node }}
       />
     )
