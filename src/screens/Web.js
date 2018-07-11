@@ -23,16 +23,20 @@ import {
 const RELOAD_OFFSET_HEIGHT = 5
 const RESTRICTED_PATHS = [OFFERS_PATH]
 const PERMITTED_PROTOCOLS = ['react-js-navigation']
-const PERMITTED_HOSTS = [
-  parseURL(FRONTEND_BASE_URL).host,
+const VIDEO_HOSTS = [
   'youtube.com',
   'youtube-nocookie.com',
   'player.vimeo.com'
 ]
 
+const isVideoURL = ({ host }) => (
+  VIDEO_HOSTS.includes(host)
+)
+
 const isExternalURL = ({ host, protocol }) => (
-  PERMITTED_HOSTS.every(p => !host.includes(p)) &&
-  PERMITTED_PROTOCOLS.every(p => !protocol.includes(p))
+  !isVideoURL({ host }) &&
+  parseURL(FRONTEND_BASE_URL).host !== host &&
+  !PERMITTED_PROTOCOLS.includes(protocol)
 )
 
 class Web extends Component {
@@ -79,8 +83,6 @@ class Web extends Component {
     const url = parseURL(this.props.data.url)
     const isConnected = await NetInfo.isConnected.fetch()
 
-    console.log(url)
-
     if (
       isConnected &&
       nextAppState === 'active' &&
@@ -109,6 +111,11 @@ class Web extends Component {
     // and prevent webview to go there.
     if (isExternalURL(url) || RESTRICTED_PATHS.includes(url.path)) {
       Linking.openURL(data.url)
+      return false
+    }
+
+    // If video tries to open, prevent webview navigation
+    if (isVideoURL(url)) {
       return false
     }
 
