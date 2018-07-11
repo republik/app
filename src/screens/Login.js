@@ -1,12 +1,19 @@
 import React, { Component } from 'react'
-import { StyleSheet, Image } from 'react-native'
+import { StyleSheet, Image, View } from 'react-native'
 import { compose } from 'react-apollo'
 import WebView from '../components/WebView'
+import { handleEnv } from '../utils/url'
 import Logo from '../assets/images/logo-title.png'
+
+const LoginHeader = () => (
+  <View style={styles.headerContainer}>
+    <Image source={Logo} style={styles.logo} />
+  </View>
+)
 
 class Login extends Component {
   render () {
-    const uri = this.props.navigation.getParam('url')
+    const uri = handleEnv(this.props.navigation.getParam('url'))
 
     return (
       <WebView
@@ -19,7 +26,8 @@ class Login extends Component {
 }
 
 Login.navigationOptions = ({ screenProps }) => ({
-  headerTitle: <Image source={Logo} style={styles.logo} />,
+  headerTitle: <LoginHeader />,
+  headerRight: <View />,
   headerStyle: { backgroundColor: '#FFFFFF' }
 })
 
@@ -27,6 +35,11 @@ var styles = StyleSheet.create({
   container: {
     flex: 1,
     zIndex: 100
+  },
+  headerContainer: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   logo: {
     width: 150,
