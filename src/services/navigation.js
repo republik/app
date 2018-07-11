@@ -21,6 +21,12 @@ const reset = (routeName, params) => {
   )
 }
 
+const goBack = () => {
+  container.dispatch(
+    NavigationActions.back()
+  )
+}
+
 const navigate = (routeName, params) => {
   container.dispatch(
     NavigationActions.navigate({
@@ -41,6 +47,7 @@ const getCurrentRoute = () => {
 
 export default {
   setContainer,
+  goBack,
   navigate,
   reset,
   getCurrentRoute
