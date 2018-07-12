@@ -24,6 +24,7 @@ export const ASSETS_SERVER_BASE_URL = handleEnv(Settings.get('assets_url') || Co
 // App paths
 export const HOME_PATH = `/`
 export const FEED_PATH = `/feed`
+export const SEARCH_PATH = '/suche'
 export const ACCOUNT_PATH = '/konto'
 export const LOGIN_PATH = `/anmelden`
 export const OFFERS_PATH = '/angebote'
@@ -39,6 +40,7 @@ export const HOME_URL = `${FRONTEND_BASE_URL}${HOME_PATH}`
 export const FEED_URL = `${FRONTEND_BASE_URL}${FEED_PATH}`
 export const LOGIN_URL = `${FRONTEND_BASE_URL}${LOGIN_PATH}`
 export const EVENTS_URL = `${FRONTEND_BASE_URL}${EVENTS_PATH}`
+export const SEARCH_URL = `${FRONTEND_BASE_URL}${SEARCH_PATH}`
 export const ACCOUNT_URL = `${FRONTEND_BASE_URL}${ACCOUNT_PATH}`
 export const FORMATS_URL = `${FRONTEND_BASE_URL}${FORMATS_PATH}`
 export const COMMUNITY_URL = `${FRONTEND_BASE_URL}${COMMUNITY_PATH}`
