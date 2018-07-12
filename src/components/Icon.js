@@ -9,22 +9,26 @@ import Play from '../assets/images/play.png'
 import Pause from '../assets/images/pause.png'
 import Close from '../assets/images/close.png'
 import Audio from '../assets/images/audio.png'
+import Search from '../assets/images/search.png'
 import Discussion from '../assets/images/discussion.png'
 import ChevronUp from '../assets/images/chevron-up.png'
 import ChevronDown from '../assets/images/chevron-down.png'
+import SearchActive from '../assets/images/search-active.png'
 
 const buttons = {
   pdf: PDF,
-  audio: Audio,
-  share: Share,
   play: Play,
   pause: Pause,
+  audio: Audio,
+  share: Share,
   close: Close,
+  search: Search,
   chevronUp: ChevronUp,
-  chevronDown: ChevronDown,
   profile: ProfileButton,
   discussion: Discussion,
-  hamburger: HamburgerButton
+  chevronDown: ChevronDown,
+  hamburger: HamburgerButton,
+  searchActive: SearchActive
 }
 
 const Icon = ({ type, side, size, menuActive, onPress, style }) => {
