@@ -66,7 +66,7 @@ const MainHeader = ({ me, toggleMenu, setUrl, currentUrl }) => {
   const onLogoClick = () => me && setUrl({ variables: {
     url: currentPath === '/' ? FEED_URL : HOME_URL }
   })
-  const onSearchClick = () => !inSearchPath &&
+  const onSearchClick = () => me && !inSearchPath &&
     setUrl({ variables: { url: SEARCH_URL } })
 
   return (
