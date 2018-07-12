@@ -5,7 +5,7 @@ import Popover from './Popover'
 import Icon from './Icon'
 import { parseURL } from '../utils/url'
 import { getPdfUrl } from '../utils/pdf'
-import { FRONTEND_BASE_URL, HOME_URL, FEED_URL } from '../constants'
+import { FRONTEND_BASE_URL, HOME_URL, FEED_URL, SEARCH_PATH, SEARCH_URL } from '../constants'
 import {
   me,
   setUrl,
@@ -33,6 +33,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center'
   },
+  buttons: {
+    width: 75,
+    alignItems: 'center',
+    flexDirection: 'row'
+  },
   logo: {
     width: 150,
     height: 25
@@ -55,29 +60,41 @@ const styles = StyleSheet.create({
 
 const MainHeader = ({ me, toggleMenu, setUrl, currentUrl }) => {
   const currentPath = parseURL(currentUrl).path
-  const LogoWrapper = me ? TouchableOpacity : View
-  const onLogoClick = () => setUrl({ variables: {
+  const inSearchPath = currentPath === SEARCH_PATH
+  const searchIcon = inSearchPath ? 'searchActive' : 'search'
+
+  const onLogoClick = () => me && setUrl({ variables: {
     url: currentPath === '/' ? FEED_URL : HOME_URL }
   })
+  const onSearchClick = () => !inSearchPath &&
+    setUrl({ variables: { url: SEARCH_URL } })
 
   return (
     <View style={styles.container}>
-      <Icon
-        side="left"
-        type="profile"
-        onPress={toggleMenu}
-      />
-      <LogoWrapper onPress={onLogoClick} style={styles.logoContainer}>
+      <View style={styles.buttons}>
+        <Icon
+          side="left"
+          type="profile"
+          onPress={toggleMenu}
+        />
+      </View>
+      <TouchableOpacity onPress={onLogoClick} style={styles.logoContainer}>
         <Image
           source={require('../assets/images/logo-title.png')}
           style={styles.logo}
         />
-      </LogoWrapper>
-      <Icon
-        side="right"
-        type="hamburger"
-        onPress={toggleMenu}
-      />
+      </TouchableOpacity>
+      <View style={styles.buttons}>
+        <Icon
+          type={searchIcon}
+          onPress={onSearchClick}
+        />
+        <Icon
+          side="right"
+          type="hamburger"
+          onPress={toggleMenu}
+        />
+      </View>
     </View>
   )
 }
