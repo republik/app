@@ -3,6 +3,7 @@ import { compose } from 'react-apollo'
 import { Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import NotificationsIOS from 'react-native-notifications'
+import navigator from './navigation'
 import { setUrl, upsertDevice, rollDeviceToken } from '../apollo'
 
 const pustNotificationsWrapper = WrappedComponent => (
@@ -37,6 +38,8 @@ const pustNotificationsWrapper = WrappedComponent => (
       switch (data.type) {
         case 'discussion':
           return this.props.setUrl({ variables: { url: data.url } })
+        case 'authorization':
+          return navigator.navigate('Login', { url: data.url })
       }
     }
 

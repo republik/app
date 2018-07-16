@@ -1,4 +1,6 @@
 import parse from 'url-parse'
+import Config from 'react-native-config'
+import { Platform } from 'react-native'
 
 const parseParams = params => {
   if (!params || params === '') {
@@ -44,4 +46,17 @@ export const parseURL = value => {
       toString: () => params
     }
   }
+}
+
+// localhost does not work on Android.
+// https://stackoverflow.com/questions/4336394/webview-and-localhost
+export const handleEnv = value => {
+  if (Config.ENV === 'development') {
+    return Platform.select({
+      ios: value,
+      android: value.replace('localhost', '10.0.2.2')
+    })
+  }
+
+  return value
 }

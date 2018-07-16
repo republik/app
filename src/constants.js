@@ -1,18 +1,6 @@
-import { Platform, Settings } from 'react-native'
+import { Settings } from 'react-native'
 import Config from 'react-native-config'
-
-// localhost does not work on Android.
-// https://stackoverflow.com/questions/4336394/webview-and-localhost
-const handleEnv = value => {
-  if (Config.ENV === 'development') {
-    return Platform.select({
-      ios: value,
-      android: value.replace('localhost', '10.0.2.2')
-    })
-  }
-
-  return value
-}
+import { handleEnv } from './utils/url'
 
 // Base urls
 export const ENV = Settings.get('environment_preference') || Config.ENV

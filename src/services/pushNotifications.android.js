@@ -3,6 +3,7 @@ import { compose } from 'react-apollo'
 import { Platform, AsyncStorage } from 'react-native'
 import firebase from 'react-native-firebase'
 import DeviceInfo from 'react-native-device-info'
+import navigator from './navigation'
 import { setUrl, upsertDevice, rollDeviceToken } from '../apollo'
 
 const TOKEN_KEY = 'notification_token'
@@ -38,6 +39,8 @@ const pustNotificationsWrapper = WrappedComponent => (
       switch (data.type) {
         case 'discussion':
           return this.props.setUrl({ variables: { url: data.url } })
+        case 'authorization':
+          return navigator.navigate('Login', { url: data.url })
       }
     }
 
