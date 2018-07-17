@@ -5,6 +5,7 @@ import WebView from '../components/WebView'
 import navigator from '../services/navigation'
 import { handleEnv } from '../utils/url'
 import Logo from '../assets/images/logo-title.png'
+import { parseURL } from '../utils/url'
 
 const LoginHeader = () => (
   <View style={styles.headerContainer}>
@@ -20,6 +21,16 @@ class Login extends Component {
     }
   }
 
+  onNavigationStateChange = (data) => {
+    const url = parseURL(data.url)
+    // close overlay instead of going elsewhere
+    if (url.path !== '/mitteilung') {
+      navigator.goBack()
+      return false
+    }
+    return true
+  }
+
   render () {
     const uri = handleEnv(this.props.navigation.getParam('url'))
 
@@ -28,6 +39,7 @@ class Login extends Component {
         source={{ uri }}
         onMessage={this.onMessage}
         style={styles.container}
+        onNavigationStateChange={this.onNavigationStateChange}
         ref={node => { this.webview = node }}
       />
     )
