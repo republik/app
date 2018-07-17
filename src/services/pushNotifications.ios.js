@@ -8,19 +8,40 @@ import { setUrl, upsertDevice, rollDeviceToken } from '../apollo'
 
 const pustNotificationsWrapper = WrappedComponent => (
   class extends Component {
+    state = { notificationVisible: false }
+
     componentDidMount () {
       NotificationsIOS.addEventListener('remoteNotificationsRegistered', this.onPushRegistered)
+      NotificationsIOS.addEventListener('notificationReceivedForeground', this.onNotificationReceivedForeground)
       NotificationsIOS.addEventListener('notificationOpened', this.onNotificationOpened)
+
+      NotificationsIOS.checkPermissions().then(() => {
+        NotificationsIOS.consumeBackgroundQueue()
+      })
     }
 
     componentWillUnmount () {
       NotificationsIOS.removeEventListener('remoteNotificationsRegistered', this.onPushRegistered)
+      NotificationsIOS.removeEventListener('notificationReceivedForeground', this.onNotificationReceivedForeground)
       NotificationsIOS.removeEventListener('notificationOpened', this.onNotificationOpened)
     }
 
-    onPushRegistered = (token) => {
-      console.log('Device Token Received', token)
+    onNotificationReceivedForeground = (notification) => {
+      const { notificationVisible } = this.state
 
+      setTimeout(() => {
+        this.setState({ notificationVisible: false })
+      }, 7000)
+
+      if (notificationVisible) {
+        this.setState({ notificationVisible: false })
+        return this.onNotificationOpened(notification)
+      }
+
+      this.setState({ notificationVisible: true })
+    }
+
+    onPushRegistered = (token) => {
       this.props.upsertDevice({ variables: {
         token,
         information: {
@@ -46,6 +67,7 @@ const pustNotificationsWrapper = WrappedComponent => (
     getNotificationsToken = async () => {
       if (!DeviceInfo.isEmulator()) {
         NotificationsIOS.requestPermissions()
+        NotificationsIOS.consumeBackgroundQueue()
       }
     }
 
