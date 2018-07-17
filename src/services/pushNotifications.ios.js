@@ -8,11 +8,9 @@ import { setUrl, upsertDevice, rollDeviceToken } from '../apollo'
 
 const pustNotificationsWrapper = WrappedComponent => (
   class extends Component {
-    state = { notificationVisible: false }
-
     componentDidMount () {
       NotificationsIOS.addEventListener('remoteNotificationsRegistered', this.onPushRegistered)
-      NotificationsIOS.addEventListener('notificationReceivedForeground', this.onNotificationReceivedForeground)
+      NotificationsIOS.addEventListener('notificationReceivedForeground', this.onNotificationOpened)
       NotificationsIOS.addEventListener('notificationOpened', this.onNotificationOpened)
 
       NotificationsIOS.checkPermissions().then(() => {
@@ -22,23 +20,8 @@ const pustNotificationsWrapper = WrappedComponent => (
 
     componentWillUnmount () {
       NotificationsIOS.removeEventListener('remoteNotificationsRegistered', this.onPushRegistered)
-      NotificationsIOS.removeEventListener('notificationReceivedForeground', this.onNotificationReceivedForeground)
+      NotificationsIOS.removeEventListener('notificationReceivedForeground', this.onNotificationOpened)
       NotificationsIOS.removeEventListener('notificationOpened', this.onNotificationOpened)
-    }
-
-    onNotificationReceivedForeground = (notification) => {
-      const { notificationVisible } = this.state
-
-      setTimeout(() => {
-        this.setState({ notificationVisible: false })
-      }, 7000)
-
-      if (notificationVisible) {
-        this.setState({ notificationVisible: false })
-        return this.onNotificationOpened(notification)
-      }
-
-      this.setState({ notificationVisible: true })
     }
 
     onPushRegistered = (token) => {

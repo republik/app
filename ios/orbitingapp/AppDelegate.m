@@ -55,32 +55,11 @@
   [self setupSettings];
   NSURL *jsCodeLocation;
   
-  if( SYSTEM_VERSION_LESS_THAN( @"10.0" ) )
-  {
-    [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge) categories:nil]];
-    [[UIApplication sharedApplication] registerForRemoteNotifications];
-  }
-  else
-  {
+  if(!SYSTEM_VERSION_LESS_THAN( @"10.0" )) {
     UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
     center.delegate = self;
-    [center requestAuthorizationWithOptions:(UNAuthorizationOptionSound | UNAuthorizationOptionAlert | UNAuthorizationOptionBadge) completionHandler:^(BOOL granted, NSError * _Nullable error)
-     {
-       if (!error)
-       {
-         [[UIApplication sharedApplication] registerForRemoteNotifications];  // required to get the app to do anything at all about push notifications
-         NSLog( @"Push registration success." );
-       }
-       else
-       {
-         NSLog( @"Push registration FAILED" );
-         NSLog( @"ERROR: %@ - %@", error.localizedFailureReason, error.localizedDescription );
-         NSLog( @"SUGGESTIONS: %@ - %@", error.localizedRecoveryOptions, error.localizedRecoverySuggestion );
-       }
-     }];
   }
-
-
+  
     #ifdef DEBUG
         jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
     #else
@@ -151,8 +130,6 @@
   localNotification.alertTitle = notification.request.content.title;
   localNotification.alertBody = notification.request.content.body;
   localNotification.userInfo = notification.request.content.userInfo;
-  
-  [RNNotifications didReceiveLocalNotification:localNotification];
   
   completionHandler(UNNotificationPresentationOptionAlert);
 }

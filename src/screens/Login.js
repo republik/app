@@ -3,9 +3,8 @@ import { StyleSheet, Image, View } from 'react-native'
 import { compose } from 'react-apollo'
 import WebView from '../components/WebView'
 import navigator from '../services/navigation'
-import { handleEnv } from '../utils/url'
 import Logo from '../assets/images/logo-title.png'
-import { parseURL } from '../utils/url'
+import { parseURL, handleEnv } from '../utils/url'
 
 const LoginHeader = () => (
   <View style={styles.headerContainer}>
