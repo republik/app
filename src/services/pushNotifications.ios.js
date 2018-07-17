@@ -8,6 +8,8 @@ import { setUrl, upsertDevice, rollDeviceToken } from '../apollo'
 
 const pustNotificationsWrapper = WrappedComponent => (
   class extends Component {
+    state = { notificationVisible: false }
+
     componentDidMount () {
       NotificationsIOS.addEventListener('remoteNotificationsRegistered', this.onPushRegistered)
       NotificationsIOS.addEventListener('notificationOpened', this.onNotificationOpened)
