@@ -124,6 +124,9 @@
   [RNNotifications didReceiveLocalNotification:notification];
 }
 
+// Method called when notification is recevied on foreground
+// In order to show it, we dispatch a new Local Notification object using remote data just like react-native-notifications does.
+// Ref: https://github.com/wix/react-native-notifications/blob/master/RNNotifications/RNNotifications.m#L353
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler
 {
   UILocalNotification *localNotification = [[UILocalNotification alloc] init];
