@@ -12,14 +12,18 @@ import android.util.Log;
 import android.webkit.JsResult;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
+import android.support.annotation.Nullable;
 
 import com.facebook.infer.annotation.SuppressLint;
+import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.common.annotations.VisibleForTesting;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 public class CustomWebViewModule extends ReactContextBaseJavaModule implements ActivityEventListener {
+    private ReactApplicationContext context;
     private ValueCallback<Uri> mUploadMessage;
     private ValueCallback<Uri[]> mUploadMessageArr = null;
 
@@ -34,6 +38,8 @@ public class CustomWebViewModule extends ReactContextBaseJavaModule implements A
         super(context);
 
         context.addActivityEventListener(this);
+
+        this.context = context;
     }
 
     public void setPackage(CustomWebViewPackage aPackage) {
@@ -82,10 +88,18 @@ public class CustomWebViewModule extends ReactContextBaseJavaModule implements A
         currentActivity.startActivity(intent);
     }
 
+    private void sendEvent(String eventName, @Nullable WritableMap params) {
+      this.context
+        .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+        .emit(eventName, params);
+    }
+
     // For Android 4.1+
     @SuppressWarnings("unused")
     public boolean startFileChooserIntent(ValueCallback<Uri> uploadMsg, String acceptType) {
         Log.d(REACT_CLASS, "Open old file dialog");
+
+        this.sendEvent("onFileChooserOpen", null);
 
         if (mUploadMessage != null) {
             mUploadMessage.onReceiveValue(null);
@@ -128,6 +142,8 @@ public class CustomWebViewModule extends ReactContextBaseJavaModule implements A
     @SuppressLint("NewApi")
     public boolean startFileChooserIntent(ValueCallback<Uri[]> filePathCallback, WebChromeClient.FileChooserParams fileChooserParams) {
         Log.d(REACT_CLASS, "Open new file dialog");
+
+        this.sendEvent("onFileChooserOpen", null);
 
         if (mUploadMessageArr != null) {
             mUploadMessageArr.onReceiveValue(null);

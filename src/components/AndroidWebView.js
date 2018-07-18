@@ -1,7 +1,14 @@
 import React from 'react'
-import { WebView, requireNativeComponent } from 'react-native'
+import { WebView, requireNativeComponent, DeviceEventEmitter } from 'react-native'
 
 export default class CustomWebView extends React.Component {
+  componentDidMount () {
+    // Listen for event triggered from native code when file chooser is opened
+    DeviceEventEmitter.addListener('onFileChooserOpen', () => {
+      this.props.onFileChooserOpen()
+    })
+  }
+
   postMessage = string => {
     this.ref.postMessage(string)
   }
@@ -19,7 +26,7 @@ export default class CustomWebView extends React.Component {
   }
 
   render () {
-    const { innerRef, ...props } = this.props
+    const { onFilePickerOpened, innerRef, ...props } = this.props
 
     return (
       <WebView
