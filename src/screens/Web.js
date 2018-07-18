@@ -81,20 +81,20 @@ class Web extends Component {
   }
 
   handleAppStateChange = async (nextAppState) => {
-    // const url = parseURL(this.props.data.url)
-    // const isConnected = await NetInfo.isConnected.fetch()
-    //
-    // if (
-    //   isConnected &&
-    //   nextAppState === 'active' &&
-    //   url.path !== LOGIN_PATH &&
-    //   this.state.appState.match(/inactive|background/)
-    // ) {
-    //   this.setState({ loading: true })
-    //   this.webview.reload()
-    // }
-    //
-    // this.setState({ appState: nextAppState })
+    const url = parseURL(this.props.data.url)
+    const isConnected = await NetInfo.isConnected.fetch()
+
+    if (
+      isConnected &&
+      nextAppState === 'active' &&
+      url.path !== LOGIN_PATH &&
+      this.state.appState.match(/inactive|background/)
+    ) {
+      this.setState({ loading: true })
+      this.webview.reload()
+    }
+
+    this.setState({ appState: nextAppState })
   }
 
   setLoading = debounce(value => {

@@ -22,13 +22,6 @@ public class CustomWebViewManager extends ReactWebViewManager {
         return "CustomWebView";
     }
 
-    @ReactProp(name = "webContentsDebuggingEnabled")
-    public void webContentsDebuggingEnabled(WebView view, boolean enabled) {
-        if (enabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            WebView.setWebContentsDebuggingEnabled(true);
-        }
-    }
-
     @ReactProp(name = "uploadEnabled")
     public void uploadEnabled(WebView view, boolean enabled) {
         if (enabled) {

@@ -29,8 +29,7 @@ export default class CustomWebView extends React.Component {
           component: RCTCustomWebView,
           props: {
             uploadEnabled: true,
-            downloadEnabled: true,
-            webContentsDebuggingEnabled: true
+            downloadEnabled: true
           }
         }}
       />
