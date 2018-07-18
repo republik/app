@@ -179,6 +179,7 @@ class Web extends Component {
     const { definitions } = query
     const operations = definitions.map(definition => definition.name && definition.name.value)
 
+    // User logs in
     if (operations.includes('me')) {
       if (data.data.me && !me) {
         await login({
@@ -190,9 +191,19 @@ class Web extends Component {
         screenProps.getNotificationsToken()
       }
 
+      // User got unauthenticated
       if (!data.data.me && me) {
         await logout()
       }
+    }
+
+    // User is updated
+    if (operations.includes('updateMe')) {
+      await login({
+        variables: {
+          user: data.data.updateMe
+        }
+      })
     }
   }
 
