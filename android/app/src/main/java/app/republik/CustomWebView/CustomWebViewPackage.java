@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+// Extends react-native webview to support uploading files from forms
+// Ref: https://github.com/hushicai/ReactNativeAndroidWebView
+
 public class CustomWebViewPackage implements ReactPackage {
     private CustomWebViewManager manager;
     private CustomWebViewModule module;
