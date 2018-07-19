@@ -241,4 +241,8 @@ class WebView extends React.PureComponent {
   }
 };
 
+WebView.defaultProps = {
+  loading: {}
+}
+
 export default WebView

@@ -43,6 +43,7 @@
     "react-native-cookies": "^3.3.0",
     "react-native-device-info": "^0.21.5",
     "react-native-firebase": "^4.2.0",
+    "react-native-notifications": "^1.1.19",
     "react-native-splash-screen": "^3.0.6",
     "react-native-track-player": "^0.2.4",
     "react-native-wkwebview-reborn": "https://github.com/orbiting/react-native-wkwebview",
