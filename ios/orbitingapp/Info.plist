@@ -41,12 +41,12 @@
 	<dict>
 		<key>NSExceptionDomains</key>
 		<dict>
-			<key>api.dev.localdomain</key>
+			<key>api.republik.test</key>
 			<dict>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
 				<true/>
 			</dict>
-			<key>dev.localdomain</key>
+			<key>republik.test</key>
 			<dict>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
 				<true/>
