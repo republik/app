@@ -108,6 +108,7 @@ class AudioPlayer extends React.Component {
 
     this.bottom = new Animated.Value(props.url ? 0 : -AUDIO_PLAYER_HEIGHT)
     this.state = {
+      started: false,
       loading: false,
       isPlaying: false,
       position: 0,
@@ -128,6 +129,11 @@ class AudioPlayer extends React.Component {
 
   async componentWillReceiveProps (nextProps) {
     if (!this.props.url && nextProps.url) {
+      if (!this.state.started) {
+        await this.setupPlayer()
+        this.setState({ started: true })
+      }
+
       await TrackPlayer.add({
         id: nextProps.title,
         url: nextProps.url,
@@ -152,6 +158,17 @@ class AudioPlayer extends React.Component {
 
   componentWillUnmount () {
     this.stopIntervals()
+  }
+
+  setupPlayer = async () => {
+    await TrackPlayer.setupPlayer()
+    await TrackPlayer.updateOptions({
+      capabilities: [
+        TrackPlayer.CAPABILITY_PLAY,
+        TrackPlayer.CAPABILITY_PAUSE,
+        TrackPlayer.CAPABILITY_STOP
+      ]
+    })
   }
 
   startIntervals = () => {
