@@ -1,13 +1,19 @@
 import React, { Fragment } from 'React'
 import { Text, View, StyleSheet, TouchableOpacity, Platform, BackHandler, ActivityIndicator } from 'react-native'
-import NativeWebView from 'react-native-wkwebview-reborn'
+import IOSWebView from 'react-native-wkwebview-reborn'
 import { parse } from 'graphql'
 import { execute, makePromise } from 'apollo-link'
+import AndroidWebView from './AndroidWebView'
 import { parseURL } from '../utils/url'
 import { injectedJavaScript } from '../utils/webview'
 import { link } from '../apollo'
 import { USER_AGENT } from '../constants'
 import withT from '../utils/withT'
+
+const NativeWebView = Platform.select({
+  ios: IOSWebView,
+  android: AndroidWebView
+})
 
 const styles = StyleSheet.create({
   container: {
