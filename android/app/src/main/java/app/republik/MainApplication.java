@@ -2,6 +2,7 @@ package app.republik;
 
 import android.app.Application;
 
+import app.republik.CustomWebView.CustomWebViewPackage;
 import com.facebook.react.ReactApplication;
 import guichaguri.trackplayer.TrackPlayer;
 import io.invertase.firebase.RNFirebasePackage;
@@ -47,6 +48,7 @@ public class MainApplication extends Application implements ReactApplication {
             new SplashScreenReactPackage(),
             new RNFirebaseMessagingPackage(),
             new RNFirebaseNotificationsPackage(),
+            new CustomWebViewPackage(),
           new CodePush(null, getApplicationContext(), BuildConfig.DEBUG)
       );
     }

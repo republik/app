@@ -54,12 +54,12 @@
 {
   [self setupSettings];
   NSURL *jsCodeLocation;
-  
+
   if(!SYSTEM_VERSION_LESS_THAN( @"10.0" )) {
     UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
     center.delegate = self;
   }
-  
+
     #ifdef DEBUG
         jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
     #else
@@ -133,7 +133,7 @@
   localNotification.alertTitle = notification.request.content.title;
   localNotification.alertBody = notification.request.content.body;
   localNotification.userInfo = notification.request.content.userInfo;
-  
+
   completionHandler(UNNotificationPresentationOptionAlert);
 }
 

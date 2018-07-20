@@ -21,7 +21,6 @@ const pustNotificationsWrapper = WrappedComponent => (
       this.notificationListener()
       this.tokenRefreshListener()
       this.notificationOpenedListener()
-      this.getInitialNotification()
     }
 
     createDefaultNotificationChannelForAndroid () {
