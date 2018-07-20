@@ -1,5 +1,6 @@
 import React, { Fragment } from 'React'
 import { Text, View, StyleSheet, TouchableOpacity, Platform, BackHandler, ActivityIndicator } from 'react-native'
+import DeviceInfo from 'react-native-device-info'
 import IOSWebView from 'react-native-wkwebview-reborn'
 import { parse } from 'graphql'
 import { execute, makePromise } from 'apollo-link'
@@ -9,6 +10,8 @@ import { injectedJavaScript } from '../utils/webview'
 import { link } from '../apollo'
 import { USER_AGENT } from '../constants'
 import withT from '../utils/withT'
+
+const nativeUserAgent = DeviceInfo.getUserAgent()
 
 const NativeWebView = Platform.select({
   ios: IOSWebView,
@@ -233,11 +236,11 @@ class WebView extends React.PureComponent {
           onMessage={this.onMessage}
           onNavigationStateChange={this.onNavigationStateChange}
           renderError={() => <ErrorState onReload={this.reload} />}
+          userAgent={`${nativeUserAgent} ${USER_AGENT}`}
           automaticallyAdjustContentInsets={false}
           injectedJavaScript={injectedJavaScript}
           allowsBackForwardNavigationGestures
           scalesPageToFit={false}
-          userAgent={USER_AGENT}
           startInLoadingState
           javaScriptEnabled
           sendCookies
