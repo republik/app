@@ -50,6 +50,12 @@ class Web extends Component {
       refreshEnabled: true,
       appState: AppState.currentState
     }
+
+    // On android file chooser makes app go to background, causing an
+    // unwanted reload on the page (due to handleAppStateChange)
+    // By this flag we handle if the webview should reload depending if
+    // the native file chooser was opened or not
+    this.fileChooserOpen = false
   }
 
   componentDidMount () {
@@ -90,8 +96,12 @@ class Web extends Component {
       url.path !== LOGIN_PATH &&
       this.state.appState.match(/inactive|background/)
     ) {
-      this.setState({ loading: true })
-      this.webview.reload()
+      if (!this.fileChooserOpen) {
+        this.setState({ loading: true })
+        this.webview.reload()
+      }
+
+      this.fileChooserOpen = false
     }
 
     this.setState({ appState: nextAppState })
@@ -169,6 +179,7 @@ class Web extends Component {
     const { definitions } = query
     const operations = definitions.map(definition => definition.name && definition.name.value)
 
+    // User logs in
     if (operations.includes('me')) {
       if (data.data.me && !me) {
         await login({
@@ -180,10 +191,26 @@ class Web extends Component {
         screenProps.getNotificationsToken()
       }
 
+      // User got unauthenticated
       if (!data.data.me && me) {
         await logout()
       }
     }
+
+    // User is updated
+    if (operations.includes('updateMe')) {
+      await login({
+        variables: {
+          user: data.data.updateMe
+        }
+      })
+    }
+  }
+
+  // Android only
+  // Prevent webview to reload after closing file chooser
+  onFileChooserOpen = () => {
+    this.fileChooserOpen = true
   }
 
   onRefresh = () => {
@@ -221,6 +248,7 @@ class Web extends Component {
             onScroll={this.onWebViewScroll}
             webViewWillTransition={this.webViewWillTransition}
             onNavigationStateChange={this.onNavigationStateChange}
+            onFileChooserOpen={this.onFileChooserOpen} // Android only
             loading={{ status: loading || refreshing, showSpinner: !refreshing }}
             ref={node => { this.webview = node }}
           />
