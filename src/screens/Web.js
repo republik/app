@@ -233,16 +233,16 @@ class Web extends Component {
   }
 
   render () {
-    const { data, audio, playbackState, article } = this.props
+    const { data, audio, playbackState, article, setUrl } = this.props
     const { loading, refreshing, refreshEnabled, subheaderVisible } = this.state
     const audioTitle = article ? article.title : ''
 
     return (
       <Fragment>
         <Subheader
+          setUrl={setUrl}
           currentUrl={data.url}
-          visible={subheaderVisible}
-          // visible={this.props.me && subheaderVisible}
+          visible={this.props.me && subheaderVisible}
         />
         <ScrollView
           contentContainerStyle={styles.container}

@@ -141,7 +141,6 @@ class WebView extends React.PureComponent {
 
   onScrollStateChange = ({ payload }) => {
     if (this.props.onScroll) {
-      console.log(payload)
       this.props.onScroll(payload)
       return true
     }
