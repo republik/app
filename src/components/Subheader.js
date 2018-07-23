@@ -1,6 +1,8 @@
 import React from 'react'
 import { TouchableOpacity, StyleSheet, Text } from 'react-native'
 import Popover from './Popover'
+import { parseURL } from '../utils/url'
+import { HOME_PATH, FEED_PATH, FORMATS_PATH } from '../constants'
 
 const styles = StyleSheet.create({
   container: {
@@ -18,22 +20,30 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   text: {
-    fontSize: 16
+    fontSize: 16,
+    color: '#B7C1BD'
+  },
+  active: {
+    color: '#000'
   }
 })
 
-const Subheader = ({ active }) => (
-  <Popover style={styles.container} active={active}>
-    <TouchableOpacity style={styles.item}>
-      <Text style={styles.text}>Front</Text>
-    </TouchableOpacity>
-    <TouchableOpacity style={styles.item}>
-      <Text style={styles.text}>Feed</Text>
-    </TouchableOpacity>
-    <TouchableOpacity style={styles.item}>
-      <Text style={styles.text}>Rubriken</Text>
-    </TouchableOpacity>
-  </Popover>
-)
+const Subheader = ({ visible, currentUrl }) => {
+  const url = parseURL(currentUrl)
+
+  return (
+    <Popover style={styles.container} active={visible}>
+      <TouchableOpacity style={styles.item}>
+        <Text style={[styles.text, url.path === HOME_PATH && styles.active]}>Front</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.item}>
+        <Text style={[styles.text, url.path === FEED_PATH && styles.active]}>Feed</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.item}>
+        <Text style={[styles.text, url.path === FORMATS_PATH && styles.active]}>Rubriken</Text>
+      </TouchableOpacity>
+    </Popover>
+  )
+}
 
 export default Subheader

@@ -239,7 +239,11 @@ class Web extends Component {
 
     return (
       <Fragment>
-        <Subheader active={subheaderVisible} />
+        <Subheader
+          currentUrl={data.url}
+          visible={subheaderVisible}
+          // visible={this.props.me && subheaderVisible}
+        />
         <ScrollView
           contentContainerStyle={styles.container}
           refreshControl={
