@@ -5,6 +5,7 @@ import gql from 'graphql-tag'
 import debounce from 'lodash.debounce'
 import { parseURL } from '../utils/url'
 import Header from '../components/Header'
+import Subheader from '../components/Subheader'
 import WebView from '../components/WebView'
 import AudioPlayer from '../components/AudioPlayer'
 import { FRONTEND_BASE_URL, OFFERS_PATH, LOGIN_PATH } from '../constants'
@@ -48,6 +49,7 @@ class Web extends Component {
       loading: true,
       refreshing: false,
       refreshEnabled: true,
+      subheaderVisible: true,
       appState: AppState.currentState
     }
 
@@ -56,6 +58,7 @@ class Web extends Component {
     // By this flag we handle if the webview should reload depending if
     // the native file chooser was opened or not
     this.fileChooserOpen = false
+    this.lastScrollY = 0
   }
 
   componentDidMount () {
@@ -219,16 +222,24 @@ class Web extends Component {
   }
 
   onWebViewScroll = ({ y }) => {
-    this.setState({ refreshEnabled: y < RELOAD_OFFSET_HEIGHT })
+    const positiveYScroll = Math.max(y, 0)
+
+    this.setState({
+      refreshEnabled: positiveYScroll < RELOAD_OFFSET_HEIGHT,
+      subheaderVisible: positiveYScroll <= this.lastScrollY
+    }, () => {
+      this.lastScrollY = y
+    })
   }
 
   render () {
     const { data, audio, playbackState, article } = this.props
-    const { loading, refreshing, refreshEnabled } = this.state
+    const { loading, refreshing, refreshEnabled, subheaderVisible } = this.state
     const audioTitle = article ? article.title : ''
 
     return (
       <Fragment>
+        <Subheader active={subheaderVisible} />
         <ScrollView
           contentContainerStyle={styles.container}
           refreshControl={

@@ -84,7 +84,7 @@ export const injectedJavaScriptImpl = function () {
     }))
   }
 
-  var debouncedOnScroll = debounce(postScrollMessage, 150)
+  var debouncedOnScroll = debounce(postScrollMessage, 100)
 
   var onScroll = function () {
     var oldScrollY = scrollY
