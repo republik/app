@@ -233,7 +233,7 @@ class Web extends Component {
   }
 
   render () {
-    const { data, audio, playbackState, article, setUrl } = this.props
+    const { me, data, menuActive, audio, playbackState, article, setUrl } = this.props
     const { loading, refreshing, refreshEnabled, subheaderVisible } = this.state
     const audioTitle = article ? article.title : ''
 
@@ -242,8 +242,7 @@ class Web extends Component {
         <Subheader
           setUrl={setUrl}
           currentUrl={data.url}
-          visible={subheaderVisible}
-          // visible={this.props.me && subheaderVisible}
+          visible={me && subheaderVisible && !menuActive}
         />
         <ScrollView
           contentContainerStyle={styles.container}
