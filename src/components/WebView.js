@@ -98,7 +98,7 @@ class WebView extends React.PureComponent {
       nextProps.source.uri !== this.props.source.uri &&
       nextProps.source.uri !== this.webview.uri
     ) {
-      this.postMessage({ type: 'replaceState', url: nextUrl.path })
+      this.postMessage({ type: 'pushRoute', url: nextUrl.path })
     }
   }
 
