@@ -31,25 +31,36 @@ const styles = StyleSheet.create({
 const Subheader = ({ visible, setUrl, currentUrl }) => {
   const url = parseURL(currentUrl)
 
+  const pathActive = url.path === HOME_PATH
+  const feedActive = url.path === FEED_PATH
+  const formatsActive = url.path === FORMATS_PATH
+  const noLinksActive = (!pathActive && !feedActive && !formatsActive)
+
   return (
     <Popover style={styles.container} active={visible}>
       <TouchableOpacity
         style={styles.item}
         onPress={() => setUrl({ variables: { url: HOME_URL } })}
       >
-        <Text style={[styles.text, url.path === HOME_PATH && styles.active]}>Front</Text>
+        <Text style={[styles.text, (noLinksActive || pathActive) && styles.active]}>
+          Front
+        </Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.item}
         onPress={() => setUrl({ variables: { url: FEED_URL } })}
       >
-        <Text style={[styles.text, url.path === FEED_PATH && styles.active]}>Feed</Text>
+        <Text style={[styles.text, (noLinksActive || feedActive) && styles.active]}>
+          Feed
+        </Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.item}
         onPress={() => setUrl({ variables: { url: FORMATS_URL } })}
       >
-        <Text style={[styles.text, url.path === FORMATS_PATH && styles.active]}>Rubriken</Text>
+        <Text style={[styles.text, (noLinksActive || formatsActive) && styles.active]}>
+          Rubriken
+        </Text>
       </TouchableOpacity>
     </Popover>
   )
