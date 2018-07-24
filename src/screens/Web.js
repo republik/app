@@ -135,6 +135,7 @@ class Web extends Component {
 
     this.props.closeMenu()
     this.enableSecondaryMenuState(false)
+    this.setState({ subheaderVisible: true })
     this.props.setUrl({ variables: { url: data.url } })
 
     return true
@@ -242,6 +243,7 @@ class Web extends Component {
         <Subheader
           setUrl={setUrl}
           currentUrl={data.url}
+          borderColor={article && article.color}
           visible={me && subheaderVisible && !menuActive}
         />
         <ScrollView
