@@ -242,7 +242,8 @@ class Web extends Component {
         <Subheader
           setUrl={setUrl}
           currentUrl={data.url}
-          visible={this.props.me && subheaderVisible}
+          visible={subheaderVisible}
+          // visible={this.props.me && subheaderVisible}
         />
         <ScrollView
           contentContainerStyle={styles.container}

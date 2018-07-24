@@ -72,6 +72,10 @@ export const injectedJavaScriptImpl = function () {
       window.scrollTo(0, 0)
     } else if (message.type === 'goto') {
       window.location.href = message.url
+    } else if (message.type === 'replaceState') {
+      console.log('>>>>>>>>>> REPLACE STATE', message.url)
+      window.Router.replace(message.url)
+      // window.history.replaceState({ url: message.url, as: message.url, options: { shallow: false } }, null, message.url)
     }
   })
 
