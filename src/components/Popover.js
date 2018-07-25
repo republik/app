@@ -5,8 +5,6 @@ const styles = StyleSheet.create({
   container: {
     top: 0,
     left: 0,
-    width: '100%',
-    height: '100%',
     position: 'absolute'
   }
 })
@@ -14,7 +12,11 @@ const styles = StyleSheet.create({
 const DURATION = 300
 
 class Popover extends Component {
-  opacity = new Animated.Value(0);
+  constructor (props) {
+    super(props)
+
+    this.opacity = new Animated.Value(props.active ? 1 : 0)
+  }
 
   componentWillReceiveProps (newProps) {
     if (newProps.active) {

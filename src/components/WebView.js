@@ -98,7 +98,7 @@ class WebView extends React.PureComponent {
       nextProps.source.uri !== this.props.source.uri &&
       nextProps.source.uri !== this.webview.uri
     ) {
-      this.postMessage({ type: 'goto', url: nextProps.source.uri })
+      this.postMessage({ type: 'pushRoute', url: nextUrl.path })
     }
   }
 
@@ -223,14 +223,13 @@ class WebView extends React.PureComponent {
   }
 
   render () {
-    const { loading } = this.props
     const { currentUrl } = this.state
+    const { loading, onLoadEnd, onLoadStart, webViewWillTransition, onFileChooserOpen } = this.props
 
     return (
       <Fragment>
         { loading.status && <LoadingState {...loading} /> }
         <NativeWebView
-          {...this.props}
           source={{ uri: currentUrl }}
           ref={node => { this.webview.ref = node }}
           onMessage={this.onMessage}
@@ -239,6 +238,10 @@ class WebView extends React.PureComponent {
           userAgent={`${nativeUserAgent} ${USER_AGENT}`}
           automaticallyAdjustContentInsets={false}
           injectedJavaScript={injectedJavaScript}
+          onLoadEnd={onLoadEnd}
+          onLoadStart={onLoadStart}
+          webViewWillTransition={webViewWillTransition}
+          onFileChooserOpen={onFileChooserOpen}
           allowsBackForwardNavigationGestures
           scalesPageToFit={false}
           startInLoadingState
