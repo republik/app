@@ -1,6 +1,7 @@
 import { Settings } from 'react-native'
 import Config from 'react-native-config'
 import { handleEnv } from './utils/url'
+import DeviceInfo from 'react-native-device-info'
 
 // Base urls
 export const ENV = Settings.get('environment_preference') || Config.ENV
@@ -35,4 +36,5 @@ export const COMMUNITY_URL = `${FRONTEND_BASE_URL}${COMMUNITY_PATH}`
 export const DISCUSSIONS_URL = `${FRONTEND_BASE_URL}${DISCUSSIONS_PATH}`
 
 // Misc
-export const USER_AGENT = 'RepublikApp'
+const nativeUserAgent = DeviceInfo.getUserAgent()
+export const USER_AGENT = `${nativeUserAgent} RepublikApp`
