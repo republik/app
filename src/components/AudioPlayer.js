@@ -5,7 +5,7 @@ import Icon from './Icon'
 import { setAudio } from '../apollo'
 import Logo from '../assets/images/playlist-logo.png'
 
-const AUDIO_PLAYER_HEIGHT = 60
+const AUDIO_PLAYER_HEIGHT = 65
 
 const styles = StyleSheet.create({
   container: {
@@ -41,8 +41,11 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     alignItems: 'flex-start'
   },
-  time: {
+  title: {
     fontSize: 18
+  },
+  time: {
+    fontSize: 14
   }
 })
 
@@ -252,7 +255,7 @@ class AudioPlayer extends React.Component {
   }
 
   render () {
-    const { setAudio } = this.props
+    const { title, setAudio } = this.props
     const { loading, isPlaying, duration, position, bufferedPosition } = this.state
     const icon = isPlaying ? 'pause' : 'play'
 
@@ -273,6 +276,7 @@ class AudioPlayer extends React.Component {
           onPress={() => this.onPlayPauseClick()}
         />
         <View style={styles.content}>
+          <Text style={styles.title}>{title}</Text>
           <Time
             loading={loading}
             duration={duration}
