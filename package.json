@@ -46,7 +46,7 @@
     "react-native-notifications": "^1.1.19",
     "react-native-splash-screen": "^3.0.6",
     "react-native-track-player": "^0.2.4",
-    "react-native-wkwebview-reborn": "https://github.com/orbiting/react-native-wkwebview",
+    "react-native-wkwebview-reborn": "https://github.com/orbiting/react-native-wkwebview#1.23.0",
     "react-navigation": "^2.0.1",
     "subscriptions-transport-ws": "^0.9.10",
     "url-parse": "^1.4.0"

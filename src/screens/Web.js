@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react'
-import { StyleSheet, Linking, ScrollView, RefreshControl, AppState, NetInfo } from 'react-native'
+import { StyleSheet, Linking, ScrollView, RefreshControl, AppState, NetInfo, Platform } from 'react-native'
 import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'
 import debounce from 'lodash.debounce'
@@ -179,28 +179,23 @@ class Web extends Component {
   }
 
   onNetwork = async ({ query, data }) => {
-    const { me, login, logout, screenProps } = this.props
+    const { me, login } = this.props
     const { definitions } = query
     const operations = definitions.map(definition => definition.name && definition.name.value)
 
     if (operations.includes('signOut')) {
-      await logout()
+      await this.logoutUser()
     }
+
     // User logs in
     if (operations.includes('me')) {
       if (data.data.me && !me) {
-        await login({
-          variables: {
-            user: data.data.me
-          }
-        })
-
-        screenProps.getNotificationsToken()
+        await this.loginUser(data)
       }
 
       // User got unauthenticated
       if (!data.data.me && me) {
-        await logout()
+        await this.logoutUser()
       }
     }
 
@@ -234,6 +229,22 @@ class Web extends Component {
     }, () => {
       this.lastScrollY = positiveYScroll
     })
+  }
+
+  loginUser = async (data) => {
+    this.setState({ subheaderVisible: true }, async () => {
+      await this.props.login({ variables: { user: data.data.me } })
+
+      // Force webview reload to update request cookies on iOS
+      if (Platform.OS === 'ios') this.webview.reload()
+
+      this.props.screenProps.getNotificationsToken()
+    })
+  }
+
+  logoutUser = async () => {
+    await this.props.logout()
+    if (Platform.OS === 'ios') this.webview.reload()
   }
 
   render () {
