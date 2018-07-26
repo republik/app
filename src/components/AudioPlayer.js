@@ -298,7 +298,9 @@ class AudioPlayer extends React.Component {
             : (
               <Fragment>
                 <TouchableOpacity onPress={this.onTitlePress}>
-                  <Text style={styles.title}>{articleTitle}</Text>
+                  <Text numberOfLines={1} style={styles.title}>
+                    {articleTitle}
+                  </Text>
                 </TouchableOpacity>
                 <Time duration={duration} position={position} />
               </Fragment>
