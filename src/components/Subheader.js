@@ -54,7 +54,7 @@ class Subheader extends React.Component {
   }
 
   render () {
-    const { visible, currentUrl, setUrl, borderColor } = this.props
+    const { currentUrl, visible, setUrl, borderColor } = this.props
 
     const url = parseURL(currentUrl)
 
