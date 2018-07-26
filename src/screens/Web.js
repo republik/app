@@ -236,7 +236,8 @@ class Web extends Component {
   render () {
     const { me, data, menuActive, audio, playbackState, article, setUrl } = this.props
     const { loading, refreshing, refreshEnabled, subheaderVisible } = this.state
-    const audioTitle = article ? article.title : ''
+    const articlePath = article ? article.path : null
+    const articleTitle = article ? article.title : ''
 
     return (
       <Fragment>
@@ -272,7 +273,9 @@ class Web extends Component {
         </ScrollView>
         <AudioPlayer
           url={audio}
-          title={audioTitle}
+          setUrl={setUrl}
+          title={articleTitle}
+          articlePath={articlePath}
           playbackState={playbackState}
         />
       </Fragment>

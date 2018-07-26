@@ -1,11 +1,12 @@
-import React from 'react'
-import { View, Text, StyleSheet, Animated, ActivityIndicator, PanResponder, Dimensions } from 'react-native'
+import React, { Fragment } from 'react'
+import { View, Text, StyleSheet, Animated, ActivityIndicator, PanResponder, Dimensions, TouchableOpacity } from 'react-native'
 import TrackPlayer from 'react-native-track-player'
 import Icon from './Icon'
 import { setAudio } from '../apollo'
 import Logo from '../assets/images/playlist-logo.png'
+import { FRONTEND_BASE_URL } from '../constants'
 
-const AUDIO_PLAYER_HEIGHT = 60
+const AUDIO_PLAYER_HEIGHT = 65
 
 const styles = StyleSheet.create({
   container: {
@@ -41,8 +42,11 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     alignItems: 'flex-start'
   },
-  time: {
+  title: {
     fontSize: 18
+  },
+  time: {
+    fontSize: 14
   }
 })
 
@@ -53,15 +57,11 @@ const parseSeconds = (value) => {
   return minutes + ':' + (seconds < 10 ? '0' : '') + seconds
 }
 
-const Time = ({ loading, duration, position }) => {
-  if (loading) return <ActivityIndicator />
-
-  return (
-    <Text style={styles.time}>
-      {parseSeconds(position)} / {parseSeconds(duration)}
-    </Text>
-  )
-}
+const Time = ({ duration, position }) => (
+  <Text style={styles.time}>
+    {parseSeconds(position)} / {parseSeconds(duration)}
+  </Text>
+)
 
 const height = new Animated.Value(5)
 
@@ -108,11 +108,13 @@ class AudioPlayer extends React.Component {
 
     this.bottom = new Animated.Value(props.url ? 0 : -AUDIO_PLAYER_HEIGHT)
     this.state = {
+      position: 0,
       started: false,
       loading: false,
       isPlaying: false,
-      position: 0,
-      bufferedPosition: 0
+      bufferedPosition: 0,
+      articleTitle: props.title,
+      articlePath: props.articlePath
     }
   }
 
@@ -153,6 +155,16 @@ class AudioPlayer extends React.Component {
       }).start()
     } else if (this.props.playbackState !== nextProps.playbackState) {
       await this.onPlaybackStateChange(nextProps.playbackState)
+    }
+
+    // Update article data if new one provided.
+    // If null, we keep the old one because user can outside the article
+    if (nextProps.title) {
+      this.setState({ articleTitle: nextProps.title })
+    }
+
+    if (nextProps.articlePath) {
+      this.setState({ articlePath: nextProps.articlePath })
     }
   }
 
@@ -251,9 +263,17 @@ class AudioPlayer extends React.Component {
     }
   }
 
+  onTitlePress = () => {
+    const { articlePath } = this.state
+
+    if (articlePath) {
+      this.props.setUrl({ variables: { url: `${FRONTEND_BASE_URL}${articlePath}` } })
+    }
+  }
+
   render () {
     const { setAudio } = this.props
-    const { loading, isPlaying, duration, position, bufferedPosition } = this.state
+    const { articleTitle, loading, isPlaying, duration, position, bufferedPosition } = this.state
     const icon = isPlaying ? 'pause' : 'play'
 
     return (
@@ -273,11 +293,19 @@ class AudioPlayer extends React.Component {
           onPress={() => this.onPlayPauseClick()}
         />
         <View style={styles.content}>
-          <Time
-            loading={loading}
-            duration={duration}
-            position={position}
-          />
+          { loading
+            ? <ActivityIndicator />
+            : (
+              <Fragment>
+                <TouchableOpacity onPress={this.onTitlePress}>
+                  <Text numberOfLines={1} style={styles.title}>
+                    {articleTitle}
+                  </Text>
+                </TouchableOpacity>
+                <Time duration={duration} position={position} />
+              </Fragment>
+            )
+          }
         </View>
         <Icon
           type="close"
