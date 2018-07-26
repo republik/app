@@ -183,6 +183,9 @@ class Web extends Component {
     const { definitions } = query
     const operations = definitions.map(definition => definition.name && definition.name.value)
 
+    if (operations.includes('signOut')) {
+      await logout()
+    }
     // User logs in
     if (operations.includes('me')) {
       if (data.data.me && !me) {
