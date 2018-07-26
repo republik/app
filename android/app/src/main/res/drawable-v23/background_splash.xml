@@ -3,6 +3,8 @@
   <item
         android:drawable="@color/white"/>
     <item
+        android:width="90dp"
+        android:height="90dp"
         android:drawable="@mipmap/splash"
         android:gravity="center" />
 
