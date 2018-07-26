@@ -52,7 +52,7 @@ class Subheader extends React.Component {
   }
 
   render () {
-    const { currentUrl, setUrl, borderColor } = this.props
+    const { visible, currentUrl, setUrl, borderColor } = this.props
 
     const url = parseURL(currentUrl)
 
@@ -65,7 +65,10 @@ class Subheader extends React.Component {
     const borderBottomColor = borderColor || '#DADDDC'
 
     return (
-      <Animated.View style={[styles.container, { height, borderBottomColor, borderBottomWidth }, { top: this.top }]}>
+      <Animated.View
+        pointerEvents={visible ? 'auto' : 'none'}
+        style={[styles.container, { height, borderBottomColor, borderBottomWidth }, { top: this.top }]}
+      >
         <TouchableOpacity
           style={styles.item}
           onPress={() => setUrl({ variables: { url: HOME_URL } })}

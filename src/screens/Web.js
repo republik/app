@@ -227,7 +227,7 @@ class Web extends Component {
 
     this.setState({
       refreshEnabled: positiveYScroll < RELOAD_OFFSET_HEIGHT,
-      subheaderVisible: positiveYScroll === 0 || positiveYScroll < this.lastScrollY
+      subheaderVisible: positiveYScroll <= this.lastScrollY
     }, () => {
       this.lastScrollY = positiveYScroll
     })
@@ -236,7 +236,8 @@ class Web extends Component {
   render () {
     const { me, data, menuActive, audio, playbackState, article, setUrl } = this.props
     const { loading, refreshing, refreshEnabled, subheaderVisible } = this.state
-    const audioTitle = article ? article.title : ''
+    const articlePath = article ? article.path : null
+    const articleTitle = article ? article.title : ''
 
     return (
       <Fragment>
@@ -272,7 +273,9 @@ class Web extends Component {
         </ScrollView>
         <AudioPlayer
           url={audio}
-          title={audioTitle}
+          setUrl={setUrl}
+          title={articleTitle}
+          articlePath={articlePath}
           playbackState={playbackState}
         />
       </Fragment>

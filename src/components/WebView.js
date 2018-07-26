@@ -75,7 +75,7 @@ class WebView extends React.PureComponent {
 
     this.subscriptions = {}
     this.state = { currentUrl: props.source.uri }
-    this.webview = { ref: null, uri: props.source.uri, canGoBack: false }
+    this.webview = { ref: null, uri: props.source.uri, canGoBack: false, scrollY: 0 }
   }
 
   componentWillMount () {
@@ -140,8 +140,13 @@ class WebView extends React.PureComponent {
   }
 
   onScrollStateChange = ({ payload }) => {
-    if (this.props.onScroll) {
+    // Prevent calling onScroll if this didn't changed (sometimes happens for unknown reason)
+    if (
+      this.props.onScroll &&
+      this.webview.scrollY !== payload.y
+    ) {
       this.props.onScroll(payload)
+      this.webview.scrollY = payload.y
       return true
     }
 
