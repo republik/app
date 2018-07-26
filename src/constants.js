@@ -36,5 +36,6 @@ export const COMMUNITY_URL = `${FRONTEND_BASE_URL}${COMMUNITY_PATH}`
 export const DISCUSSIONS_URL = `${FRONTEND_BASE_URL}${DISCUSSIONS_PATH}`
 
 // Misc
+export const APP_VERSION = DeviceInfo.getVersion()
 const nativeUserAgent = DeviceInfo.getUserAgent()
-export const USER_AGENT = `${nativeUserAgent} RepublikApp`
+export const USER_AGENT = `${nativeUserAgent} RepublikApp/${APP_VERSION}`
