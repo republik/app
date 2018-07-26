@@ -5,13 +5,14 @@ import DeviceInfo from 'react-native-device-info'
 import NotificationsIOS from 'react-native-notifications'
 import navigator from './navigation'
 import { setUrl, upsertDevice, rollDeviceToken } from '../apollo'
+import { APP_VERSION } from '../constants'
 
 const pustNotificationsWrapper = WrappedComponent => (
   class extends Component {
     componentDidMount () {
       NotificationsIOS.addEventListener('remoteNotificationsRegistered', this.onPushRegistered)
       NotificationsIOS.addEventListener('notificationOpened', this.onNotificationOpened)
-      
+
       // iOS does not show remote notifications when app is in foreground
       // Because of this, we dispatch a new local notification on native code that when clicked,
       // react-native-notifications triggers this event. That's why we also bind it to `onNotificationOpened`
@@ -40,7 +41,7 @@ const pustNotificationsWrapper = WrappedComponent => (
           os: Platform.OS,
           osVersion: Platform.Version,
           model: DeviceInfo.getModel(),
-          appVersion: DeviceInfo.getVersion()
+          appVersion: APP_VERSION
         }
       }})
     }
