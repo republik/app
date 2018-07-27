@@ -32,6 +32,8 @@ const BORDER_HEIGHT = 3
 const HEADER_HEIGHT = 45
 
 class Subheader extends React.Component {
+  static HEIGHT = HEADER_HEIGHT
+
   constructor (props) {
     super(props)
 
