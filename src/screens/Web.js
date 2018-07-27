@@ -180,15 +180,14 @@ class Web extends Component {
     }
   }
 
-  loadInitialState = state => {
+  loadInitialState = (payload) => {
     const { me } = this.props
-    const meKey = state.ROOT_QUERY && state.ROOT_QUERY.me
 
-    if (meKey && !me) {
-      return this.loginUser(state[meKey.id], { reload: false })
+    if (payload.me && !me) {
+      return this.loginUser(payload.me, { reload: false })
     }
 
-    if (!meKey && me) {
+    if (!payload.me && me) {
       return this.logoutUser({ reload: false })
     }
   }
