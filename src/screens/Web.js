@@ -266,7 +266,6 @@ class Web extends Component {
     const { loading, refreshing, refreshEnabled, subheaderVisible } = this.state
     const articlePath = article ? article.path : null
     const articleTitle = article ? article.title : ''
-    const onIOS = Platform.OS === 'ios'
 
     return (
       <Fragment>
@@ -277,7 +276,7 @@ class Web extends Component {
           visible={me && subheaderVisible && !menuActive}
         />
         <ScrollView
-          style={{ marginTop: refreshing && onIOS ? Subheader.HEIGHT : 0 }}
+          style={{ marginTop: refreshing ? Subheader.HEIGHT : 0 }}
           contentContainerStyle={styles.container}
           refreshControl={
             <RefreshControl
