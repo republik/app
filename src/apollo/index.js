@@ -73,10 +73,7 @@ export const resolvers = {
       return true
     },
     logout: (_, variables, context) => {
-      context.cache.writeData({ data: {
-        url: LOGIN_URL,
-        user: null
-      } })
+      context.cache.writeData({ data: defaults })
       return false
     },
     toggleMenu: async (_, variables, context) => {
