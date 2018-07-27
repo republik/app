@@ -87,7 +87,7 @@ class WebView extends React.PureComponent {
 
     // If url host changes, we force the redirect
     // This might happen when user change settings in ios
-    if (nextUrl.host !== previousUrl.host) {
+    if (nextProps.forceRedirect || nextUrl.host !== previousUrl.host) {
       return this.setState({ currentUrl: nextProps.source.uri })
     }
 
