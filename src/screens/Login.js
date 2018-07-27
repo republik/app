@@ -40,6 +40,7 @@ class Login extends Component {
         style={styles.container}
         onNavigationStateChange={this.onNavigationStateChange}
         ref={node => { this.webview = node }}
+        forceRedirect
       />
     )
   }
