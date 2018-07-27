@@ -162,6 +162,8 @@ class Web extends Component {
 
   onMessage = message => {
     switch (message.type) {
+      case 'initial-state':
+        return this.loadInitialState(message.payload)
       case 'article-opened':
         return this.props.setArticle({ variables: { article: message.payload } })
       case 'article-closed':
@@ -178,6 +180,19 @@ class Web extends Component {
     }
   }
 
+  loadInitialState = state => {
+    const { me } = this.props
+    const meKey = state.ROOT_QUERY && state.ROOT_QUERY.me
+
+    if (meKey && !me) {
+      return this.loginUser(state[meKey.id], { reload: false })
+    }
+
+    if (!meKey && me) {
+      return this.logoutUser({ reload: false })
+    }
+  }
+
   onNetwork = async ({ query, data }) => {
     const { me, login } = this.props
     const { definitions } = query
@@ -190,7 +205,7 @@ class Web extends Component {
     // User logs in
     if (operations.includes('me')) {
       if (data.data.me && !me) {
-        await this.loginUser(data)
+        await this.loginUser(data.data.me)
       }
 
       // User got unauthenticated
@@ -231,20 +246,20 @@ class Web extends Component {
     })
   }
 
-  loginUser = async (data) => {
+  loginUser = async (user, { reload = true } = {}) => {
     this.setState({ subheaderVisible: true }, async () => {
-      await this.props.login({ variables: { user: data.data.me } })
+      await this.props.login({ variables: { user } })
 
       // Force webview reload to update request cookies on iOS
-      if (Platform.OS === 'ios') this.webview.reload()
+      if (reload && Platform.OS === 'ios') this.webview.reload()
 
       this.props.screenProps.getNotificationsToken()
     })
   }
 
-  logoutUser = async () => {
+  logoutUser = async ({ reload = true } = {}) => {
     await this.props.logout()
-    if (Platform.OS === 'ios') this.webview.reload()
+    if (reload && Platform.OS === 'ios') this.webview.reload()
   }
 
   render () {
@@ -252,6 +267,7 @@ class Web extends Component {
     const { loading, refreshing, refreshEnabled, subheaderVisible } = this.state
     const articlePath = article ? article.path : null
     const articleTitle = article ? article.title : ''
+    const onIOS = Platform.OS === 'ios'
 
     return (
       <Fragment>
@@ -262,6 +278,7 @@ class Web extends Component {
           visible={me && subheaderVisible && !menuActive}
         />
         <ScrollView
+          style={{ marginTop: refreshing && onIOS ? Subheader.HEIGHT : 0 }}
           contentContainerStyle={styles.container}
           refreshControl={
             <RefreshControl

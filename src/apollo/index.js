@@ -7,7 +7,7 @@ import { ApolloLink } from 'apollo-link'
 import { withClientState } from 'apollo-link-state'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import { CachePersistor } from 'apollo-cache-persist'
-import { HOME_URL, LOGIN_URL } from '../constants'
+import { LOGIN_URL } from '../constants'
 import { getMenuStateQuery } from './queries'
 import { link } from './link'
 
@@ -67,13 +67,20 @@ export const resolvers = {
   Mutation: {
     login: (_, { user }, context) => {
       context.cache.writeData({ data: {
-        url: HOME_URL,
         user: { ...user, __typename: 'User' }
       } })
       return true
     },
     logout: (_, variables, context) => {
-      context.cache.writeData({ data: defaults })
+      context.cache.writeData({ data: {
+        user: null,
+        menuActive: false,
+        secondaryMenuActive: false,
+        secondaryMenuVisible: false,
+        article: null,
+        audio: null,
+        playbackState: TrackPlayer.STATE_NONE
+      } })
       return false
     },
     toggleMenu: async (_, variables, context) => {

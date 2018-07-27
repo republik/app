@@ -110,6 +110,7 @@ class WebView extends React.PureComponent {
   }
 
   reload = () => {
+    this.setState({ currentUrl: this.props.source.uri })
     this.webview.ref.reload()
   }
 
