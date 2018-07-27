@@ -1,4 +1,5 @@
 import { graphql } from 'react-apollo'
+import queries from './queries'
 import gql from 'graphql-tag'
 
 const toggleMenu = graphql(gql`
@@ -29,7 +30,16 @@ const signOut = graphql(gql`
   mutation SignOut {
     signOut
   }
-`, { name: 'signOut' })
+`, {
+  name: 'signOut',
+  props: ({mutate, ownProps}) => ({
+    signOut: () => mutate({
+      refetchQueries: [{
+        query: queries.me
+      }]
+    })
+  })
+})
 
 const setUrl = graphql(gql`
   mutation SetUrl($url: String!) {

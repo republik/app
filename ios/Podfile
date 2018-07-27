@@ -8,4 +8,7 @@ target 'orbitingapp' do
   # Pods for orbitingapp
   pod 'Firebase/Core', '~> 4.13'
   pod 'Firebase/Messaging'
+
+  pod 'react-native-wkwebview', :path => '../node_modules/react-native-wkwebview-reborn'
+
 end
