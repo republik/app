@@ -263,9 +263,10 @@ class Web extends Component {
 
   render () {
     const { me, data, menuActive, audio, playbackState, article, setUrl } = this.props
-    const { loading, refreshing, refreshEnabled, subheaderVisible } = this.state
+    const { loading, refreshing, refreshEnabled } = this.state
     const articlePath = article ? article.path : null
     const articleTitle = article ? article.title : ''
+    const subheaderVisible = me && this.state.subheaderVisible
 
     return (
       <Fragment>
@@ -273,10 +274,10 @@ class Web extends Component {
           setUrl={setUrl}
           currentUrl={data.url}
           borderColor={article && article.color}
-          visible={me && subheaderVisible && !menuActive}
+          visible={subheaderVisible && !menuActive}
         />
         <ScrollView
-          style={{ marginTop: refreshing ? Subheader.HEIGHT : 0 }}
+          style={{ marginTop: refreshing && subheaderVisible ? Subheader.HEIGHT : 0 }}
           contentContainerStyle={styles.container}
           refreshControl={
             <RefreshControl
