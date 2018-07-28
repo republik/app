@@ -67,20 +67,13 @@ export const resolvers = {
   Mutation: {
     login: (_, { user }, context) => {
       context.cache.writeData({ data: {
+        menuActive: false,
         user: { ...user, __typename: 'User' }
       } })
       return true
     },
     logout: (_, variables, context) => {
-      context.cache.writeData({ data: {
-        user: null,
-        menuActive: false,
-        secondaryMenuActive: false,
-        secondaryMenuVisible: false,
-        article: null,
-        audio: null,
-        playbackState: TrackPlayer.STATE_NONE
-      } })
+      context.cache.writeData({ data: defaults })
       return false
     },
     toggleMenu: async (_, variables, context) => {
