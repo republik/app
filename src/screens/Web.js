@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react'
-import { StyleSheet, Linking, ScrollView, RefreshControl, AppState, NetInfo, Platform } from 'react-native'
+import { StyleSheet, Linking, ScrollView, RefreshControl, AppState, NetInfo, Platform, Share } from 'react-native'
 import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'
 import debounce from 'lodash.debounce'
@@ -14,12 +14,13 @@ import {
   login,
   logout,
   setUrl,
-  setArticle,
-  enableSecondaryMenu,
+  setAudio,
   closeMenu,
-  withMenuState,
   withAudio,
-  withCurrentArticle
+  setArticle,
+  withMenuState,
+  withCurrentArticle,
+  enableSecondaryMenu
 } from '../apollo'
 
 const RELOAD_OFFSET_HEIGHT = 5
@@ -40,6 +41,8 @@ const isExternalURL = ({ host, protocol }) => (
   parseURL(FRONTEND_BASE_URL).host !== host &&
   !PERMITTED_PROTOCOLS.includes(protocol)
 )
+
+let WEBVIEW_INSTANCE = null
 
 class Web extends Component {
   constructor (props) {
@@ -68,20 +71,20 @@ class Web extends Component {
   componentWillReceiveProps (nextProps) {
     // Toggle primary menu on webview
     if (!this.props.menuActive && nextProps.menuActive) {
-      this.webview.postMessage({ type: 'open-menu' })
+      WEBVIEW_INSTANCE.postMessage({ type: 'open-menu' })
     }
 
     if (this.props.menuActive && !nextProps.menuActive) {
-      this.webview.postMessage({ type: 'close-menu' })
+      WEBVIEW_INSTANCE.postMessage({ type: 'close-menu' })
     }
 
     // Toggle secondary menu on webview
     if (!this.props.secondaryMenuActive && nextProps.secondaryMenuActive) {
-      this.webview.postMessage({ type: 'open-secondary-menu' })
+      WEBVIEW_INSTANCE.postMessage({ type: 'open-secondary-menu' })
     }
 
     if (this.props.secondaryMenuActive && !nextProps.secondaryMenuActive) {
-      this.webview.postMessage({ type: 'close-secondary-menu' })
+      WEBVIEW_INSTANCE.postMessage({ type: 'close-secondary-menu' })
     }
   }
 
@@ -101,7 +104,7 @@ class Web extends Component {
     ) {
       if (!this.fileChooserOpen) {
         this.setState({ loading: true })
-        this.webview.reload()
+        WEBVIEW_INSTANCE.reload()
       }
 
       this.fileChooserOpen = false
@@ -152,7 +155,7 @@ class Web extends Component {
 
     if (this.state.refreshing) {
       this.setState({ refreshing: false })
-      this.webview.postMessage({ type: 'scroll-to-top' })
+      WEBVIEW_INSTANCE.postMessage({ type: 'scroll-to-top' })
     }
 
     if (this.props.screenProps.onLoadEnd) {
@@ -164,6 +167,10 @@ class Web extends Component {
     switch (message.type) {
       case 'initial-state':
         return this.loadInitialState(message.payload)
+      case 'share':
+        return this.shareCurrentArticle()
+      case 'show-audio-player':
+        return this.showAudioPlayer()
       case 'article-opened':
         return this.props.setArticle({ variables: { article: message.payload } })
       case 'article-closed':
@@ -190,6 +197,23 @@ class Web extends Component {
     if (!payload.me && me) {
       return this.logoutUser({ reload: false })
     }
+  }
+
+  shareCurrentArticle = () => {
+    const { article } = this.props
+    const url = `${FRONTEND_BASE_URL}${article.path}`
+
+    Share.share({
+      url,
+      message: url,
+      title: article.title,
+      subject: article.title,
+      dialogTitle: article.title
+    })
+  }
+
+  showAudioPlayer = () => {
+    this.props.setAudio({ variables: { audio: this.props.article.audioSource } })
   }
 
   onNetwork = async ({ query, data }) => {
@@ -231,7 +255,7 @@ class Web extends Component {
 
   onRefresh = () => {
     this.setState({ refreshing: true })
-    this.webview.reload()
+    WEBVIEW_INSTANCE.reload()
   }
 
   onWebViewScroll = ({ y }) => {
@@ -250,7 +274,7 @@ class Web extends Component {
       await this.props.login({ variables: { user } })
 
       // Force webview reload to update request cookies on iOS
-      if (reload && Platform.OS === 'ios') this.webview.reload()
+      if (reload && Platform.OS === 'ios') WEBVIEW_INSTANCE.reload()
 
       this.props.screenProps.getNotificationsToken()
     })
@@ -258,7 +282,7 @@ class Web extends Component {
 
   logoutUser = async ({ reload = true } = {}) => {
     await this.props.logout()
-    if (reload && Platform.OS === 'ios') this.webview.reload()
+    if (reload && Platform.OS === 'ios') WEBVIEW_INSTANCE.reload()
   }
 
   render () {
@@ -298,7 +322,7 @@ class Web extends Component {
             onNavigationStateChange={this.onNavigationStateChange}
             onFileChooserOpen={this.onFileChooserOpen} // Android only
             loading={{ status: loading || refreshing, showSpinner: !refreshing }}
-            ref={node => { this.webview = node }}
+            ref={node => { WEBVIEW_INSTANCE = node }}
           />
         </ScrollView>
         <AudioPlayer
@@ -314,8 +338,13 @@ class Web extends Component {
 }
 
 Web.navigationOptions = ({ screenProps }) => ({
-  headerTitle: <Header {...screenProps} />,
-  headerStyle: { backgroundColor: '#FFFFFF' }
+  headerStyle: { backgroundColor: '#FFFFFF' },
+  headerTitle: (
+    <Header
+      {...screenProps}
+      onPDFClick={() => { WEBVIEW_INSTANCE.postMessage({ type: 'toggle-pdf' }) }}
+    />
+  )
 })
 
 var styles = StyleSheet.create({
@@ -337,6 +366,7 @@ export default compose(
   logout,
   getData,
   setUrl,
+  setAudio,
   withAudio,
   setArticle,
   withMenuState,

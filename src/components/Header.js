@@ -1,10 +1,9 @@
 import React, { Fragment } from 'react'
 import { compose } from 'react-apollo'
-import { View, Text, Image, TouchableOpacity, Linking, Share, StyleSheet } from 'react-native'
+import { View, Text, Image, TouchableOpacity, Share, StyleSheet } from 'react-native'
 import Popover from './Popover'
 import Icon from './Icon'
 import { parseURL } from '../utils/url'
-import { getPdfUrl } from '../utils/pdf'
 import { FRONTEND_BASE_URL, HOME_URL, FEED_URL, SEARCH_PATH, SEARCH_URL } from '../constants'
 import {
   me,
@@ -99,10 +98,6 @@ const MainHeader = ({ me, toggleMenu, setUrl, currentUrl }) => {
   )
 }
 
-const onPDFClick = (article) => {
-  Linking.openURL(getPdfUrl(article))
-}
-
 const onShareClick = (article) => {
   const url = `${FRONTEND_BASE_URL}${article.path}`
 
@@ -122,7 +117,8 @@ const SeriesHeader = ({
   setAudio,
   menuOpened,
   toggleMenu,
-  toggleSecondaryMenu
+  toggleSecondaryMenu,
+  onPDFClick
 }) => {
   const name = article && article.series
   const audio = article && article.audioSource
@@ -153,7 +149,7 @@ const SeriesHeader = ({
             size={30}
             side="right"
             type="pdf"
-            onPress={() => onPDFClick(article)}
+            onPress={onPDFClick}
             style={{ marginRight: 5 }}
           />
         )}
@@ -200,7 +196,8 @@ const Header = ({
   menuActive,
   secondaryMenuActive,
   secondaryMenuVisible,
-  toggleSecondaryMenu
+  toggleSecondaryMenu,
+  onPDFClick
 }) => (
   <Fragment>
     <MainHeader
@@ -214,6 +211,7 @@ const Header = ({
       article={article}
       setAudio={setAudio}
       toggleMenu={toggleMenu}
+      onPDFClick={onPDFClick}
       menuOpened={secondaryMenuActive}
       toggleSecondaryMenu={toggleSecondaryMenu}
       active={!menuActive && secondaryMenuVisible}
