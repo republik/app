@@ -188,7 +188,7 @@ const SeriesHeader = ({
               type="discussion"
               style={{ marginRight: 5 }}
             />
-            <Text style={styles.discussionCount}>{count}</Text>
+            {count && <Text style={styles.discussionCount}>{count}</Text>}
           </TouchableOpacity>
         )}
       </View>
