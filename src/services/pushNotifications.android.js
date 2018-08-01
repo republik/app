@@ -49,8 +49,6 @@ const pustNotificationsWrapper = WrappedComponent => (
         await firebase.messaging().requestPermission()
         const token = await firebase.messaging().getToken()
 
-        console.log('>>>>', token)
-
         await AsyncStorage.setItem(TOKEN_KEY, token)
 
         this.createDefaultNotificationChannelForAndroid()
@@ -80,8 +78,6 @@ const pustNotificationsWrapper = WrappedComponent => (
       notification.android.setChannelId('notifications')
       notification.android.setSmallIcon('notification_icon')
       notification.android.setPriority(firebase.notifications.Android.Priority.Max)
-
-      console.log(notification.android)
 
       firebase.notifications().displayNotification(notification)
     }
