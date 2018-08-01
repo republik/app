@@ -18,7 +18,8 @@ const getCurrentArticleQuery = gql`
       title
       series
       template
-      discussion
+      discussionId
+      discussionPath
       audioSource
     }
   }
@@ -34,6 +35,17 @@ const getCurrentAudioQuery = gql`
   query GetCurrentAudio {
     audio @client
     playbackState @client
+  }
+`
+
+const countQuery = gql`
+  query discussion($discussionId: ID!) {
+    discussion(id: $discussionId) {
+      id
+      comments(first: 0) {
+        totalCount
+      }
+    }
   }
 `
 
@@ -80,8 +92,21 @@ const me = graphql(gql`
   }
 })
 
+const withCount = graphql(countQuery, {
+  options: ({ article }) => ({
+    pollInterval: 10000,
+    variables: {
+      discussionId: article ? article.discussionId : null
+    }
+  }),
+  props: ({ data: { discussion } }) => ({
+    count: discussion && discussion.comments.totalCount
+  })
+})
+
 export {
   me,
+  withCount,
   withAudio,
   withMenuState,
   withCurrentUrl,

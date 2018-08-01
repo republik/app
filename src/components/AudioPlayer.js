@@ -136,8 +136,6 @@ class AudioPlayer extends React.Component {
       this.setState({ started: true })
     }
 
-    console.log(this.props.url !== nextProps.url)
-
     if (!this.props.url && nextProps.url) {
       this.setState({ loading: true })
       await this.startPlaying(nextProps)
