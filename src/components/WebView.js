@@ -257,7 +257,8 @@ class WebView extends React.PureComponent {
 };
 
 WebView.defaultProps = {
-  loading: {}
+  loading: {},
+  onFileChooserOpen: () => {}
 }
 
 export default WebView
