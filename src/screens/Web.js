@@ -254,7 +254,7 @@ class Web extends Component {
   }
 
   onRefresh = () => {
-    this.setState({ refreshing: true, refreshEnabled: false })
+    this.setState({ refreshing: true })
     WEBVIEW_INSTANCE.reload()
   }
 
@@ -303,7 +303,7 @@ class Web extends Component {
         <ScrollView
           style={{ marginTop: refreshing && subheaderVisible ? Subheader.HEIGHT : 0 }}
           contentContainerStyle={styles.container}
-          scrollEnabled={refreshEnabled}
+          scrollEnabled={!refreshing}
           refreshControl={
             <RefreshControl
               onRefresh={this.onRefresh}
