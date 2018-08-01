@@ -221,8 +221,6 @@ class Web extends Component {
     const { definitions } = query
     const operations = definitions.map(definition => definition.name && definition.name.value)
 
-    console.log(operations, data)
-
     if (operations.includes('signOut')) {
       await this.logoutUser()
     }
