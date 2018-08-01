@@ -9,6 +9,7 @@ import {
   me,
   setUrl,
   setAudio,
+  withCount,
   toggleMenu,
   withMenuState,
   withCurrentUrl,
@@ -54,6 +55,15 @@ const styles = StyleSheet.create({
   seriesName: {
     fontSize: 15,
     marginRight: 5
+  },
+  discussion: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  discussionCount: {
+    color: '#3cad01',
+    fontWeight: 'bold',
+    fontSize: 15
   }
 })
 
@@ -111,6 +121,7 @@ const onShareClick = (article) => {
 }
 
 const SeriesHeader = ({
+  count,
   active,
   setUrl,
   article,
@@ -122,7 +133,7 @@ const SeriesHeader = ({
 }) => {
   const name = article && article.series
   const audio = article && article.audioSource
-  const discussion = article && article.discussion
+  const discussionPath = article && article.discussionPath
   const pdf = article && article.template === 'article'
   const icon = menuOpened ? 'chevronUp' : 'chevronDown'
 
@@ -162,18 +173,23 @@ const SeriesHeader = ({
             onPress={() => setAudio({ variables: { audio } })}
           />
         )}
-        { discussion && (
-          <Icon
-            size={30}
-            side="right"
-            type="discussion"
-            style={{ marginRight: 5 }}
+        { discussionPath && (
+          <TouchableOpacity
+            style={styles.discussion}
             onPress={() => {
               setUrl({
-                variables: { url: `${FRONTEND_BASE_URL}${article.discussion}` }
+                variables: { url: `${FRONTEND_BASE_URL}${article.discussionPath}` }
               })
             }}
-          />
+          >
+            <Icon
+              size={30}
+              side="right"
+              type="discussion"
+              style={{ marginRight: 5 }}
+            />
+            <Text style={styles.discussionCount}>{count}</Text>
+          </TouchableOpacity>
         )}
       </View>
       <Icon
@@ -197,7 +213,8 @@ const Header = ({
   secondaryMenuActive,
   secondaryMenuVisible,
   toggleSecondaryMenu,
-  onPDFClick
+  onPDFClick,
+  count
 }) => (
   <Fragment>
     <MainHeader
@@ -207,6 +224,7 @@ const Header = ({
       toggleMenu={toggleMenu}
     />
     <SeriesHeader
+      count={count}
       setUrl={setUrl}
       article={article}
       setAudio={setAudio}
@@ -227,5 +245,6 @@ export default compose(
   withMenuState,
   withCurrentUrl,
   withCurrentArticle,
-  toggleSecondaryMenu
+  toggleSecondaryMenu,
+  withCount
 )(Header)
