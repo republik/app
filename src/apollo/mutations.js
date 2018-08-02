@@ -93,18 +93,25 @@ const setPlaybackStateMutation = gql`
   }
 `
 
+const shouldOpenOverlayNextTime = graphql(gql`
+  mutation ShouldOpenOverlayNextTime($value: Boolean) {
+    shouldOpenOverlayNextTime(value: $value) @client
+  }
+`, { name: 'shouldOpenOverlayNextTime' })
+
 export {
-  toggleMenu,
-  closeMenu,
   login,
+  setUrl,
   logout,
   signOut,
-  setUrl,
   setAudio,
+  closeMenu,
   setArticle,
-  enableSecondaryMenu,
-  toggleSecondaryMenu,
+  toggleMenu,
   upsertDevice,
   rollDeviceToken,
-  setPlaybackStateMutation
+  enableSecondaryMenu,
+  toggleSecondaryMenu,
+  setPlaybackStateMutation,
+  shouldOpenOverlayNextTime
 }

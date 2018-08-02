@@ -4,6 +4,7 @@ import { compose } from 'react-apollo'
 import WebView from '../components/WebView'
 import navigator from '../services/navigation'
 import Logo from '../assets/images/logo-title.png'
+import { shouldOpenOverlayNextTime } from '../apollo'
 import { parseURL, handleEnv } from '../utils/url'
 
 const LoginHeader = () => (
@@ -13,6 +14,12 @@ const LoginHeader = () => (
 )
 
 class Login extends Component {
+  authSuccessful = false
+
+  async componentWillUnmount () {
+    this.props.shouldOpenOverlayNextTime({ variables: { value: false } })
+  }
+
   onMessage = message => {
     switch (message.type) {
       case 'close-auth-overlay':
@@ -24,6 +31,7 @@ class Login extends Component {
     const url = parseURL(data.url)
     // close overlay instead of going elsewhere
     if (url.path !== '/mitteilung') {
+      this.authSuccessful = true
       navigator.goBack()
       return false
     }
@@ -69,4 +77,5 @@ var styles = StyleSheet.create({
 })
 
 export default compose(
+  shouldOpenOverlayNextTime
 )(Login)

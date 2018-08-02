@@ -4,7 +4,7 @@ import { Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import NotificationsIOS from 'react-native-notifications'
 import navigator from './navigation'
-import { setUrl, upsertDevice, rollDeviceToken } from '../apollo'
+import { setUrl, upsertDevice, rollDeviceToken, shouldOpenOverlay } from '../apollo'
 import { APP_VERSION } from '../constants'
 
 const pustNotificationsWrapper = WrappedComponent => (
@@ -12,11 +12,6 @@ const pustNotificationsWrapper = WrappedComponent => (
     componentDidMount () {
       NotificationsIOS.addEventListener('remoteNotificationsRegistered', this.onPushRegistered)
       NotificationsIOS.addEventListener('notificationOpened', this.onNotificationOpened)
-
-      // iOS does not show remote notifications when app is in foreground
-      // Because of this, we dispatch a new local notification on native code that when clicked,
-      // react-native-notifications triggers this event. That's why we also bind it to `onNotificationOpened`
-      NotificationsIOS.addEventListener('notificationReceivedForeground', this.onNotificationOpened)
 
       // iOS does not show remote notifications when app is in foreground
       // Because of this, we dispatch a new local notification on native code that when clicked,
@@ -46,14 +41,15 @@ const pustNotificationsWrapper = WrappedComponent => (
       }})
     }
 
-    onNotificationOpened = (notification) => {
+    onNotificationOpened = async (notification) => {
       const data = notification.getData()
+      const { setUrl, shouldOpenOverlay } = this.props
 
       switch (data.type) {
         case 'discussion':
-          return this.props.setUrl({ variables: { url: data.url } })
+          return setUrl({ variables: { url: data.url } })
         case 'authorization':
-          return navigator.navigate('Login', { url: data.url })
+          return shouldOpenOverlay && navigator.navigate('Login', { url: data.url })
       }
     }
 
@@ -79,5 +75,6 @@ export default compose(
   setUrl,
   upsertDevice,
   rollDeviceToken,
+  shouldOpenOverlay,
   pustNotificationsWrapper
 )

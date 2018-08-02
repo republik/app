@@ -92,6 +92,18 @@ const me = graphql(gql`
   }
 })
 
+const shouldOpenOverlay = graphql(gql`
+  query shouldOpenOverlay {
+    shouldOpenOverlay @client
+  }
+`, {
+  props: ({ data }) => {
+    return {
+      shouldOpenOverlay: data.shouldOpenOverlay
+    }
+  }
+})
+
 const withCount = graphql(countQuery, {
   options: ({ article }) => ({
     pollInterval: 10000,
@@ -111,6 +123,7 @@ export {
   withAudio,
   withMenuState,
   withCurrentUrl,
+  shouldOpenOverlay,
   getMenuStateQuery,
   withCurrentArticle
 }

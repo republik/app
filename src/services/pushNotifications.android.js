@@ -4,7 +4,7 @@ import { Platform, AsyncStorage } from 'react-native'
 import firebase from 'react-native-firebase'
 import DeviceInfo from 'react-native-device-info'
 import navigator from './navigation'
-import { setUrl, upsertDevice, rollDeviceToken } from '../apollo'
+import { setUrl, upsertDevice, rollDeviceToken, shouldOpenOverlay } from '../apollo'
 import { APP_VERSION } from '../constants'
 
 const TOKEN_KEY = 'notification_token'
@@ -35,12 +35,13 @@ const pustNotificationsWrapper = WrappedComponent => (
 
     onNotificationOpened = ({ notification }) => {
       const data = notification.data || {}
+      const { setUrl, shouldOpenOverlay } = this.props
 
       switch (data.type) {
         case 'discussion':
-          return this.props.setUrl({ variables: { url: data.url } })
+          return setUrl({ variables: { url: data.url } })
         case 'authorization':
-          return navigator.navigate('Login', { url: data.url })
+          return shouldOpenOverlay && navigator.navigate('Login', { url: data.url })
       }
     }
 
@@ -74,6 +75,12 @@ const pustNotificationsWrapper = WrappedComponent => (
     }
 
     onNotification = notification => {
+      const data = notification.data || {}
+
+      if (data.type === 'authorization') {
+        return this.onNotificationOpened({ notification })
+      }
+
       notification.android.setAutoCancel(true)
       notification.android.setChannelId('notifications')
       notification.android.setSmallIcon('notification_icon')
@@ -97,5 +104,6 @@ export default compose(
   setUrl,
   upsertDevice,
   rollDeviceToken,
+  shouldOpenOverlay,
   pustNotificationsWrapper
 )
