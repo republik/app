@@ -86,6 +86,9 @@ const MainHeader = ({ me, toggleMenu, setUrl, currentUrl }) => {
           type="profile"
           onPress={toggleMenu}
         />
+        <Icon
+          type="lock"
+        />
       </View>
       <TouchableOpacity onPress={onLogoClick} style={styles.logoContainer}>
         <Image
