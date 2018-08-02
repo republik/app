@@ -39,4 +39,3 @@ export const DISCUSSIONS_URL = `${FRONTEND_BASE_URL}${DISCUSSIONS_PATH}`
 export const APP_VERSION = DeviceInfo.getVersion()
 const nativeUserAgent = DeviceInfo.getUserAgent()
 export const USER_AGENT = `${nativeUserAgent} RepublikApp/${APP_VERSION}`
-export const LOGIN_OVERLAY_KEY = 'LOGIN_OVERLAY_KEY'
