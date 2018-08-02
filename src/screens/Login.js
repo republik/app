@@ -17,7 +17,7 @@ class Login extends Component {
   authSuccessful = false
 
   async componentWillUnmount () {
-    this.props.shouldOpenOverlayNextTime({ variables: { value: false } })
+    this.props.shouldOpenOverlayNextTime({ variables: { value: this.authSuccessful } })
   }
 
   onMessage = message => {
