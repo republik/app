@@ -24,6 +24,7 @@ import {
 } from '../apollo'
 
 const RELOAD_OFFSET_HEIGHT = 5
+const RELOAD_TIME_THRESHOLD = 60 * 60 * 1000 // 1hr
 const RESTRICTED_PATHS = [OFFERS_PATH]
 const PERMITTED_PROTOCOLS = ['react-js-navigation']
 const VIDEO_HOSTS = [
@@ -52,16 +53,12 @@ class Web extends Component {
       loading: true,
       refreshing: false,
       refreshEnabled: true,
-      subheaderVisible: true,
-      appState: AppState.currentState
+      subheaderVisible: true
     }
 
-    // On android file chooser makes app go to background, causing an
-    // unwanted reload on the page (due to handleAppStateChange)
-    // By this flag we handle if the webview should reload depending if
-    // the native file chooser was opened or not
-    this.fileChooserOpen = false
     this.lastScrollY = 0
+    this.shouldReload = false
+    this.lastActiveDate = null
   }
 
   componentDidMount () {
@@ -93,24 +90,14 @@ class Web extends Component {
   }
 
   handleAppStateChange = async (nextAppState) => {
-    const url = parseURL(this.props.data.url)
-    const isConnected = await NetInfo.isConnected.fetch()
-
-    if (
-      isConnected &&
-      nextAppState === 'active' &&
-      url.path !== LOGIN_PATH &&
-      this.state.appState.match(/inactive|background/)
-    ) {
-      if (!this.fileChooserOpen) {
-        this.setState({ loading: true })
-        WEBVIEW_INSTANCE.reload()
+    if (nextAppState.match(/inactive|background/)) {
+      this.lastActiveDate = Date.now()
+    } else {
+      if (this.lastActiveDate) {
+        this.shouldReload = this.shouldReload ||
+          Date.now() - this.lastActiveDate > RELOAD_TIME_THRESHOLD
       }
-
-      this.fileChooserOpen = false
     }
-
-    this.setState({ appState: nextAppState })
   }
 
   setLoading = debounce(value => {
@@ -140,8 +127,24 @@ class Web extends Component {
     this.enableSecondaryMenuState(false)
     this.setState({ subheaderVisible: true })
     this.props.setUrl({ variables: { url: data.url } })
+    this.reloadIfNeccesary()
 
     return true
+  }
+
+  reloadIfNeccesary = async () => {
+    const url = parseURL(this.props.data.url)
+    const isConnected = await NetInfo.isConnected.fetch()
+
+    if (
+      isConnected &&
+      this.shouldReload &&
+      url.path !== LOGIN_PATH
+    ) {
+      this.setState({ loading: true })
+      WEBVIEW_INSTANCE.reload()
+      this.shouldReload = false
+    }
   }
 
   onLoadStart = () => {
@@ -247,12 +250,6 @@ class Web extends Component {
     }
   }
 
-  // Android only
-  // Prevent webview to reload after closing file chooser
-  onFileChooserOpen = () => {
-    this.fileChooserOpen = true
-  }
-
   onRefresh = () => {
     this.setState({ refreshing: true })
     WEBVIEW_INSTANCE.reload()
@@ -321,7 +318,6 @@ class Web extends Component {
             onScroll={this.onWebViewScroll}
             webViewWillTransition={this.webViewWillTransition}
             onNavigationStateChange={this.onNavigationStateChange}
-            onFileChooserOpen={this.onFileChooserOpen} // Android only
             loading={{ status: loading || refreshing, showSpinner: !refreshing }}
             ref={node => { WEBVIEW_INSTANCE = node }}
           />
