@@ -6,10 +6,12 @@ import { withMenuState } from '../apollo'
 import PDF from '../assets/images/pdf.png'
 import Share from '../assets/images/share.png'
 import Play from '../assets/images/play.png'
+import Lock from '../assets/images/lock.png'
 import Pause from '../assets/images/pause.png'
 import Close from '../assets/images/close.png'
 import Audio from '../assets/images/audio.png'
 import Search from '../assets/images/search.png'
+import IOSBack from '../assets/images/ios-back.png'
 import Discussion from '../assets/images/discussion.png'
 import ChevronUp from '../assets/images/chevron-up.png'
 import ChevronDown from '../assets/images/chevron-down.png'
@@ -18,11 +20,13 @@ import SearchActive from '../assets/images/search-active.png'
 const buttons = {
   pdf: PDF,
   play: Play,
+  lock: Lock,
   pause: Pause,
   audio: Audio,
   share: Share,
   close: Close,
   search: Search,
+  IOSBack: IOSBack,
   chevronUp: ChevronUp,
   profile: ProfileButton,
   discussion: Discussion,
@@ -49,7 +53,7 @@ const Icon = ({ type, side, size, menuActive, onPress, style }) => {
 
   return (
     <Button
-      style={[style, { padding: 15 }]}
+      style={[style, { padding: 10 }]}
       active={menuActive}
       onPress={onPress}
     />

@@ -1,5 +1,4 @@
 import { graphql } from 'react-apollo'
-import queries from './queries'
 import gql from 'graphql-tag'
 
 const toggleMenu = graphql(gql`
@@ -31,14 +30,7 @@ const signOut = graphql(gql`
     signOut
   }
 `, {
-  name: 'signOut',
-  props: ({mutate, ownProps}) => ({
-    signOut: () => mutate({
-      refetchQueries: [{
-        query: queries.me
-      }]
-    })
-  })
+  name: 'signOut'
 })
 
 const setUrl = graphql(gql`
@@ -94,17 +86,17 @@ const setPlaybackStateMutation = gql`
 `
 
 export {
-  toggleMenu,
-  closeMenu,
   login,
+  setUrl,
   logout,
   signOut,
-  setUrl,
   setAudio,
+  closeMenu,
   setArticle,
-  enableSecondaryMenu,
-  toggleSecondaryMenu,
+  toggleMenu,
   upsertDevice,
   rollDeviceToken,
+  enableSecondaryMenu,
+  toggleSecondaryMenu,
   setPlaybackStateMutation
 }
