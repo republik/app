@@ -7,7 +7,7 @@ import AndroidWebView from './AndroidWebView'
 import { parseURL } from '../utils/url'
 import { injectedJavaScript } from '../utils/webview'
 import { link } from '../apollo'
-import { USER_AGENT } from '../constants'
+import { FEED_PATH, USER_AGENT } from '../constants'
 import withT from '../utils/withT'
 
 const NativeWebView = Platform.select({
@@ -112,6 +112,14 @@ class WebView extends React.PureComponent {
   reload = () => {
     this.setState({ currentUrl: this.props.source.uri })
     this.webview.ref.reload()
+  }
+
+  goBack = () => {
+    if (this.webview.canGoBack) {
+      this.webview.ref.goBack()
+    } else {
+      this.postMessage({ type: 'pushRoute', url: FEED_PATH })
+    }
   }
 
   // Native onNavigationStateChange method shim.

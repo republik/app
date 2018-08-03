@@ -339,6 +339,7 @@ Web.navigationOptions = ({ screenProps }) => ({
   headerTitle: (
     <Header
       {...screenProps}
+      onBackClick={() => { WEBVIEW_INSTANCE.goBack() }}
       onPDFClick={() => { WEBVIEW_INSTANCE.postMessage({ type: 'toggle-pdf' }) }}
     />
   )
