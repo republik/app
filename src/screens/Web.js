@@ -8,6 +8,7 @@ import Header from '../components/Header'
 import Subheader from '../components/Subheader'
 import WebView from '../components/WebView'
 import AudioPlayer from '../components/AudioPlayer'
+import navigator from '../services/navigation'
 import { FRONTEND_BASE_URL, OFFERS_PATH, LOGIN_PATH } from '../constants'
 import {
   me,
@@ -65,10 +66,7 @@ class Web extends Component {
   componentDidMount () {
     AppState.addEventListener('change', this.handleAppStateChange)
 
-    // Open Login screen
-    if (this.props.pendingAppSignIn) {
-
-    }
+    this.goToLoginIfPendingRequest()
   }
 
   componentWillReceiveProps (nextProps) {
@@ -104,7 +102,14 @@ class Web extends Component {
           Date.now() - this.lastActiveDate > RELOAD_TIME_THRESHOLD
       }
 
-      this.props.checkPendingAppSignIn()
+      this.goToLoginIfPendingRequest()
+    }
+  }
+
+  goToLoginIfPendingRequest = async () => {
+    const { data } = await this.props.refetchPendingSignInRequests()
+    if (data.pendingAppSignIn) {
+      navigator.navigate('Login', { url: data.pendingAppSignIn.verificationUrl })
     }
   }
 

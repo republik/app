@@ -37,14 +37,15 @@ const styles = StyleSheet.create({
   },
   buttons: {
     width: 75,
-    marginLeft: 5,
     alignItems: 'center',
     flexDirection: 'row'
   },
   buttonsLeft: {
+    marginLeft: 5,
     justifyContent: 'flex-start'
   },
   buttonsRight: {
+    marginRight: 5,
     justifyContent: 'flex-end'
   },
   logo: {
@@ -82,8 +83,6 @@ const MainHeader = ({ me, toggleMenu, setUrl, currentUrl, onBackClick, pendingAp
   const currentPath = parseURL(currentUrl).path
   const inSearchPath = currentPath === SEARCH_PATH
   const searchIcon = inSearchPath ? 'searchActive' : 'search'
-
-  console.log(pendingAppSignIn)
 
   const onLogoClick = () => me && setUrl({ variables: {
     url: currentPath === '/' ? FEED_URL : HOME_URL }
@@ -226,7 +225,7 @@ const SeriesHeader = ({
         side="right"
         type="hamburger"
         onPress={toggleMenu}
-        style={{ marginLeft: 5 }}
+        style={{ marginRight: 5 }}
       />
     </Popover>
   )

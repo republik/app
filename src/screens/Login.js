@@ -4,6 +4,7 @@ import WebView from '../components/WebView'
 import navigator from '../services/navigation'
 import Logo from '../assets/images/logo-title.png'
 import { parseURL, handleEnv } from '../utils/url'
+import { pendingAppSignIn } from '../apollo'
 
 const LoginHeader = () => (
   <View style={styles.headerContainer}>
@@ -13,6 +14,11 @@ const LoginHeader = () => (
 
 class Login extends Component {
   authSuccessful = false
+
+  componentWillUnmount () {
+    console.log(this.props)
+    this.props.refetchPendingSignInRequests()
+  }
 
   onMessage = message => {
     switch (message.type) {
@@ -70,4 +76,4 @@ var styles = StyleSheet.create({
   }
 })
 
-export default Login
+export default pendingAppSignIn(Login)

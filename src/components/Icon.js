@@ -53,7 +53,7 @@ const Icon = ({ type, side, size, menuActive, onPress, style }) => {
 
   return (
     <Button
-      style={[style, { padding: 15 }]}
+      style={[style, { padding: 10 }]}
       active={menuActive}
       onPress={onPress}
     />

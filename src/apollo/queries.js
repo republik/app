@@ -104,10 +104,13 @@ const me = graphql(gql`
 })
 
 const pendingAppSignIn = graphql(pendingAppSignInQuery, {
+  options: {
+    fetchPolicy: 'network-only'
+  },
   props: ({ data }) => {
     return {
-      checkPendingAppSignIn: data.refetch,
-      pendingAppSignIn: data.pendingAppSignIn
+      pendingAppSignIn: data.pendingAppSignIn,
+      refetchPendingSignInRequests: data.refetch
     }
   }
 })

@@ -5,7 +5,6 @@ const styles = StyleSheet.create({
   container: {
     width: 40,
     height: 50,
-    marginRight: 5,
     alignItems: 'center',
     justifyContent: 'center'
   }
