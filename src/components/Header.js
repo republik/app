@@ -38,6 +38,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row'
   },
+  buttonsLeft: {
+    justifyContent: 'flex-start'
+  },
+  buttonsRight: {
+    justifyContent: 'flex-end'
+  },
   logo: {
     width: 150,
     height: 25
@@ -80,7 +86,7 @@ const MainHeader = ({ me, toggleMenu, setUrl, currentUrl }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.buttons}>
+      <View style={[styles.buttons, styles.buttonsLeft]}>
         <Icon
           side="left"
           type="profile"
@@ -93,11 +99,13 @@ const MainHeader = ({ me, toggleMenu, setUrl, currentUrl }) => {
           style={styles.logo}
         />
       </TouchableOpacity>
-      <View style={styles.buttons}>
-        <Icon
-          type={searchIcon}
-          onPress={onSearchClick}
-        />
+      <View style={[styles.buttons, styles.buttonsRight]}>
+        {me && (
+          <Icon
+            type={searchIcon}
+            onPress={onSearchClick}
+          />
+        )}
         <Icon
           side="right"
           type="hamburger"
