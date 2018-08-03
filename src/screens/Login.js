@@ -16,7 +16,6 @@ class Login extends Component {
   authSuccessful = false
 
   componentWillUnmount () {
-    console.log(this.props)
     this.props.refetchPendingSignInRequests()
   }
 
