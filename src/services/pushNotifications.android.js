@@ -35,10 +35,11 @@ const pustNotificationsWrapper = WrappedComponent => (
 
     onNotificationOpened = ({ notification }) => {
       const data = notification.data || {}
+      const { setUrl } = this.props
 
       switch (data.type) {
         case 'discussion':
-          return this.props.setUrl({ variables: { url: data.url } })
+          return setUrl({ variables: { url: data.url } })
         case 'authorization':
           return navigator.navigate('Login', { url: data.url })
       }
@@ -74,6 +75,12 @@ const pustNotificationsWrapper = WrappedComponent => (
     }
 
     onNotification = notification => {
+      const data = notification.data || {}
+
+      if (data.type === 'authorization') {
+        return this.onNotificationOpened({ notification })
+      }
+
       notification.android.setAutoCancel(true)
       notification.android.setChannelId('notifications')
       notification.android.setSmallIcon('notification_icon')

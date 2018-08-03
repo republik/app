@@ -1,10 +1,11 @@
 import React, { Fragment } from 'react'
 import { compose } from 'react-apollo'
-import { View, Text, Image, TouchableOpacity, Share, StyleSheet } from 'react-native'
+import { View, Text, Image, TouchableOpacity, Share, Platform, StyleSheet } from 'react-native'
 import Popover from './Popover'
 import Icon from './Icon'
 import { parseURL } from '../utils/url'
-import { FRONTEND_BASE_URL, HOME_URL, FEED_URL, SEARCH_PATH, SEARCH_URL } from '../constants'
+import navigator from '../services/navigation'
+import { FRONTEND_BASE_URL, HOME_URL, FEED_URL, SEARCH_PATH, SEARCH_URL, HOME_PATH, FEED_PATH, FORMATS_PATH } from '../constants'
 import {
   me,
   setUrl,
@@ -13,6 +14,7 @@ import {
   toggleMenu,
   withMenuState,
   withCurrentUrl,
+  pendingAppSignIn,
   withCurrentArticle,
   toggleSecondaryMenu
 } from '../apollo'
@@ -35,13 +37,16 @@ const styles = StyleSheet.create({
   },
   buttons: {
     width: 75,
+    marginLeft: 5,
     alignItems: 'center',
     flexDirection: 'row'
   },
   buttonsLeft: {
+    marginLeft: 5,
     justifyContent: 'flex-start'
   },
   buttonsRight: {
+    marginRight: 5,
     justifyContent: 'flex-end'
   },
   logo: {
@@ -50,7 +55,7 @@ const styles = StyleSheet.create({
   },
   icons: {
     flex: 1,
-    marginLeft: 15,
+    marginLeft: 5,
     flexDirection: 'row'
   },
   series: {
@@ -73,7 +78,9 @@ const styles = StyleSheet.create({
   }
 })
 
-const MainHeader = ({ me, toggleMenu, setUrl, currentUrl }) => {
+const OVERVIEW_PAGES = [HOME_PATH, FEED_PATH, FORMATS_PATH]
+
+const MainHeader = ({ me, toggleMenu, setUrl, currentUrl, onBackClick, pendingAppSignIn }) => {
   const currentPath = parseURL(currentUrl).path
   const inSearchPath = currentPath === SEARCH_PATH
   const searchIcon = inSearchPath ? 'searchActive' : 'search'
@@ -84,14 +91,24 @@ const MainHeader = ({ me, toggleMenu, setUrl, currentUrl }) => {
   const onSearchClick = () => me && !inSearchPath &&
     setUrl({ variables: { url: SEARCH_URL } })
 
+  const hasBackIcon = me && Platform.OS === 'ios' && !OVERVIEW_PAGES.includes(currentPath)
+  const leftTopIcon = hasBackIcon ? 'IOSBack' : 'profile'
+  const onLeftTopIconClick = () => hasBackIcon ? onBackClick() : toggleMenu()
+
   return (
     <View style={styles.container}>
       <View style={[styles.buttons, styles.buttonsLeft]}>
         <Icon
           side="left"
-          type="profile"
-          onPress={toggleMenu}
+          type={leftTopIcon}
+          onPress={onLeftTopIconClick}
         />
+        { pendingAppSignIn && (
+          <Icon
+            type="lock"
+            onPress={() => navigator.navigate('Login', { url: pendingAppSignIn.verificationUrl })}
+          />
+        )}
       </View>
       <TouchableOpacity onPress={onLogoClick} style={styles.logoContainer}>
         <Image
@@ -148,6 +165,11 @@ const SeriesHeader = ({
   return (
     <Popover active={active} style={styles.container}>
       <View style={styles.icons}>
+        <Icon
+          side="left"
+          type='IOSBack'
+          onPress={toggleMenu}
+        />
         {name && (
           <TouchableOpacity style={styles.series} onPress={() => toggleSecondaryMenu()}>
             <Fragment>
@@ -204,7 +226,7 @@ const SeriesHeader = ({
         side="right"
         type="hamburger"
         onPress={toggleMenu}
-        style={{ marginLeft: 5 }}
+        style={{ marginRight: 5 }}
       />
     </Popover>
   )
@@ -218,10 +240,12 @@ const Header = ({
   currentUrl,
   toggleMenu,
   menuActive,
+  pendingAppSignIn,
   secondaryMenuActive,
   secondaryMenuVisible,
   toggleSecondaryMenu,
   onPDFClick,
+  onBackClick,
   count
 }) => (
   <Fragment>
@@ -230,6 +254,8 @@ const Header = ({
       setUrl={setUrl}
       currentUrl={currentUrl}
       toggleMenu={toggleMenu}
+      onBackClick={onBackClick}
+      pendingAppSignIn={pendingAppSignIn}
     />
     <SeriesHeader
       count={count}
@@ -252,6 +278,7 @@ export default compose(
   toggleMenu,
   withMenuState,
   withCurrentUrl,
+  pendingAppSignIn,
   withCurrentArticle,
   toggleSecondaryMenu,
   withCount

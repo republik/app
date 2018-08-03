@@ -47,12 +47,12 @@ const typeDefs = `
 
   type Mutation {
     logout(): Boolean
-    toggleMenu(): Boolean
     closeMenu(): Boolean
+    toggleMenu(): Boolean
     login(user: User!): Boolean
     setUrl(url: String!): Boolean
-    setArticle(article: Article!): Boolean
     toggleSecondayMenu(): Boolean
+    setArticle(article: Article!): Boolean
     enableSecondaryMenu(open: Boolean!): Boolean
   }
 

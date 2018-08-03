@@ -49,6 +49,17 @@ const countQuery = gql`
   }
 `
 
+const pendingAppSignInQuery = gql`
+  query pendingAppSignIn {
+    pendingAppSignIn {
+      title
+      body
+      expiresAt
+      verificationUrl
+    }
+  }
+`
+
 const withMenuState = graphql(getMenuStateQuery, {
   props: ({ data: { menuActive, secondaryMenuVisible, secondaryMenuActive } }) => ({
     menuActive,
@@ -92,6 +103,18 @@ const me = graphql(gql`
   }
 })
 
+const pendingAppSignIn = graphql(pendingAppSignInQuery, {
+  options: {
+    fetchPolicy: 'network-only'
+  },
+  props: ({ data }) => {
+    return {
+      pendingAppSignIn: data.pendingAppSignIn,
+      refetchPendingSignInRequests: data.refetch
+    }
+  }
+})
+
 const withCount = graphql(countQuery, {
   options: ({ article }) => ({
     pollInterval: 10000,
@@ -111,6 +134,8 @@ export {
   withAudio,
   withMenuState,
   withCurrentUrl,
+  pendingAppSignIn,
   getMenuStateQuery,
-  withCurrentArticle
+  withCurrentArticle,
+  pendingAppSignInQuery
 }

@@ -18,11 +18,6 @@ const pustNotificationsWrapper = WrappedComponent => (
       // react-native-notifications triggers this event. That's why we also bind it to `onNotificationOpened`
       NotificationsIOS.addEventListener('notificationReceivedForeground', this.onNotificationOpened)
 
-      // iOS does not show remote notifications when app is in foreground
-      // Because of this, we dispatch a new local notification on native code that when clicked,
-      // react-native-notifications triggers this event. That's why we also bind it to `onNotificationOpened`
-      NotificationsIOS.addEventListener('notificationReceivedForeground', this.onNotificationOpened)
-
       NotificationsIOS.checkPermissions().then(() => {
         NotificationsIOS.consumeBackgroundQueue()
       })
@@ -46,12 +41,13 @@ const pustNotificationsWrapper = WrappedComponent => (
       }})
     }
 
-    onNotificationOpened = (notification) => {
+    onNotificationOpened = async (notification) => {
       const data = notification.getData()
+      const { setUrl } = this.props
 
       switch (data.type) {
         case 'discussion':
-          return this.props.setUrl({ variables: { url: data.url } })
+          return setUrl({ variables: { url: data.url } })
         case 'authorization':
           return navigator.navigate('Login', { url: data.url })
       }

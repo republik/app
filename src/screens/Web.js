@@ -8,6 +8,7 @@ import Header from '../components/Header'
 import Subheader from '../components/Subheader'
 import WebView from '../components/WebView'
 import AudioPlayer from '../components/AudioPlayer'
+import navigator from '../services/navigation'
 import { FRONTEND_BASE_URL, OFFERS_PATH, LOGIN_PATH } from '../constants'
 import {
   me,
@@ -19,6 +20,7 @@ import {
   withAudio,
   setArticle,
   withMenuState,
+  pendingAppSignIn,
   withCurrentArticle,
   enableSecondaryMenu
 } from '../apollo'
@@ -63,6 +65,8 @@ class Web extends Component {
 
   componentDidMount () {
     AppState.addEventListener('change', this.handleAppStateChange)
+
+    this.goToLoginIfPendingRequest()
   }
 
   componentWillReceiveProps (nextProps) {
@@ -97,6 +101,15 @@ class Web extends Component {
         this.shouldReload = this.shouldReload ||
           Date.now() - this.lastActiveDate > RELOAD_TIME_THRESHOLD
       }
+
+      this.goToLoginIfPendingRequest()
+    }
+  }
+
+  goToLoginIfPendingRequest = async () => {
+    const { data } = await this.props.refetchPendingSignInRequests()
+    if (data.pendingAppSignIn) {
+      navigator.navigate('Login', { url: data.pendingAppSignIn.verificationUrl })
     }
   }
 
@@ -339,6 +352,7 @@ Web.navigationOptions = ({ screenProps }) => ({
   headerTitle: (
     <Header
       {...screenProps}
+      onBackClick={() => { WEBVIEW_INSTANCE.goBack() }}
       onPDFClick={() => { WEBVIEW_INSTANCE.postMessage({ type: 'toggle-pdf' }) }}
     />
   )
@@ -364,10 +378,11 @@ export default compose(
   getData,
   setUrl,
   setAudio,
+  closeMenu,
   withAudio,
   setArticle,
   withMenuState,
+  pendingAppSignIn,
   withCurrentArticle,
-  enableSecondaryMenu,
-  closeMenu
+  enableSecondaryMenu
 )(Web)
