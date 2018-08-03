@@ -19,8 +19,7 @@ const defaults = {
   secondaryMenuVisible: false,
   article: null,
   audio: null,
-  playbackState: TrackPlayer.STATE_NONE,
-  shouldOpenOverlay: true
+  playbackState: TrackPlayer.STATE_NONE
 }
 
 const typeDefs = `
@@ -55,7 +54,6 @@ const typeDefs = `
     toggleSecondayMenu(): Boolean
     setArticle(article: Article!): Boolean
     enableSecondaryMenu(open: Boolean!): Boolean
-    shouldOpenOverlayNextTime(value: Boolean!): Boolean
   }
 
   type Query {
@@ -63,7 +61,6 @@ const typeDefs = `
     withCurrentUrl: String
     withMenuState: Boolean
     withCurrentArticle: Article
-    shouldOpenOverlay: Boolean
   }
 `
 
@@ -133,10 +130,6 @@ export const resolvers = {
     },
     setPlaybackState: async (_, { state }, context) => {
       context.cache.writeData({ data: { playbackState: state } })
-      return true
-    },
-    shouldOpenOverlayNextTime: async (_, { value }, context) => {
-      context.cache.writeData({ data: { shouldOpenOverlay: value } })
       return true
     }
   }

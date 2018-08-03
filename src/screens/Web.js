@@ -19,6 +19,7 @@ import {
   withAudio,
   setArticle,
   withMenuState,
+  pendingAppSignIn,
   withCurrentArticle,
   enableSecondaryMenu
 } from '../apollo'
@@ -63,6 +64,11 @@ class Web extends Component {
 
   componentDidMount () {
     AppState.addEventListener('change', this.handleAppStateChange)
+
+    // Open Login screen
+    if (this.props.pendingAppSignIn) {
+
+    }
   }
 
   componentWillReceiveProps (nextProps) {
@@ -97,6 +103,8 @@ class Web extends Component {
         this.shouldReload = this.shouldReload ||
           Date.now() - this.lastActiveDate > RELOAD_TIME_THRESHOLD
       }
+
+      this.props.checkPendingAppSignIn()
     }
   }
 
@@ -365,10 +373,11 @@ export default compose(
   getData,
   setUrl,
   setAudio,
+  closeMenu,
   withAudio,
   setArticle,
   withMenuState,
+  pendingAppSignIn,
   withCurrentArticle,
-  enableSecondaryMenu,
-  closeMenu
+  enableSecondaryMenu
 )(Web)

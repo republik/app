@@ -1,5 +1,5 @@
 import { graphql } from 'react-apollo'
-import queries from './queries'
+import { pendingAppSignInQuery } from './queries'
 import gql from 'graphql-tag'
 
 const toggleMenu = graphql(gql`
@@ -31,14 +31,7 @@ const signOut = graphql(gql`
     signOut
   }
 `, {
-  name: 'signOut',
-  props: ({mutate, ownProps}) => ({
-    signOut: () => mutate({
-      refetchQueries: [{
-        query: queries.me
-      }]
-    })
-  })
+  name: 'signOut'
 })
 
 const setUrl = graphql(gql`
@@ -93,12 +86,6 @@ const setPlaybackStateMutation = gql`
   }
 `
 
-const shouldOpenOverlayNextTime = graphql(gql`
-  mutation ShouldOpenOverlayNextTime($value: Boolean) {
-    shouldOpenOverlayNextTime(value: $value) @client
-  }
-`, { name: 'shouldOpenOverlayNextTime' })
-
 export {
   login,
   setUrl,
@@ -112,6 +99,5 @@ export {
   rollDeviceToken,
   enableSecondaryMenu,
   toggleSecondaryMenu,
-  setPlaybackStateMutation,
-  shouldOpenOverlayNextTime
+  setPlaybackStateMutation
 }

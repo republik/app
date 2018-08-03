@@ -4,6 +4,7 @@ import { View, Text, Image, TouchableOpacity, Share, Platform, StyleSheet } from
 import Popover from './Popover'
 import Icon from './Icon'
 import { parseURL } from '../utils/url'
+import navigator from '../services/navigation'
 import { FRONTEND_BASE_URL, HOME_URL, FEED_URL, SEARCH_PATH, SEARCH_URL, HOME_PATH, FEED_PATH, FORMATS_PATH } from '../constants'
 import {
   me,
@@ -13,6 +14,7 @@ import {
   toggleMenu,
   withMenuState,
   withCurrentUrl,
+  pendingAppSignIn,
   withCurrentArticle,
   toggleSecondaryMenu
 } from '../apollo'
@@ -76,10 +78,12 @@ const styles = StyleSheet.create({
 
 const OVERVIEW_PAGES = [HOME_PATH, FEED_PATH, FORMATS_PATH]
 
-const MainHeader = ({ me, toggleMenu, setUrl, currentUrl, onBackClick }) => {
+const MainHeader = ({ me, toggleMenu, setUrl, currentUrl, onBackClick, pendingAppSignIn }) => {
   const currentPath = parseURL(currentUrl).path
   const inSearchPath = currentPath === SEARCH_PATH
   const searchIcon = inSearchPath ? 'searchActive' : 'search'
+
+  console.log(pendingAppSignIn)
 
   const onLogoClick = () => me && setUrl({ variables: {
     url: currentPath === '/' ? FEED_URL : HOME_URL }
@@ -99,9 +103,12 @@ const MainHeader = ({ me, toggleMenu, setUrl, currentUrl, onBackClick }) => {
           type={leftTopIcon}
           onPress={onLeftTopIconClick}
         />
-        {/* <Icon
-          type="lock"
-        /> */}
+        { pendingAppSignIn && (
+          <Icon
+            type="lock"
+            onPress={() => navigator.navigate('Login', { url: pendingAppSignIn.verificationUrl })}
+          />
+        )}
       </View>
       <TouchableOpacity onPress={onLogoClick} style={styles.logoContainer}>
         <Image
@@ -233,6 +240,7 @@ const Header = ({
   currentUrl,
   toggleMenu,
   menuActive,
+  pendingAppSignIn,
   secondaryMenuActive,
   secondaryMenuVisible,
   toggleSecondaryMenu,
@@ -247,6 +255,7 @@ const Header = ({
       currentUrl={currentUrl}
       toggleMenu={toggleMenu}
       onBackClick={onBackClick}
+      pendingAppSignIn={pendingAppSignIn}
     />
     <SeriesHeader
       count={count}
@@ -269,6 +278,7 @@ export default compose(
   toggleMenu,
   withMenuState,
   withCurrentUrl,
+  pendingAppSignIn,
   withCurrentArticle,
   toggleSecondaryMenu,
   withCount

@@ -4,7 +4,7 @@ import { Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import NotificationsIOS from 'react-native-notifications'
 import navigator from './navigation'
-import { setUrl, upsertDevice, rollDeviceToken, shouldOpenOverlay } from '../apollo'
+import { setUrl, upsertDevice, rollDeviceToken } from '../apollo'
 import { APP_VERSION } from '../constants'
 
 const pustNotificationsWrapper = WrappedComponent => (
@@ -43,13 +43,13 @@ const pustNotificationsWrapper = WrappedComponent => (
 
     onNotificationOpened = async (notification) => {
       const data = notification.getData()
-      const { setUrl, shouldOpenOverlay } = this.props
+      const { setUrl } = this.props
 
       switch (data.type) {
         case 'discussion':
           return setUrl({ variables: { url: data.url } })
         case 'authorization':
-          return shouldOpenOverlay && navigator.navigate('Login', { url: data.url })
+          return navigator.navigate('Login', { url: data.url })
       }
     }
 
@@ -75,6 +75,5 @@ export default compose(
   setUrl,
   upsertDevice,
   rollDeviceToken,
-  shouldOpenOverlay,
   pustNotificationsWrapper
 )

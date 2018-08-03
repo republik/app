@@ -4,7 +4,7 @@ import { Platform, AsyncStorage } from 'react-native'
 import firebase from 'react-native-firebase'
 import DeviceInfo from 'react-native-device-info'
 import navigator from './navigation'
-import { setUrl, upsertDevice, rollDeviceToken, shouldOpenOverlay } from '../apollo'
+import { setUrl, upsertDevice, rollDeviceToken } from '../apollo'
 import { APP_VERSION } from '../constants'
 
 const TOKEN_KEY = 'notification_token'
@@ -35,13 +35,13 @@ const pustNotificationsWrapper = WrappedComponent => (
 
     onNotificationOpened = ({ notification }) => {
       const data = notification.data || {}
-      const { setUrl, shouldOpenOverlay } = this.props
+      const { setUrl } = this.props
 
       switch (data.type) {
         case 'discussion':
           return setUrl({ variables: { url: data.url } })
         case 'authorization':
-          return shouldOpenOverlay && navigator.navigate('Login', { url: data.url })
+          return navigator.navigate('Login', { url: data.url })
       }
     }
 
@@ -104,6 +104,5 @@ export default compose(
   setUrl,
   upsertDevice,
   rollDeviceToken,
-  shouldOpenOverlay,
   pustNotificationsWrapper
 )

@@ -49,6 +49,17 @@ const countQuery = gql`
   }
 `
 
+const pendingAppSignInQuery = gql`
+  query pendingAppSignIn {
+    pendingAppSignIn {
+      title
+      body
+      expiresAt
+      verificationUrl
+    }
+  }
+`
+
 const withMenuState = graphql(getMenuStateQuery, {
   props: ({ data: { menuActive, secondaryMenuVisible, secondaryMenuActive } }) => ({
     menuActive,
@@ -92,14 +103,11 @@ const me = graphql(gql`
   }
 })
 
-const shouldOpenOverlay = graphql(gql`
-  query shouldOpenOverlay {
-    shouldOpenOverlay @client
-  }
-`, {
+const pendingAppSignIn = graphql(pendingAppSignInQuery, {
   props: ({ data }) => {
     return {
-      shouldOpenOverlay: data.shouldOpenOverlay
+      checkPendingAppSignIn: data.refetch,
+      pendingAppSignIn: data.pendingAppSignIn
     }
   }
 })
@@ -123,7 +131,8 @@ export {
   withAudio,
   withMenuState,
   withCurrentUrl,
-  shouldOpenOverlay,
+  pendingAppSignIn,
   getMenuStateQuery,
-  withCurrentArticle
+  withCurrentArticle,
+  pendingAppSignInQuery
 }

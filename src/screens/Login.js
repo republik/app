@@ -1,10 +1,8 @@
 import React, { Component } from 'react'
 import { StyleSheet, Image, View } from 'react-native'
-import { compose } from 'react-apollo'
 import WebView from '../components/WebView'
 import navigator from '../services/navigation'
 import Logo from '../assets/images/logo-title.png'
-import { shouldOpenOverlayNextTime } from '../apollo'
 import { parseURL, handleEnv } from '../utils/url'
 
 const LoginHeader = () => (
@@ -15,10 +13,6 @@ const LoginHeader = () => (
 
 class Login extends Component {
   authSuccessful = false
-
-  async componentWillUnmount () {
-    this.props.shouldOpenOverlayNextTime({ variables: { value: this.authSuccessful } })
-  }
 
   onMessage = message => {
     switch (message.type) {
@@ -76,6 +70,4 @@ var styles = StyleSheet.create({
   }
 })
 
-export default compose(
-  shouldOpenOverlayNextTime
-)(Login)
+export default Login
