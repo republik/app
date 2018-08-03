@@ -1,5 +1,4 @@
 import { graphql } from 'react-apollo'
-import { pendingAppSignInQuery } from './queries'
 import gql from 'graphql-tag'
 
 const toggleMenu = graphql(gql`
