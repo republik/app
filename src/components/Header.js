@@ -1,10 +1,10 @@
 import React, { Fragment } from 'react'
 import { compose } from 'react-apollo'
-import { View, Text, Image, TouchableOpacity, Share, StyleSheet } from 'react-native'
+import { View, Text, Image, TouchableOpacity, Share, Platform, StyleSheet } from 'react-native'
 import Popover from './Popover'
 import Icon from './Icon'
 import { parseURL } from '../utils/url'
-import { FRONTEND_BASE_URL, HOME_URL, FEED_URL, SEARCH_PATH, SEARCH_URL } from '../constants'
+import { FRONTEND_BASE_URL, HOME_URL, FEED_URL, SEARCH_PATH, SEARCH_URL, HOME_PATH, FEED_PATH, FORMATS_PATH } from '../constants'
 import {
   me,
   setUrl,
@@ -35,6 +35,7 @@ const styles = StyleSheet.create({
   },
   buttons: {
     width: 75,
+    marginLeft: 5,
     alignItems: 'center',
     flexDirection: 'row'
   },
@@ -44,7 +45,7 @@ const styles = StyleSheet.create({
   },
   icons: {
     flex: 1,
-    marginLeft: 15,
+    marginLeft: 5,
     flexDirection: 'row'
   },
   series: {
@@ -67,7 +68,9 @@ const styles = StyleSheet.create({
   }
 })
 
-const MainHeader = ({ me, toggleMenu, setUrl, currentUrl }) => {
+const OVERVIEW_PAGES = [HOME_PATH, FEED_PATH, FORMATS_PATH]
+
+const MainHeader = ({ me, toggleMenu, setUrl, currentUrl, onBackClick }) => {
   const currentPath = parseURL(currentUrl).path
   const inSearchPath = currentPath === SEARCH_PATH
   const searchIcon = inSearchPath ? 'searchActive' : 'search'
@@ -78,17 +81,21 @@ const MainHeader = ({ me, toggleMenu, setUrl, currentUrl }) => {
   const onSearchClick = () => me && !inSearchPath &&
     setUrl({ variables: { url: SEARCH_URL } })
 
+  const hasBackIcon = me && Platform.OS === 'ios' && !OVERVIEW_PAGES.includes(currentPath)
+  const leftTopIcon = hasBackIcon ? 'IOSBack' : 'profile'
+  const onLeftTopIconClick = () => hasBackIcon ? onBackClick() : toggleMenu()
+
   return (
     <View style={styles.container}>
       <View style={styles.buttons}>
         <Icon
           side="left"
-          type="profile"
-          onPress={toggleMenu}
+          type={leftTopIcon}
+          onPress={onLeftTopIconClick}
         />
-        <Icon
+        {/* <Icon
           type="lock"
-        />
+        /> */}
       </View>
       <TouchableOpacity onPress={onLogoClick} style={styles.logoContainer}>
         <Image
@@ -143,6 +150,11 @@ const SeriesHeader = ({
   return (
     <Popover active={active} style={styles.container}>
       <View style={styles.icons}>
+        <Icon
+          side="left"
+          type='IOSBack'
+          onPress={toggleMenu}
+        />
         {name && (
           <TouchableOpacity style={styles.series} onPress={() => toggleSecondaryMenu()}>
             <Fragment>
@@ -217,6 +229,7 @@ const Header = ({
   secondaryMenuVisible,
   toggleSecondaryMenu,
   onPDFClick,
+  onBackClick,
   count
 }) => (
   <Fragment>
@@ -225,6 +238,7 @@ const Header = ({
       setUrl={setUrl}
       currentUrl={currentUrl}
       toggleMenu={toggleMenu}
+      onBackClick={onBackClick}
     />
     <SeriesHeader
       count={count}
