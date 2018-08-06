@@ -51,6 +51,7 @@ class App extends Component {
         screenProps={{
           persistor: this.props.persistor,
           onLoadEnd: this.hideSplashScreen,
+          checkForUpdates: this.props.checkForUpdates,
           getNotificationsToken
         }}
       />
