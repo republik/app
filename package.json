@@ -14,6 +14,7 @@
     "run-ios-production": "react-native run-ios --scheme 'orbitingapp (production)'",
     "deploy-android-alpha": "cd ./android && ENVFILE=.env.staging fastlane alpha && cd -",
     "deploy-ios-beta": "cd ./ios && fastlane ios beta && cd -",
+    "release-ota": "node scripts/ota/release",
     "translations": "gsheets --key=1KFxXKjFplXM97N9ssk55oJol0FttDfwYiR9MJSQwpqw --title=live --pretty --out src/utils/translations.json"
   },
   "lint-staged": {
@@ -53,7 +54,11 @@
     "url-parse": "^1.4.0"
   },
   "devDependencies": {
+    "archiver": "^2.1.1",
+    "aws-sdk": "^2.286.2",
     "babel-eslint": "^8.2.3",
+    "child-process-promise": "^2.2.1",
+    "dotenv": "^6.0.0",
     "eslint": "^4.17.0",
     "eslint-config-standard": "^11.0.0-beta.0",
     "eslint-config-standard-react": "^5.0.0",
@@ -66,6 +71,8 @@
     "husky": "^0.14.3",
     "inquirer": "^5.2.0",
     "lint-staged": "^6.1.0",
+    "prompt-checkbox": "^2.2.0",
+    "react-native-cli": "^2.0.1",
     "standard": "^10.0.3"
   }
 }
