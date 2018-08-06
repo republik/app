@@ -29,4 +29,15 @@
   }
 }
 
++ (void)clearBundle {
+  NSString *documentPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+  NSString *bundlePath = [documentPath stringByAppendingString:@"/latest.jsbundle"];
+  BOOL isDir = NO;
+  BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:bundlePath isDirectory:&isDir];
+  if (exists) {
+    [[NSFileManager defaultManager] removeItemAtPath:bundlePath error:NULL];
+  }
+}
+
+
 @end

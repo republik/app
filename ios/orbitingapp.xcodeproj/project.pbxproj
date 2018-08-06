@@ -20,7 +20,6 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		146834051AC3E58100842450 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146834041AC3E56700842450 /* libReact.a */; };
-		33B64FB3CC774736B0EEB96E /* libCodePush.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EF7C1240FC7545B89A184D59 /* libCodePush.a */; };
 		5C57AB6364294083B7B3FE30 /* libRNTrackPlayer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CDFE734A6C34A61967DE987 /* libRNTrackPlayer.a */; };
 		5E9157361DD0AC6A00FF2AA8 /* libRCTAnimation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E9157331DD0AC6500FF2AA8 /* libRCTAnimation.a */; };
 		82DFFE830D024FA0878FAE38 /* libReactNativeConfig.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C2E7A5C9E06848F5B7BC48FE /* libReactNativeConfig.a */; };
@@ -36,7 +35,6 @@
 		F194A53520F018510070C1FC /* dummy.swift in Sources */ = {isa = PBXBuildFile; fileRef = F194A53420F018510070C1FC /* dummy.swift */; };
 		F1A928D420EB61A60051D086 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = F1A928D320EB61A60051D086 /* Settings.bundle */; };
 		F1B09E98210A7A8B0076D2D5 /* libRCTWKWebView.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F1B09E80210A7A6B0076D2D5 /* libRCTWKWebView.a */; };
-		F1D78ABB20E3BCD000006DA6 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F1D78ABA20E3BCD000006DA6 /* GoogleService-Info.plist */; };
 		F1FF58CB20F9283B00906EC5 /* libRNNotifications.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F1FF58C820F9282800906EC5 /* libRNNotifications.a */; };
 /* End PBXBuildFile section */
 
@@ -307,20 +305,6 @@
 			remoteGlobalIDString = 358F4ED71D1E81A9004DF814;
 			remoteInfo = RCTBlob;
 		};
-		F10990D920AF529700BD7DB0 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 4F093AB1F9E94A99B8640957 /* CodePush.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 134814201AA4EA6300B7C361;
-			remoteInfo = CodePush;
-		};
-		F10990DB20AF529700BD7DB0 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 4F093AB1F9E94A99B8640957 /* CodePush.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = F886647B1F4ADB500036D01B;
-			remoteInfo = "CodePush-tvOS";
-		};
 		F10990E220AF548200BD7DB0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F10990DD20AF548200BD7DB0 /* RCTPushNotification.xcodeproj */;
@@ -425,7 +409,6 @@
 		2D16E6891FA4F8E400B85C8A /* libReact.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libReact.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		312EE186E3E4460690F41054 /* SplashScreen.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = SplashScreen.xcodeproj; path = "../node_modules/react-native-splash-screen/ios/SplashScreen.xcodeproj"; sourceTree = "<group>"; };
 		45C734975C494B4EAF4E9EF6 /* libRNCookieManagerIOS.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNCookieManagerIOS.a; sourceTree = "<group>"; };
-		4F093AB1F9E94A99B8640957 /* CodePush.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = CodePush.xcodeproj; path = "../node_modules/react-native-code-push/ios/CodePush.xcodeproj"; sourceTree = "<group>"; };
 		5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTAnimation.xcodeproj; path = "../node_modules/react-native/Libraries/NativeAnimation/RCTAnimation.xcodeproj"; sourceTree = "<group>"; };
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
@@ -446,7 +429,6 @@
 		F194A53420F018510070C1FC /* dummy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dummy.swift; sourceTree = "<group>"; };
 		F1A928D320EB61A60051D086 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		F1B09E5F210A7A6B0076D2D5 /* RCTWKWebView.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTWKWebView.xcodeproj; path = "../node_modules/react-native-wkwebview-reborn/ios/RCTWKWebView.xcodeproj"; sourceTree = "<group>"; };
-		F1D78ABA20E3BCD000006DA6 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		F1FF589420F9282800906EC5 /* RNNotifications.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNNotifications.xcodeproj; path = "../node_modules/react-native-notifications/RNNotifications/RNNotifications.xcodeproj"; sourceTree = "<group>"; };
 		F518F59067814385AA132944 /* RNTrackPlayer.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNTrackPlayer.xcodeproj; path = "../node_modules/react-native-track-player/ios/RNTrackPlayer.xcodeproj"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -474,7 +456,6 @@
 				832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */,
 				00C302EA1ABCBA2D00DB3ED1 /* libRCTVibration.a in Frameworks */,
 				139FDEF61B0652A700C62182 /* libRCTWebSocket.a in Frameworks */,
-				33B64FB3CC774736B0EEB96E /* libCodePush.a in Frameworks */,
 				D13A3DCD4DD54CB3BE056245 /* libz.tbd in Frameworks */,
 				AC284E35605044AC97CD5D5E /* libSplashScreen.a in Frameworks */,
 				82DFFE830D024FA0878FAE38 /* libReactNativeConfig.a in Frameworks */,
@@ -652,7 +633,6 @@
 				832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */,
 				00C302DF1ABCB9EE00DB3ED1 /* RCTVibration.xcodeproj */,
 				139FDEE61B06529A00C62182 /* RCTWebSocket.xcodeproj */,
-				4F093AB1F9E94A99B8640957 /* CodePush.xcodeproj */,
 				312EE186E3E4460690F41054 /* SplashScreen.xcodeproj */,
 				0F42BCB854C74B57B9AA11C1 /* ReactNativeConfig.xcodeproj */,
 				B38485E53BF84AED96ACBFEB /* RNCookieManagerIOS.xcodeproj */,
@@ -676,7 +656,6 @@
 			children = (
 				F194A53420F018510070C1FC /* dummy.swift */,
 				F1A928D320EB61A60051D086 /* Settings.bundle */,
-				F1D78ABA20E3BCD000006DA6 /* GoogleService-Info.plist */,
 				13B07FAE1A68108700A75B9A /* orbitingapp */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* orbitingappTests */,
@@ -726,15 +705,6 @@
 				1CDFE734A6C34A61967DE987 /* libRNTrackPlayer.a */,
 			);
 			name = "Recovered References";
-			sourceTree = "<group>";
-		};
-		F10990D520AF529700BD7DB0 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				F10990DA20AF529700BD7DB0 /* libCodePush.a */,
-				F10990DC20AF529700BD7DB0 /* libCodePush.a */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 		F10990DE20AF548200BD7DB0 /* Products */ = {
@@ -868,10 +838,6 @@
 			productRefGroup = 83CBBA001A601CBA00E9B192 /* Products */;
 			projectDirPath = "";
 			projectReferences = (
-				{
-					ProductGroup = F10990D520AF529700BD7DB0 /* Products */;
-					ProjectRef = 4F093AB1F9E94A99B8640957 /* CodePush.xcodeproj */;
-				},
 				{
 					ProductGroup = 00C302A81ABCB8CE00DB3ED1 /* Products */;
 					ProjectRef = 00C302A71ABCB8CE00DB3ED1 /* RCTActionSheet.xcodeproj */;
@@ -1235,20 +1201,6 @@
 			remoteRef = ADBDB9261DFEBF0700ED6528 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		F10990DA20AF529700BD7DB0 /* libCodePush.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libCodePush.a;
-			remoteRef = F10990D920AF529700BD7DB0 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		F10990DC20AF529700BD7DB0 /* libCodePush.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libCodePush.a;
-			remoteRef = F10990DB20AF529700BD7DB0 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		F10990E320AF548200BD7DB0 /* libRCTPushNotification.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -1335,7 +1287,6 @@
 			files = (
 				F1A928D420EB61A60051D086 /* Settings.bundle in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				F1D78ABB20E3BCD000006DA6 /* GoogleService-Info.plist in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
