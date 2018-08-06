@@ -107,6 +107,7 @@ const pendingAppSignIn = graphql(pendingAppSignInQuery, {
   options: {
     fetchPolicy: 'network-only'
   },
+  skip: props => !props.me,
   props: ({ data }) => {
     return {
       pendingAppSignIn: data.pendingAppSignIn,
