@@ -8,10 +8,9 @@ import cookies from './services/cookies'
 import settings from './services/settings'
 import navigator from './services/navigation'
 import deepLinking from './services/deepLinking'
+import ota from './services/ota'
 import pushNotifications from './services/pushNotifications'
 import withApollo from './apollo'
-import ota from './utils/ota'
-import { OTA_BASE_URL } from './constants'
 
 const Router = createStackNavigator({
   Web: { screen: Web },
@@ -35,8 +34,6 @@ class App extends Component {
     this.props.persistor.restore().then(() => {
       this.setState({ cacheLoaded: true })
     })
-
-    ota.downloadUpdate(OTA_BASE_URL)
   }
 
   hideSplashScreen = () => {
@@ -63,6 +60,7 @@ class App extends Component {
 
 export default compose(
   withApollo,
+  ota,
   deepLinking,
   pushNotifications,
   cookies,
