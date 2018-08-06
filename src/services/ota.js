@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
-import { Platform, AsyncStorage } from 'react-native'
+import { Platform, AsyncStorage, NativeModules } from 'react-native'
 import RNFetchBlob from 'rn-fetch-blob'
 import { OTA_BASE_URL, APP_VERSION } from '../constants'
+
+// const NativeOTA = NativeModules.OTA
 
 const UPDATE_THREASHOLD = 15 * 60 * 1000
 const LAST_OTA_UPDATE_KEY = 'LAST_OTA_UPDATE'
