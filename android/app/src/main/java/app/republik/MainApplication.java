@@ -2,11 +2,15 @@ package app.republik;
 
 import android.app.Application;
 
+import app.republik.OTA.OTA;
+import app.republik.OTA.OTAPackage;
 import app.republik.CustomWebView.CustomWebViewPackage;
+import android.content.Context;
 import com.facebook.react.ReactApplication;
 import com.RNFetchBlob.RNFetchBlobPackage;
 import guichaguri.trackplayer.TrackPlayer;
 
+import com.facebook.react.bridge.ReactApplicationContext;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.psykar.cookiemanager.CookieManagerPackage;
 import io.invertase.firebase.RNFirebasePackage;
@@ -30,18 +34,9 @@ public class MainApplication extends Application implements ReactApplication {
 
     @Override
     protected String getJSBundleFile() {
-        File packageBundleFile = this.getCurrentPackageBundleFile();
-
-        if (packageBundleFile.exists()) {
-            return packageBundleFile.getAbsolutePath();
-        } else {
-            return "assets://" + this.getBundleAssetName();
-        }
-    }
-
-    private File getCurrentPackageBundleFile() {
-        String exteralStorage = getApplicationContext().getFilesDir().getAbsolutePath();
-        return new File(exteralStorage + "/latest.jsbundle");
+        Context context = getApplicationContext();
+        String bundleAssetName = this.getBundleAssetName();
+        return OTA.getJSBundleFile(context, bundleAssetName);
     }
 
     @Override
@@ -55,6 +50,7 @@ public class MainApplication extends Application implements ReactApplication {
           new MainReactPackage(),
             new RNFetchBlobPackage(),
             new TrackPlayer(),
+            new OTAPackage(),
             new SplashScreenReactPackage(),
             new RNFirebasePackage(),
             new RNDeviceInfo(),
