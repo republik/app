@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Platform, AsyncStorage, NativeModules } from 'react-native'
 import RNFetchBlob from 'rn-fetch-blob'
+import { unzip } from 'react-native-zip-archive'
 import { OTA_BASE_URL, APP_VERSION } from '../constants'
 
 // const NativeOTA = NativeModules.OTA
@@ -51,7 +52,14 @@ const cookiesWrapper = WrappedComponent => (
         .fetch('GET', url, {})
       console.log('ota-simple: downloaded new bundle zip to: ', res.path())
 
-      //TODO extract to BUNDLE_DIR
+      const path = await unzip(res.path(), BUNDLE_DIR)
+        .catch((error) => {
+          console.error('ota-simple: unzip error: ', error)
+        })
+      console.log(`ota-simple: unzip completed to ${path}`)
+
+      // cleanup
+      RNFetchBlob.fs.unlink(BUNDLE_ZIP_PATH)
     }
 
     checkForUpdates = async ({ force } = {}) => {
