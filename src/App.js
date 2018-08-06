@@ -6,7 +6,6 @@ import Web from './screens/Web'
 import Login from './screens/Login'
 import cookies from './services/cookies'
 import settings from './services/settings'
-import codePush from './services/codePush'
 import navigator from './services/navigation'
 import deepLinking from './services/deepLinking'
 import pushNotifications from './services/pushNotifications'
@@ -64,7 +63,6 @@ class App extends Component {
 
 export default compose(
   withApollo,
-  codePush,
   deepLinking,
   pushNotifications,
   cookies,

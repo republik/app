@@ -12,7 +12,6 @@ import io.invertase.firebase.RNFirebasePackage;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.psykar.cookiemanager.CookieManagerPackage;
 import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
-import com.microsoft.codepush.react.CodePush;
 import guichaguri.trackplayer.TrackPlayer;
 import io.invertase.firebase.RNFirebasePackage;
 import io.invertase.firebase.messaging.RNFirebaseMessagingPackage;
@@ -57,17 +56,9 @@ public class MainApplication extends Application implements ReactApplication {
             new RNDeviceInfo(),
             new CookieManagerPackage(),
             new ReactNativeConfigPackage(),
-            new CodePush(null, getApplicationContext(), BuildConfig.DEBUG),
-            new TrackPlayer(),
-          new RNDeviceInfo(),
-            new RNFirebasePackage(),
-            new CookieManagerPackage(),
-            new ReactNativeConfigPackage(),
-            new SplashScreenReactPackage(),
             new RNFirebaseMessagingPackage(),
             new RNFirebaseNotificationsPackage(),
             new CustomWebViewPackage(),
-          new CodePush(null, getApplicationContext(), BuildConfig.DEBUG)
       );
     }
 
