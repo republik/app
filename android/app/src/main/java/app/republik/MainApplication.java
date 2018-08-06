@@ -6,7 +6,6 @@ import app.republik.CustomWebView.CustomWebViewPackage;
 import com.facebook.react.ReactApplication;
 import com.RNFetchBlob.RNFetchBlobPackage;
 import guichaguri.trackplayer.TrackPlayer;
-import com.wix.reactnativenotifications.RNNotificationsPackage;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.psykar.cookiemanager.CookieManagerPackage;
 import io.invertase.firebase.RNFirebasePackage;
@@ -27,10 +26,10 @@ public class MainApplication extends Application implements ReactApplication {
 
   private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
 
-    @Override
-    protected String getJSBundleFile() {
-      return CodePush.getJSBundleFile();
-    }
+//    @Override
+//    protected String getJSBundleFile() {
+//      return CodePush.getJSBundleFile();
+//    }
 
     @Override
     public boolean getUseDeveloperSupport() {
@@ -44,14 +43,13 @@ public class MainApplication extends Application implements ReactApplication {
             new RNFetchBlobPackage(),
             new TrackPlayer(),
             new SplashScreenReactPackage(),
-            new RNNotificationsPackage(),
             new RNFirebasePackage(),
             new RNDeviceInfo(),
             new CookieManagerPackage(),
             new ReactNativeConfigPackage(),
             new RNFirebaseMessagingPackage(),
             new RNFirebaseNotificationsPackage(),
-            new CustomWebViewPackage(),
+            new CustomWebViewPackage()
       );
     }
 
