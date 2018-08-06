@@ -1,11 +1,10 @@
 import React, { Component } from 'react'
 import { StyleSheet, Image, View } from 'react-native'
-import { compose } from 'react-apollo'
 import WebView from '../components/WebView'
 import navigator from '../services/navigation'
 import Logo from '../assets/images/logo-title.png'
 import { parseURL, handleEnv } from '../utils/url'
-import { me, pendingAppSignIn } from '../apollo'
+import { pendingAppSignIn } from '../apollo'
 
 const LoginHeader = () => (
   <View style={styles.headerContainer}>
@@ -76,7 +75,4 @@ var styles = StyleSheet.create({
   }
 })
 
-export default compose(
-  me,
-  pendingAppSignIn
-)(Login)
+export default pendingAppSignIn(Login)

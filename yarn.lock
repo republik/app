@@ -518,9 +518,9 @@
   version "0.12.6"
   resolved "https://registry.yarnpkg.com/@types/graphql/-/graphql-0.12.6.tgz#3d619198585fcabe5f4e1adfb5cf5f3388c66c13"
 
-"@types/zen-observable@^0.5.3":
-  version "0.5.3"
-  resolved "https://registry.yarnpkg.com/@types/zen-observable/-/zen-observable-0.5.3.tgz#91b728599544efbb7386d8b6633693a3c2e7ade5"
+"@types/zen-observable@^0.8.0":
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/@types/zen-observable/-/zen-observable-0.8.0.tgz#8b63ab7f1aa5321248aad5ac890a485656dcea4d"
 
 abbrev@1:
   version "1.1.1"
@@ -656,6 +656,12 @@ apollo-cache-persist@^0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/apollo-cache-persist/-/apollo-cache-persist-0.1.1.tgz#e6cfe1983b998982a679aaf05241d3ed395edb1e"
 
+apollo-cache@^1.1.13:
+  version "1.1.13"
+  resolved "https://registry.yarnpkg.com/apollo-cache/-/apollo-cache-1.1.13.tgz#75c28091825992b2eec9fb63c9a367db3b4714a8"
+  dependencies:
+    apollo-utilities "^1.0.17"
+
 apollo-cache@^1.1.8:
   version "1.1.8"
   resolved "https://registry.yarnpkg.com/apollo-cache/-/apollo-cache-1.1.8.tgz#b078d33dec876d52b5a81a325d3c254d4e362d3c"
@@ -663,14 +669,14 @@ apollo-cache@^1.1.8:
     apollo-utilities "^1.0.12"
 
 apollo-client@^2.3.1:
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/apollo-client/-/apollo-client-2.3.1.tgz#64b204779b7e8b21f901529527a9a9c973eb7fd4"
+  version "2.3.7"
+  resolved "https://registry.yarnpkg.com/apollo-client/-/apollo-client-2.3.7.tgz#891cd2392851f861a62fe334fa76fc629ed19fd3"
   dependencies:
-    "@types/zen-observable" "^0.5.3"
-    apollo-cache "^1.1.8"
+    "@types/zen-observable" "^0.8.0"
+    apollo-cache "^1.1.13"
     apollo-link "^1.0.0"
     apollo-link-dedup "^1.0.0"
-    apollo-utilities "^1.0.12"
+    apollo-utilities "^1.0.17"
     symbol-observable "^1.0.2"
     zen-observable "^0.8.0"
   optionalDependencies:
@@ -719,6 +725,12 @@ apollo-link@^1.0.0, apollo-link@^1.2.2:
 apollo-utilities@^1.0.0, apollo-utilities@^1.0.12, apollo-utilities@^1.0.8:
   version "1.0.12"
   resolved "https://registry.yarnpkg.com/apollo-utilities/-/apollo-utilities-1.0.12.tgz#9e2b2a34cf89f3bf0d73a664effd8c1bb5d1b7f7"
+
+apollo-utilities@^1.0.17:
+  version "1.0.17"
+  resolved "https://registry.yarnpkg.com/apollo-utilities/-/apollo-utilities-1.0.17.tgz#04cd22db5c5dba8dbd349e28b0d9f9f525ab8e8a"
+  dependencies:
+    fast-json-stable-stringify "^2.0.0"
 
 app-root-path@^2.0.0:
   version "2.0.1"
@@ -3672,15 +3684,11 @@ lodash.throttle@^4.1.1:
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/lodash.throttle/-/lodash.throttle-4.1.1.tgz#c23e91b710242ac70c37f1e1cda9274cc39bf2f4"
 
-lodash@4.17.5:
-  version "4.17.5"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.5.tgz#99a92d65c0272debe8c96b6057bc8fbfa3bed511"
-
 lodash@^3.5.0:
   version "3.10.1"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-3.10.1.tgz#5bf45e8e49ba4189e17d482789dfd15bd140b7b6"
 
-lodash@^4.0.0, lodash@^4.14.0, lodash@^4.17.4, lodash@^4.17.5, lodash@^4.2.0, lodash@^4.3.0, lodash@^4.6.1:
+lodash@^4.0.0, lodash@^4.14.0, lodash@^4.17.10, lodash@^4.17.4, lodash@^4.17.5, lodash@^4.2.0, lodash@^4.3.0, lodash@^4.6.1:
   version "4.17.10"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.10.tgz#1b7793cf7259ea38fb3661d4d38b3260af8ae4e7"
 
@@ -4638,13 +4646,13 @@ rc@^1.1.7:
     strip-json-comments "~2.0.1"
 
 react-apollo@^2.1.4:
-  version "2.1.4"
-  resolved "https://registry.yarnpkg.com/react-apollo/-/react-apollo-2.1.4.tgz#a51059ac56f1a7997cad636a5d36398b9c93ff12"
+  version "2.1.9"
+  resolved "https://registry.yarnpkg.com/react-apollo/-/react-apollo-2.1.9.tgz#1fd30ea2116375197bd53daa725e6fb8ab43ab80"
   dependencies:
     fbjs "^0.8.16"
     hoist-non-react-statics "^2.5.0"
     invariant "^2.2.2"
-    lodash "4.17.5"
+    lodash "^4.17.10"
     prop-types "^15.6.0"
 
 react-base16-styling@^0.5.1:
