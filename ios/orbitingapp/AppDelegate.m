@@ -6,7 +6,6 @@
  */
 
 #import "AppDelegate.h"
-#import <CodePush/CodePush.h>
 #import "OTA.h"
 #import <React/RCTPushNotificationManager.h>
 #import <React/RCTLinkingManager.h>
@@ -29,6 +28,7 @@
   NSString *graphQLUrl = [[NSUserDefaults standardUserDefaults] stringForKey:@"graphql_url"];
   NSString *wsUrl = [[NSUserDefaults standardUserDefaults] stringForKey:@"ws_url"];
   NSString *assetsUrl = [[NSUserDefaults standardUserDefaults] stringForKey:@"assets_url"];
+  Boolean clearOTABundle = [[NSUserDefaults standardUserDefaults] boolForKey:@"clear_ota"];
 
   [[NSUserDefaults standardUserDefaults] setObject:appVersion forKey:@"version_preference"];
   [[NSUserDefaults standardUserDefaults] setObject:buildNumber forKey:@"build_preference"];
@@ -48,6 +48,11 @@
 
   if ([assetsUrl length] == 0) {
     [[NSUserDefaults standardUserDefaults] setObject:[env objectForKey:@"ASSETS_SERVER_BASE_URL"] forKey:@"assets_url"];
+  }
+  
+  if (clearOTABundle) {
+    [OTA clearBundle];
+    [[NSUserDefaults standardUserDefaults] setObject:false forKey:@"clear_ota"];
   }
 }
 
