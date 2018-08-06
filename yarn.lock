@@ -5346,6 +5346,10 @@ react-native-track-player@^0.2.4:
   dependencies:
     fbjs "^0.8.3"
 
+react-native-zip-archive@^2.2.6:
+  version "2.2.6"
+  resolved "https://registry.yarnpkg.com/react-native-zip-archive/-/react-native-zip-archive-2.2.6.tgz#590c3c43447d7dba7e9daf8b1276870986866311"
+
 react-native@0.55.3:
   version "0.55.3"
   resolved "https://registry.yarnpkg.com/react-native/-/react-native-0.55.3.tgz#6ff1691bd0645d0480fba16377edb9dce5bd28c4"
