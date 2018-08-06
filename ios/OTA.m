@@ -31,7 +31,7 @@ RCT_EXPORT_MODULE();
 - (void)reloadBundle
 {
   NSString *documentPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
-  NSString *bundlePath = [documentPath stringByAppendingString:@"/latest.jsbundle"];
+  NSString *bundlePath = [documentPath stringByAppendingString:@"/ota/main.jsbundle"];
   // This needs to be async dispatched because the bridge is not set on init
   // when the app first starts, therefore rollbacks will not take effect.
   dispatch_async(dispatch_get_main_queue(), ^{
@@ -56,7 +56,7 @@ RCT_EXPORT_MODULE();
 
 + (NSURL *)downloadedBundleURL {
   NSString *documentPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
-  NSString *bundlePath = [documentPath stringByAppendingString:@"/latest.jsbundle"];
+  NSString *bundlePath = [documentPath stringByAppendingString:@"/ota/main.jsbundle"];
   BOOL isDir = NO;
   BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:bundlePath isDirectory:&isDir];
   if (!exists) {
@@ -77,7 +77,7 @@ RCT_EXPORT_MODULE();
 
 + (void)clearBundle {
   NSString *documentPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
-  NSString *bundlePath = [documentPath stringByAppendingString:@"/latest.jsbundle"];
+  NSString *bundlePath = [documentPath stringByAppendingString:@"/ota/main.jsbundle"];
   BOOL isDir = NO;
   BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:bundlePath isDirectory:&isDir];
   if (exists) {

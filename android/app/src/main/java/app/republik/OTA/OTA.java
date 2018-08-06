@@ -33,7 +33,7 @@ public class OTA extends ReactContextBaseJavaModule {
 
     public static File getCurrentPackageBundleFile(Context reactContext) {
         String exteralStorage = reactContext.getFilesDir().getAbsolutePath();
-        return new File(exteralStorage + "/latest.jsbundle");
+        return new File(exteralStorage + "/ota/main.jsbundle");
     }
 
     public OTA(ReactApplicationContext reactContext) {
