@@ -1,12 +1,15 @@
 import React, { Component } from 'react'
 import { Platform, AsyncStorage } from 'react-native'
 import RNFetchBlob from 'rn-fetch-blob'
-import { OTA_BASE_URL } from '../constants'
+import { OTA_BASE_URL, APP_VERSION } from '../constants'
 
 const UPDATE_THREASHOLD = 15 * 60 * 1000
 const LAST_OTA_UPDATE_KEY = 'LAST_OTA_UPDATE'
-const BUNDLE_PATH = `${RNFetchBlob.fs.dirs.DocumentDir}/latest.jsbundle`
-const UPDATE_PATH = `${OTA_BASE_URL}/${Platform.OS}.jsbundle`
+const BUNDLE_VERSION_KEY = 'BUNDLE_VERSION_KEY'
+const VERSIONS_URL = `${OTA_BASE_URL}/versions.json`
+const BUNDLE_ZIP_PATH = `${RNFetchBlob.fs.dirs.DocumentDir}/ota.zip`
+const BUNDLE_DIR = `${RNFetchBlob.fs.dirs.DocumentDir}/ota/`
+
 
 const cookiesWrapper = WrappedComponent => (
   class extends Component {
@@ -20,25 +23,55 @@ const cookiesWrapper = WrappedComponent => (
       this.checkForUpdates({ force: true })
     }
 
-    shouldUpdate = async () => {
+    shouldCheck = async () => {
       const now = Date.now()
       const lastUpdate = await AsyncStorage.getItem(LAST_OTA_UPDATE_KEY)
 
       return now - parseInt(lastUpdate) > UPDATE_THREASHOLD
     }
 
+    shouldUpdateToBundle = async (bundleVersion) => {
+      const localBundleVersion = await AsyncStorage.getItem(BUNDLE_VERSION_KEY)
+      const localBundleDate = localBundleVersion && new Date(localBundleVersion)
+      if (!localBundleDate) {
+        return true
+      }
+      const removeBundleDate = new Date(bundleVersion)
+      return removeBundleDate > localBundleDate
+    }
+
+    downloadAndExtractBundle = async (bundleVersion) => {
+      const url = `${OTA_BASE_URL}/${bundleVersion}/${Platform.OS}.zip`
+      console.log(`ota-simple: downloading ${url} ...`)
+
+      const res = await RNFetchBlob
+        .config({ path: BUNDLE_ZIP_PATH })
+        .fetch('GET', url, {})
+      console.log('ota-simple: downloaded new bundle zip to: ', res.path())
+
+      //TODO extract to BUNDLE_DIR
+    }
+
     checkForUpdates = async ({ force } = {}) => {
-      const shouldUpdate = await this.shouldUpdate()
-      if (!force && !shouldUpdate) return
+      const shouldCheck = await this.shouldCheck()
+      if (!force && !shouldCheck) return
+
+      // Save check date to disk
+      await AsyncStorage.setItem(LAST_OTA_UPDATE_KEY, `${Date.now()}`)
 
       try {
-        const res = await RNFetchBlob
-          .config({ path: BUNDLE_PATH })
-          .fetch('GET', UPDATE_PATH, {})
+        const versionsResult = await RNFetchBlob
+          .fetch('GET', VERSIONS_URL, {})
 
-        // Save last update to disk
-        await AsyncStorage.setItem(LAST_OTA_UPDATE_KEY, `${Date.now()}`)
-        console.log('ota-simple: downloaded new bundle to: ', res.path())
+        if (versionsResult && versionsResult.data) {
+          const versions = JSON.parse(versionsResult.data)
+          const remoteEntry = versions.find( v => v.bin === APP_VERSION)
+          console.log({remoteEntry})
+          if (remoteEntry && this.shouldUpdateToBundle(remoteEntry.bundle)) {
+            this.downloadAndExtractBundle(remoteEntry.bundle)
+          }
+        }
+
       } catch (e) {
         console.warn(e.message)
       }
