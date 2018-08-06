@@ -163,6 +163,17 @@ android {
 }
 
 dependencies {
+    compile project(':rn-fetch-blob')
+    compile project(':react-native-track-player')
+    compile project(':react-native-splash-screen')
+    compile project(':react-native-notifications')
+    compile(project(':react-native-firebase')) {
+        transitive = false
+    }
+    compile project(':react-native-device-info')
+    compile project(':react-native-cookies')
+    compile project(':react-native-config')
+    compile project(':react-native-code-push')
     implementation project(':react-native-track-player')
     implementation project(':react-native-device-info')
     implementation project(':react-native-firebase')

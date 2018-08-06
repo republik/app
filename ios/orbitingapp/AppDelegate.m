@@ -7,6 +7,7 @@
 
 #import "AppDelegate.h"
 #import <CodePush/CodePush.h>
+#import "OTA.h"
 #import <React/RCTPushNotificationManager.h>
 #import <React/RCTLinkingManager.h>
 #import <React/RCTBundleURLProvider.h>
@@ -59,11 +60,11 @@
     UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
     center.delegate = self;
   }
-
+  
     #ifdef DEBUG
         jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
     #else
-        jsCodeLocation = [CodePush bundleURL];
+        jsCodeLocation = [OTA bundleURL];
     #endif
 
   RCTRootView *rootView = [[RCTRootView alloc] initWithBundleURL:jsCodeLocation
