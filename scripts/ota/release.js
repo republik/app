@@ -112,13 +112,13 @@ const pack = (input, outputPath) => new Promise( (resolve, reject) => {
 const updateVersionsFile = async (newBundleVersion) => {
   const versions = require(VERSIONS_PATH)
 
-	const prompt = new Prompt({
-		name: 'versions',
-		message: `Which binary versions should get this update? (${newBundleVersion})`,
-		choices: versions.map( v => v.bin )
-	})
+  const prompt = new Prompt({
+    name: 'versions',
+    message: `Which binary versions should get this update? (${newBundleVersion})`,
+    choices: versions.map( v => v.bin )
+  })
 
-	const answer = await prompt.run()
+  const answer = await prompt.run()
 
   if(answer.length === 0) {
     console.log('Ok, none it is')
@@ -158,7 +158,6 @@ const upload = async (outputPath, newBundleVersion) => {
       })
     }
   }
-
 }
 
 
