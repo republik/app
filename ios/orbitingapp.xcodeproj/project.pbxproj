@@ -35,7 +35,6 @@
 		F194A53520F018510070C1FC /* dummy.swift in Sources */ = {isa = PBXBuildFile; fileRef = F194A53420F018510070C1FC /* dummy.swift */; };
 		F1A928D420EB61A60051D086 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = F1A928D320EB61A60051D086 /* Settings.bundle */; };
 		F1B09E98210A7A8B0076D2D5 /* libRCTWKWebView.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F1B09E80210A7A6B0076D2D5 /* libRCTWKWebView.a */; };
-		F1D78ABB20E3BCD000006DA6 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F1D78ABA20E3BCD000006DA6 /* GoogleService-Info.plist */; };
 		F1FF58CB20F9283B00906EC5 /* libRNNotifications.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F1FF58C820F9282800906EC5 /* libRNNotifications.a */; };
 /* End PBXBuildFile section */
 
@@ -430,7 +429,6 @@
 		F194A53420F018510070C1FC /* dummy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dummy.swift; sourceTree = "<group>"; };
 		F1A928D320EB61A60051D086 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		F1B09E5F210A7A6B0076D2D5 /* RCTWKWebView.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTWKWebView.xcodeproj; path = "../node_modules/react-native-wkwebview-reborn/ios/RCTWKWebView.xcodeproj"; sourceTree = "<group>"; };
-		F1D78ABA20E3BCD000006DA6 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		F1FF589420F9282800906EC5 /* RNNotifications.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNNotifications.xcodeproj; path = "../node_modules/react-native-notifications/RNNotifications/RNNotifications.xcodeproj"; sourceTree = "<group>"; };
 		F518F59067814385AA132944 /* RNTrackPlayer.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNTrackPlayer.xcodeproj; path = "../node_modules/react-native-track-player/ios/RNTrackPlayer.xcodeproj"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -658,7 +656,6 @@
 			children = (
 				F194A53420F018510070C1FC /* dummy.swift */,
 				F1A928D320EB61A60051D086 /* Settings.bundle */,
-				F1D78ABA20E3BCD000006DA6 /* GoogleService-Info.plist */,
 				13B07FAE1A68108700A75B9A /* orbitingapp */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* orbitingappTests */,
@@ -1290,7 +1287,6 @@
 			files = (
 				F1A928D420EB61A60051D086 /* Settings.bundle in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				F1D78ABB20E3BCD000006DA6 /* GoogleService-Info.plist in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
