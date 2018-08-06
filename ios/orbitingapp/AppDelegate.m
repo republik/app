@@ -6,7 +6,6 @@
  */
 
 #import "AppDelegate.h"
-#import <CodePush/CodePush.h>
 #import "OTA.h"
 #import <React/RCTPushNotificationManager.h>
 #import <React/RCTLinkingManager.h>
