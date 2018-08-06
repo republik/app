@@ -1,4 +1,22 @@
 rootProject.name = 'republik'
+include ':rn-fetch-blob'
+project(':rn-fetch-blob').projectDir = new File(rootProject.projectDir, '../node_modules/rn-fetch-blob/android')
+include ':react-native-track-player'
+project(':react-native-track-player').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-track-player/android')
+include ':react-native-splash-screen'
+project(':react-native-splash-screen').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-splash-screen/android')
+include ':react-native-notifications'
+project(':react-native-notifications').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-notifications/android')
+include ':react-native-firebase'
+project(':react-native-firebase').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-firebase/android')
+include ':react-native-device-info'
+project(':react-native-device-info').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-device-info/android')
+include ':react-native-cookies'
+project(':react-native-cookies').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-cookies/android')
+include ':react-native-config'
+project(':react-native-config').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-config/android')
+include ':react-native-code-push'
+project(':react-native-code-push').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-code-push/android/app')
 include ':react-native-track-player'
 project(':react-native-track-player').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-track-player/android')
 include ':react-native-firebase'
