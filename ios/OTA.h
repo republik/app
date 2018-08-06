@@ -3,5 +3,6 @@
 @interface OTA : NSObject
 
 + (NSURL *)bundleURL;
++ (void)clearBundle;
 
 @end
