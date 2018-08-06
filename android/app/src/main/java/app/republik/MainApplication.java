@@ -15,7 +15,6 @@ import io.invertase.firebase.notifications.RNFirebaseNotificationsPackage;
 import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
 import app.republik.BuildConfig;
 
-import android.util.Log;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
@@ -34,12 +33,8 @@ public class MainApplication extends Application implements ReactApplication {
         File packageBundleFile = this.getCurrentPackageBundleFile();
 
         if (packageBundleFile.exists()) {
-            Log.d("ReactNative", "Update found!!");
             return packageBundleFile.getAbsolutePath();
-
         } else {
-            Log.d("ReactNative", "There has not been any downloaded updates");
-            // There has not been any downloaded updates.
             return "assets://" + this.getBundleAssetName();
         }
     }
