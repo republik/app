@@ -11,7 +11,13 @@ const LAST_OTA_UPDATE_KEY = 'LAST_OTA_UPDATE'
 const BUNDLE_VERSION_KEY = 'BUNDLE_VERSION_KEY'
 const VERSIONS_URL = `${OTA_BASE_URL}/versions.json`
 const BUNDLE_ZIP_PATH = `${RNFetchBlob.fs.dirs.DocumentDir}/ota.zip`
-const BUNDLE_DIR = `${RNFetchBlob.fs.dirs.DocumentDir}/ota/`
+
+const SLOT_A_KEY = 'A'
+const SLOT_B_KEY = 'B'
+const getBundleDir = (slotKey) =>
+  `${RNFetchBlob.fs.dirs.DocumentDir}/${slotKey}/ota/`
+const getSlotFile = (slotKey) =>
+  `${getBundleDir(slotKey)}active`
 
 const cookiesWrapper = WrappedComponent => (
   class extends Component {
@@ -42,6 +48,25 @@ const cookiesWrapper = WrappedComponent => (
       return removeBundleDate > localBundleDate
     }
 
+    getCurrentlyFreeSlot = async () => {
+      const b = await RNFetchBlob.fs.exists(getSlotFile(SLOT_B_KEY))
+      return b ? SLOT_A_KEY : SLOT_B_KEY
+    }
+
+    activateSlot = async (slot) => {
+      const free = slot === SLOT_A_KEY
+        ? SLOT_B_KEY
+        : SLOT_A_KEY
+      await RNFetchBlob.fs.createFile(getSlotFile(slot), 'usethis', 'utf8')
+        .catch((error) => {
+          console.error('ota-simple: createFile error: ', error)
+        })
+      await RNFetchBlob.fs.unlink(getSlotFile(free))
+        .catch((error) => {
+          console.error('ota-simple: unlink error: ', error)
+        })
+    }
+
     downloadAndExtractBundle = async (bundleVersion) => {
       const url = `${OTA_BASE_URL}/${bundleVersion}/${Platform.OS}.zip`
       console.log(`ota-simple: downloading ${url} ...`)
@@ -51,14 +76,19 @@ const cookiesWrapper = WrappedComponent => (
         .fetch('GET', url, {})
       console.log('ota-simple: downloaded new bundle zip to: ', res.path())
 
-      const path = await unzip(res.path(), BUNDLE_DIR)
+      const freeSlot = await this.getCurrentlyFreeSlot()
+      const bundleDir = getBundleDir(freeSlot)
+
+      const path = unzip(res.path(), bundleDir)
+        .then( async () => {
+          console.log(`ota-simple: unzip completed to ${path}`)
+          // cleanup
+          await this.activateSlot(freeSlot)
+          RNFetchBlob.fs.unlink(BUNDLE_ZIP_PATH)
+        })
         .catch((error) => {
           console.error('ota-simple: unzip error: ', error)
         })
-      console.log(`ota-simple: unzip completed to ${path}`)
-
-      // cleanup
-      RNFetchBlob.fs.unlink(BUNDLE_ZIP_PATH)
     }
 
     checkForUpdates = async ({ force } = {}) => {
