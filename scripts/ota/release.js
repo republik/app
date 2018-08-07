@@ -35,7 +35,7 @@ const argv = yargs
     description: 'specify bundle version to use'
   })
   .option('dry', {
-    string: true,
+    boolean: true,
     default: false,
     description: "don't upload anything"
   })
@@ -54,12 +54,13 @@ if (argv.all) {
 
 const spawn = require('child-process-promise').spawn
 const fs = require('fs')
+const mkdirp = require('mkdirp')
 const Prompt = require('prompt-checkbox')
 const Confirm = require('prompt-confirm')
 const s3 = require('./lib/s3')
 
 const VERSIONS_PATH = './versions.json'
-const VERIONS_PATH_ABSOLUTE = __dirname.concat('/', VERSIONS_PATH)
+const VERIONS_PATH_ABSOLUTE = `${__dirname}/versions.json`
 const PLATFORMS = ['ios', 'android']
 
 const getDateTime =
@@ -143,7 +144,7 @@ const updateVersionsFile = async (newBundleVersion) => {
     })
     const newVersions = JSON.stringify(versions, null, 2)
     fs.writeFileSync(VERIONS_PATH_ABSOLUTE, newVersions)
-    console.log(`new versions written:\n${newVersions})`)
+    console.log(`new versions written to ${VERIONS_PATH_ABSOLUTE}:\n${newVersions})`)
   }
 
   console.log('Keep in mind: You can always update ota/versions.json manually and call this script with --uploadVersions')
@@ -177,12 +178,11 @@ const upload = async (outputPath, newBundleVersion) => {
 
 return new Promise( async (resolve, reject) => {
   const newBundleVersion = argv.bundleVersion || getDateTime()
-  const output = `./build/${newBundleVersion}`
+  const output = `${__dirname}/build/${newBundleVersion}`
 
   if (argv.bundle) {
-    mkdir('./build')
-    mkdir(output)
-    console.log(`----\nnew version: ${newBundleVersion}\noutput: ${output}\n-----`)
+    mkdirp.sync(output)
+    console.log(`----\nversion: ${newBundleVersion}\noutput: ${output}\n-----`)
 
     for(let platform of PLATFORMS) {
       const workingDir = `${output}/${platform}`
@@ -191,7 +191,7 @@ return new Promise( async (resolve, reject) => {
     }
     await updateVersionsFile(newBundleVersion)
   }
-  if (!argv.dry) {
+  if (argv.dry) {
     await upload(output, newBundleVersion)
   }
 
