@@ -164,7 +164,6 @@ android {
 dependencies {
     implementation project(':react-native-zip-archive')
     implementation project(':rn-fetch-blob')
-    implementation project(':react-native-notifications')
     implementation project(':react-native-track-player')
     implementation project(':react-native-device-info')
     implementation project(':react-native-firebase')
