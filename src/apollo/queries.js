@@ -122,10 +122,10 @@ const withCount = graphql(countQuery, {
       discussionId: article ? article.discussionId : null
     }
   }),
-  skip: props => !props.article,
   props: ({ data: { discussion } }) => ({
     count: discussion && discussion.comments.totalCount
-  })
+  }),
+  skip: props => !(props.article && props.article.discussionId)
 })
 
 export {
