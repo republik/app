@@ -70,7 +70,7 @@ const bundle = async (platform, output) => {
     '--platform', `${platform}`,
     '--entry-file', 'index.js',
     '--bundle-output', `${output}/main.jsbundle`,
-    '--assets-dest', `${output}/assets/`,
+    '--assets-dest', `${output}/`,
     '--dev', 'false'
   ])
   const childProcess = promise.childProcess
