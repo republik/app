@@ -69,15 +69,16 @@ const cookiesWrapper = WrappedComponent => (
       await AsyncStorage.setItem(LAST_OTA_UPDATE_KEY, `${Date.now()}`)
 
       try {
-        const versionsResult = await RNFetchBlob
-          .fetch('GET', VERSIONS_URL, {})
+        const versionsResult = await RNFetchBlob.fetch('GET', VERSIONS_URL, {})
 
         if (versionsResult && versionsResult.data) {
           const versions = JSON.parse(versionsResult.data)
           const remoteEntry = versions.find(v => v.bin === APP_VERSION)
-          console.log({remoteEntry})
-          if (remoteEntry && this.shouldUpdateToBundle(remoteEntry.bundle)) {
+          const shouldUpdateToBundle = await this.shouldUpdateToBundle(remoteEntry.bundle)
+
+          if (remoteEntry && shouldUpdateToBundle) {
             this.downloadAndExtractBundle(remoteEntry.bundle)
+            await AsyncStorage.setItem(BUNDLE_VERSION_KEY, remoteEntry.bundle)
           }
         }
       } catch (e) {
