@@ -150,7 +150,7 @@ const updateVersionsFile = async (newBundleVersion) => {
 }
 
 const upload = async (outputPath, newBundleVersion, versionUpdated) => {
-  const basePath = `ota-test/`
+  const basePath = `ota/`
 
   if(argv.uploadVersions || argv.upload || (argv.all && versionUpdated) ) {
     console.log('uploading versions.json...')
