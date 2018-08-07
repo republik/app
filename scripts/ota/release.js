@@ -46,11 +46,6 @@ const argv = yargs
 if (!argv.all && !argv.bundle && !argv.upload && !argv.uploadVersions) {
   argv.all = true
 }
-if (argv.all) {
-  argv.bundle = true
-  argv.upload = true
-  argv.uploadVersions = true
-}
 
 const spawn = require('child-process-promise').spawn
 const fs = require('fs')
@@ -126,8 +121,10 @@ const updateVersionsFile = async (newBundleVersion) => {
   })
   const answerVersions = await prompt.run()
 
+  let result
   if(answerVersions.length === 0) {
     console.log('Ok, none it is')
+    result = false
   } else {
     const urgentPrompt = new Confirm({
       name: 'urgent',
@@ -145,15 +142,17 @@ const updateVersionsFile = async (newBundleVersion) => {
     const newVersions = JSON.stringify(versions, null, 2)
     fs.writeFileSync(VERIONS_PATH_ABSOLUTE, newVersions)
     console.log(`new versions written to ${VERIONS_PATH_ABSOLUTE}:\n${newVersions})`)
+    result = true
   }
 
   console.log('Keep in mind: You can always update ota/versions.json manually and call this script with --uploadVersions')
+  return result
 }
 
-const upload = async (outputPath, newBundleVersion) => {
-  const basePath = `ota/`
+const upload = async (outputPath, newBundleVersion, versionUpdated) => {
+  const basePath = `ota-test/`
 
-  if(argv.uploadVersions || argv.upload) {
+  if(argv.uploadVersions || argv.upload || (argv.all && versionUpdated) ) {
     console.log('uploading versions.json...')
     await s3.upload({
       stream: fs.createReadStream(VERIONS_PATH_ABSOLUTE),
@@ -162,7 +161,7 @@ const upload = async (outputPath, newBundleVersion) => {
       bucket: AWS_S3_BUCKET
     })
   }
-  if (argv.upload) {
+  if (argv.upload || argv.all) {
     for(let platform of PLATFORMS) {
       console.log(`uploading ${platform}.zip...`)
       await s3.upload({
@@ -180,7 +179,8 @@ return new Promise( async (resolve, reject) => {
   const newBundleVersion = argv.bundleVersion || getDateTime()
   const output = `${__dirname}/build/${newBundleVersion}`
 
-  if (argv.bundle) {
+  let versionUpdated = false
+  if (argv.bundle || argv.all) {
     mkdirp.sync(output)
     console.log(`----\nversion: ${newBundleVersion}\noutput: ${output}\n-----`)
 
@@ -189,10 +189,10 @@ return new Promise( async (resolve, reject) => {
       await bundle(platform, workingDir)
       await pack(workingDir, `${output}/${platform}.zip`)
     }
-    await updateVersionsFile(newBundleVersion)
+    versionUpdated = await updateVersionsFile(newBundleVersion)
   }
   if (!argv.dry) {
-    await upload(output, newBundleVersion)
+    await upload(output, newBundleVersion, versionUpdated)
   }
 
 }
