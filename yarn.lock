@@ -5071,7 +5071,7 @@ prompt-actions@^3.0.2:
   dependencies:
     debug "^2.6.8"
 
-prompt-base@^4.0.2:
+prompt-base@^4.0.1, prompt-base@^4.0.2:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/prompt-base/-/prompt-base-4.1.0.tgz#7b88e4c01b096c83d2f4e501a7e85f0d369ecd1f"
   dependencies:
@@ -5113,6 +5113,13 @@ prompt-choices@^4.0.5:
     strip-color "^0.1.0"
     terminal-paginator "^2.0.2"
     toggle-array "^1.0.1"
+
+prompt-confirm@^2.0.4:
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/prompt-confirm/-/prompt-confirm-2.0.4.tgz#42c06907333e876f2ae8867281e0b9521a4796ca"
+  dependencies:
+    ansi-cyan "^0.1.1"
+    prompt-base "^4.0.1"
 
 prompt-question@^5.0.1:
   version "5.0.2"
