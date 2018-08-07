@@ -17,10 +17,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     height: AUDIO_PLAYER_HEIGHT
   },
-  progressBar: {
+  progressBarContainer: {
     top: 0,
+    height: 18,
     width: '100%',
-    position: 'absolute',
+    position: 'absolute'
+  },
+  progressBar: {
+    width: '100%',
     backgroundColor: '#e8e8ed'
   },
   progressPosition: {
@@ -94,10 +98,12 @@ class ProgressBar extends React.Component {
     const buffered = (bufferedPosition / duration) * 100
 
     return (
-      <Animated.View style={[styles.progressBar, { height }]} {...this.pan.panHandlers}>
-        <View style={[styles.progressBuffer, { width: `${buffered}%` }]} />
-        <View style={[styles.progressPosition, { width: `${progress}%` }]} />
-      </Animated.View>
+      <View style={styles.progressBarContainer} {...this.pan.panHandlers}>
+        <Animated.View style={[styles.progressBar, { height }]}>
+          <View style={[styles.progressBuffer, { width: `${buffered}%` }]} />
+          <View style={[styles.progressPosition, { width: `${progress}%` }]} />
+        </Animated.View>
+      </View>
     )
   }
 }
@@ -106,60 +112,51 @@ class AudioPlayer extends React.Component {
   constructor (props) {
     super(props)
 
+    this.started = false
     this.bottom = new Animated.Value(props.url ? 0 : -AUDIO_PLAYER_HEIGHT)
     this.state = {
       position: 0,
-      started: false,
       loading: false,
       isPlaying: false,
       bufferedPosition: 0,
+      audioUrl: props.url,
       articleTitle: props.title,
       articlePath: props.articlePath
     }
   }
 
-  async componentDidMount () {
-    await TrackPlayer.setupPlayer()
-    await TrackPlayer.updateOptions({
-      capabilities: [
-        TrackPlayer.CAPABILITY_PLAY,
-        TrackPlayer.CAPABILITY_PAUSE,
-        TrackPlayer.CAPABILITY_STOP
-      ]
-    })
-  }
-
   async componentWillReceiveProps (nextProps) {
-    if (!this.state.started) {
+    if (!this.started && nextProps.url) {
       await this.setupPlayer()
       this.startIntervals()
-      this.setState({ started: true })
+      this.started = true
     }
 
-    if (!this.props.url && nextProps.url) {
-      this.setState({ loading: true })
+    if (!this.state.audioUrl && nextProps.url) {
+      this.setState({
+        loading: true,
+        audioUrl: nextProps.url,
+        articleTitle: nextProps.title,
+        articlePath: nextProps.articlePath
+      })
       await this.startPlaying(nextProps)
       Animated.timing(this.bottom, { toValue: 0, duration: 250 }).start()
-    } else if (this.props.url && !nextProps.url) {
+    } else if (this.state.audioUrl && !nextProps.url) {
       await this.stopPlaying()
       Animated.timing(this.bottom, { toValue: -AUDIO_PLAYER_HEIGHT, duration: 250 }).start()
-    } else if (this.props.url !== nextProps.url) {
+      this.setState({ audioUrl: null })
+    } else if (this.state.audioUrl !== nextProps.url) {
+      this.setState({
+        audioUrl: nextProps.url,
+        articleTitle: nextProps.title,
+        articlePath: nextProps.articlePath
+      })
       await this.stopPlaying()
       await this.startPlaying(nextProps)
     }
 
     if (this.props.playbackState !== nextProps.playbackState) {
       await this.onPlaybackStateChange(nextProps.playbackState)
-    }
-
-    // Update article data if new one provided.
-    // If null, we keep the old one because user can outside the article
-    if (nextProps.title) {
-      this.setState({ articleTitle: nextProps.title })
-    }
-
-    if (nextProps.articlePath) {
-      this.setState({ articlePath: nextProps.articlePath })
     }
   }
 
@@ -215,17 +212,12 @@ class AudioPlayer extends React.Component {
   onPlaybackStateChange = async state => {
     switch (state) {
       case TrackPlayer.STATE_PLAYING:
+        const duration = await TrackPlayer.getDuration()
         if (this.state.loading) {
-          this.setState({
-            loading: false,
-            duration: await TrackPlayer.getDuration()
-          })
+          this.setState({ loading: false, duration })
           TrackPlayer.pause()
         } else {
-          this.setState({
-            isPlaying: true,
-            duration: await TrackPlayer.getDuration()
-          })
+          this.setState({ isPlaying: true, duration })
         }
         break
       case TrackPlayer.STATE_PAUSED:
@@ -251,15 +243,22 @@ class AudioPlayer extends React.Component {
   }
 
   onPositionReleased = () => {
-    TrackPlayer.seekTo(this.state.position)
-    setTimeout(() => {
-      this.startIntervals()
-    }, 250)
+    try {
+      TrackPlayer.seekTo(this.state.position)
+      setTimeout(() => {
+        this.startIntervals()
+      }, 250)
+    } catch (e) {
+      // The player is probably not initialized yet, we'll just ignore it
+    }
   }
 
   updateProgress = async () => {
     try {
-      this.setState({ position: await TrackPlayer.getPosition() })
+      const position = await TrackPlayer.getPosition()
+      if (this.state.position !== position) {
+        this.setState({ position })
+      }
     } catch (e) {
       // The player is probably not initialized yet, we'll just ignore it
     }
@@ -267,7 +266,10 @@ class AudioPlayer extends React.Component {
 
   updateBufferProgress = async () => {
     try {
-      this.setState({ bufferedPosition: await TrackPlayer.getBufferedPosition() })
+      const bufferedPosition = await TrackPlayer.getBufferedPosition()
+      if (this.state.bufferedPosition !== bufferedPosition) {
+        this.setState({ bufferedPosition })
+      }
     } catch (e) {
       // The player is probably not initialized yet, we'll just ignore it
     }
