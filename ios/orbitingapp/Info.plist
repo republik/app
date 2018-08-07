@@ -64,7 +64,7 @@
 		</dict>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string/>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>
@@ -85,5 +85,11 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>UIAppFonts</key>
+	<array>
+		<string>GT-America-Standard-Medium.otf</string>
+		<string>GT-America-Standard-Regular-Italic.otf</string>
+		<string>GT-America-Standard-Regular.otf</string>
+	</array>
 </dict>
 </plist>

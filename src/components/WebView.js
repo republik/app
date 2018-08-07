@@ -36,7 +36,8 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 20,
     textAlign: 'center',
-    marginBottom: 20
+    marginBottom: 20,
+    fontFamily: 'GT America'
   },
   button: {
     color: '#FFF',

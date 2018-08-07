@@ -47,10 +47,12 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start'
   },
   title: {
-    fontSize: 18
+    fontSize: 18,
+    fontFamily: 'GT America'
   },
   time: {
-    fontSize: 14
+    fontSize: 14,
+    fontFamily: 'GT America'
   }
 })
 
