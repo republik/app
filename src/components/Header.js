@@ -80,13 +80,13 @@ const styles = StyleSheet.create({
 
 const OVERVIEW_PAGES = [HOME_PATH, FEED_PATH, FORMATS_PATH]
 
-const MainHeader = ({ me, toggleMenu, setUrl, currentUrl, onBackClick, pendingAppSignIn }) => {
+const MainHeader = ({ me, toggleMenu, setUrl, currentUrl, onBackClick, onLogoClick, pendingAppSignIn }) => {
   const currentPath = parseURL(currentUrl).path
   const inSearchPath = currentPath === SEARCH_PATH
   const searchIcon = inSearchPath ? 'searchActive' : 'search'
 
-  const onLogoClick = () => me && setUrl({ variables: {
-    url: currentPath === '/' ? FEED_URL : HOME_URL }
+  const onLogoImageClick = () => me && setUrl({ variables: {
+    url: currentPath !== '/' ? HOME_URL : onLogoClick() }
   })
   const onSearchClick = () => me && !inSearchPath &&
     setUrl({ variables: { url: SEARCH_URL } })
@@ -110,7 +110,7 @@ const MainHeader = ({ me, toggleMenu, setUrl, currentUrl, onBackClick, pendingAp
           />
         )}
       </View>
-      <TouchableOpacity onPress={onLogoClick} style={styles.logoContainer}>
+      <TouchableOpacity onPress={onLogoImageClick} style={styles.logoContainer}>
         <Image
           source={require('../assets/images/logo-title.png')}
           style={styles.logo}
@@ -246,6 +246,7 @@ const Header = ({
   toggleSecondaryMenu,
   onPDFClick,
   onBackClick,
+  onLogoClick,
   count
 }) => (
   <Fragment>
@@ -255,6 +256,7 @@ const Header = ({
       currentUrl={currentUrl}
       toggleMenu={toggleMenu}
       onBackClick={onBackClick}
+      onLogoClick={onLogoClick}
       pendingAppSignIn={pendingAppSignIn}
     />
     <SeriesHeader
