@@ -191,7 +191,7 @@ return new Promise( async (resolve, reject) => {
     }
     await updateVersionsFile(newBundleVersion)
   }
-  if (argv.dry) {
+  if (!argv.dry) {
     await upload(output, newBundleVersion)
   }
 
