@@ -17,6 +17,9 @@ const getBundleDir = (slotKey) =>
 const getSlotFile = (slotKey) =>
   `${getBundleDir(slotKey)}active`
 
+// debounce
+let running = false
+
 const cookiesWrapper = WrappedComponent => (
   class extends Component {
     componentDidMount () {
@@ -33,7 +36,7 @@ const cookiesWrapper = WrappedComponent => (
       const now = Date.now()
       const lastUpdate = await AsyncStorage.getItem(LAST_OTA_UPDATE_KEY)
 
-      return now - parseInt(lastUpdate) > UPDATE_THREASHOLD
+      return !lastUpdate || now - parseInt(lastUpdate) > UPDATE_THREASHOLD
     }
 
     shouldUpdateToBundle = async (bundleVersion) => {
@@ -90,9 +93,15 @@ const cookiesWrapper = WrappedComponent => (
     }
 
     checkForUpdates = async ({ force } = {}) => {
+      if (running) {
+        console.log('ota-simple: already running, exit')
+        return
+      }
+      running = true
       const shouldCheck = await this.shouldCheck()
       if (!force && !shouldCheck) {
         console.log('ota-simple: skip checking for updates', {force, shouldCheck})
+        running = false
         return
       }
 
@@ -113,8 +122,10 @@ const cookiesWrapper = WrappedComponent => (
           }
         }
       } catch (e) {
+        running = false
         console.warn(e.message)
       }
+      running = false
     }
 
     render () {
