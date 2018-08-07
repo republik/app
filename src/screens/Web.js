@@ -354,6 +354,7 @@ Web.navigationOptions = ({ screenProps }) => ({
       {...screenProps}
       onBackClick={() => { WEBVIEW_INSTANCE.goBack() }}
       onPDFClick={() => { WEBVIEW_INSTANCE.postMessage({ type: 'toggle-pdf' }) }}
+      onLogoClick={() => { WEBVIEW_INSTANCE.postMessage({ type: 'scroll-to-top' }) }}
     />
   )
 })
