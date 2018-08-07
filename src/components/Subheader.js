@@ -76,7 +76,7 @@ class Subheader extends React.Component {
           onPress={() => setUrl({ variables: { url: HOME_URL } })}
         >
           <Text style={[styles.text, (noLinksActive || pathActive) && styles.active]}>
-            Front
+            Magazin
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
