@@ -20,7 +20,8 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 16,
-    color: '#B7C1BD'
+    color: '#B7C1BD',
+    fontFamily: 'GT America'
   },
   active: {
     color: '#000'

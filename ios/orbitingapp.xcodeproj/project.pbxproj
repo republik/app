@@ -5,7 +5,6 @@
 	};
 	objectVersion = 46;
 	objects = {
-
 /* Begin PBXBuildFile section */
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
@@ -36,6 +35,9 @@
 		F1B09E98210A7A8B0076D2D5 /* libRCTWKWebView.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F1B09E80210A7A6B0076D2D5 /* libRCTWKWebView.a */; };
 		F1D78ABB20E3BCD000006DA6 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F1D78ABA20E3BCD000006DA6 /* GoogleService-Info.plist */; };
 		F1FF58CB20F9283B00906EC5 /* libRNNotifications.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F1FF58C820F9282800906EC5 /* libRNNotifications.a */; };
+		DA01B516E8DB49E6A9E86C68 /* GT-America-Standard-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 953B7CDBAED448E39940EC42 /* GT-America-Standard-Medium.otf */; };
+		B768DBE6B43E48DCBE56427B /* GT-America-Standard-Regular-Italic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 3D5ADFCEB30A401E842AC543 /* GT-America-Standard-Regular-Italic.otf */; };
+		A7E77267EDC54BAFB409B656 /* GT-America-Standard-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 50DF6F2C2DE443589009705C /* GT-America-Standard-Regular.otf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -444,6 +446,9 @@
 		F1D78ABA20E3BCD000006DA6 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		F1FF589420F9282800906EC5 /* RNNotifications.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNNotifications.xcodeproj; path = "../node_modules/react-native-notifications/RNNotifications/RNNotifications.xcodeproj"; sourceTree = "<group>"; };
 		F518F59067814385AA132944 /* RNTrackPlayer.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNTrackPlayer.xcodeproj; path = "../node_modules/react-native-track-player/ios/RNTrackPlayer.xcodeproj"; sourceTree = "<group>"; };
+		953B7CDBAED448E39940EC42 /* GT-America-Standard-Medium.otf */ = {isa = PBXFileReference; name = "GT-America-Standard-Medium.otf"; path = "../src/assets/fonts/GT-America-Standard-Medium.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		3D5ADFCEB30A401E842AC543 /* GT-America-Standard-Regular-Italic.otf */ = {isa = PBXFileReference; name = "GT-America-Standard-Regular-Italic.otf"; path = "../src/assets/fonts/GT-America-Standard-Regular-Italic.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		50DF6F2C2DE443589009705C /* GT-America-Standard-Regular.otf */ = {isa = PBXFileReference; name = "GT-America-Standard-Regular.otf"; path = "../src/assets/fonts/GT-America-Standard-Regular.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -675,6 +680,7 @@
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				F10990AF20AF529600BD7DB0 /* Recovered References */,
 				F194A53320F018510070C1FC /* orbitingapp-Bridging-Header.h */,
+				6B4E7BEF9F864E0C9EB5D7AE /* Resources */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -794,6 +800,17 @@
 			);
 			name = Products;
 			sourceTree = "<group>";
+		};
+		6B4E7BEF9F864E0C9EB5D7AE /* Resources */ = {
+			isa = "PBXGroup";
+			children = (
+				953B7CDBAED448E39940EC42 /* GT-America-Standard-Medium.otf */,
+				3D5ADFCEB30A401E842AC543 /* GT-America-Standard-Regular-Italic.otf */,
+				50DF6F2C2DE443589009705C /* GT-America-Standard-Regular.otf */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+			path = "";
 		};
 /* End PBXGroup section */
 
@@ -1317,6 +1334,9 @@
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				F1D78ABB20E3BCD000006DA6 /* GoogleService-Info.plist in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
+				DA01B516E8DB49E6A9E86C68 /* GT-America-Standard-Medium.otf in Resources */,
+				B768DBE6B43E48DCBE56427B /* GT-America-Standard-Regular-Italic.otf in Resources */,
+				A7E77267EDC54BAFB409B656 /* GT-America-Standard-Regular.otf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
