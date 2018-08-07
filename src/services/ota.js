@@ -15,7 +15,7 @@ const BUNDLE_ZIP_PATH = `${RNFetchBlob.fs.dirs.DocumentDir}/ota.zip`
 const SLOT_A_KEY = 'A'
 const SLOT_B_KEY = 'B'
 const getBundleDir = (slotKey) =>
-  `${RNFetchBlob.fs.dirs.DocumentDir}/${slotKey}/ota/`
+  `${RNFetchBlob.fs.dirs.DocumentDir}/ota/${slotKey}/`
 const getSlotFile = (slotKey) =>
   `${getBundleDir(slotKey)}active`
 
@@ -49,8 +49,8 @@ const cookiesWrapper = WrappedComponent => (
     }
 
     getCurrentlyFreeSlot = async () => {
-      const b = await RNFetchBlob.fs.exists(getSlotFile(SLOT_B_KEY))
-      return b ? SLOT_A_KEY : SLOT_B_KEY
+      const a = await RNFetchBlob.fs.exists(getSlotFile(SLOT_A_KEY))
+      return a ? SLOT_B_KEY : SLOT_A_KEY
     }
 
     activateSlot = async (slot) => {
@@ -79,8 +79,9 @@ const cookiesWrapper = WrappedComponent => (
       const freeSlot = await this.getCurrentlyFreeSlot()
       const bundleDir = getBundleDir(freeSlot)
 
-      const path = unzip(res.path(), bundleDir)
-        .then( async () => {
+      console.log(`ota-simple: unzipping to ${bundleDir} ...`)
+      unzip(res.path(), bundleDir)
+        .then( async (path) => {
           console.log(`ota-simple: unzip completed to ${path}`)
           // cleanup
           await this.activateSlot(freeSlot)
