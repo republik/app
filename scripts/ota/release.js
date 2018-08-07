@@ -53,6 +53,7 @@ const mkdirp = require('mkdirp')
 const Prompt = require('prompt-checkbox')
 const Confirm = require('prompt-confirm')
 const s3 = require('./lib/s3')
+const { purgeUrls } = require('./lib/keyCDN')
 
 const VERSIONS_PATH = './versions.json'
 const VERIONS_PATH_ABSOLUTE = `${__dirname}/versions.json`
@@ -160,6 +161,7 @@ const upload = async (outputPath, newBundleVersion, versionUpdated) => {
       mimeType: 'application/json',
       bucket: AWS_S3_BUCKET
     })
+    await purgeUrls([`/s3/${AWS_S3_BUCKET}/ota/versions.json`])
   }
   if (argv.upload || argv.all) {
     for(let platform of PLATFORMS) {
