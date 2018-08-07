@@ -136,9 +136,7 @@ const updateVersionsFile = async (newBundleVersion) => {
     answerVersions.forEach( binVersion => {
       const versionEntry = versions.find( v => v.bin === binVersion)
       versionEntry.bundle = newBundleVersion
-      if (!!answerUrgent) {
-        versionEntry.urgent = true
-      }
+      versionEntry.urgent = !!answerUrgent
     })
     const newVersions = JSON.stringify(versions, null, 2)
     fs.writeFileSync(VERIONS_PATH_ABSOLUTE, newVersions)
