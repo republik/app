@@ -5,7 +5,7 @@ import Popover from './Popover'
 import Icon from './Icon'
 import { parseURL } from '../utils/url'
 import navigator from '../services/navigation'
-import { FRONTEND_BASE_URL, HOME_URL, FEED_URL, SEARCH_PATH, SEARCH_URL, HOME_PATH, FEED_PATH, FORMATS_PATH } from '../constants'
+import { FRONTEND_BASE_URL, HOME_URL, SEARCH_PATH, SEARCH_URL, HOME_PATH, FEED_PATH, FORMATS_PATH } from '../constants'
 import {
   me,
   setUrl,
