@@ -34,6 +34,11 @@ const argv = yargs
     default: null,
     description: 'specify bundle version to use'
   })
+  .option('dry', {
+    string: true,
+    default: false,
+    description: "don't upload anything"
+  })
   .help()
   .argv
 
@@ -50,6 +55,7 @@ if (argv.all) {
 const spawn = require('child-process-promise').spawn
 const fs = require('fs')
 const Prompt = require('prompt-checkbox')
+const Confirm = require('prompt-confirm')
 const s3 = require('./lib/s3')
 
 const VERSIONS_PATH = './versions.json'
@@ -117,15 +123,23 @@ const updateVersionsFile = async (newBundleVersion) => {
     message: `Which binary versions should get this update? (${newBundleVersion})`,
     choices: versions.map( v => v.bin )
   })
+  const answerVersions = await prompt.run()
 
-  const answer = await prompt.run()
-
-  if(answer.length === 0) {
+  if(answerVersions.length === 0) {
     console.log('Ok, none it is')
   } else {
-    answer.forEach( binVersion => {
+    const urgentPrompt = new Confirm({
+      name: 'urgent',
+      message: 'Is this an **urgent** release?',
+      default: false
+    })
+    const answerUrgent = await urgentPrompt.run()
+    answerVersions.forEach( binVersion => {
       const versionEntry = versions.find( v => v.bin === binVersion)
       versionEntry.bundle = newBundleVersion
+      if (!!answerUrgent) {
+        versionEntry.urgent = true
+      }
     })
     const newVersions = JSON.stringify(versions, null, 2)
     fs.writeFileSync(VERIONS_PATH_ABSOLUTE, newVersions)
@@ -177,7 +191,9 @@ return new Promise( async (resolve, reject) => {
     }
     await updateVersionsFile(newBundleVersion)
   }
-  await upload(output, newBundleVersion)
+  if (!argv.dry) {
+    await upload(output, newBundleVersion)
+  }
 
 }
 ).then(() => {
