@@ -13,7 +13,6 @@ const VERSIONS_URL = `${OTA_BASE_URL}/versions.json`
 const BUNDLE_ZIP_PATH = `${RNFetchBlob.fs.dirs.DocumentDir}/ota.zip`
 const BUNDLE_DIR = `${RNFetchBlob.fs.dirs.DocumentDir}/ota/`
 
-
 const cookiesWrapper = WrappedComponent => (
   class extends Component {
     componentDidMount () {
@@ -75,13 +74,12 @@ const cookiesWrapper = WrappedComponent => (
 
         if (versionsResult && versionsResult.data) {
           const versions = JSON.parse(versionsResult.data)
-          const remoteEntry = versions.find( v => v.bin === APP_VERSION)
+          const remoteEntry = versions.find(v => v.bin === APP_VERSION)
           console.log({remoteEntry})
           if (remoteEntry && this.shouldUpdateToBundle(remoteEntry.bundle)) {
             this.downloadAndExtractBundle(remoteEntry.bundle)
           }
         }
-
       } catch (e) {
         console.warn(e.message)
       }

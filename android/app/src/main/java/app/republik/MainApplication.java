@@ -7,6 +7,7 @@ import app.republik.OTA.OTAPackage;
 import app.republik.CustomWebView.CustomWebViewPackage;
 import android.content.Context;
 import com.facebook.react.ReactApplication;
+import com.rnziparchive.RNZipArchivePackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
 import guichaguri.trackplayer.TrackPlayer;
 
@@ -48,6 +49,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNZipArchivePackage(),
             new RNFetchBlobPackage(),
             new TrackPlayer(),
             new OTAPackage(),
