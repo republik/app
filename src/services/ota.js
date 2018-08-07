@@ -1,10 +1,8 @@
 import React, { Component } from 'react'
-import { Platform, AsyncStorage, NativeModules } from 'react-native'
+import { Platform, AsyncStorage } from 'react-native'
 import RNFetchBlob from 'rn-fetch-blob'
 import { unzip } from 'react-native-zip-archive'
 import { OTA_BASE_URL, APP_VERSION } from '../constants'
-
-// const NativeOTA = NativeModules.OTA
 
 const UPDATE_THREASHOLD = 15 * 60 * 1000
 const LAST_OTA_UPDATE_KEY = 'LAST_OTA_UPDATE'
@@ -48,15 +46,13 @@ const cookiesWrapper = WrappedComponent => (
       return removeBundleDate > localBundleDate
     }
 
-    getCurrentlyFreeSlot = async () => {
+    getCurrentlyFreeSlot = async () => {
       const a = await RNFetchBlob.fs.exists(getSlotFile(SLOT_A_KEY))
       return a ? SLOT_B_KEY : SLOT_A_KEY
     }
 
-    activateSlot = async (slot) => {
-      const free = slot === SLOT_A_KEY
-        ? SLOT_B_KEY
-        : SLOT_A_KEY
+    activateSlot = async (slot) => {
+      const free = slot === SLOT_A_KEY ? SLOT_B_KEY : SLOT_A_KEY
       await RNFetchBlob.fs.createFile(getSlotFile(slot), 'usethis', 'utf8')
         .catch((error) => {
           console.error('ota-simple: createFile error: ', error)
@@ -81,7 +77,7 @@ const cookiesWrapper = WrappedComponent => (
 
       console.log(`ota-simple: unzipping to ${bundleDir} ...`)
       unzip(res.path(), bundleDir)
-        .then( async (path) => {
+        .then(async (path) => {
           console.log(`ota-simple: unzip completed to ${path}`)
           // cleanup
           await this.activateSlot(freeSlot)
