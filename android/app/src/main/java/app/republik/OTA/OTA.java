@@ -22,7 +22,7 @@ public class OTA extends ReactContextBaseJavaModule {
     public static String getJSBundleFile (Context context, String bundleAssetName) {
         File packageBundleFile = OTA.getCurrentPackageBundleFile(context);
 
-        if (packageBundleFile.exists()) {
+        if (packageBundleFile != null && packageBundleFile.exists()) {
             Log.d("ReactNative", "Update found!!");
             return packageBundleFile.getAbsolutePath();
         } else {
@@ -33,7 +33,18 @@ public class OTA extends ReactContextBaseJavaModule {
 
     public static File getCurrentPackageBundleFile(Context reactContext) {
         String exteralStorage = reactContext.getFilesDir().getAbsolutePath();
-        return new File(exteralStorage + "/ota/main.jsbundle");
+        File slotAActiveFile = new File(exteralStorage + "/ota/A/active");
+        File slotBActiveFile = new File(exteralStorage + "/ota/B/active");
+
+        if (slotAActiveFile.exists()) {
+            return new File(exteralStorage + "/ota/A/main.jsbundle");
+        }
+
+        if (slotBActiveFile.exists()) {
+            return new File(exteralStorage + "/ota/B/main.jsbundle");
+        }
+
+        return null;
     }
 
     public OTA(ReactApplicationContext reactContext) {

@@ -30,8 +30,8 @@ RCT_EXPORT_MODULE();
 
 - (void)reloadBundle
 {
-  NSString *documentPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
-  NSString *bundlePath = [documentPath stringByAppendingString:@"/ota/main.jsbundle"];
+  NSURL *downloadedBundleUrl = [OTA downloadedBundleURL];
+  
   // This needs to be async dispatched because the bridge is not set on init
   // when the app first starts, therefore rollbacks will not take effect.
   dispatch_async(dispatch_get_main_queue(), ^{
@@ -41,7 +41,7 @@ RCT_EXPORT_MODULE();
     // the current bundle URL to point at the latest update
   
     if (![super.bridge.bundleURL.scheme hasPrefix:@"http"]) {
-      [super.bridge setValue:bundlePath forKey:@"bundleURL"];
+      [super.bridge setValue:[downloadedBundleUrl absoluteString] forKey:@"bundleURL"];
     }
     
     [super.bridge reload];
@@ -55,19 +55,31 @@ RCT_EXPORT_MODULE();
 }
 
 + (NSURL *)downloadedBundleURL {
-  NSString *documentPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
-  NSString *bundlePath = [documentPath stringByAppendingString:@"/ota/main.jsbundle"];
   BOOL isDir = NO;
-  BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:bundlePath isDirectory:&isDir];
-  if (!exists) {
-    return nil;
-  } else {
-    return [[NSURL alloc] initFileURLWithPath:bundlePath];
+
+  NSString *documentPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+  NSString *slotAActivePath = [documentPath stringByAppendingString:@"/ota/A/active"];
+  NSString *slotBActivePath = [documentPath stringByAppendingString:@"/ota/B/active"];
+  
+  BOOL slotAActiveExists = [[NSFileManager defaultManager] fileExistsAtPath:slotAActivePath isDirectory:&isDir];
+  BOOL slotBActiveExists = [[NSFileManager defaultManager] fileExistsAtPath:slotBActivePath isDirectory:&isDir];
+  
+  if (slotAActiveExists) {
+    NSString *slotABundlePath = [documentPath stringByAppendingString:@"/ota/A/main.jsbundle"];
+    return [[NSURL alloc] initFileURLWithPath:slotABundlePath];
   }
+  
+  if (slotBActiveExists) {
+    NSString *slotBBundlePath = [documentPath stringByAppendingString:@"/ota/B/main.jsbundle"];
+    return [[NSURL alloc] initFileURLWithPath:slotBBundlePath];
+  }
+  
+  return nil;
 }
 
 + (NSURL *)bundleURL {
   NSURL *downloadedBundleUrl = [self downloadedBundleURL];
+
   if (downloadedBundleUrl) {
     return downloadedBundleUrl;
   } else {
@@ -76,12 +88,21 @@ RCT_EXPORT_MODULE();
 }
 
 + (void)clearBundle {
-  NSString *documentPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
-  NSString *bundlePath = [documentPath stringByAppendingString:@"/ota/main.jsbundle"];
   BOOL isDir = NO;
-  BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:bundlePath isDirectory:&isDir];
-  if (exists) {
-    [[NSFileManager defaultManager] removeItemAtPath:bundlePath error:NULL];
+
+  NSString *documentPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+  NSString *slotABundlePath = [documentPath stringByAppendingString:@"/ota/A/main.jsbundle"];
+  NSString *slotBBundlePath = [documentPath stringByAppendingString:@"/ota/B/main.jsbundle"];
+  
+  BOOL slotABundleExists = [[NSFileManager defaultManager] fileExistsAtPath:slotABundlePath isDirectory:&isDir];
+  BOOL slotBBundleExists = [[NSFileManager defaultManager] fileExistsAtPath:slotBBundlePath isDirectory:&isDir];
+  
+  if (slotABundleExists) {
+    [[NSFileManager defaultManager] removeItemAtPath:slotABundlePath error:NULL];
+  }
+  
+  if (slotBBundleExists) {
+    [[NSFileManager defaultManager] removeItemAtPath:slotBBundlePath error:NULL];
   }
 }
 
