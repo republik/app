@@ -105,8 +105,11 @@ const cookiesWrapper = WrappedComponent => (
         return
       }
 
+      console.log('ota-simple: checking for update...')
       try {
-        const versionsResult = await RNFetchBlob.fetch('GET', VERSIONS_URL, {})
+        const versionsResult = await RNFetchBlob.fetch('GET', VERSIONS_URL, {
+          'Cache-Control' : 'no-store'
+        })
 
         if (versionsResult && versionsResult.data) {
           // Save check date to disk
@@ -115,6 +118,7 @@ const cookiesWrapper = WrappedComponent => (
           const versions = JSON.parse(versionsResult.data)
           const remoteEntry = versions.find(v => v.bin === APP_VERSION)
           const shouldUpdateToBundle = await this.shouldUpdateToBundle(remoteEntry.bundle)
+          console.log('ota-simple: shouldUpdateToBundle: ', shouldUpdateToBundle)
 
           if (remoteEntry && shouldUpdateToBundle) {
             this.downloadAndExtractBundle(remoteEntry.bundle)
