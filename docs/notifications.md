@@ -1,6 +1,6 @@
 # Notifications
 
-There are a series of steps you should do to set up the project to receive push notifications
+There are a ~series of~ one step you should do to set up the project to receive push notifications
 
 ## Android
 
