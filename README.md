@@ -13,6 +13,7 @@ Most, if not all views are provided by [republik-frontend](https://github.com/or
 
 * [Messages API](docs/messages.md)
 * [Publishing](docs/publishing.md)
+* [Notifications](docs/notifications.md)
 * [Fonts](docs/fonts.md)
 
 ## Key Screens
