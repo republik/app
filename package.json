@@ -14,6 +14,7 @@
     "run-ios-production": "react-native run-ios --scheme 'orbitingapp (production)'",
     "deploy-android-alpha": "cd ./android && ENVFILE=.env.staging fastlane alpha && cd -",
     "deploy-ios-beta": "cd ./ios && fastlane ios beta && cd -",
+    "release-ota": "node scripts/ota/release",
     "translations": "gsheets --key=1KFxXKjFplXM97N9ssk55oJol0FttDfwYiR9MJSQwpqw --title=live --pretty --out src/utils/translations.json"
   },
   "lint-staged": {
@@ -43,7 +44,6 @@
     "react-apollo": "^2.1.4",
     "react-json-tree": "^0.11.0",
     "react-native": "0.55.3",
-    "react-native-code-push": "^5.3.3",
     "react-native-config": "^0.11.5",
     "react-native-cookies": "^3.3.0",
     "react-native-device-info": "^0.21.5",
@@ -52,12 +52,19 @@
     "react-native-splash-screen": "^3.0.6",
     "react-native-track-player": "^0.2.4",
     "react-native-wkwebview-reborn": "https://github.com/orbiting/react-native-wkwebview#1.24.0",
+    "react-native-zip-archive": "^2.2.6",
     "react-navigation": "^2.0.1",
+    "rn-fetch-blob": "^0.10.12",
     "subscriptions-transport-ws": "^0.9.10",
     "url-parse": "^1.4.0"
   },
   "devDependencies": {
+    "archiver": "^2.1.1",
+    "aws-sdk": "^2.286.2",
     "babel-eslint": "^8.2.3",
+    "child-process-promise": "^2.2.1",
+    "debug": "^3.1.0",
+    "dotenv": "^6.0.0",
     "eslint": "^4.17.0",
     "eslint-config-standard": "^11.0.0-beta.0",
     "eslint-config-standard-react": "^5.0.0",
@@ -69,7 +76,12 @@
     "gsheets": "^2.0.0",
     "husky": "^0.14.3",
     "inquirer": "^5.2.0",
+    "isomorphic-unfetch": "^2.1.1",
     "lint-staged": "^6.1.0",
+    "mkdirp": "^0.5.1",
+    "prompt-checkbox": "^2.2.0",
+    "prompt-confirm": "^2.0.4",
+    "react-native-cli": "^2.0.1",
     "standard": "^10.0.3"
   }
 }
