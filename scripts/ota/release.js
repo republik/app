@@ -53,13 +53,14 @@ const mkdirp = require('mkdirp')
 const Prompt = require('prompt-checkbox')
 const Confirm = require('prompt-confirm')
 const s3 = require('./lib/s3')
+const { purgeUrls } = require('./lib/keyCDN')
 
 const VERSIONS_PATH = './versions.json'
 const VERIONS_PATH_ABSOLUTE = `${__dirname}/versions.json`
 const PLATFORMS = ['ios', 'android']
 
 const getDateTime =
-  () => new Date().toISOString().slice(0, -5)//.replace(/[^\d]/g, ':')
+  () => new Date().toISOString()
 
 
 const mkdir = (path) => {
@@ -135,9 +136,7 @@ const updateVersionsFile = async (newBundleVersion) => {
     answerVersions.forEach( binVersion => {
       const versionEntry = versions.find( v => v.bin === binVersion)
       versionEntry.bundle = newBundleVersion
-      if (!!answerUrgent) {
-        versionEntry.urgent = true
-      }
+      versionEntry.urgent = !!answerUrgent
     })
     const newVersions = JSON.stringify(versions, null, 2)
     fs.writeFileSync(VERIONS_PATH_ABSOLUTE, newVersions)
@@ -160,6 +159,7 @@ const upload = async (outputPath, newBundleVersion, versionUpdated) => {
       mimeType: 'application/json',
       bucket: AWS_S3_BUCKET
     })
+    await purgeUrls([`/s3/${AWS_S3_BUCKET}/ota/versions.json`])
   }
   if (argv.upload || argv.all) {
     for(let platform of PLATFORMS) {

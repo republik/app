@@ -5,7 +5,7 @@ import firebase from 'react-native-firebase'
 import DeviceInfo from 'react-native-device-info'
 import navigator from './navigation'
 import { setUrl, upsertDevice, rollDeviceToken } from '../apollo'
-import { APP_VERSION } from '../constants'
+import { APP_VERSION, USER_AGENT } from '../constants'
 
 const TOKEN_KEY = 'notification_token'
 
@@ -60,7 +60,8 @@ const pustNotificationsWrapper = WrappedComponent => (
             os: Platform.OS,
             osVersion: Platform.Version,
             model: DeviceInfo.getModel(),
-            appVersion: APP_VERSION
+            appVersion: APP_VERSION,
+            userAgent: USER_AGENT
           }
         }})
       } catch (error) {

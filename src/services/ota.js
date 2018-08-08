@@ -17,6 +17,9 @@ const getBundleDir = (slotKey) =>
 const getSlotFile = (slotKey) =>
   `${getBundleDir(slotKey)}active`
 
+// debounce
+let running = false
+
 const cookiesWrapper = WrappedComponent => (
   class extends Component {
     componentDidMount () {
@@ -33,7 +36,7 @@ const cookiesWrapper = WrappedComponent => (
       const now = Date.now()
       const lastUpdate = await AsyncStorage.getItem(LAST_OTA_UPDATE_KEY)
 
-      return now - parseInt(lastUpdate) > UPDATE_THREASHOLD
+      return !lastUpdate || now - parseInt(lastUpdate) > UPDATE_THREASHOLD
     }
 
     shouldUpdateToBundle = async (bundleVersion) => {
@@ -42,8 +45,7 @@ const cookiesWrapper = WrappedComponent => (
       if (!localBundleDate) {
         return true
       }
-      const removeBundleDate = new Date(bundleVersion)
-      return removeBundleDate > localBundleDate
+      return new Date(bundleVersion) > localBundleDate
     }
 
     getCurrentlyFreeSlot = async () => {
@@ -59,7 +61,9 @@ const cookiesWrapper = WrappedComponent => (
         })
       await RNFetchBlob.fs.unlink(getSlotFile(free))
         .catch((error) => {
-          console.error('ota-simple: unlink error: ', error)
+          if (!error || (error && error.code !== 'EUNSPECIFIED')) {
+            console.error('ota-simple: unlink error: ', error)
+          }
         })
     }
 
@@ -89,19 +93,32 @@ const cookiesWrapper = WrappedComponent => (
     }
 
     checkForUpdates = async ({ force } = {}) => {
+      if (running) {
+        console.log('ota-simple: already running, exit')
+        return
+      }
+      running = true
       const shouldCheck = await this.shouldCheck()
-      if (!force && !shouldCheck) return
+      if (!force && !shouldCheck) {
+        console.log('ota-simple: skip checking for updates', {force, shouldCheck})
+        running = false
+        return
+      }
 
-      // Save check date to disk
-      await AsyncStorage.setItem(LAST_OTA_UPDATE_KEY, `${Date.now()}`)
-
+      console.log('ota-simple: checking for update...')
       try {
-        const versionsResult = await RNFetchBlob.fetch('GET', VERSIONS_URL, {})
+        const versionsResult = await RNFetchBlob.fetch('GET', VERSIONS_URL, {
+          'Cache-Control' : 'no-store'
+        })
 
         if (versionsResult && versionsResult.data) {
+          // Save check date to disk
+          await AsyncStorage.setItem(LAST_OTA_UPDATE_KEY, `${Date.now()}`)
+
           const versions = JSON.parse(versionsResult.data)
           const remoteEntry = versions.find(v => v.bin === APP_VERSION)
           const shouldUpdateToBundle = await this.shouldUpdateToBundle(remoteEntry.bundle)
+          console.log('ota-simple: shouldUpdateToBundle: ', shouldUpdateToBundle)
 
           if (remoteEntry && shouldUpdateToBundle) {
             this.downloadAndExtractBundle(remoteEntry.bundle)
@@ -109,8 +126,10 @@ const cookiesWrapper = WrappedComponent => (
           }
         }
       } catch (e) {
+        running = false
         console.warn(e.message)
       }
+      running = false
     }
 
     render () {
