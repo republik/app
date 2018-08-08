@@ -192,6 +192,10 @@ class Web extends Component {
         return this.props.setArticle({ variables: { article: message.payload } })
       case 'article-closed':
         return this.props.setArticle({ variables: { article: null } })
+      case 'gallery-opened':
+        return this.props.navigation.setParams({ headerVisible: false })
+      case 'gallery-closed':
+        return this.props.navigation.setParams({ headerVisible: true })
       case 'close-menu':
         return this.props.closeMenu()
       case 'show-secondary-nav':
@@ -297,11 +301,12 @@ class Web extends Component {
   }
 
   render () {
-    const { me, data, menuActive, audio, playbackState, article, setUrl } = this.props
+    const { me, data, menuActive, audio, playbackState, article, setUrl, navigation } = this.props
     const { loading, refreshing, refreshEnabled } = this.state
     const articlePath = article ? article.path : null
     const articleTitle = article ? article.title : ''
     const subheaderVisible = me && this.state.subheaderVisible
+    const headerVisible = navigation.getParam('headerVisible', true)
 
     return (
       <Fragment>
@@ -309,7 +314,7 @@ class Web extends Component {
           setUrl={setUrl}
           currentUrl={data.url}
           borderColor={article && article.color}
-          visible={subheaderVisible && !menuActive}
+          visible={subheaderVisible && !menuActive && headerVisible}
         />
         <ScrollView
           style={{ marginTop: refreshing && subheaderVisible ? Subheader.HEIGHT : 0 }}
