@@ -166,6 +166,7 @@ class WebView extends React.PureComponent {
 
     switch (message.type) {
       case 'navigation':
+        console.log('WebView onMessage', message)
         return this.onNavigationStateChange(message)
       case 'scroll':
         return this.onScrollStateChange(message)

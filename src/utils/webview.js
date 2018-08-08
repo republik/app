@@ -36,18 +36,6 @@ export const injectedJavaScriptImpl = function () {
     return back.apply(window.history)
   }
 
-  window.onload = function () {
-    updateNavState()
-  }
-
-  window.onpopstate = function () {
-    updateNavState()
-  }
-
-  window.onhashchange = function () {
-    updateNavState()
-  }
-
   // Scrolling polyfills
 
   function debounce (func, wait) {
