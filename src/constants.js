@@ -1,4 +1,4 @@
-import { Settings } from 'react-native'
+import { Settings, AsyncStorage } from 'react-native'
 import Config from 'react-native-config'
 import { handleEnv } from './utils/url'
 import DeviceInfo from 'react-native-device-info'
@@ -9,7 +9,6 @@ export const API_URL = handleEnv(Settings.get('graphql_url') || Config.API_URL)
 export const API_WS_URL = handleEnv(Settings.get('ws_url') || Config.API_WS_URL)
 export const FRONTEND_BASE_URL = handleEnv(Settings.get('application_url') || Config.FRONTEND_BASE_URL)
 export const ASSETS_SERVER_BASE_URL = handleEnv(Settings.get('assets_url') || Config.ASSETS_SERVER_BASE_URL)
-export const OTA_BASE_URL = handleEnv(Settings.get('ota_base_url') || Config.OTA_BASE_URL)
 
 // App paths
 export const HOME_PATH = `/`
@@ -39,4 +38,9 @@ export const DISCUSSIONS_URL = `${FRONTEND_BASE_URL}${DISCUSSIONS_PATH}`
 // Misc
 export const APP_VERSION = DeviceInfo.getVersion()
 const nativeUserAgent = DeviceInfo.getUserAgent()
-export const USER_AGENT = `${nativeUserAgent} RepublikApp/${APP_VERSION}`
+export let USER_AGENT = `${nativeUserAgent} RepublikApp/${APP_VERSION}`
+
+// Append bundle version to user-agent header
+AsyncStorage.getItem('BUNDLE_VERSION_KEY').then(BUNDLE_VERSION => {
+  USER_AGENT += BUNDLE_VERSION ? '/' + BUNDLE_VERSION : ''
+})

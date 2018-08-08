@@ -69,3 +69,6 @@ Pods
 .env.dev
 .env.staging
 .env.production
+
+# Fonts
+*.otf
