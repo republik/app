@@ -5,7 +5,7 @@ import DeviceInfo from 'react-native-device-info'
 import NotificationsIOS from 'react-native-notifications'
 import navigator from './navigation'
 import { setUrl, upsertDevice, rollDeviceToken } from '../apollo'
-import { APP_VERSION } from '../constants'
+import { APP_VERSION, USER_AGENT } from '../constants'
 
 const pustNotificationsWrapper = WrappedComponent => (
   class extends Component {
@@ -36,7 +36,8 @@ const pustNotificationsWrapper = WrappedComponent => (
           os: Platform.OS,
           osVersion: Platform.Version,
           model: DeviceInfo.getModel(),
-          appVersion: APP_VERSION
+          appVersion: APP_VERSION,
+          userAgent: USER_AGENT
         }
       }})
     }

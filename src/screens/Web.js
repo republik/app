@@ -103,6 +103,7 @@ class Web extends Component {
       }
 
       this.goToLoginIfPendingRequest()
+      this.props.screenProps.checkForUpdates()
     }
   }
 
