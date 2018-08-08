@@ -23,11 +23,6 @@ let running = false
 const cookiesWrapper = WrappedComponent => (
   class extends Component {
     componentDidMount () {
-      if (!OTA_BASE_URL) {
-        console.warn('ota-simple missing baseUrl. cannot update.')
-        return
-      }
-
       // Force update everytime the app is started
       this.checkForUpdates({ force: true })
     }
@@ -93,6 +88,10 @@ const cookiesWrapper = WrappedComponent => (
     }
 
     checkForUpdates = async ({ force } = {}) => {
+      if (!OTA_BASE_URL) {
+        console.warn("ota-simple: missing OTA_BASE_URL can't check for updates")
+        return
+      }
       if (running) {
         console.log('ota-simple: already running, exit')
         return
