@@ -60,7 +60,7 @@ const VERIONS_PATH_ABSOLUTE = `${__dirname}/versions.json`
 const PLATFORMS = ['ios', 'android']
 
 const getDateTime =
-  () => new Date().toISOString().slice(0, -5)//.replace(/[^\d]/g, ':')
+  () => new Date().toISOString()
 
 
 const mkdir = (path) => {
