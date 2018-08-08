@@ -76,6 +76,25 @@ Triggered from the frontend every time a user leaves from an article's page
 | ------------- |:-------------:| -----:|
 | type      | Message type | article-closed |
 
+
+### gallery-opened
+
+Triggered from the frontend every time the gallery is opened
+
+| Key        | Description           | Value  |
+| ------------- |:-------------:| -----:|
+| type      | Message type | gellery-opened |
+
+> This is used to get proper data to show in native nabvar
+
+### gallery-closed
+
+Triggered from the frontend every time the gallery is closed
+
+| Key        | Description           | Value  |
+| ------------- |:-------------:| -----:|
+| type      | Message type | gallery-closed |
+
 ### close-menu
 
 Triggered from the frontend to inform that the menu popover was closed
