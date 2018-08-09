@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react'
-import { StyleSheet, Linking, ScrollView, RefreshControl, AppState, NetInfo, Platform, Share } from 'react-native'
+import { StyleSheet, Linking, ScrollView, RefreshControl, AppState, NetInfo, Platform, Share, StatusBar } from 'react-native'
 import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'
 import debounce from 'lodash.debounce'
@@ -330,6 +330,7 @@ class Web extends Component {
 
     return (
       <Fragment>
+        <StatusBar hidden={!headerVisible} />
         <Subheader
           setUrl={setUrl}
           currentUrl={data.url}
