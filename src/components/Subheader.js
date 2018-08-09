@@ -55,7 +55,7 @@ class Subheader extends React.Component {
   }
 
   render () {
-    const { currentUrl, visible, setUrl, borderColor } = this.props
+    const { currentUrl, visible, setUrl, borderColor, style, pointerEvents } = this.props
 
     const url = parseURL(currentUrl)
 
@@ -69,8 +69,8 @@ class Subheader extends React.Component {
 
     return (
       <Animated.View
-        pointerEvents={visible ? 'auto' : 'none'}
-        style={[styles.container, { height, borderBottomColor, borderBottomWidth }, { top: this.top }]}
+        pointerEvents={pointerEvents || (visible ? 'auto' : 'none')}
+        style={[style, styles.container, { height, borderBottomColor, borderBottomWidth }, { top: this.top }]}
       >
         <TouchableOpacity
           style={styles.item}
