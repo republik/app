@@ -24,6 +24,9 @@ import {
   withCurrentArticle,
   enableSecondaryMenu
 } from '../apollo'
+import mkDebug from '../utils/debug'
+
+const debug = mkDebug('Web')
 
 const RELOAD_OFFSET_HEIGHT = 5
 const RELOAD_TIME_THRESHOLD = 60 * 60 * 1000 // 1hr
@@ -241,6 +244,8 @@ class Web extends Component {
     const { me, login } = this.props
     const { definitions } = query
     const operations = definitions.map(definition => definition.name && definition.name.value)
+
+    debug('onNetwork', operations, Object.keys(data.data).map(key => [key, !!data.data[key]]))
 
     if (operations.includes('signOut')) {
       await this.logoutUser()
