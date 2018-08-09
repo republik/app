@@ -335,7 +335,9 @@ class Web extends Component {
           setUrl={setUrl}
           currentUrl={data.url}
           borderColor={article && article.color}
-          visible={subheaderVisible && !menuActive && headerVisible}
+          visible={subheaderVisible && !menuActive}
+          style={!headerVisible && { opacity: 0 }}
+          pointerEvents={!headerVisible ? 'none' : null}
         />
         <ScrollView
           style={{ marginTop: refreshing && subheaderVisible ? Subheader.HEIGHT : 0 }}
