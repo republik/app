@@ -27,7 +27,7 @@ const Router = createStackNavigator({
 
     return {
       headerTintColor: '#000000',
-      headerStyle: { backgroundColor: '#FF0000' },
+      headerStyle: { backgroundColor: '#FFFFFF' },
       header: headerVisible ? undefined : null
     }
   }
