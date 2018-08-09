@@ -7,7 +7,7 @@ import AndroidWebView from './AndroidWebView'
 import { parseURL } from '../utils/url'
 import { injectedJavaScript } from '../utils/webview'
 import { link } from '../apollo'
-import { FEED_PATH, USER_AGENT } from '../constants'
+import { FRONTEND_BASE_URL, FEED_PATH, USER_AGENT } from '../constants'
 import withT from '../utils/withT'
 
 const NativeWebView = Platform.select({
@@ -126,6 +126,7 @@ class WebView extends React.PureComponent {
   // Native onNavigationStateChange method shim.
   // We call onNavigationStateChange either when the native calls, or onMessage
   onNavigationStateChange = ({ url, canGoBack }) => {
+    const { host } = parseURL(url)
     const { onNavigationStateChange } = this.props
 
     this.webview.canGoBack = this.webview.canGoBack || canGoBack
@@ -138,7 +139,12 @@ class WebView extends React.PureComponent {
 
         if (!shouldFollowRedirect) {
           this.webview.ref.stopLoading()
-          this.webview.ref.goBack()
+
+          // Only force back when navigating inside Republik's page
+          console.log(host, FRONTEND_BASE_URL);
+          if (host === parseURL(FRONTEND_BASE_URL).host) {
+            this.webview.ref.goBack()
+          }
           return false
         }
       }
