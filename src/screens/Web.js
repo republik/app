@@ -66,6 +66,9 @@ class Web extends Component {
   componentDidMount () {
     AppState.addEventListener('change', this.handleAppStateChange)
 
+    // Subheader starts open
+    WEBVIEW_INSTANCE.postMessage({ type: 'subheader-opened' })
+
     this.goToLoginIfPendingRequest()
   }
 
@@ -118,9 +121,14 @@ class Web extends Component {
     this.setState({ loading: value })
   }, 150)
 
-  enableSecondaryMenuState = debounce(value => {
+  setSecondaryMenuState = debounce(value => {
     this.props.enableSecondaryMenu({ variables: { open: value } })
   }, 150)
+
+  setSubHeaderState = ({ visible, ...other }, fn) => {
+    this.setState({ subheaderVisible: visible, ...other }, fn)
+    WEBVIEW_INSTANCE.postMessage({ type: visible ? 'subheader-opened' : 'subheader-closed' })
+  }
 
   onNavigationStateChange = (data) => {
     const url = parseURL(data.url)
@@ -138,8 +146,8 @@ class Web extends Component {
     }
 
     this.props.closeMenu()
-    this.enableSecondaryMenuState(false)
-    this.setState({ subheaderVisible: true })
+    this.setSecondaryMenuState(false)
+    this.setSubHeaderState({ visible: true })
     this.props.setUrl({ variables: { url: data.url } })
     this.reloadIfNeccesary()
 
@@ -199,9 +207,9 @@ class Web extends Component {
       case 'close-menu':
         return this.props.closeMenu()
       case 'show-secondary-nav':
-        return this.enableSecondaryMenuState(true)
+        return this.setSecondaryMenuState(true)
       case 'hide-secondary-nav':
-        return this.enableSecondaryMenuState(false)
+        return this.setSecondaryMenuState(false)
       default:
         console.log(message)
         console.warn(`Unhandled message of type: ${message.type}`)
@@ -276,16 +284,16 @@ class Web extends Component {
   onWebViewScroll = ({ y }) => {
     const positiveYScroll = Math.max(y, 0)
 
-    this.setState({
+    this.setSubHeaderState({
       refreshEnabled: positiveYScroll < RELOAD_OFFSET_HEIGHT,
-      subheaderVisible: positiveYScroll <= 45 || positiveYScroll < this.lastScrollY
+      visible: positiveYScroll <= 45 || positiveYScroll < this.lastScrollY
     }, () => {
       this.lastScrollY = positiveYScroll
     })
   }
 
   loginUser = async (user, { reload = true } = {}) => {
-    this.setState({ subheaderVisible: true }, async () => {
+    this.setSubHeaderState({ visible: true }, async () => {
       await this.props.login({ variables: { user } })
 
       // Force webview reload to update request cookies on iOS
