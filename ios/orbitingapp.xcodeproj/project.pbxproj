@@ -1395,7 +1395,7 @@
 				CODE_SIGN_ENTITLEMENTS = orbitingapp/orbitingapp.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 23;
+				CURRENT_PROJECT_VERSION = 24;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = 7MQXM58QM7;
 				HEADER_SEARCH_PATHS = (
@@ -1441,7 +1441,7 @@
 				CODE_SIGN_ENTITLEMENTS = orbitingapp/orbitingapp.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 23;
+				CURRENT_PROJECT_VERSION = 24;
 				DEVELOPMENT_TEAM = 7MQXM58QM7;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
