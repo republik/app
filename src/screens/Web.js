@@ -278,7 +278,7 @@ class Web extends Component {
 
     this.setState({
       refreshEnabled: positiveYScroll < RELOAD_OFFSET_HEIGHT,
-      subheaderVisible: positiveYScroll === 0 || positiveYScroll < this.lastScrollY
+      subheaderVisible: positiveYScroll <= 45 || positiveYScroll < this.lastScrollY
     }, () => {
       this.lastScrollY = positiveYScroll
     })
