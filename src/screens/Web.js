@@ -129,8 +129,11 @@ class Web extends Component {
   }, 150)
 
   setSubHeaderState = ({ visible, ...other }, fn) => {
+    if (this.state.subheaderVisible !== visible) {
+      WEBVIEW_INSTANCE.postMessage({ type: visible ? 'subheader-opened' : 'subheader-closed' })
+    }
+
     this.setState({ subheaderVisible: visible, ...other }, fn)
-    WEBVIEW_INSTANCE.postMessage({ type: visible ? 'subheader-opened' : 'subheader-closed' })
   }
 
   onNavigationStateChange = (data) => {
