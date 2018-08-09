@@ -141,6 +141,7 @@ class Web extends Component {
     this.enableSecondaryMenuState(false)
     this.setState({ subheaderVisible: true })
     this.props.setUrl({ variables: { url: data.url } })
+    this.props.navigation.setParams({ headerVisible: true })
     this.reloadIfNeccesary()
 
     return true
