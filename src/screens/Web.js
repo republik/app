@@ -223,6 +223,7 @@ class Web extends Component {
   loadInitialState = (payload) => {
     const { me } = this.props
 
+    debug('loadInitialState', 'props.me', !!me, 'payload.me', !!payload.me)
     if (payload.me && !me) {
       return this.loginUser(payload.me, { reload: false })
     }
@@ -299,6 +300,7 @@ class Web extends Component {
   }
 
   loginUser = async (user, { reload = true } = {}) => {
+    debug('loginUser', user.email, { reload })
     this.setSubHeaderState({ visible: true }, async () => {
       await this.props.login({ variables: { user } })
 
@@ -310,6 +312,7 @@ class Web extends Component {
   }
 
   logoutUser = async ({ reload = true } = {}) => {
+    debug('logoutUser', { reload })
     await this.props.logout()
     if (reload && Platform.OS === 'ios') WEBVIEW_INSTANCE.reload()
   }
