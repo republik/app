@@ -228,7 +228,7 @@ class Web extends Component {
 
     debug('loadInitialState', 'props.me', !!me, 'payload.me', !!payload.me)
     if (payload.me && !me) {
-      return this.loginUser(payload.me, { reload: false })
+      return this.loginUser(payload.me, { reload: true })
     }
 
     if (!payload.me && me) {
