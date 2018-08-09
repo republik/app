@@ -9,6 +9,10 @@ import { injectedJavaScript } from '../utils/webview'
 import { link } from '../apollo'
 import { FRONTEND_BASE_URL, FEED_PATH, USER_AGENT } from '../constants'
 import withT from '../utils/withT'
+import mkDebug from '../utils/debug'
+import Config from 'react-native-config'
+
+const debug = mkDebug('WebView')
 
 const NativeWebView = Platform.select({
   ios: IOSWebView,
@@ -107,6 +111,7 @@ class WebView extends React.PureComponent {
   }
 
   postMessage = message => {
+    debug('postMessage', message.type, message.url || message.id)
     this.webview.ref.postMessage(JSON.stringify(message))
   }
 
@@ -172,18 +177,32 @@ class WebView extends React.PureComponent {
 
     switch (message.type) {
       case 'navigation':
+        debug('onMessage', message.type, message.url)
         return this.onNavigationStateChange(message)
       case 'scroll':
+        debug('onMessage', message.type, message.payload.y)
         return this.onScrollStateChange(message)
       case 'graphql':
+        debug('onMessage', message.type, message.id)
         return this.handleGraphQLRequest(message)
       case 'start':
       case 'stop':
+        debug('onMessage', message.type, message.id)
         return this.handleGraphQLSubscription(message)
       case 'log':
         console.log('Webview >>>', message.data)
         break
       default:
+        if (Config.ENV === 'development') {
+          const payload = JSON.stringify(message.payload)
+          debug(
+            'onMessage', 
+            message.type,
+            payload && payload.length > 80
+              ? payload.slice(0, 80) + '...'
+              : payload
+          )
+        }
         onMessage && onMessage(message)
     }
   }
