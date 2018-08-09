@@ -296,7 +296,7 @@ class Web extends Component {
 
     this.setSubHeaderState({
       refreshEnabled: positiveYScroll < RELOAD_OFFSET_HEIGHT,
-      visible: positiveYScroll <= 45 || positiveYScroll < this.lastScrollY
+      visible: positiveYScroll <= Subheader.HEIGHT || positiveYScroll < this.lastScrollY
     }, () => {
       this.lastScrollY = positiveYScroll
     })
@@ -331,12 +331,12 @@ class Web extends Component {
     return (
       <Fragment>
         <StatusBar hidden={!headerVisible} />
-        <Subheader
+        {/* <Subheader
           setUrl={setUrl}
           currentUrl={data.url}
           borderColor={article && article.color}
           visible={subheaderVisible && !menuActive && headerVisible}
-        />
+        /> */}
         <ScrollView
           style={{ marginTop: refreshing && subheaderVisible ? Subheader.HEIGHT : 0 }}
           contentContainerStyle={styles.container}
