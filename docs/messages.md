@@ -83,7 +83,7 @@ Triggered from the frontend every time the gallery is opened
 
 | Key        | Description           | Value  |
 | ------------- |:-------------:| -----:|
-| type      | Message type | gellery-opened |
+| type      | Message type | gallery-opened |
 
 > This is used to get proper data to show in native nabvar
 
