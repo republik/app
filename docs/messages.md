@@ -173,6 +173,22 @@ Triggered from the app to tell frontend he should close secondary menu popover
 | ------------- |:-------------:| -----:|
 | type      | Message type | close-secondary-menu |
 
+### subheader-opened
+
+Triggered from the app to tell frontend the subheader was opened
+
+| Key        | Description           | Value  |
+| ------------- |:-------------:| -----:|
+| type      | Message type | subheader-opened |
+
+### subheader-closed
+
+Triggered from the app to tell frontend the subheader was closed
+
+| Key        | Description           | Value  |
+| ------------- |:-------------:| -----:|
+| type      | Message type | subheader-closed |
+
 ### scroll-to-top
 
 Scrolls to the top of the WebView's page
