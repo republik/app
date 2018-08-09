@@ -141,7 +141,6 @@ class WebView extends React.PureComponent {
           this.webview.ref.stopLoading()
 
           // Only force back when navigating inside Republik's page
-          console.log(host, FRONTEND_BASE_URL);
           if (host === parseURL(FRONTEND_BASE_URL).host) {
             this.webview.ref.goBack()
           }
