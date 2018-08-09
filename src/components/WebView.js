@@ -183,7 +183,7 @@ class WebView extends React.PureComponent {
         debug('onMessage', message.type, message.payload.y)
         return this.onScrollStateChange(message)
       case 'graphql':
-        debug('onMessage', message.type, message.id)
+        debug('onMessage', message.type, message.data.id)
         return this.handleGraphQLRequest(message)
       case 'start':
       case 'stop':

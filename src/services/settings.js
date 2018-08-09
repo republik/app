@@ -3,6 +3,9 @@ import { AsyncStorage } from 'react-native'
 import { compose } from 'react-apollo'
 import { withCurrentUrl, logout } from '../apollo'
 import { FRONTEND_BASE_URL } from '../constants'
+import mkDebug from '../utils/debug'
+
+const debug = mkDebug('settings')
 
 const settingsWrapper = WrappedComponent => (
   class extends Component {
@@ -14,6 +17,7 @@ const settingsWrapper = WrappedComponent => (
         previousApplicationPreference &&
         applicationPreference !== previousApplicationPreference
       ) {
+        debug('logout because of new app perference')
         this.props.logout()
       }
 
