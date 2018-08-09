@@ -331,12 +331,12 @@ class Web extends Component {
     return (
       <Fragment>
         <StatusBar hidden={!headerVisible} />
-        {/* <Subheader
+        <Subheader
           setUrl={setUrl}
           currentUrl={data.url}
           borderColor={article && article.color}
           visible={subheaderVisible && !menuActive && headerVisible}
-        /> */}
+        />
         <ScrollView
           style={{ marginTop: refreshing && subheaderVisible ? Subheader.HEIGHT : 0 }}
           contentContainerStyle={styles.container}
