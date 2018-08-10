@@ -72,6 +72,7 @@
         jsCodeLocation = [OTA bundleURL];
     #endif
 
+  NSLog(@"jsCodeLocation: %@", jsCodeLocation);
   RCTRootView *rootView = [[RCTRootView alloc] initWithBundleURL:jsCodeLocation
                                                       moduleName:@"orbitingapp"
                                                initialProperties:nil
