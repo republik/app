@@ -1,11 +1,16 @@
 /* eslint-disable no-undef */
 
 export const injectedJavaScriptImpl = function () {
+  // Set to body the background color of ios native app
+  // See https://github.com/orbiting/app/issues/136 for more details
+  document.body.style.backgroundColor = '#e9e9ef'
+  document.body.style.marginTop = '45px'
+  document.getElementById('__next').style.backgroundColor = '#fff'
+
   // Navigation polyfills
   // Injected code to spy on browser's navigation history
   // Native WebView onNavigationStateChange does not recognize SPA page transitions,
   // so we inject code that enables to spy on changes, sending messages.
-
   var pushState = window.history.pushState
   var replaceState = window.history.replaceState
   var back = window.history.back

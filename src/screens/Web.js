@@ -296,7 +296,7 @@ class Web extends Component {
 
     this.setSubHeaderState({
       refreshEnabled: positiveYScroll < RELOAD_OFFSET_HEIGHT,
-      visible: positiveYScroll <= 45 || positiveYScroll < this.lastScrollY
+      visible: positiveYScroll <= Subheader.HEIGHT || positiveYScroll < this.lastScrollY
     }, () => {
       this.lastScrollY = positiveYScroll
     })
