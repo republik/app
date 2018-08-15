@@ -358,7 +358,6 @@ class Web extends Component {
             onLoadEnd={this.onLoadEnd}
             onLoadStart={this.onLoadStart}
             onScroll={this.onWebViewScroll}
-            webViewWillTransition={this.webViewWillTransition}
             onNavigationStateChange={this.onNavigationStateChange}
             loading={{ status: loading || refreshing, showSpinner: !refreshing }}
             ref={node => { WEBVIEW_INSTANCE = node }}
