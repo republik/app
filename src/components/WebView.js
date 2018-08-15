@@ -261,7 +261,7 @@ class WebView extends React.PureComponent {
 
   render () {
     const { currentUrl } = this.state
-    const { loading, onLoadEnd, onLoadStart, webViewWillTransition, onFileChooserOpen } = this.props
+    const { loading, onLoadEnd, onLoadStart, onFileChooserOpen } = this.props
 
     return (
       <Fragment>
@@ -277,7 +277,6 @@ class WebView extends React.PureComponent {
           injectedJavaScript={injectedJavaScript}
           onLoadEnd={onLoadEnd}
           onLoadStart={onLoadStart}
-          webViewWillTransition={webViewWillTransition}
           onFileChooserOpen={onFileChooserOpen}
           allowsBackForwardNavigationGestures
           scalesPageToFit={false}
