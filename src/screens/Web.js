@@ -7,7 +7,7 @@ import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'
 import debounce from 'lodash.debounce'
 import { parseURL } from '../utils/url'
-import Header, { HEADER_HEIGHT } from '../components/Header'
+import Header, { headerStyle } from '../components/Header'
 import NavBar from '../components/NavBar'
 import WebView from '../components/WebView'
 import AudioPlayer from '../components/AudioPlayer'
@@ -381,10 +381,7 @@ class Web extends Component {
 }
 
 Web.navigationOptions = ({ screenProps }) => ({
-  headerStyle: {
-    backgroundColor: '#FFFFFF',
-    height: HEADER_HEIGHT
-  },
+  headerStyle,
   headerTitle: (
     <Header
       {...screenProps}
