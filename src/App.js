@@ -11,6 +11,7 @@ import deepLinking from './services/deepLinking'
 import ota from './services/ota'
 import pushNotifications from './services/pushNotifications'
 import withApollo from './apollo'
+import { HEADER_HEIGHT } from './components/Header'
 
 const Router = createStackNavigator({
   Web: { screen: Web },
@@ -27,7 +28,10 @@ const Router = createStackNavigator({
 
     return {
       headerTintColor: '#000000',
-      headerStyle: { backgroundColor: '#FFFFFF' },
+      headerStyle: {
+        backgroundColor: '#FFFFFF',
+        height: HEADER_HEIGHT
+      },
       header: headerVisible ? undefined : null
     }
   }

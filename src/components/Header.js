@@ -19,6 +19,8 @@ import {
   toggleSecondaryMenu
 } from '../apollo'
 
+export const HEADER_HEIGHT = 45
+
 const styles = StyleSheet.create({
   container: {
     zIndex: 150,

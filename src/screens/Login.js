@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { StyleSheet, Image, View } from 'react-native'
 import WebView from '../components/WebView'
+import SafeAreaView from '../components/SafeAreaView'
+import { HEADER_HEIGHT } from '../components/Header'
 import navigator from '../services/navigation'
 import Logo from '../assets/images/logo-title.png'
 import { parseURL, handleEnv } from '../utils/url'
@@ -41,14 +43,16 @@ class Login extends Component {
     const uri = handleEnv(this.props.navigation.getParam('url'))
 
     return (
-      <WebView
-        source={{ uri }}
-        onMessage={this.onMessage}
-        style={styles.container}
-        onNavigationStateChange={this.onNavigationStateChange}
-        ref={node => { this.webview = node }}
-        forceRedirect
-      />
+      <SafeAreaView>
+        <WebView
+          source={{ uri }}
+          onMessage={this.onMessage}
+          style={styles.container}
+          onNavigationStateChange={this.onNavigationStateChange}
+          ref={node => { this.webview = node }}
+          forceRedirect
+        />
+      </SafeAreaView>
     )
   }
 }
@@ -56,7 +60,10 @@ class Login extends Component {
 Login.navigationOptions = ({ screenProps }) => ({
   headerTitle: <LoginHeader />,
   headerRight: <View />,
-  headerStyle: { backgroundColor: '#FFFFFF' }
+  headerStyle: {
+    backgroundColor: '#FFFFFF',
+    height: HEADER_HEIGHT
+  }
 })
 
 var styles = StyleSheet.create({
