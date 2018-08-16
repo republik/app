@@ -1,13 +1,17 @@
 import React, { Component, Fragment } from 'react'
-import { StyleSheet, Linking, ScrollView, RefreshControl, AppState, NetInfo, Platform, Share, StatusBar } from 'react-native'
+import {
+  StyleSheet, Linking, ScrollView, RefreshControl, AppState, NetInfo, Platform, Share,
+  StatusBar, Dimensions
+} from 'react-native'
 import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'
 import debounce from 'lodash.debounce'
 import { parseURL } from '../utils/url'
-import Header from '../components/Header'
+import Header, { HEADER_HEIGHT } from '../components/Header'
 import NavBar from '../components/NavBar'
 import WebView from '../components/WebView'
 import AudioPlayer from '../components/AudioPlayer'
+import SafeAreaView from '../components/SafeAreaView'
 import navigator from '../services/navigation'
 import { FRONTEND_BASE_URL, OFFERS_PATH, LOGIN_PATH } from '../constants'
 import {
@@ -330,7 +334,6 @@ class Web extends Component {
 
     return (
       <Fragment>
-        <StatusBar hidden={!headerVisible} />
         <NavBar
           setUrl={setUrl}
           currentUrl={data.url}
@@ -339,44 +342,49 @@ class Web extends Component {
           style={!headerVisible && { opacity: 0 }}
           pointerEvents={!headerVisible ? 'none' : null}
         />
-        <ScrollView
-          style={{ marginTop: refreshing && navBarVisible ? NavBar.HEIGHT : 0 }}
-          contentContainerStyle={styles.container}
-          scrollEnabled={!refreshing}
-          refreshControl={
-            <RefreshControl
-              onRefresh={this.onRefresh}
-              refreshing={this.state.refreshing}
-              enabled={refreshEnabled}
+        <SafeAreaView fullscreen={!headerVisible}>
+          <ScrollView
+            style={{ marginTop: refreshing && navBarVisible ? NavBar.HEIGHT : 0 }}
+            contentContainerStyle={styles.container}
+            scrollEnabled={!refreshing}
+            refreshControl={
+              <RefreshControl
+                onRefresh={this.onRefresh}
+                refreshing={this.state.refreshing}
+                enabled={refreshEnabled}
+              />
+            }
+          >
+            <WebView
+              source={{ uri: data.url }}
+              onNetwork={this.onNetwork}
+              onMessage={this.onMessage}
+              onLoadEnd={this.onLoadEnd}
+              onLoadStart={this.onLoadStart}
+              onScroll={this.onWebViewScroll}
+              onNavigationStateChange={this.onNavigationStateChange}
+              loading={{ status: loading || refreshing, showSpinner: !refreshing }}
+              ref={node => { WEBVIEW_INSTANCE = node }}
             />
-          }
-        >
-          <WebView
-            source={{ uri: data.url }}
-            onNetwork={this.onNetwork}
-            onMessage={this.onMessage}
-            onLoadEnd={this.onLoadEnd}
-            onLoadStart={this.onLoadStart}
-            onScroll={this.onWebViewScroll}
-            onNavigationStateChange={this.onNavigationStateChange}
-            loading={{ status: loading || refreshing, showSpinner: !refreshing }}
-            ref={node => { WEBVIEW_INSTANCE = node }}
+          </ScrollView>
+          <AudioPlayer
+            url={audio}
+            setUrl={setUrl}
+            title={articleTitle}
+            articlePath={articlePath}
+            playbackState={playbackState}
           />
-        </ScrollView>
-        <AudioPlayer
-          url={audio}
-          setUrl={setUrl}
-          title={articleTitle}
-          articlePath={articlePath}
-          playbackState={playbackState}
-        />
+        </SafeAreaView>
       </Fragment>
     )
   }
 }
 
 Web.navigationOptions = ({ screenProps }) => ({
-  headerStyle: { backgroundColor: '#FFFFFF' },
+  headerStyle: {
+    backgroundColor: '#FFFFFF',
+    height: HEADER_HEIGHT
+  },
   headerTitle: (
     <Header
       {...screenProps}

@@ -19,7 +19,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   text: {
-    fontSize: 16,
+    fontSize: 15,
     color: '#B7C1BD',
     fontFamily: 'GT America'
   },
@@ -30,16 +30,16 @@ const styles = StyleSheet.create({
 
 const DURATION = 300
 const BORDER_HEIGHT = 3
-const HEADER_HEIGHT = 45
+const NAV_BAR_HEIGHT = 36
 
 class NavBar extends React.Component {
-  static HEIGHT = HEADER_HEIGHT
+  static HEIGHT = NAV_BAR_HEIGHT
 
   constructor (props) {
     super(props)
 
     this.animating = false
-    this.top = new Animated.Value(props.active ? 0 : -HEADER_HEIGHT)
+    this.top = new Animated.Value(props.active ? 0 : -NAV_BAR_HEIGHT)
   }
 
   componentWillReceiveProps (newProps) {
@@ -48,7 +48,7 @@ class NavBar extends React.Component {
 
       const animation = newProps.visible
         ? Animated.timing(this.top, { toValue: 0, duration: DURATION })
-        : Animated.timing(this.top, { toValue: -HEADER_HEIGHT, duration: DURATION })
+        : Animated.timing(this.top, { toValue: -NAV_BAR_HEIGHT, duration: DURATION })
 
       animation.start(() => { this.animating = false })
     }
@@ -63,7 +63,7 @@ class NavBar extends React.Component {
     const feedActive = url.path === FEED_PATH
     const formatsActive = url.path === FORMATS_PATH
     const noLinksActive = (!pathActive && !feedActive && !formatsActive)
-    const height = borderColor ? HEADER_HEIGHT + BORDER_HEIGHT : HEADER_HEIGHT
+    const height = borderColor ? NAV_BAR_HEIGHT + BORDER_HEIGHT : NAV_BAR_HEIGHT
     const borderBottomWidth = borderColor ? BORDER_HEIGHT : 1
     const borderBottomColor = borderColor || '#DADDDC'
 
