@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { StyleSheet, Image, View } from 'react-native'
 import WebView from '../components/WebView'
 import SafeAreaView from '../components/SafeAreaView'
-import { HEADER_HEIGHT } from '../components/Header'
+import { headerStyle } from '../components/Header'
 import navigator from '../services/navigation'
 import Logo from '../assets/images/logo-title.png'
 import { parseURL, handleEnv } from '../utils/url'
@@ -60,10 +60,7 @@ class Login extends Component {
 Login.navigationOptions = ({ screenProps }) => ({
   headerTitle: <LoginHeader />,
   headerRight: <View />,
-  headerStyle: {
-    backgroundColor: '#FFFFFF',
-    height: HEADER_HEIGHT
-  }
+  headerStyle
 })
 
 var styles = StyleSheet.create({
