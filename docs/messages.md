@@ -76,7 +76,6 @@ Triggered from the frontend every time a user leaves from an article's page
 | ------------- |:-------------:| -----:|
 | type      | Message type | article-closed |
 
-
 ### gallery-opened
 
 Triggered from the frontend every time the gallery is opened
@@ -84,8 +83,6 @@ Triggered from the frontend every time the gallery is opened
 | Key        | Description           | Value  |
 | ------------- |:-------------:| -----:|
 | type      | Message type | gallery-opened |
-
-> This is used to get proper data to show in native nabvar
 
 ### gallery-closed
 
@@ -173,21 +170,21 @@ Triggered from the app to tell frontend he should close secondary menu popover
 | ------------- |:-------------:| -----:|
 | type      | Message type | close-secondary-menu |
 
-### subheader-opened
+### nav-bar-opened
 
-Triggered from the app to tell frontend the subheader was opened
-
-| Key        | Description           | Value  |
-| ------------- |:-------------:| -----:|
-| type      | Message type | subheader-opened |
-
-### subheader-closed
-
-Triggered from the app to tell frontend the subheader was closed
+Triggered from the app to tell frontend the nav bar was opened
 
 | Key        | Description           | Value  |
 | ------------- |:-------------:| -----:|
-| type      | Message type | subheader-closed |
+| type      | Message type | nav-bar-opened |
+
+### nav-bar-closed
+
+Triggered from the app to tell frontend the nav bar was closed
+
+| Key        | Description           | Value  |
+| ------------- |:-------------:| -----:|
+| type      | Message type | nav-bar-closed |
 
 ### scroll-to-top
 
