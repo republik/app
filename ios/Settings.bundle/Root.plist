@@ -2,76 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>Title</key>
-	<string></string>
 	<key>StringsTable</key>
 	<string>Root</string>
 	<key>PreferenceSpecifiers</key>
 	<array>
-		<dict>
-			<key>Type</key>
-			<string>PSTextFieldSpecifier</string>
-			<key>Title</key>
-			<string>Application URL</string>
-			<key>Key</key>
-			<string>application_url</string>
-			<key>KeyboardType</key>
-			<string>URL</string>
-			<key>DefaultValue</key>
-			<string></string>
-			<key>AutocapitalizationType</key>
-			<string>None</string>
-			<key>IsSecure</key>
-			<false/>
-		</dict>
-		<dict>
-			<key>Type</key>
-			<string>PSTextFieldSpecifier</string>
-			<key>Title</key>
-			<string>GraphQL URL</string>
-			<key>Key</key>
-			<string>graphql_url</string>
-			<key>KeyboardType</key>
-			<string>URL</string>
-			<key>DefaultValue</key>
-			<string></string>
-			<key>AutocapitalizationType</key>
-			<string>None</string>
-		</dict>
-		<dict>
-			<key>Type</key>
-			<string>PSTextFieldSpecifier</string>
-			<key>Title</key>
-			<string>WS URL</string>
-			<key>Key</key>
-			<string>ws_url</string>
-			<key>KeyboardType</key>
-			<string>URL</string>
-			<key>DefaultValue</key>
-			<string></string>
-			<key>AutocapitalizationType</key>
-			<string>None</string>
-		</dict>
-		<dict>
-			<key>Type</key>
-			<string>PSTextFieldSpecifier</string>
-			<key>Title</key>
-			<string>Assets URL</string>
-			<key>Key</key>
-			<string>assets_url</string>
-			<key>KeyboardType</key>
-			<string>URL</string>
-			<key>DefaultValue</key>
-			<string></string>
-			<key>AutocapitalizationType</key>
-			<string>None</string>
-		</dict>
-		<dict>
-			<key>Type</key>
-			<string>PSGroupSpecifier</string>
-			<key>Title</key>
-			<string>APP INFO</string>
-		</dict>
 		<dict>
 			<key>Type</key>
 			<string>PSTitleValueSpecifier</string>
@@ -108,32 +42,16 @@
 			<key>Title</key>
 			<string>Updates</string>
 		</dict>
-        <dict>
-            <key>Type</key>
-            <string>PSToggleSwitchSpecifier</string>
-            <key>Title</key>
-            <string>Clear OTA bundle</string>
-            <key>Key</key>
-            <string>clear_ota</string>
-            <key>DefaultValue</key>
-            <false/>
-        </dict>
-		<dict>
-			<key>Type</key>
-			<string>PSGroupSpecifier</string>
-			<key>Title</key>
-			<string></string>
-		</dict>
-		<dict>
-			<key>Type</key>
-			<string>PSTitleValueSpecifier</string>
-			<key>Title</key>
-			<string>Teapot</string>
-			<key>Key</key>
-			<string>teapot</string>
-			<key>DefaultValue</key>
-			<string>☕️</string>
-		</dict>
+    <dict>
+      <key>Type</key>
+      <string>PSToggleSwitchSpecifier</string>
+      <key>Title</key>
+      <string>Reset</string>
+      <key>Key</key>
+      <string>clear_ota</string>
+      <key>DefaultValue</key>
+      <false/>
+    </dict>
 	</array>
 </dict>
 </plist>
