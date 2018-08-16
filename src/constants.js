@@ -1,15 +1,14 @@
-import { Settings, AsyncStorage } from 'react-native'
+import { AsyncStorage } from 'react-native'
 import Config from 'react-native-config'
 import { handleEnv } from './utils/url'
 import DeviceInfo from 'react-native-device-info'
 
 // Base urls
-export const ENV = Settings.get('environment_preference') || Config.ENV
-export const API_URL = handleEnv(Settings.get('graphql_url') || Config.API_URL)
-export const API_WS_URL = handleEnv(Settings.get('ws_url') || Config.API_WS_URL)
-export const FRONTEND_BASE_URL = handleEnv(Settings.get('application_url') || Config.FRONTEND_BASE_URL)
-export const ASSETS_SERVER_BASE_URL = handleEnv(Settings.get('assets_url') || Config.ASSETS_SERVER_BASE_URL)
-export const OTA_BASE_URL = handleEnv(Settings.get('ota_base_url') || Config.OTA_BASE_URL)
+export const ENV = Config.ENV
+export const API_URL = handleEnv(Config.API_URL)
+export const API_WS_URL = handleEnv(Config.API_WS_URL)
+export const FRONTEND_BASE_URL = handleEnv(Config.FRONTEND_BASE_URL)
+export const OTA_BASE_URL = handleEnv(Config.OTA_BASE_URL)
 
 // App paths
 export const HOME_PATH = `/`

@@ -24,32 +24,13 @@
   NSDictionary *env = ReactNativeConfig.env;
   NSString *appVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
   NSString *buildNumber = [[NSBundle mainBundle] objectForInfoDictionaryKey:(NSString *)kCFBundleVersionKey];
-  NSString *applicationUrl = [[NSUserDefaults standardUserDefaults] stringForKey:@"application_url"];
-  NSString *graphQLUrl = [[NSUserDefaults standardUserDefaults] stringForKey:@"graphql_url"];
-  NSString *wsUrl = [[NSUserDefaults standardUserDefaults] stringForKey:@"ws_url"];
-  NSString *assetsUrl = [[NSUserDefaults standardUserDefaults] stringForKey:@"assets_url"];
+
   Boolean clearOTABundle = [[NSUserDefaults standardUserDefaults] boolForKey:@"clear_ota"];
 
   [[NSUserDefaults standardUserDefaults] setObject:appVersion forKey:@"version_preference"];
   [[NSUserDefaults standardUserDefaults] setObject:buildNumber forKey:@"build_preference"];
   [[NSUserDefaults standardUserDefaults] setObject:[env objectForKey:@"ENV"] forKey:@"environment_preference"];
 
-  if ([applicationUrl length] == 0) {
-    [[NSUserDefaults standardUserDefaults] setObject:[env objectForKey:@"FRONTEND_BASE_URL"] forKey:@"application_url"];
-  }
-
-  if ([graphQLUrl length] == 0) {
-    [[NSUserDefaults standardUserDefaults] setObject:[env objectForKey:@"API_URL"] forKey:@"graphql_url"];
-  }
-
-  if ([wsUrl length] == 0) {
-    [[NSUserDefaults standardUserDefaults] setObject:[env objectForKey:@"API_WS_URL"] forKey:@"ws_url"];
-  }
-
-  if ([assetsUrl length] == 0) {
-    [[NSUserDefaults standardUserDefaults] setObject:[env objectForKey:@"ASSETS_SERVER_BASE_URL"] forKey:@"assets_url"];
-  }
-  
   if (clearOTABundle) {
     [OTA clearBundle];
     [[NSUserDefaults standardUserDefaults] setObject:false forKey:@"clear_ota"];
