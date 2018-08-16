@@ -54,12 +54,13 @@ export const injectedJavaScriptImpl = function () {
   }
 
   document.addEventListener('message', function (event) {
-    var message = JSON.parse(event.data)
+    var message = {}
+    try {
+      message = JSON.parse(event.data)
+    } catch (error) {}
 
     if (message.type === 'scroll-to-top') {
       window.scrollTo(0, 0)
-    } else if (message.type === 'goto') {
-      window.location.href = message.url
     } else if (message.type === 'pushRoute') {
       window.Router.pushRoute(message.url)
     }

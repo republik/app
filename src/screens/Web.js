@@ -1,13 +1,17 @@
 import React, { Component, Fragment } from 'react'
-import { StyleSheet, Linking, ScrollView, RefreshControl, AppState, NetInfo, Platform, Share, StatusBar } from 'react-native'
+import {
+  StyleSheet, Linking, ScrollView, RefreshControl, AppState, NetInfo, Platform, Share,
+  StatusBar, Dimensions
+} from 'react-native'
 import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'
 import debounce from 'lodash.debounce'
 import { parseURL } from '../utils/url'
-import Header from '../components/Header'
-import Subheader from '../components/Subheader'
+import Header, { HEADER_HEIGHT } from '../components/Header'
+import NavBar from '../components/NavBar'
 import WebView from '../components/WebView'
 import AudioPlayer from '../components/AudioPlayer'
+import SafeAreaView from '../components/SafeAreaView'
 import navigator from '../services/navigation'
 import { FRONTEND_BASE_URL, OFFERS_PATH, LOGIN_PATH } from '../constants'
 import {
@@ -58,7 +62,7 @@ class Web extends Component {
       loading: true,
       refreshing: false,
       refreshEnabled: true,
-      subheaderVisible: true
+      navBarVisible: true
     }
 
     this.lastScrollY = 0
@@ -69,8 +73,8 @@ class Web extends Component {
   componentDidMount () {
     AppState.addEventListener('change', this.handleAppStateChange)
 
-    // Subheader starts open
-    WEBVIEW_INSTANCE.postMessage({ type: 'subheader-opened' })
+    // NavBar starts open
+    WEBVIEW_INSTANCE.postMessage({ type: 'nav-bar-opened' })
 
     this.goToLoginIfPendingRequest()
   }
@@ -128,12 +132,12 @@ class Web extends Component {
     this.props.enableSecondaryMenu({ variables: { open: value } })
   }, 150)
 
-  setSubHeaderState = ({ visible, ...other }, fn) => {
-    if (this.state.subheaderVisible !== visible) {
-      WEBVIEW_INSTANCE.postMessage({ type: visible ? 'subheader-opened' : 'subheader-closed' })
+  setNavBarState = ({ visible, ...other }, fn) => {
+    if (this.state.navBarVisible !== visible) {
+      WEBVIEW_INSTANCE.postMessage({ type: visible ? 'nav-bar-opened' : 'nav-bar-closed' })
     }
 
-    this.setState({ subheaderVisible: visible, ...other }, fn)
+    this.setState({ navBarVisible: visible, ...other }, fn)
   }
 
   onNavigationStateChange = (data) => {
@@ -153,7 +157,7 @@ class Web extends Component {
 
     this.props.closeMenu()
     this.setSecondaryMenuState(false)
-    this.setSubHeaderState({ visible: true })
+    this.setNavBarState({ visible: true })
     this.props.setUrl({ variables: { url: data.url } })
     this.props.navigation.setParams({ headerVisible: true })
     this.reloadIfNeccesary()
@@ -294,7 +298,7 @@ class Web extends Component {
   onWebViewScroll = ({ y }) => {
     const positiveYScroll = Math.max(y, 0)
 
-    this.setSubHeaderState({
+    this.setNavBarState({
       refreshEnabled: positiveYScroll < RELOAD_OFFSET_HEIGHT,
       visible: positiveYScroll <= 45 || positiveYScroll < this.lastScrollY
     }, () => {
@@ -304,7 +308,7 @@ class Web extends Component {
 
   loginUser = async (user, { reload = true } = {}) => {
     debug('loginUser', user.email, { reload })
-    this.setSubHeaderState({ visible: true }, async () => {
+    this.setNavBarState({ visible: true }, async () => {
       await this.props.login({ variables: { user } })
 
       // Force webview reload to update request cookies on iOS
@@ -325,58 +329,62 @@ class Web extends Component {
     const { loading, refreshing, refreshEnabled } = this.state
     const articlePath = article ? article.path : null
     const articleTitle = article ? article.title : ''
-    const subheaderVisible = me && this.state.subheaderVisible
+    const navBarVisible = me && this.state.navBarVisible
     const headerVisible = navigation.getParam('headerVisible', true)
 
     return (
       <Fragment>
-        <StatusBar hidden={!headerVisible} />
-        <Subheader
+        <NavBar
           setUrl={setUrl}
           currentUrl={data.url}
           borderColor={article && article.color}
-          visible={subheaderVisible && !menuActive}
+          visible={navBarVisible && !menuActive}
           style={!headerVisible && { opacity: 0 }}
           pointerEvents={!headerVisible ? 'none' : null}
         />
-        <ScrollView
-          style={{ marginTop: refreshing && subheaderVisible ? Subheader.HEIGHT : 0 }}
-          contentContainerStyle={styles.container}
-          scrollEnabled={!refreshing}
-          refreshControl={
-            <RefreshControl
-              onRefresh={this.onRefresh}
-              refreshing={this.state.refreshing}
-              enabled={refreshEnabled}
+        <SafeAreaView fullscreen={!headerVisible}>
+          <ScrollView
+            style={{ marginTop: refreshing && navBarVisible ? NavBar.HEIGHT : 0 }}
+            contentContainerStyle={styles.container}
+            scrollEnabled={!refreshing}
+            refreshControl={
+              <RefreshControl
+                onRefresh={this.onRefresh}
+                refreshing={this.state.refreshing}
+                enabled={refreshEnabled}
+              />
+            }
+          >
+            <WebView
+              source={{ uri: data.url }}
+              onNetwork={this.onNetwork}
+              onMessage={this.onMessage}
+              onLoadEnd={this.onLoadEnd}
+              onLoadStart={this.onLoadStart}
+              onScroll={this.onWebViewScroll}
+              onNavigationStateChange={this.onNavigationStateChange}
+              loading={{ status: loading || refreshing, showSpinner: !refreshing }}
+              ref={node => { WEBVIEW_INSTANCE = node }}
             />
-          }
-        >
-          <WebView
-            source={{ uri: data.url }}
-            onNetwork={this.onNetwork}
-            onMessage={this.onMessage}
-            onLoadEnd={this.onLoadEnd}
-            onLoadStart={this.onLoadStart}
-            onScroll={this.onWebViewScroll}
-            onNavigationStateChange={this.onNavigationStateChange}
-            loading={{ status: loading || refreshing, showSpinner: !refreshing }}
-            ref={node => { WEBVIEW_INSTANCE = node }}
+          </ScrollView>
+          <AudioPlayer
+            url={audio}
+            setUrl={setUrl}
+            title={articleTitle}
+            articlePath={articlePath}
+            playbackState={playbackState}
           />
-        </ScrollView>
-        <AudioPlayer
-          url={audio}
-          setUrl={setUrl}
-          title={articleTitle}
-          articlePath={articlePath}
-          playbackState={playbackState}
-        />
+        </SafeAreaView>
       </Fragment>
     )
   }
 }
 
 Web.navigationOptions = ({ screenProps }) => ({
-  headerStyle: { backgroundColor: '#FFFFFF' },
+  headerStyle: {
+    backgroundColor: '#FFFFFF',
+    height: HEADER_HEIGHT
+  },
   headerTitle: (
     <Header
       {...screenProps}
