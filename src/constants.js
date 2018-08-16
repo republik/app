@@ -9,6 +9,7 @@ export const API_URL = handleEnv(Config.API_URL)
 export const API_WS_URL = handleEnv(Config.API_WS_URL)
 export const FRONTEND_BASE_URL = handleEnv(Config.FRONTEND_BASE_URL)
 export const OTA_BASE_URL = handleEnv(Config.OTA_BASE_URL)
+export const API_AUTHORIZATION_HEADER = Config.API_AUTHORIZATION_HEADER
 
 // App paths
 export const HOME_PATH = `/`
