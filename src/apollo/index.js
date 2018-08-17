@@ -94,7 +94,11 @@ export const resolvers = {
     },
     setArticle: async (_, { article }, context) => {
       const meta = article ? article.meta : {}
-      const format = article ? meta.format : null
+      const formatMeta = meta && (
+        meta.template === 'format'
+          ? meta
+          : meta.format && meta.format.meta
+      )
       const audioSource = article ? meta.audioSource || {} : {}
 
       const value = article ? {
@@ -102,7 +106,7 @@ export const resolvers = {
         path: meta.path,
         title: meta.title,
         template: meta.template,
-        color: format ? format.meta.color : null,
+        color: formatMeta ? formatMeta.color : null,
         series: meta.series ? meta.series.title : null,
         discussionPath: meta.discussion ? meta.discussion.meta.path : null,
         discussionId: meta.discussion ? meta.discussion.meta.discussionId : null,
