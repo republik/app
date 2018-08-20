@@ -62,7 +62,9 @@ export const injectedJavaScriptImpl = function () {
     if (message.type === 'scroll-to-top') {
       window.scrollTo(0, 0)
     } else if (message.type === 'pushRoute') {
-      window.Router.pushRoute(message.url)
+      window.Router.pushRoute(message.url).then(() => {
+        window.scrollTo(0, 0)
+      })
     }
   })
 
