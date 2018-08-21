@@ -116,12 +116,14 @@ const cookiesWrapper = WrappedComponent => (
 
           const versions = JSON.parse(versionsResult.data)
           const remoteEntry = versions.find(v => v.bin === APP_VERSION)
-          const shouldUpdateToBundle = await this.shouldUpdateToBundle(remoteEntry.bundle)
-          console.log('ota-simple: shouldUpdateToBundle: ', shouldUpdateToBundle)
 
-          if (remoteEntry && shouldUpdateToBundle) {
-            this.downloadAndExtractBundle(remoteEntry.bundle)
-            await AsyncStorage.setItem(BUNDLE_VERSION_KEY, remoteEntry.bundle)
+          if (remoteEntry) {
+            const shouldUpdateToBundle = await this.shouldUpdateToBundle(remoteEntry.bundle)
+            console.log('ota-simple: shouldUpdateToBundle: ', shouldUpdateToBundle)
+            if (shouldUpdateToBundle) {
+              this.downloadAndExtractBundle(remoteEntry.bundle)
+              await AsyncStorage.setItem(BUNDLE_VERSION_KEY, remoteEntry.bundle)
+            }
           }
         }
       } catch (e) {
