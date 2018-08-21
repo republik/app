@@ -2,19 +2,55 @@
 
 A thin native app for persistent auth, app store presence and convenience.
 
-Most, if not all views are provided by [republik-frontend](https://github.com/orbiting/republik-frontend) and rendered in a web view.
+Most views are provided by [republik-frontend](https://github.com/orbiting/republik-frontend) and rendered in a web view.
 
-## Installation
-1) Install NPM packages with your package manager of choice - i.e run yarn or npm install
-2) Copy .env files into root project folder: `.env.dev`, `.env.staging`, `.env.production`
-3) Follow the notifications setup instructions below
+## Usage
 
-## Table of Contents
+[Setup React Native for projects with native code](https://facebook.github.io/react-native/docs/getting-started.html).
+
+Bootstrap your .env file:
+
+```bash
+cp .env.example .env.dev
+```
+
+Install and run:
+
+```bash
+yarn
+yarn run run-ios-dev # or run via Xcode
+# Start your Android virtual device from Android Studio
+yarn run run-android-dev
+```
+
+For testing on real iOS devices: Make sure to switch on automatic signing in the general project settings.
+
+Follow the guides to get up to speed on messages api (between `republik-frontend` and the `app`), fonts, notifications and deployments.
+
+### Guides
 
 * [Messages API](docs/messages.md)
 * [Publishing](docs/publishing.md)
 * [Notifications](docs/notifications.md)
 * [Fonts](docs/fonts.md)
+
+### Universal Links
+
+The app is configured to responde to `www.republik.ch` links.
+
+You can test this in the iOS simulator by running following command:
+
+```bash
+xcrun simctl openurl booted "https://www.republik.ch/feed"
+```
+
+With Android virtual devices:
+
+```bash
+adb shell am start -a android.intent.action.VIEW \
+    -c android.intent.category.BROWSABLE \
+    -d "https://www.republik.ch/feed"
+```
 
 ## Key Screens
 
@@ -22,12 +58,3 @@ Most, if not all views are provided by [republik-frontend](https://github.com/or
 
 The login screen needs to be implemented specifically for the app, probably in the web front end. The existing front and article views can be used as is.
 
-**Other important screens:**
-- feed (existing, chronological list of articles)
-- notifiction list (new)
-
-## Frame
-
-As a first step we'll customized the web frame based on user agent detection, see #X.
-
-In a second step we might want to integrate deeply. Hide the whole frame via user agent detection and do a native frame.
