@@ -23,7 +23,7 @@ yarn run run-ios-dev # or run via Xcode
 yarn run run-android-dev
 ```
 
-For testing on real iOS devices: Make sure to switch on automatic signing in the general project settings.
+For testing on real iOS devices: Make sure that automatic signing in the general project settings is on and your device is registered and provisioned.
 
 Follow the guides to get up to speed on messages api (between `republik-frontend` and the `app`), fonts, notifications and deployments.
 
