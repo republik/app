@@ -85,6 +85,9 @@ class Web extends Component {
   }
 
   goToLoginIfPendingRequest = async () => {
+    if (!this.props.me) {
+      return
+    }
     const { data } = await this.props.refetchPendingSignInRequests()
     if (data.pendingAppSignIn) {
       navigator.navigate('Login', { url: data.pendingAppSignIn.verificationUrl })
