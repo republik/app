@@ -1,18 +1,6 @@
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 
-const toggleMenu = graphql(gql`
-  mutation ToggleMenu {
-    toggleMenu @client
-  }
-`, { name: 'toggleMenu' })
-
-const closeMenu = graphql(gql`
-  mutation ToggleMenu {
-    closeMenu @client
-  }
-`, { name: 'closeMenu' })
-
 const login = graphql(gql`
   mutation Login($user: User) {
     login(user: $user) @client
@@ -25,14 +13,6 @@ const logout = graphql(gql`
   }
 `, { name: 'logout' })
 
-const signOut = graphql(gql`
-  mutation SignOut {
-    signOut
-  }
-`, {
-  name: 'signOut'
-})
-
 const setUrl = graphql(gql`
   mutation SetUrl($url: String!) {
     setUrl(url: $url) @client
@@ -44,24 +24,6 @@ const setAudio = graphql(gql`
     setAudio(audio: $audio) @client
   }
 `, { name: 'setAudio' })
-
-const setArticle = graphql(gql`
-  mutation SetArticle($article: Article!) {
-    setArticle(article: $article) @client
-  }
-`, { name: 'setArticle' })
-
-const enableSecondaryMenu = graphql(gql`
-  mutation enableSecondaryMenu($open: Boolean) {
-    enableSecondaryMenu(open: $open) @client
-  }
-`, { name: 'enableSecondaryMenu' })
-
-const toggleSecondaryMenu = graphql(gql`
-  mutation ToggleSecondaryMenu {
-    toggleSecondaryMenu @client
-  }
-`, { name: 'toggleSecondaryMenu' })
 
 const upsertDevice = graphql(gql`
   mutation UpsertDevice($token: ID!, $information: DeviceInformationInput!) {
@@ -89,14 +51,8 @@ export {
   login,
   setUrl,
   logout,
-  signOut,
   setAudio,
-  closeMenu,
-  setArticle,
-  toggleMenu,
   upsertDevice,
   rollDeviceToken,
-  enableSecondaryMenu,
-  toggleSecondaryMenu,
   setPlaybackStateMutation
 }

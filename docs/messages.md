@@ -14,6 +14,22 @@ Triggered every time the WebView's navigation (url) changes
 
 > This is possible due to JS injection on the WebView JS runtime
 
+### share
+
+Trigger native share dialog
+
+| Key        | Description           | Value  |
+| ------------- |:-------------:| -----:|
+| type      | Message type | share |
+| payload      | meta data | {} |
+| payload.title | share title | - |
+| payload.message | share text, optional | - |
+| payload.url | share url, appended to / sent as message on android | - |
+| payload.subject | email subject, iOS only | - |
+| payload.dialogTitle | android only | - |
+
+See `react-native`s [`Share.share`](https://facebook.github.io/react-native/docs/share).
+
 ### scroll
 
 Triggered every time the WebView's scroll changes
@@ -57,25 +73,6 @@ Log something from frontend into app's console
 | type      | Message type | log |
 | data      | String to log in app's console | - |
 
-### article-opened
-
-Triggered from the frontend every time an article is visited
-
-| Key        | Description           | Value  |
-| ------------- |:-------------:| -----:|
-| type      | Message type | article-opened |
-| payload      | Article JSON data | - |
-
-> This is used to get proper data to show in native nabvar
-
-### article-closed
-
-Triggered from the frontend every time a user leaves from an article's page
-
-| Key        | Description           | Value  |
-| ------------- |:-------------:| -----:|
-| type      | Message type | article-closed |
-
 ### gallery-opened
 
 Triggered from the frontend every time the gallery is opened
@@ -91,30 +88,6 @@ Triggered from the frontend every time the gallery is closed
 | Key        | Description           | Value  |
 | ------------- |:-------------:| -----:|
 | type      | Message type | gallery-closed |
-
-### close-menu
-
-Triggered from the frontend to inform that the menu popover was closed
-
-| Key        | Description           | Value  |
-| ------------- |:-------------:| -----:|
-| type      | Message type | close-menu |
-
-### show-secondary-nav
-
-Triggered from the frontend to inform that the secondary menu popover was opened
-
-| Key        | Description           | Value  |
-| ------------- |:-------------:| -----:|
-| type      | Message type | show-secondary-nav |
-
-### hide-secondary-nav
-
-Triggered from the frontend to inform that the secondary menu popover was closed
-
-| Key        | Description           | Value  |
-| ------------- |:-------------:| -----:|
-| type      | Message type | hide-secondary-nav |
 
 ##  App -> Frontend
 
@@ -137,54 +110,6 @@ Sends GraphQL subscription responses back to the frontend instance
 | type      | Message type | data / error / complete |
 | id      | Subscription unique identifier | - |
 | payload      | Subscription response data | - |
-
-### open-menu
-
-Triggered from the app to tell frontend he should open menu popover
-
-| Key        | Description           | Value  |
-| ------------- |:-------------:| -----:|
-| type      | Message type | open-menu |
-
-### close-menu
-
-Triggered from the app to tell frontend he should close menu popover
-
-| Key        | Description           | Value  |
-| ------------- |:-------------:| -----:|
-| type      | Message type | close-menu |
-
-### open-secondary-menu
-
-Triggered from the app to tell frontend he should open secondary menu popover
-
-| Key        | Description           | Value  |
-| ------------- |:-------------:| -----:|
-| type      | Message type | open-secondary-menu |
-
-### close-secondary-menu
-
-Triggered from the app to tell frontend he should close secondary menu popover
-
-| Key        | Description           | Value  |
-| ------------- |:-------------:| -----:|
-| type      | Message type | close-secondary-menu |
-
-### nav-bar-opened
-
-Triggered from the app to tell frontend the nav bar was opened
-
-| Key        | Description           | Value  |
-| ------------- |:-------------:| -----:|
-| type      | Message type | nav-bar-opened |
-
-### nav-bar-closed
-
-Triggered from the app to tell frontend the nav bar was closed
-
-| Key        | Description           | Value  |
-| ------------- |:-------------:| -----:|
-| type      | Message type | nav-bar-closed |
 
 ### scroll-to-top
 

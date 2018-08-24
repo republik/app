@@ -1,5 +1,13 @@
 import React, { Fragment } from 'React'
-import { Text, View, StyleSheet, TouchableOpacity, Platform, BackHandler, ActivityIndicator } from 'react-native'
+import { 
+  Text, View,
+  StyleSheet,
+  TouchableOpacity,
+  Platform,
+  BackHandler,
+  ActivityIndicator,
+  Share
+} from 'react-native'
 import IOSWebView from 'react-native-wkwebview-reborn'
 import { parse } from 'graphql'
 import { execute, makePromise } from 'apollo-link'
@@ -171,6 +179,19 @@ class WebView extends React.PureComponent {
     return false
   }
 
+  share = ({ url, title, message, subject, dialogTitle }) => {
+    Share.share(Platform.OS === 'ios' ? {
+      url,
+      title,
+      subject,
+      message
+    } : {
+      dialogTitle,
+      title,
+      message: [message, url].filter(Boolean).join('\n')
+    })
+  }
+
   onMessage = e => {
     const { onMessage } = this.props
     const message = JSON.parse(e.nativeEvent.data)
@@ -179,6 +200,9 @@ class WebView extends React.PureComponent {
       case 'navigation':
         debug('onMessage', message.type, message.url)
         return this.onNavigationStateChange(message)
+      case 'share':
+        debug('onMessage', message.type, message.payload.url)
+        return this.share(message.payload)
       case 'scroll':
         debug('onMessage', message.type, message.payload.y)
         return this.onScrollStateChange(message)
