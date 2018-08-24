@@ -1,18 +1,18 @@
 {
-  "updated": "2018-06-08T09:55:10.335Z",
+  "updated": "2018-08-24T11:34:40.587Z",
   "title": "live",
   "data": [
     {
       "key": "webview/error/title",
-      "value": "Unable to load contents."
+      "value": "Inhalt konnte nicht geladen werden"
     },
     {
       "key": "webview/error/description",
-      "value": "Please check your network connection."
+      "value": "Bitte prüfen Sie ihre Internetverbindung."
     },
     {
       "key": "webview/error/reload",
-      "value": "Reload"
+      "value": "neu laden"
     }
   ]
 }

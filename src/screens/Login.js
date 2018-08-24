@@ -2,11 +2,21 @@ import React, { Component } from 'react'
 import { StyleSheet, Image, View } from 'react-native'
 import WebView from '../components/WebView'
 import SafeAreaView from '../components/SafeAreaView'
-import { headerStyle } from '../components/Header'
 import navigator from '../services/navigation'
 import Logo from '../assets/images/logo-title.png'
 import { parseURL, handleEnv } from '../utils/url'
 import { pendingAppSignIn } from '../apollo'
+
+const HEADER_HEIGHT = 45
+const headerStyle = {
+  zIndex: 400,
+  backgroundColor: '#FFFFFF',
+  borderBottomWidth: 1,
+  borderBottomColor: '#DADDDC',
+  height: HEADER_HEIGHT,
+  shadowOpacity: 0,
+  elevation: 0
+}
 
 const LoginHeader = () => (
   <View style={styles.headerContainer}>
@@ -19,13 +29,6 @@ class Login extends Component {
 
   componentWillUnmount () {
     this.props.refetchPendingSignInRequests()
-  }
-
-  onMessage = message => {
-    switch (message.type) {
-      case 'close-auth-overlay':
-        return navigator.goBack()
-    }
   }
 
   onNavigationStateChange = (data) => {
@@ -58,6 +61,7 @@ class Login extends Component {
 }
 
 Login.navigationOptions = ({ screenProps }) => ({
+  header: undefined,
   headerTitle: <LoginHeader />,
   headerRight: <View />,
   headerStyle
