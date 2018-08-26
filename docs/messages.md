@@ -73,21 +73,21 @@ Log something from frontend into app's console
 | type      | Message type | log |
 | data      | String to log in app's console | - |
 
-### gallery-opened
+### fullscreen-enter
 
-Triggered from the frontend every time the gallery is opened
-
-| Key        | Description           | Value  |
-| ------------- |:-------------:| -----:|
-| type      | Message type | gallery-opened |
-
-### gallery-closed
-
-Triggered from the frontend every time the gallery is closed
+Triggered by the frontend when displaying fullscreen content (e.g. gallery)
 
 | Key        | Description           | Value  |
 | ------------- |:-------------:| -----:|
-| type      | Message type | gallery-closed |
+| type      | Message type | fullscreen-enter |
+
+### fullscreen-exit
+
+Triggered from the frontend when closing fullscreen content (e.g. gallery)
+
+| Key        | Description           | Value  |
+| ------------- |:-------------:| -----:|
+| type      | Message type | fullscreen-exit |
 
 ##  App -> Frontend
 
