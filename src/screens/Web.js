@@ -1,7 +1,6 @@
 import React, { Component, Fragment } from 'react'
 import {
-  StyleSheet, Linking, ScrollView, RefreshControl, AppState, NetInfo, Platform,
-  StatusBar, Dimensions
+  StyleSheet, Linking, ScrollView, RefreshControl, AppState, NetInfo, Platform
 } from 'react-native'
 import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'

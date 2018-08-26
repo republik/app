@@ -57,9 +57,9 @@ const getHead = async ({
   try {
     result = await s3.headObject({
       Key: path,
-      Bucket: bucket,
+      Bucket: bucket
     }).promise()
-  } catch(e) {
+  } catch (e) {
     return false
   }
 

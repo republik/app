@@ -8,7 +8,6 @@ import { withClientState } from 'apollo-link-state'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import { CachePersistor } from 'apollo-cache-persist'
 import { LOGIN_URL, HOME_URL } from '../constants'
-import { getMenuStateQuery } from './queries'
 import { link } from './link'
 
 const defaults = {
