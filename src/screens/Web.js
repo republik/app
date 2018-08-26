@@ -45,7 +45,6 @@ class Web extends Component {
       refreshEnabled: true
     }
 
-    this.lastScrollY = 0
     this.shouldReload = false
     this.lastActiveDate = null
   }
@@ -217,10 +216,6 @@ class Web extends Component {
     this.webview.reload()
   }
 
-  onWebViewScroll = ({ y }) => {
-    const positiveYScroll = Math.max(y, 0)
-  }
-
   loginUser = async (user, { reload = true } = {}) => {
     debug('loginUser', user.email, { reload })
 
@@ -273,7 +268,6 @@ class Web extends Component {
               onMessage={this.onMessage}
               onLoadEnd={this.onLoadEnd}
               onLoadStart={this.onLoadStart}
-              onScroll={this.onWebViewScroll}
               onNavigationStateChange={this.onNavigationStateChange}
               loading={{ status: loading || refreshing, showSpinner: !refreshing }}
               ref={node => { this.webview = node }}
