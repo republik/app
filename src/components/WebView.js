@@ -85,7 +85,7 @@ class WebView extends React.PureComponent {
 
     this.subscriptions = {}
     this.state = { currentUrl: props.source.uri }
-    this.webview = { ref: null, uri: props.source.uri, canGoBack: false, scrollY: 0 }
+    this.webview = { ref: null, uri: props.source.uri, canGoBack: false }
   }
 
   componentWillMount () {
@@ -165,20 +165,6 @@ class WebView extends React.PureComponent {
     return true
   }
 
-  onScrollStateChange = ({ payload }) => {
-    // Prevent calling onScroll if this didn't changed (sometimes happens for unknown reason)
-    if (
-      this.props.onScroll &&
-      this.webview.scrollY !== payload.y
-    ) {
-      this.props.onScroll(payload)
-      this.webview.scrollY = payload.y
-      return true
-    }
-
-    return false
-  }
-
   share = ({ url, title, message, subject, dialogTitle }) => {
     Share.share(Platform.OS === 'ios' ? {
       url,
@@ -203,9 +189,6 @@ class WebView extends React.PureComponent {
       case 'share':
         debug('onMessage', message.type, message.payload.url)
         return this.share(message.payload)
-      case 'scroll':
-        debug('onMessage', message.type, message.payload.y)
-        return this.onScrollStateChange(message)
       case 'graphql':
         debug('onMessage', message.type, message.data.id)
         return this.handleGraphQLRequest(message)

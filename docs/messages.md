@@ -30,19 +30,6 @@ Trigger native share dialog
 
 See `react-native`s [`Share.share`](https://facebook.github.io/react-native/docs/share).
 
-### scroll
-
-Triggered every time the WebView's scroll changes
-
-| Key        | Description           | Value  |
-| ------------- |:-------------:| -----:|
-| type      | Message type | scroll |
-| payload      | Object showing current scroll position | - |
-| payload.x      | WebView current X scroll | - |
-| payload.y      | WebView current Y scroll | - |
-
-> This callback is debounced, except for when the scroll is near 0, in which we want immediate information for pull-to-refresh feature
-
 ### graphql
 
 GraphQL network request to be resolved app-side
