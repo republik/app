@@ -216,6 +216,16 @@ class WebView extends React.PureComponent {
       case 'log':
         console.log('Webview >>>', message.data)
         break
+      case 'initial-state':
+        // a new apollo client was initiated
+        // - unsubscribe from all previously active subscriptions
+        Object.keys(this.subscriptions).forEach(key => {
+          const subscription = this.subscriptions[key]
+          if (subscription) {
+            subscription.unsubscribe()
+          }
+        })
+        this.subscriptions = {}
       default:
         if (Config.ENV === 'development') {
           const payload = JSON.stringify(message.payload)
@@ -245,7 +255,11 @@ class WebView extends React.PureComponent {
   handleGraphQLSubscription = (message) => {
     switch (message.type) {
       case 'stop':
-        this.subscriptions[message.id] && this.subscriptions[message.id].unsubscribe()
+        const subscription = this.subscriptions[message.id]
+        if (subscription) {
+          subscription.unsubscribe()
+        }
+        delete this.subscriptions[message.id]
         break
       case 'start':
         const query = typeof message.payload.query === 'string'
