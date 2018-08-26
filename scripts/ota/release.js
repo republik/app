@@ -1,10 +1,14 @@
-const dotenv = require('dotenv')
-dotenv.config({path: __dirname+'/.env'})
+const path = require('path')
+
+require('dotenv').config({
+  path: path.join(__dirname, '.env')
+})
+
 const {
-  AWS_S3_BUCKET,
-  AWS_REGION,
-  AWS_ACCESS_KEY_ID,
-  AWS_SECRET_ACCESS_KEY
+  AWS_S3_BUCKET
+  // AWS_REGION,
+  // AWS_ACCESS_KEY_ID,
+  // AWS_SECRET_ACCESS_KEY
 } = process.env
 
 const yargs = require('yargs')
@@ -32,12 +36,12 @@ const argv = yargs
   .option('bundleVersion', {
     string: true,
     default: null,
-    description: 'specify bundle version to use'
+    description: 'specify bundle version to use'
   })
   .option('dry', {
     boolean: true,
     default: false,
-    description: "don't upload anything"
+    description: "don't upload anything"
   })
   .help()
   .argv
@@ -59,9 +63,7 @@ const VERSIONS_PATH = './versions.json'
 const VERIONS_PATH_ABSOLUTE = `${__dirname}/versions.json`
 const PLATFORMS = ['ios', 'android']
 
-const getDateTime =
-  () => new Date().toISOString()
-
+const getDateTime = () => new Date().toISOString()
 
 const mkdir = (path) => {
   fs.existsSync(path) || fs.mkdirSync(path)
@@ -86,14 +88,14 @@ const bundle = async (platform, output) => {
 
   await promise
     .catch(function (err) {
-      console.error('[react-native build] ERROR: ', err);
+      console.error('[react-native build] ERROR: ', err)
       throw new Error(err)
     })
 
   console.log('[react-native build] finished!')
 }
 
-const pack = (input, outputPath) => new Promise( (resolve, reject) => {
+const pack = (input, outputPath) => new Promise((resolve, reject) => {
   const archive = require('archiver')('zip')
   const output = fs.createWriteStream(outputPath)
 
@@ -118,12 +120,12 @@ const updateVersionsFile = async (newBundleVersion) => {
   const prompt = new Prompt({
     name: 'versions',
     message: `Which binary versions should get this update? (${newBundleVersion})`,
-    choices: versions.map( v => v.bin )
+    choices: versions.map(v => v.bin)
   })
   const answerVersions = await prompt.run()
 
   let result
-  if(answerVersions.length === 0) {
+  if (answerVersions.length === 0) {
     console.log('Ok, none it is')
     result = false
   } else {
@@ -133,8 +135,8 @@ const updateVersionsFile = async (newBundleVersion) => {
       default: false
     })
     const answerUrgent = await urgentPrompt.run()
-    answerVersions.forEach( binVersion => {
-      const versionEntry = versions.find( v => v.bin === binVersion)
+    answerVersions.forEach(binVersion => {
+      const versionEntry = versions.find(v => v.bin === binVersion)
       versionEntry.bundle = newBundleVersion
       versionEntry.urgent = !!answerUrgent
     })
@@ -151,7 +153,7 @@ const updateVersionsFile = async (newBundleVersion) => {
 const upload = async (outputPath, newBundleVersion, versionUpdated) => {
   const basePath = `ota/`
 
-  if(argv.uploadVersions || argv.upload || (argv.all && versionUpdated) ) {
+  if (argv.uploadVersions || argv.upload || (argv.all && versionUpdated)) {
     console.log('uploading versions.json...')
     await s3.upload({
       stream: fs.createReadStream(VERIONS_PATH_ABSOLUTE),
@@ -162,7 +164,7 @@ const upload = async (outputPath, newBundleVersion, versionUpdated) => {
     await purgeUrls([`/s3/${AWS_S3_BUCKET}/ota/versions.json`])
   }
   if (argv.upload || argv.all) {
-    for(let platform of PLATFORMS) {
+    for (let platform of PLATFORMS) {
       console.log(`uploading ${platform}.zip...`)
       await s3.upload({
         stream: fs.createReadStream(`${outputPath}/${platform}.zip`),
@@ -174,8 +176,7 @@ const upload = async (outputPath, newBundleVersion, versionUpdated) => {
   }
 }
 
-
-return new Promise( async (resolve, reject) => {
+new Promise(async (resolve, reject) => {
   const newBundleVersion = argv.bundleVersion || getDateTime()
   const output = `${__dirname}/build/${newBundleVersion}`
 
@@ -184,7 +185,7 @@ return new Promise( async (resolve, reject) => {
     mkdirp.sync(output)
     console.log(`----\nversion: ${newBundleVersion}\noutput: ${output}\n-----`)
 
-    for(let platform of PLATFORMS) {
+    for (let platform of PLATFORMS) {
       const workingDir = `${output}/${platform}`
       await bundle(platform, workingDir)
       await pack(workingDir, `${output}/${platform}.zip`)
@@ -194,7 +195,6 @@ return new Promise( async (resolve, reject) => {
   if (!argv.dry) {
     await upload(output, newBundleVersion, versionUpdated)
   }
-
 }
 ).then(() => {
   process.exit()
