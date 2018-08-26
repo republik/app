@@ -159,11 +159,11 @@ class Web extends Component {
         return this.loadInitialState(message.payload)
       case 'show-audio-player':
         return this.showAudioPlayer()
-      case 'gallery-opened':
+      case 'fullscreen-enter':
         return this.setState({
           fullscreen: true
         })
-      case 'gallery-closed':
+      case 'fullscreen-exit':
         return this.setState({
           fullscreen: false
         })
