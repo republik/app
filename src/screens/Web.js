@@ -120,12 +120,20 @@ class Web extends Component {
   }
 
   onLoadStart = () => {
+    debug('onLoadStart')
+    if (this.state.fullscreen) {
+      this.setState({
+        fullscreen: false
+      })
+    }
     if (this.props.screenProps.onLoadStart) {
       this.props.screenProps.onLoadStart()
     }
   }
 
   onLoadEnd = () => {
+    debug('onLoadEnd')
+
     this.setLoading(false)
 
     if (this.state.refreshing) {
@@ -145,13 +153,9 @@ class Web extends Component {
       case 'show-audio-player':
         return this.showAudioPlayer()
       case 'fullscreen-enter':
-        return this.setState({
-          fullscreen: true
-        })
+        return this.setState({ fullscreen: true })
       case 'fullscreen-exit':
-        return this.setState({
-          fullscreen: false
-        })
+        return this.setState({ fullscreen: false })
       default:
         console.log(message)
         console.warn(`Unhandled message of type: ${message.type}`)
@@ -232,6 +236,15 @@ class Web extends Component {
     debug('logoutUser', { reload })
     await this.props.logout()
     if (reload && Platform.OS === 'ios') this.webview.reload()
+  }
+
+  componentWillReceiveProps (nextProps) {
+    if (
+      nextProps.data.url !== this.props.data.url &&
+      this.state.fullscreen
+    ) {
+      this.setState({ fullscreen: false })
+    }
   }
 
   render () {
