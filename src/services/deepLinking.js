@@ -2,7 +2,9 @@ import React, { Component } from 'react'
 import { Linking } from 'react-native'
 import { withApollo, compose } from 'react-apollo'
 import { parse, format } from 'url'
-import { FRONTEND_BASE_URL } from '../constants'
+import { FRONTEND_BASE_URL, NOTIFICATIONS_PATH } from '../constants'
+import navigator from './navigation'
+import { setUrl } from '../apollo'
 
 const deepLinkingWrapper = WrappedComponent => (
   class extends Component {
@@ -20,14 +22,19 @@ const deepLinkingWrapper = WrappedComponent => (
     }
 
     handleOpenURL = (event) => {
-      const { path } = parse(event.url || '')
+      const { path, pathname } = parse(event.url || '')
 
       // When deep/universal link opened, we edit
       //   the global url state to show correct page
       setTimeout(() => {
-        this.props.client.writeData({ data: {
-          url: `${FRONTEND_BASE_URL}${path}`
-        } })
+        const url = `${FRONTEND_BASE_URL}${path}`
+        if (pathname === NOTIFICATIONS_PATH) {
+          navigator.navigate('Login', { url })
+        } else {
+          this.props.setUrl({
+            variables: { url }
+          })
+        }
       }, 100)
     }
 
@@ -39,4 +46,4 @@ const deepLinkingWrapper = WrappedComponent => (
   }
 )
 
-export default compose(withApollo, deepLinkingWrapper)
+export default compose(setUrl, deepLinkingWrapper)
