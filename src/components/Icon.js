@@ -1,8 +1,5 @@
 import React from 'react'
 import { Image, TouchableOpacity } from 'react-native'
-import ProfileButton from './ProfileButton'
-import HamburgerButton from './HamburgerButton'
-import { withMenuState } from '../apollo'
 import PDF from '../assets/images/pdf.png'
 import Share from '../assets/images/share.png'
 import Play from '../assets/images/play.png'
@@ -28,14 +25,12 @@ const buttons = {
   search: Search,
   IOSBack: IOSBack,
   chevronUp: ChevronUp,
-  profile: ProfileButton,
   discussion: Discussion,
   chevronDown: ChevronDown,
-  hamburger: HamburgerButton,
   searchActive: SearchActive
 }
 
-const Icon = ({ type, side, size, menuActive, onPress, style }) => {
+const Icon = ({ type, side, size, onPress, style }) => {
   if (typeof buttons[type] === 'number') {
     const Wrapper = onPress ? TouchableOpacity : ({ children }) => children
 
@@ -54,7 +49,6 @@ const Icon = ({ type, side, size, menuActive, onPress, style }) => {
   return (
     <Button
       style={[style, { padding: 10 }]}
-      active={menuActive}
       onPress={onPress}
     />
   )
@@ -64,4 +58,4 @@ Icon.defaultProps = {
   size: 25
 }
 
-export default withMenuState(Icon)
+export default Icon

@@ -11,7 +11,6 @@ import deepLinking from './services/deepLinking'
 import ota from './services/ota'
 import pushNotifications from './services/pushNotifications'
 import withApollo from './apollo'
-import { headerStyle } from './components/Header'
 
 const Router = createStackNavigator({
   Web: { screen: Web },
@@ -23,13 +22,11 @@ const Router = createStackNavigator({
   mode: 'modal',
   initialRouteName: 'Web',
   navigationOptions: ({ screenProps, navigation }) => {
-    const params = navigation.state.params || {}
-    const headerVisible = params.headerVisible === undefined ? true : params.headerVisible
+    // const params = navigation.state.params || {}
 
     return {
       headerTintColor: '#000000',
-      headerStyle,
-      header: headerVisible ? undefined : null
+      header: null
     }
   }
 })

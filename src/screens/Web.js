@@ -1,14 +1,11 @@
 import React, { Component, Fragment } from 'react'
 import {
-  StyleSheet, Linking, ScrollView, RefreshControl, AppState, NetInfo, Platform, Share,
-  StatusBar, Dimensions
+  StyleSheet, Linking, ScrollView, RefreshControl, AppState, NetInfo, Platform
 } from 'react-native'
 import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'
 import debounce from 'lodash.debounce'
 import { parseURL } from '../utils/url'
-import Header, { headerStyle } from '../components/Header'
-import NavBar from '../components/NavBar'
 import WebView from '../components/WebView'
 import AudioPlayer from '../components/AudioPlayer'
 import SafeAreaView from '../components/SafeAreaView'
@@ -20,13 +17,8 @@ import {
   logout,
   setUrl,
   setAudio,
-  closeMenu,
   withAudio,
-  setArticle,
-  withMenuState,
-  pendingAppSignIn,
-  withCurrentArticle,
-  enableSecondaryMenu
+  pendingAppSignIn
 } from '../apollo'
 import mkDebug from '../utils/debug'
 
@@ -36,23 +28,12 @@ const RELOAD_OFFSET_HEIGHT = 5
 const RELOAD_TIME_THRESHOLD = 60 * 60 * 1000 // 1hr
 const RESTRICTED_PATHS = [OFFERS_PATH]
 const PERMITTED_PROTOCOLS = ['react-js-navigation']
-const VIDEO_HOSTS = [
-  'youtube.com',
-  'youtube-nocookie.com',
-  'player.vimeo.com'
-]
 
-const isVideoURL = ({ host }) => (
-  VIDEO_HOSTS.includes(host)
-)
-
+const FRONTEND_HOST = parseURL(FRONTEND_BASE_URL).host
 const isExternalURL = ({ host, protocol }) => (
-  !isVideoURL({ host }) &&
-  parseURL(FRONTEND_BASE_URL).host !== host &&
+  FRONTEND_HOST !== host &&
   !PERMITTED_PROTOCOLS.includes(protocol)
 )
-
-let WEBVIEW_INSTANCE = null
 
 class Web extends Component {
   constructor (props) {
@@ -61,11 +42,9 @@ class Web extends Component {
     this.state = {
       loading: true,
       refreshing: false,
-      refreshEnabled: true,
-      navBarVisible: true
+      refreshEnabled: true
     }
 
-    this.lastScrollY = 0
     this.shouldReload = false
     this.lastActiveDate = null
   }
@@ -73,30 +52,7 @@ class Web extends Component {
   componentDidMount () {
     AppState.addEventListener('change', this.handleAppStateChange)
 
-    // NavBar starts open
-    WEBVIEW_INSTANCE.postMessage({ type: 'nav-bar-opened' })
-
     this.goToLoginIfPendingRequest()
-  }
-
-  componentWillReceiveProps (nextProps) {
-    // Toggle primary menu on webview
-    if (!this.props.menuActive && nextProps.menuActive) {
-      WEBVIEW_INSTANCE.postMessage({ type: 'open-menu' })
-    }
-
-    if (this.props.menuActive && !nextProps.menuActive) {
-      WEBVIEW_INSTANCE.postMessage({ type: 'close-menu' })
-    }
-
-    // Toggle secondary menu on webview
-    if (!this.props.secondaryMenuActive && nextProps.secondaryMenuActive) {
-      WEBVIEW_INSTANCE.postMessage({ type: 'open-secondary-menu' })
-    }
-
-    if (this.props.secondaryMenuActive && !nextProps.secondaryMenuActive) {
-      WEBVIEW_INSTANCE.postMessage({ type: 'close-secondary-menu' })
-    }
   }
 
   componentWillUnmount () {
@@ -118,6 +74,9 @@ class Web extends Component {
   }
 
   goToLoginIfPendingRequest = async () => {
+    if (!this.props.me) {
+      return
+    }
     const { data } = await this.props.refetchPendingSignInRequests()
     if (data.pendingAppSignIn) {
       navigator.navigate('Login', { url: data.pendingAppSignIn.verificationUrl })
@@ -127,18 +86,6 @@ class Web extends Component {
   setLoading = debounce(value => {
     this.setState({ loading: value })
   }, 150)
-
-  setSecondaryMenuState = debounce(value => {
-    this.props.enableSecondaryMenu({ variables: { open: value } })
-  }, 150)
-
-  setNavBarState = ({ visible, ...other }, fn) => {
-    if (this.state.navBarVisible !== visible) {
-      WEBVIEW_INSTANCE.postMessage({ type: visible ? 'nav-bar-opened' : 'nav-bar-closed' })
-    }
-
-    this.setState({ navBarVisible: visible, ...other }, fn)
-  }
 
   onNavigationStateChange = (data) => {
     const url = parseURL(data.url)
@@ -150,16 +97,7 @@ class Web extends Component {
       return false
     }
 
-    // If video tries to open, prevent webview navigation
-    if (isVideoURL(url)) {
-      return false
-    }
-
-    this.props.closeMenu()
-    this.setSecondaryMenuState(false)
-    this.setNavBarState({ visible: true })
     this.props.setUrl({ variables: { url: data.url } })
-    this.props.navigation.setParams({ headerVisible: true })
     this.reloadIfNeccesary()
 
     return true
@@ -175,23 +113,31 @@ class Web extends Component {
       url.path !== LOGIN_PATH
     ) {
       this.setState({ loading: true })
-      WEBVIEW_INSTANCE.reload()
+      this.webview.reload()
       this.shouldReload = false
     }
   }
 
   onLoadStart = () => {
+    debug('onLoadStart')
+    if (this.state.fullscreen) {
+      this.setState({
+        fullscreen: false
+      })
+    }
     if (this.props.screenProps.onLoadStart) {
       this.props.screenProps.onLoadStart()
     }
   }
 
   onLoadEnd = () => {
+    debug('onLoadEnd')
+
     this.setLoading(false)
 
     if (this.state.refreshing) {
       this.setState({ refreshing: false })
-      WEBVIEW_INSTANCE.postMessage({ type: 'scroll-to-top' })
+      this.webview.postMessage({ type: 'scroll-to-top' })
     }
 
     if (this.props.screenProps.onLoadEnd) {
@@ -203,24 +149,12 @@ class Web extends Component {
     switch (message.type) {
       case 'initial-state':
         return this.loadInitialState(message.payload)
-      case 'share':
-        return this.shareCurrentArticle()
-      case 'show-audio-player':
-        return this.showAudioPlayer()
-      case 'article-opened':
-        return this.props.setArticle({ variables: { article: message.payload } })
-      case 'article-closed':
-        return this.props.setArticle({ variables: { article: null } })
-      case 'gallery-opened':
-        return this.props.navigation.setParams({ headerVisible: false })
-      case 'gallery-closed':
-        return this.props.navigation.setParams({ headerVisible: true })
-      case 'close-menu':
-        return this.props.closeMenu()
-      case 'show-secondary-nav':
-        return this.setSecondaryMenuState(true)
-      case 'hide-secondary-nav':
-        return this.setSecondaryMenuState(false)
+      case 'play-audio':
+        return this.playAudio(message.payload)
+      case 'fullscreen-enter':
+        return this.setState({ fullscreen: true })
+      case 'fullscreen-exit':
+        return this.setState({ fullscreen: false })
       default:
         console.log(message)
         console.warn(`Unhandled message of type: ${message.type}`)
@@ -240,21 +174,10 @@ class Web extends Component {
     }
   }
 
-  shareCurrentArticle = () => {
-    const { article } = this.props
-    const url = `${FRONTEND_BASE_URL}${article.path}`
-
-    Share.share({
-      url,
-      message: url,
-      title: article.title,
-      subject: article.title,
-      dialogTitle: article.title
+  playAudio = payload => {
+    this.props.setAudio({
+      variables: payload
     })
-  }
-
-  showAudioPlayer = () => {
-    this.props.setAudio({ variables: { audio: this.props.article.audioSource } })
   }
 
   onNetwork = async ({ query, data }) => {
@@ -292,59 +215,49 @@ class Web extends Component {
 
   onRefresh = () => {
     this.setState({ refreshing: true })
-    WEBVIEW_INSTANCE.reload()
-  }
-
-  onWebViewScroll = ({ y }) => {
-    const positiveYScroll = Math.max(y, 0)
-
-    this.setNavBarState({
-      refreshEnabled: positiveYScroll < RELOAD_OFFSET_HEIGHT,
-      visible: positiveYScroll <= 45 || positiveYScroll < this.lastScrollY
-    }, () => {
-      this.lastScrollY = positiveYScroll
-    })
+    this.webview.reload()
   }
 
   loginUser = async (user, { reload = true } = {}) => {
     debug('loginUser', user.email, { reload })
-    this.setNavBarState({ visible: true }, async () => {
-      await this.props.login({ variables: { user } })
 
-      // Force webview reload to update request cookies on iOS
-      if (reload && Platform.OS === 'ios') WEBVIEW_INSTANCE.reload()
+    await this.props.login({ variables: { user } })
 
-      this.props.screenProps.getNotificationsToken()
-    })
+    // Force webview reload to update request cookies on iOS
+    if (reload && Platform.OS === 'ios') this.webview.reload()
+
+    this.props.screenProps.getNotificationsToken()
   }
 
   logoutUser = async ({ reload = true } = {}) => {
     debug('logoutUser', { reload })
     await this.props.logout()
-    if (reload && Platform.OS === 'ios') WEBVIEW_INSTANCE.reload()
+    if (reload && Platform.OS === 'ios') this.webview.reload()
+  }
+
+  componentWillReceiveProps (nextProps) {
+    if (
+      nextProps.data.url !== this.props.data.url &&
+      this.state.fullscreen
+    ) {
+      this.setState({ fullscreen: false })
+    }
   }
 
   render () {
-    const { me, data, menuActive, audio, playbackState, article, setUrl, navigation } = this.props
-    const { loading, refreshing, refreshEnabled } = this.state
-    const articlePath = article ? article.path : null
-    const articleTitle = article ? article.title : ''
-    const navBarVisible = me && this.state.navBarVisible
-    const headerVisible = navigation.getParam('headerVisible', true)
+    const {
+      me, data,
+      audio,
+      playbackState,
+      setUrl,
+      navigation
+    } = this.props
+    const { loading, refreshing, refreshEnabled, fullscreen } = this.state
 
     return (
       <Fragment>
-        <NavBar
-          setUrl={setUrl}
-          currentUrl={data.url}
-          borderColor={article && article.color}
-          visible={navBarVisible && !menuActive}
-          style={!headerVisible && { opacity: 0 }}
-          pointerEvents={!headerVisible ? 'none' : null}
-        />
-        <SafeAreaView fullscreen={!headerVisible}>
+        <SafeAreaView fullscreen={fullscreen}>
           <ScrollView
-            style={{ marginTop: refreshing && navBarVisible ? NavBar.HEIGHT : 0 }}
             contentContainerStyle={styles.container}
             scrollEnabled={!refreshing}
             refreshControl={
@@ -361,17 +274,14 @@ class Web extends Component {
               onMessage={this.onMessage}
               onLoadEnd={this.onLoadEnd}
               onLoadStart={this.onLoadStart}
-              onScroll={this.onWebViewScroll}
               onNavigationStateChange={this.onNavigationStateChange}
               loading={{ status: loading || refreshing, showSpinner: !refreshing }}
-              ref={node => { WEBVIEW_INSTANCE = node }}
+              ref={node => { this.webview = node }}
             />
           </ScrollView>
           <AudioPlayer
-            url={audio}
+            {...audio}
             setUrl={setUrl}
-            title={articleTitle}
-            articlePath={articlePath}
             playbackState={playbackState}
           />
         </SafeAreaView>
@@ -381,18 +291,10 @@ class Web extends Component {
 }
 
 Web.navigationOptions = ({ screenProps }) => ({
-  headerStyle,
-  headerTitle: (
-    <Header
-      {...screenProps}
-      onBackClick={() => { WEBVIEW_INSTANCE.goBack() }}
-      onPDFClick={() => { WEBVIEW_INSTANCE.postMessage({ type: 'toggle-pdf' }) }}
-      onLogoClick={() => { WEBVIEW_INSTANCE.postMessage({ type: 'scroll-to-top' }) }}
-    />
-  )
+  header: null
 })
 
-var styles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     zIndex: 100
@@ -412,11 +314,6 @@ export default compose(
   getData,
   setUrl,
   setAudio,
-  closeMenu,
   withAudio,
-  setArticle,
-  withMenuState,
-  pendingAppSignIn,
-  withCurrentArticle,
-  enableSecondaryMenu
+  pendingAppSignIn
 )(Web)

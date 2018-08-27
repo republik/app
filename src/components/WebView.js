@@ -1,5 +1,13 @@
 import React, { Fragment } from 'React'
-import { Text, View, StyleSheet, TouchableOpacity, Platform, BackHandler, ActivityIndicator } from 'react-native'
+import { 
+  Text, View,
+  StyleSheet,
+  TouchableOpacity,
+  Platform,
+  BackHandler,
+  ActivityIndicator,
+  Share
+} from 'react-native'
 import IOSWebView from 'react-native-wkwebview-reborn'
 import { parse } from 'graphql'
 import { execute, makePromise } from 'apollo-link'
@@ -77,7 +85,7 @@ class WebView extends React.PureComponent {
 
     this.subscriptions = {}
     this.state = { currentUrl: props.source.uri }
-    this.webview = { ref: null, uri: props.source.uri, canGoBack: false, scrollY: 0 }
+    this.webview = { ref: null, uri: props.source.uri, canGoBack: false }
   }
 
   componentWillMount () {
@@ -157,18 +165,17 @@ class WebView extends React.PureComponent {
     return true
   }
 
-  onScrollStateChange = ({ payload }) => {
-    // Prevent calling onScroll if this didn't changed (sometimes happens for unknown reason)
-    if (
-      this.props.onScroll &&
-      this.webview.scrollY !== payload.y
-    ) {
-      this.props.onScroll(payload)
-      this.webview.scrollY = payload.y
-      return true
-    }
-
-    return false
+  share = ({ url, title, message, subject, dialogTitle }) => {
+    Share.share(Platform.OS === 'ios' ? {
+      url,
+      title,
+      subject,
+      message
+    } : {
+      dialogTitle,
+      title,
+      message: [message, url].filter(Boolean).join('\n')
+    })
   }
 
   onMessage = e => {
@@ -179,9 +186,9 @@ class WebView extends React.PureComponent {
       case 'navigation':
         debug('onMessage', message.type, message.url)
         return this.onNavigationStateChange(message)
-      case 'scroll':
-        debug('onMessage', message.type, message.payload.y)
-        return this.onScrollStateChange(message)
+      case 'share':
+        debug('onMessage', message.type, message.payload.url)
+        return this.share(message.payload)
       case 'graphql':
         debug('onMessage', message.type, message.data.id)
         return this.handleGraphQLRequest(message)
@@ -192,6 +199,16 @@ class WebView extends React.PureComponent {
       case 'log':
         console.log('Webview >>>', message.data)
         break
+      case 'initial-state':
+        // a new apollo client was initiated
+        // - unsubscribe from all previously active subscriptions
+        Object.keys(this.subscriptions).forEach(key => {
+          const subscription = this.subscriptions[key]
+          if (subscription) {
+            subscription.unsubscribe()
+          }
+        })
+        this.subscriptions = {}
       default:
         if (Config.ENV === 'development') {
           const payload = JSON.stringify(message.payload)
@@ -221,7 +238,11 @@ class WebView extends React.PureComponent {
   handleGraphQLSubscription = (message) => {
     switch (message.type) {
       case 'stop':
-        this.subscriptions[message.id] && this.subscriptions[message.id].unsubscribe()
+        const subscription = this.subscriptions[message.id]
+        if (subscription) {
+          subscription.unsubscribe()
+        }
+        delete this.subscriptions[message.id]
         break
       case 'start':
         const query = typeof message.payload.query === 'string'

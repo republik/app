@@ -30,7 +30,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>26</string>
+	<string>28</string>
 	<key>CodePushDeploymentKey</key>
 	<string>Bsk5U89NO5ZlSyCpNfHq3ku7E6gYaed374fd-a9e5-4b90-9732-7ec56cc57c1a</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
@@ -64,7 +64,11 @@
 		</dict>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string/>
+	<string>The app will not request your location.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>The app will not request your location.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>The app will not request your location.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>

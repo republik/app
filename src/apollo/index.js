@@ -8,16 +8,11 @@ import { withClientState } from 'apollo-link-state'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import { CachePersistor } from 'apollo-cache-persist'
 import { LOGIN_URL, HOME_URL } from '../constants'
-import { getMenuStateQuery } from './queries'
 import { link } from './link'
 
 const defaults = {
   url: LOGIN_URL,
   user: null,
-  menuActive: false,
-  secondaryMenuActive: false,
-  secondaryMenuVisible: false,
-  article: null,
   audio: null,
   playbackState: TrackPlayer.STATE_NONE
 }
@@ -33,34 +28,21 @@ const typeDefs = `
     portrait: String
   }
 
-  type Article {
-    id: String
-    path: String
+  type Audio {
+    url: String!
     title: String
-    color: String
-    series: String
-    template: String
-    audioSource: String
-    discussionId: String
-    discussionPath: String
+    sourcePath: String
   }
 
   type Mutation {
     logout(): Boolean
-    closeMenu(): Boolean
-    toggleMenu(): Boolean
     login(user: User!): Boolean
     setUrl(url: String!): Boolean
-    toggleSecondayMenu(): Boolean
-    setArticle(article: Article!): Boolean
-    enableSecondaryMenu(open: Boolean!): Boolean
   }
 
   type Query {
     me: User
     withCurrentUrl: String
-    withMenuState: Boolean
-    withCurrentArticle: Article
   }
 `
 
@@ -69,7 +51,6 @@ export const resolvers = {
     login: (_, { user }, context) => {
       context.cache.writeData({ data: {
         url: HOME_URL,
-        menuActive: false,
         user: { ...user, __typename: 'User' }
       } })
       return true
@@ -78,58 +59,25 @@ export const resolvers = {
       context.cache.writeData({ data: defaults })
       return false
     },
-    toggleMenu: async (_, variables, context) => {
-      const previous = await context.cache.readQuery({ query: getMenuStateQuery })
-      const next = !previous.menuActive
-      context.cache.writeData({ data: { menuActive: next } })
-      return next
-    },
-    closeMenu: async (_, variables, context) => {
-      context.cache.writeData({ data: { menuActive: false } })
-      return false
-    },
     setUrl: async (_, { url }, context) => {
       context.cache.writeData({ data: { url } })
       return true
     },
-    setArticle: async (_, { article }, context) => {
-      const meta = article ? article.meta : {}
-      const formatMeta = meta && (
-        meta.template === 'format'
-          ? meta
-          : meta.format && meta.format.meta
-      )
-      const audioSource = article ? meta.audioSource || {} : {}
-
-      const value = article ? {
-        id: article.id,
-        path: meta.path,
-        title: meta.title,
-        template: meta.template,
-        color: formatMeta ? formatMeta.color : null,
-        series: meta.series ? meta.series.title : null,
-        discussionPath: meta.discussion ? meta.discussion.meta.path : null,
-        discussionId: meta.discussion ? meta.discussion.meta.discussionId : null,
-        audioSource: audioSource.mp3 || audioSource.ogg || audioSource.aac || null,
-        __typename: 'Article'
-      } : null
-
-      context.cache.writeData({ data: { article: value } })
-      return true
-    },
-    enableSecondaryMenu: async (_, { open }, context) => {
-      const active = !open ? { secondaryMenuActive: false } : {}
-      context.cache.writeData({ data: { ...active, secondaryMenuVisible: open } })
-      return true
-    },
-    toggleSecondaryMenu: async (_, variables, context) => {
-      const previous = await context.cache.readQuery({ query: getMenuStateQuery })
-      const next = !previous.secondaryMenuActive
-      context.cache.writeData({ data: { secondaryMenuActive: next } })
-      return next
-    },
-    setAudio: async (_, { audio }, context) => {
-      const data = audio ? { audio } : { audio, playbackState: TrackPlayer.STATE_NONE }
+    setAudio: async (_, { url, title, sourcePath }, context) => {
+      const data = url
+        ? {
+          audio: {
+            __typename: 'Audio',
+            url,
+            title,
+            sourcePath
+          },
+          playbackState: TrackPlayer.STATE_PLAYING
+        }
+        : {
+          audio: null,
+          playbackState: TrackPlayer.STATE_NONE
+        }
       context.cache.writeData({ data })
       return true
     },
