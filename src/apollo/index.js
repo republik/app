@@ -32,6 +32,12 @@ const typeDefs = `
     portrait: String
   }
 
+  type Audio {
+    url: String!
+    title: String
+    sourcePath: String
+  }
+
   type Mutation {
     logout(): Boolean
     login(user: User!): Boolean
@@ -62,8 +68,21 @@ export const resolvers = {
       context.cache.writeData({ data: { url } })
       return true
     },
-    setAudio: async (_, { audio }, context) => {
-      const data = audio ? { audio } : { audio, playbackState: TrackPlayer.STATE_NONE }
+    setAudio: async (_, { url, title, sourcePath }, context) => {
+      const data = url
+        ? {
+          audio: {
+            __typename: 'Audio',
+            url,
+            title,
+            sourcePath
+          },
+          playbackState: TrackPlayer.STATE_PLAYING
+        }
+        : {
+          audio: null,
+          playbackState: TrackPlayer.STATE_NONE
+        }
       context.cache.writeData({ data })
       return true
     },

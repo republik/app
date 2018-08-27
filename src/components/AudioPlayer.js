@@ -122,8 +122,8 @@ class AudioPlayer extends React.Component {
       isPlaying: false,
       bufferedPosition: 0,
       audioUrl: props.url,
-      articleTitle: props.title,
-      articlePath: props.articlePath
+      title: props.title,
+      sourcePath: props.sourcePath
     }
   }
 
@@ -138,8 +138,8 @@ class AudioPlayer extends React.Component {
       this.setState({
         loading: true,
         audioUrl: nextProps.url,
-        articleTitle: nextProps.title,
-        articlePath: nextProps.articlePath
+        title: nextProps.title,
+        sourcePath: nextProps.sourcePath
       })
       await this.startPlaying(nextProps)
       Animated.timing(this.bottom, { toValue: 0, duration: 250 }).start()
@@ -150,8 +150,8 @@ class AudioPlayer extends React.Component {
     } else if (this.state.audioUrl !== nextProps.url) {
       this.setState({
         audioUrl: nextProps.url,
-        articleTitle: nextProps.title,
-        articlePath: nextProps.articlePath
+        title: nextProps.title,
+        sourcePath: nextProps.sourcePath
       })
       await this.stopPlaying()
       await this.startPlaying(nextProps)
@@ -278,16 +278,20 @@ class AudioPlayer extends React.Component {
   }
 
   onTitlePress = () => {
-    const { articlePath } = this.state
+    const { sourcePath } = this.state
 
-    if (articlePath) {
-      this.props.setUrl({ variables: { url: `${FRONTEND_BASE_URL}${articlePath}` } })
+    if (sourcePath) {
+      this.props.setUrl({
+        variables: {
+          url: `${FRONTEND_BASE_URL}${sourcePath}`
+        }
+      })
     }
   }
 
   render () {
     const { setAudio } = this.props
-    const { articleTitle, loading, isPlaying, duration, position, bufferedPosition } = this.state
+    const { title, loading, isPlaying, duration, position, bufferedPosition } = this.state
     const icon = isPlaying ? 'pause' : 'play'
 
     return (
@@ -313,7 +317,7 @@ class AudioPlayer extends React.Component {
               <Fragment>
                 <TouchableOpacity onPress={this.onTitlePress}>
                   <Text numberOfLines={1} style={styles.title}>
-                    {articleTitle}
+                    {title}
                   </Text>
                 </TouchableOpacity>
                 <Time duration={duration} position={position} />

@@ -20,8 +20,8 @@ const setUrl = graphql(gql`
 `, { name: 'setUrl' })
 
 const setAudio = graphql(gql`
-  mutation SetAudio($audio: String!) {
-    setAudio(audio: $audio) @client
+  mutation SetAudio($url: String, $title: String, $sourcePath: String) {
+    setAudio(url: $url, title: $title, sourcePath: $sourcePath) @client
   }
 `, { name: 'setAudio' })
 

@@ -149,8 +149,8 @@ class Web extends Component {
     switch (message.type) {
       case 'initial-state':
         return this.loadInitialState(message.payload)
-      case 'show-audio-player':
-        return this.showAudioPlayer()
+      case 'play-audio':
+        return this.playAudio(message.payload)
       case 'fullscreen-enter':
         return this.setState({ fullscreen: true })
       case 'fullscreen-exit':
@@ -174,8 +174,10 @@ class Web extends Component {
     }
   }
 
-  showAudioPlayer = () => {
-    this.props.setAudio({ variables: { audio: this.props.article.audioSource } })
+  playAudio = payload => {
+    this.props.setAudio({
+      variables: payload
+    })
   }
 
   onNetwork = async ({ query, data }) => {
@@ -243,10 +245,14 @@ class Web extends Component {
   }
 
   render () {
-    const { me, data, menuActive, audio, playbackState, article, setUrl, navigation } = this.props
+    const {
+      me, data,
+      audio,
+      playbackState,
+      setUrl,
+      navigation
+    } = this.props
     const { loading, refreshing, refreshEnabled, fullscreen } = this.state
-    const articlePath = article ? article.path : null
-    const articleTitle = article ? article.title : ''
 
     return (
       <Fragment>
@@ -274,10 +280,8 @@ class Web extends Component {
             />
           </ScrollView>
           <AudioPlayer
-            url={audio}
+            {...audio}
             setUrl={setUrl}
-            title={articleTitle}
-            articlePath={articlePath}
             playbackState={playbackState}
           />
         </SafeAreaView>

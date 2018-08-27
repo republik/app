@@ -9,7 +9,11 @@ const getCurrentUrlQuery = gql`
 
 const getCurrentAudioQuery = gql`
   query GetCurrentAudio {
-    audio @client
+    audio @client {
+      url
+      title
+      sourcePath
+    }
     playbackState @client
   }
 `

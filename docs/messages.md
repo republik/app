@@ -76,6 +76,18 @@ Triggered from the frontend when closing fullscreen content (e.g. gallery)
 | ------------- |:-------------:| -----:|
 | type      | Message type | fullscreen-exit |
 
+### play-audio
+
+Trigger native audio player
+
+| Key        | Description           | Value  |
+| ------------- |:-------------:| -----:|
+| type      | Message type | play-audio |
+| payload      | meta data | {} |
+| payload.url   | url to a aac, mp3 or ogg file | - |
+| payload.title | title | - |
+| payload.sourcePath  | path to source page | - |
+
 ##  App -> Frontend
 
 ### graphql
