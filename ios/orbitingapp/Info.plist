@@ -64,7 +64,11 @@
 		</dict>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string/>
+	<string>The app will not request your location.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>The app will not request your location.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>The app will not request your location.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>
