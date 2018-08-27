@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
 import { StyleSheet, Image, View } from 'react-native'
+import { parse } from 'url'
 import WebView from '../components/WebView'
 import SafeAreaView from '../components/SafeAreaView'
 import navigator from '../services/navigation'
 import Logo from '../assets/images/logo-title.png'
-import { parseURL, handleEnv } from '../utils/url'
+import { handleEnv } from '../utils/url'
 import { pendingAppSignIn } from '../apollo'
 
 const HEADER_HEIGHT = 45
@@ -35,9 +36,9 @@ class Login extends Component {
   }
 
   onNavigationStateChange = (data) => {
-    const url = parseURL(data.url)
+    const url = parse(data.url)
     // close overlay instead of going elsewhere
-    if (url.path !== '/mitteilung') {
+    if (url.pathname !== '/mitteilung') {
       this.authSuccessful = true
       navigator.goBack()
       return false

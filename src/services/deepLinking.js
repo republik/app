@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
 import { Linking } from 'react-native'
 import { withApollo, compose } from 'react-apollo'
-import { format } from 'url'
-import { parseURL } from '../utils/url'
+import { parse, format } from 'url'
 import { FRONTEND_BASE_URL } from '../constants'
 
 const deepLinkingWrapper = WrappedComponent => (
@@ -21,16 +20,13 @@ const deepLinkingWrapper = WrappedComponent => (
     }
 
     handleOpenURL = (event) => {
-      const { path, params } = parseURL(event.url)
+      const { path } = parse(event.url || '')
 
       // When deep/universal link opened, we edit
       //   the global url state to show correct page
       setTimeout(() => {
         this.props.client.writeData({ data: {
-          url: `${FRONTEND_BASE_URL}${format({
-            pathname: path,
-            query: params
-          })}`
+          url: `${FRONTEND_BASE_URL}${path}`
         } })
       }, 100)
     }

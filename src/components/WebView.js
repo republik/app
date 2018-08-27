@@ -10,12 +10,12 @@ import {
 } from 'react-native'
 import IOSWebView from 'react-native-wkwebview-reborn'
 import { parse } from 'graphql'
+import { parse as parseUrl } from 'url'
 import { execute, makePromise } from 'apollo-link'
 import AndroidWebView from './AndroidWebView'
-import { parseURL } from '../utils/url'
 import { injectedJavaScript } from '../utils/webview'
 import { link } from '../apollo'
-import { FRONTEND_BASE_URL, FEED_PATH, USER_AGENT } from '../constants'
+import { FRONTEND_HOST, FEED_PATH, USER_AGENT } from '../constants'
 import withT from '../utils/withT'
 import mkDebug from '../utils/debug'
 import Config from 'react-native-config'
@@ -95,8 +95,8 @@ class WebView extends React.PureComponent {
   }
 
   componentWillReceiveProps (nextProps) {
-    const nextUrl = parseURL(nextProps.source.uri)
-    const previousUrl = parseURL(this.props.source.uri)
+    const nextUrl = parseUrl(nextProps.source.uri)
+    const previousUrl = parseUrl(this.props.source.uri)
 
     // If url host changes, we force the redirect
     // This might happen when user change settings in ios
@@ -139,7 +139,7 @@ class WebView extends React.PureComponent {
   // Native onNavigationStateChange method shim.
   // We call onNavigationStateChange either when the native calls, or onMessage
   onNavigationStateChange = ({ url, canGoBack }) => {
-    const { host } = parseURL(url)
+    const { host } = parseUrl(url)
     const { onNavigationStateChange } = this.props
 
     this.webview.canGoBack = this.webview.canGoBack || canGoBack
@@ -154,7 +154,7 @@ class WebView extends React.PureComponent {
           this.webview.ref.stopLoading()
 
           // Only force back when navigating inside Republik's page
-          if (host === parseURL(FRONTEND_BASE_URL).host) {
+          if (host === FRONTEND_HOST) {
             this.webview.ref.goBack()
           }
           return false

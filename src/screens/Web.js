@@ -5,12 +5,12 @@ import {
 import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'
 import debounce from 'lodash.debounce'
-import { parseURL } from '../utils/url'
+import { parse } from 'url'
 import WebView from '../components/WebView'
 import AudioPlayer from '../components/AudioPlayer'
 import SafeAreaView from '../components/SafeAreaView'
 import navigator from '../services/navigation'
-import { FRONTEND_BASE_URL, OFFERS_PATH, LOGIN_PATH } from '../constants'
+import { FRONTEND_HOST, OFFERS_PATH, LOGIN_PATH } from '../constants'
 import {
   me,
   login,
@@ -29,7 +29,6 @@ const RELOAD_TIME_THRESHOLD = 60 * 60 * 1000 // 1hr
 const RESTRICTED_PATHS = [OFFERS_PATH]
 const PERMITTED_PROTOCOLS = ['react-js-navigation']
 
-const FRONTEND_HOST = parseURL(FRONTEND_BASE_URL).host
 const isExternalURL = ({ host, protocol }) => (
   FRONTEND_HOST !== host &&
   !PERMITTED_PROTOCOLS.includes(protocol)
@@ -89,11 +88,11 @@ class Web extends Component {
   }, 150)
 
   onNavigationStateChange = (data) => {
-    const url = parseURL(data.url)
+    const url = parse(data.url || '')
 
     // If user goes to a external or restricted path, we open it in system browser
     // and prevent webview to go there.
-    if (isExternalURL(url) || RESTRICTED_PATHS.includes(url.path)) {
+    if (isExternalURL(url) || RESTRICTED_PATHS.includes(url.pathname)) {
       Linking.openURL(data.url)
       return false
     }
@@ -105,13 +104,13 @@ class Web extends Component {
   }
 
   reloadIfNeccesary = async () => {
-    const url = parseURL(this.props.data.url)
+    const url = parse(this.props.data.url || '')
     const isConnected = await NetInfo.isConnected.fetch()
 
     if (
       isConnected &&
       this.shouldReload &&
-      url.path !== LOGIN_PATH
+      url.pathname !== LOGIN_PATH
     ) {
       this.setState({ loading: true })
       this.webview.reload()
