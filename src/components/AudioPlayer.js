@@ -52,14 +52,15 @@ const styles = StyleSheet.create({
   },
   time: {
     fontSize: 14,
-    fontFamily: 'GT America'
+    fontFamily: 'GT America',
+    fontVariant: ['tabular-nums']
   }
 })
 
 const parseSeconds = (value) => {
   if (value === null || value === undefined) return ''
   const minutes = Math.floor(value / 60)
-  const seconds = (value - (minutes * 60)).toFixed(0)
+  const seconds = Math.floor(value - (minutes * 60))
   return minutes + ':' + (seconds < 10 ? '0' : '') + seconds
 }
 
