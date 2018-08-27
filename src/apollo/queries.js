@@ -1,5 +1,5 @@
 import gql from 'graphql-tag'
-import { graphql } from 'react-apollo'
+import { graphql, compose } from 'react-apollo'
 
 const getCurrentUrlQuery = gql`
   query GetCurrentUrl {
@@ -58,22 +58,25 @@ const me = graphql(gql`
   }
 })
 
-const pendingAppSignIn = graphql(pendingAppSignInQuery, {
-  options: {
-    fetchPolicy: 'network-only'
-  },
-  props: ({ data }) => {
-    return {
-      pendingAppSignIn: data.pendingAppSignIn,
-      refetchPendingSignInRequests: data.refetch
+const pendingAppSignIn = compose(
+  me,
+  graphql(pendingAppSignInQuery, {
+    skip: props => !props.me,
+    options: {
+      fetchPolicy: 'network-only'
+    },
+    props: ({ data, ownProps: { me } }) => {
+      return {
+        pendingAppSignIn: data.pendingAppSignIn,
+        refetchPendingSignInRequests: data.refetch
+      }
     }
-  }
-})
+  })
+)
 
 export {
   me,
   withAudio,
   withCurrentUrl,
-  pendingAppSignIn,
-  pendingAppSignInQuery
+  pendingAppSignIn
 }

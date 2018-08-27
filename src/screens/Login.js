@@ -28,7 +28,10 @@ class Login extends Component {
   authSuccessful = false
 
   componentWillUnmount () {
-    this.props.refetchPendingSignInRequests()
+    const { refetchPendingSignInRequests } = this.props
+    if (refetchPendingSignInRequests) {
+      refetchPendingSignInRequests()
+    }
   }
 
   onNavigationStateChange = (data) => {
