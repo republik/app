@@ -13,10 +13,6 @@ import { link } from './link'
 const defaults = {
   url: LOGIN_URL,
   user: null,
-  menuActive: false,
-  secondaryMenuActive: false,
-  secondaryMenuVisible: false,
-  article: null,
   audio: null,
   playbackState: TrackPlayer.STATE_NONE
 }
@@ -55,7 +51,6 @@ export const resolvers = {
     login: (_, { user }, context) => {
       context.cache.writeData({ data: {
         url: HOME_URL,
-        menuActive: false,
         user: { ...user, __typename: 'User' }
       } })
       return true
