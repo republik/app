@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Linking } from 'react-native'
 import { withApollo, compose } from 'react-apollo'
+import { format } from 'url'
 import { parseURL } from '../utils/url'
 import { FRONTEND_BASE_URL } from '../constants'
 
@@ -26,7 +27,10 @@ const deepLinkingWrapper = WrappedComponent => (
       //   the global url state to show correct page
       setTimeout(() => {
         this.props.client.writeData({ data: {
-          url: `${FRONTEND_BASE_URL}${path}?${params.toString()}`
+          url: `${FRONTEND_BASE_URL}${format({
+            pathname: path,
+            query: params
+          })}`
         } })
       }, 100)
     }

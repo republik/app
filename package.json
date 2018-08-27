@@ -56,8 +56,7 @@
     "react-native-zip-archive": "^2.2.6",
     "react-navigation": "^2.0.1",
     "rn-fetch-blob": "^0.10.12",
-    "subscriptions-transport-ws": "^0.9.10",
-    "url-parse": "^1.4.0"
+    "subscriptions-transport-ws": "^0.9.10"
   },
   "devDependencies": {
     "archiver": "^2.1.1",

@@ -1,50 +1,16 @@
-import parse from 'url-parse'
 import Config from 'react-native-config'
 import { Platform } from 'react-native'
-
-const parseParams = params => {
-  if (!params || params === '') {
-    return {}
-  }
-
-  return params.split('&').reduce((acc, param) => {
-    const paramData = param.split('=')
-
-    return {
-      ...acc,
-      [paramData[0]]: paramData[1]
-    }
-  }, {})
-}
-
-const normalize = url => url.replace('www.', '')
+import { parse } from 'url'
 
 export const parseURL = value => {
-  const match = parse(value)
-
-  if (!match) {
-    return {
-      url: value,
-      protocol: null,
-      host: null,
-      path: null,
-      params: {
-        toString: () => ''
-      }
-    }
-  }
-
-  const params = match.query.substring(1)
+  const url = parse(value || '', true)
 
   return {
-    url: normalize(match.href),
-    protocol: match.protocol,
-    host: normalize(match.hostname),
-    path: match.pathname,
-    params: {
-      ...parseParams(params),
-      toString: () => params
-    }
+    url: url.href,
+    protocol: url.protocol,
+    host: url.hostname,
+    path: url.pathname,
+    params: url.query
   }
 }
 
