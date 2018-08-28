@@ -5321,6 +5321,10 @@ react-native-firebase@^4.2.0:
     postinstall-build "^5.0.1"
     prop-types "^15.6.1"
 
+react-native-haptic@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/react-native-haptic/-/react-native-haptic-1.0.1.tgz#5ecedb6049c1b0cdeca5e31e4fbde16a622675f3"
+
 react-native-notifications@^1.1.19:
   version "1.1.19"
   resolved "https://registry.yarnpkg.com/react-native-notifications/-/react-native-notifications-1.1.19.tgz#0b702878ae8c4e46874f6e8e96864acd2a001b4c"

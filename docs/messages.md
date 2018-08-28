@@ -42,7 +42,16 @@ Trigger `react-native`s [`Vibration.vibrate`](https://facebook.github.io/react-n
 | payload.repeat | bool, loop, you will need to send cancel true | - |
 | payload.cancel | bool, stops vibrating when truthy | - |
 
-See `react-native`s [`Share.share`](https://facebook.github.io/react-native/docs/share).
+### haptic
+
+Trigger `react-native-haptic`s [`ReactNativeHaptic.generate`](https://github.com/AppAndFlow/react-native-haptic)
+
+| Key        | Description           | Value  |
+| ------------- |:-------------:| -----:|
+| type      | Message type | vibrate |
+| payload      | haptic data | {} |
+| payload.type | string, e.g. `impact` | - |
+| payload.prepare | bool, awake taptic engine, optional call | - |
 
 ### graphql
 

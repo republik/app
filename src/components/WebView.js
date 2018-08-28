@@ -20,6 +20,7 @@ import { FRONTEND_HOST, FEED_PATH, USER_AGENT } from '../constants'
 import withT from '../utils/withT'
 import mkDebug from '../utils/debug'
 import Config from 'react-native-config'
+import ReactNativeHaptic from 'react-native-haptic'
 
 const debug = mkDebug('WebView')
 
@@ -179,6 +180,25 @@ class WebView extends React.PureComponent {
     })
   }
 
+  vibrate (payload = {}) {
+    if (payload.cancel) {
+      Vibration.cancel()
+    } else {
+      Vibration.vibrate(
+        payload.pattern || 1000,
+        payload.repeat
+      )
+    }
+  }
+
+  haptic (payload = {}) {
+    if (payload.prepare) {
+      ReactNativeHaptic.prepare()
+    } else {
+      ReactNativeHaptic.generate(payload.type)
+    }
+  }
+
   onMessage = e => {
     const { onMessage } = this.props
     const message = JSON.parse(e.nativeEvent.data)
@@ -201,17 +221,11 @@ class WebView extends React.PureComponent {
         console.log('Webview >>>', message.data)
         break
       case 'vibrate':
-        const { payload = {} } = message
-        debug('onMessage', message.type, JSON.stringify(payload))
-        if (payload.cancel) {
-          Vibration.cancel()
-        } else {
-          Vibration.vibrate(
-            payload.pattern || 1000,
-            payload.repeat
-          )
-        }
-        return
+        debug('onMessage', message.type, JSON.stringify(message.payload))
+        return this.vibrate(message.payload)
+      case 'haptic':
+        debug('onMessage', message.type, JSON.stringify(message.payload))
+        return this.haptic(message.payload)
       case 'initial-state':
         // a new apollo client was initiated
         // - unsubscribe from all previously active subscriptions
