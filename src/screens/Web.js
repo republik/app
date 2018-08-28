@@ -277,10 +277,6 @@ class Web extends Component {
   }
 }
 
-Web.navigationOptions = ({ screenProps }) => ({
-  header: null
-})
-
 const getData = graphql(gql`
   query GetData {
     url @client

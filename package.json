@@ -55,7 +55,7 @@
     "react-native-track-player": "^0.2.4",
     "react-native-wkwebview-reborn": "https://github.com/orbiting/react-native-wkwebview#1.24.0",
     "react-native-zip-archive": "^2.2.6",
-    "react-navigation": "^2.0.1",
+    "react-navigation": "^2.12.1",
     "rn-fetch-blob": "^0.10.12",
     "subscriptions-transport-ws": "^0.9.10"
   },

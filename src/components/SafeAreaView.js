@@ -32,14 +32,21 @@ class SafeAreaView extends Component {
       <RawSafeAreaView style={{
         flex: 1,
         backgroundColor: fullscreen ? '#000' : '#fff'
-      }} forceInset={{ bottom: 'never' }}>
+      }} forceInset={{
+        bottom: 'never',
+        top: fullscreen ? 'never' : 'always'
+      }}>
+        <StatusBar hidden={landscape || fullscreen}  />
         <View style={{flex: 1}} onLayout={this.onLayout}>
-          <StatusBar hidden={landscape || fullscreen}  />
           {children}
         </View>
       </RawSafeAreaView>
     )
   }
+}
+
+SafeAreaView.defaultProps = {
+  fullscreen: false
 }
 
 export default SafeAreaView

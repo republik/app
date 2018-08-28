@@ -13,7 +13,9 @@ import pushNotifications from './services/pushNotifications'
 import withApollo from './apollo'
 
 const Router = createStackNavigator({
-  Web: { screen: Web },
+  Web: {
+    screen: Web
+  },
   Login: {
     screen: Login,
     path: 'login/:url'
@@ -21,14 +23,7 @@ const Router = createStackNavigator({
 }, {
   mode: 'modal',
   initialRouteName: 'Web',
-  navigationOptions: ({ screenProps, navigation }) => {
-    // const params = navigation.state.params || {}
-
-    return {
-      headerTintColor: '#000000',
-      header: null
-    }
-  }
+  headerMode: 'none'
 })
 
 class App extends Component {

@@ -6,7 +6,6 @@ import navigator from '../services/navigation'
 import { handleEnv } from '../utils/url'
 import { pendingAppSignIn } from '../apollo'
 
-
 class Login extends Component {
   authSuccessful = false
 
@@ -44,9 +43,5 @@ class Login extends Component {
     )
   }
 }
-
-Login.navigationOptions = ({ screenProps }) => ({
-  header: null
-})
 
 export default pendingAppSignIn(Login)
