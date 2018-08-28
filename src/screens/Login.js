@@ -1,29 +1,11 @@
 import React, { Component } from 'react'
-import { StyleSheet, Image, View } from 'react-native'
 import { parse } from 'url'
 import WebView from '../components/WebView'
 import SafeAreaView from '../components/SafeAreaView'
 import navigator from '../services/navigation'
-import Logo from '../assets/images/logo-title.png'
 import { handleEnv } from '../utils/url'
 import { pendingAppSignIn } from '../apollo'
 
-const HEADER_HEIGHT = 45
-const headerStyle = {
-  zIndex: 400,
-  backgroundColor: '#FFFFFF',
-  borderBottomWidth: 1,
-  borderBottomColor: '#DADDDC',
-  height: HEADER_HEIGHT,
-  shadowOpacity: 0,
-  elevation: 0
-}
-
-const LoginHeader = () => (
-  <View style={styles.headerContainer}>
-    <Image source={Logo} style={styles.logo} />
-  </View>
-)
 
 class Login extends Component {
   authSuccessful = false
@@ -54,7 +36,6 @@ class Login extends Component {
         <WebView
           source={{ uri }}
           onMessage={this.onMessage}
-          style={styles.container}
           onNavigationStateChange={this.onNavigationStateChange}
           ref={node => { this.webview = node }}
           forceRedirect
@@ -65,26 +46,7 @@ class Login extends Component {
 }
 
 Login.navigationOptions = ({ screenProps }) => ({
-  header: undefined,
-  headerTitle: <LoginHeader />,
-  headerRight: <View />,
-  headerStyle
-})
-
-var styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    zIndex: 100
-  },
-  headerContainer: {
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  logo: {
-    width: 150,
-    height: 25
-  }
+  header: null
 })
 
 export default pendingAppSignIn(Login)
