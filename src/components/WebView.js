@@ -201,7 +201,7 @@ class WebView extends React.PureComponent {
         console.log('Webview >>>', message.data)
         break
       case 'vibrate':
-        const { payload } = message
+        const { payload = {} } = message
         debug('onMessage', message.type, JSON.stringify(payload))
         if (payload.cancel) {
           Vibration.cancel()
