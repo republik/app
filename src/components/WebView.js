@@ -6,7 +6,8 @@ import {
   Platform,
   BackHandler,
   ActivityIndicator,
-  Share
+  Share,
+  Vibration
 } from 'react-native'
 import IOSWebView from 'react-native-wkwebview-reborn'
 import { parse } from 'graphql'
@@ -199,6 +200,18 @@ class WebView extends React.PureComponent {
       case 'log':
         console.log('Webview >>>', message.data)
         break
+      case 'vibrate':
+        const { payload } = message
+        debug('onMessage', message.type, JSON.stringify(payload))
+        if (payload.cancel) {
+          Vibration.cancel()
+        } else {
+          Vibration.vibrate(
+            payload.pattern || 1000,
+            payload.repeat
+          )
+        }
+        return
       case 'initial-state':
         // a new apollo client was initiated
         // - unsubscribe from all previously active subscriptions

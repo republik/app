@@ -30,6 +30,20 @@ Trigger native share dialog
 
 See `react-native`s [`Share.share`](https://facebook.github.io/react-native/docs/share).
 
+### vibrate
+
+Trigger `react-native`s [`Vibration.vibrate`](https://facebook.github.io/react-native/docs/vibration)
+
+| Key        | Description           | Value  |
+| ------------- |:-------------:| -----:|
+| type      | Message type | vibrate |
+| payload      | vibration data | {} |
+| payload.pattern | duration number or vibration pattern as array of numbers, on iOS the duration of the vibration is not configurable—only wait times inbetween | - |
+| payload.repeat | bool, loop, you will need to send cancel true | - |
+| payload.cancel | bool, stops vibrating when truthy | - |
+
+See `react-native`s [`Share.share`](https://facebook.github.io/react-native/docs/share).
+
 ### graphql
 
 GraphQL network request to be resolved app-side
