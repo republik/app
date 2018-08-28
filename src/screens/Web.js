@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react'
 import {
-  StyleSheet, Linking, ScrollView, RefreshControl, AppState, NetInfo, Platform
+  StyleSheet, Linking, AppState, NetInfo, Platform
 } from 'react-native'
 import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'
@@ -40,8 +40,7 @@ class Web extends Component {
 
     this.state = {
       loading: true,
-      refreshing: false,
-      refreshEnabled: true
+      refreshing: false
     }
 
     this.shouldReload = false
@@ -252,33 +251,21 @@ class Web extends Component {
       setUrl,
       navigation
     } = this.props
-    const { loading, refreshing, refreshEnabled, fullscreen } = this.state
+    const { loading, refreshing, fullscreen } = this.state
 
     return (
       <Fragment>
         <SafeAreaView fullscreen={fullscreen}>
-          <ScrollView
-            contentContainerStyle={styles.container}
-            scrollEnabled={!refreshing}
-            refreshControl={
-              <RefreshControl
-                onRefresh={this.onRefresh}
-                refreshing={this.state.refreshing}
-                enabled={refreshEnabled}
-              />
-            }
-          >
-            <WebView
-              source={{ uri: data.url }}
-              onNetwork={this.onNetwork}
-              onMessage={this.onMessage}
-              onLoadEnd={this.onLoadEnd}
-              onLoadStart={this.onLoadStart}
-              onNavigationStateChange={this.onNavigationStateChange}
-              loading={{ status: loading || refreshing, showSpinner: !refreshing }}
-              ref={node => { this.webview = node }}
-            />
-          </ScrollView>
+          <WebView
+            source={{ uri: data.url }}
+            onNetwork={this.onNetwork}
+            onMessage={this.onMessage}
+            onLoadEnd={this.onLoadEnd}
+            onLoadStart={this.onLoadStart}
+            onNavigationStateChange={this.onNavigationStateChange}
+            loading={{ status: loading || refreshing, showSpinner: !refreshing }}
+            ref={node => { this.webview = node }}
+          />
           <AudioPlayer
             {...audio}
             setUrl={setUrl}
@@ -292,13 +279,6 @@ class Web extends Component {
 
 Web.navigationOptions = ({ screenProps }) => ({
   header: null
-})
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    zIndex: 100
-  }
 })
 
 const getData = graphql(gql`
