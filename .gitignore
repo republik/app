@@ -63,6 +63,7 @@ GoogleService-Info.plist
 
 # iOS
 Pods
+ios/orbitingapp.app.dSYM.zip
 
 # Env
 .env
