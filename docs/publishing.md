@@ -15,13 +15,23 @@ fastlane match development
 
 ### Publish
 
-#### Beta version
+#### Staging version
 
-Just run
+This will use `.env.staging`.
 
 ```sh
 yarn deploy-ios-beta
 ```
+
+#### Production version
+
+This will use `.env.production`.
+
+```sh
+yarn deploy-ios-production
+```
+
+This will also just upload a build to Apple that can be used for TestFlight and real releases.
 
 ## Android
 
@@ -63,7 +73,7 @@ Android native project has a separate .env file used in the publishing process. 
 
 #### Alpha version
 
-Just run
+This will use `.env.staging`.
 
 ```sh
 yarn deploy-android-alpha type:[version-type]
@@ -81,3 +91,11 @@ This process will:
 3. Build signed APK
 4. Upload APK to Google Play as new alpha version
 5. Post success message in Slack
+
+#### Alpha version pointing at Production
+
+This will use `.env.production`.
+
+```sh
+yarn deploy-android-alpha-prod type:[version-type]
+```

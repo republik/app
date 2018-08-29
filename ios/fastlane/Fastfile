@@ -42,4 +42,28 @@ platform :ios do
      }
    )
   end
+  lane :production do
+    increment_build_number
+    match(
+      type: "appstore",
+      git_url: "git@github.com:orbiting/app-certificates.git"
+    ) # more information: https://codesigning.guide
+    gym(
+      scheme: "orbitingapp (production)"
+    ) # Build your app - more options available
+    pilot(skip_waiting_for_build_processing: true)
+    slack(
+     message: "New version successfully uploaded to Apple.",
+     success: true,
+     slack_url: ENV["SLACK_URL"],
+     attachment_properties: {
+       fields: [
+         {
+           title: "Build code",
+           value: lane_context[SharedValues::BUILD_NUMBER],
+         },
+       ]
+     }
+   )
+  end
 end
