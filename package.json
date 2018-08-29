@@ -18,7 +18,8 @@
     "deploy-ios-production": "cd ./ios && fastlane ios production && cd -",
     "release-ota": "node scripts/ota/release",
     "translations": "gsheets --key=1KFxXKjFplXM97N9ssk55oJol0FttDfwYiR9MJSQwpqw --title=live --pretty --out src/utils/translations.json",
-    "standardize": "standard --fix"
+    "standardize": "standard --fix",
+    "bundle-into-simulator-app": "react-native bundle --platform ios --entry-file index.js --bundle-output ./ios/build/Build/Products/Debug-iphonesimulator/orbitingapp.app/main.jsbundle --assets-dest ./ios/build/Build/Products/Debug-iphonesimulator/orbitingapp.app/ --dev false"
   },
   "lint-staged": {
     "*.js": [
