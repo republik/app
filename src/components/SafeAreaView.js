@@ -4,9 +4,13 @@ import {
 } from 'react-native'
 import { SafeAreaView as RawSafeAreaView } from 'react-navigation'
 
-const isLandscape = () => {
+const getHiddenStatusBar = () => {
   const { width, height } = Dimensions.get('window')
-  return width > height
+
+  return (
+    width > height && // landscape
+    height < 600 // not big enough tablet
+  )
 }
 
 class SafeAreaView extends Component {
@@ -14,20 +18,20 @@ class SafeAreaView extends Component {
     super(props)
 
     this.state = {
-      landscape: isLandscape()
+      hiddenStatusBar: getHiddenStatusBar()
     }
   }
   onLayout = () => {
-    const landscape = isLandscape()
-    if (landscape !== this.state.landscape) {
+    const hiddenStatusBar = getHiddenStatusBar()
+    if (hiddenStatusBar !== this.state.hiddenStatusBar) {
       this.setState({
-        landscape
+        hiddenStatusBar
       })
     }
   }
   render () {
     const { children, fullscreen } = this.props
-    const { landscape } = this.state
+    const { hiddenStatusBar } = this.state
     return (
       <RawSafeAreaView style={{
         flex: 1,
@@ -36,7 +40,7 @@ class SafeAreaView extends Component {
         bottom: 'never',
         top: fullscreen ? 'never' : 'always'
       }}>
-        <StatusBar hidden={landscape || fullscreen}  />
+        <StatusBar hidden={hiddenStatusBar || fullscreen}  />
         <View style={{flex: 1}} onLayout={this.onLayout}>
           {children}
         </View>
