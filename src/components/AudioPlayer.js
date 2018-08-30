@@ -1,10 +1,11 @@
 import React, { Component, Fragment } from 'react'
-import { View, Text, StyleSheet, Animated, ActivityIndicator, PanResponder, Dimensions, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, Animated, PanResponder, Dimensions, TouchableOpacity } from 'react-native'
 import TrackPlayer from 'react-native-track-player'
 import Icon from './Icon'
-import { setAudio } from '../apollo'
+import { withAudio, setAudio, setPlaybackState } from '../apollo'
 import Logo from '../assets/images/playlist-logo.png'
 import { FRONTEND_BASE_URL } from '../constants'
+import { compose } from 'react-apollo'
 
 const AUDIO_PLAYER_HEIGHT = 65
 
@@ -122,29 +123,37 @@ class AudioPlayer extends Component {
   constructor (props) {
     super(props)
 
-    this.bottom = new Animated.Value(props.url ? 0 : -AUDIO_PLAYER_HEIGHT)
+    this.bottom = new Animated.Value(props.audio ? 0 : -AUDIO_PLAYER_HEIGHT)
     this.state = {
-      loading: false,
       isPlaying: false
     }
   }
 
   async componentWillReceiveProps (nextProps) {
-    if (nextProps.url) {
-      if (this.state.audioUrl !== nextProps.url) {
+    if (nextProps.audio) {
+      if (this.state.audio !== nextProps.audio) {
         await this.setTrack(nextProps)
         TrackPlayer.play()
         Animated.timing(this.bottom, { toValue: 0, duration: ANIMATION_DURATION }).start()
       }
-    } else if (this.state.audioUrl) {
+    } else if (this.state.audio) {
       await this.clearTrack()
       Animated.timing(this.bottom, { toValue: -AUDIO_PLAYER_HEIGHT, duration: 250 }).start()
     }
+    // see TrackPlayer.registerEventHandler in the root index.js
+    if (this.props.playbackState !== nextProps.playbackState) {
+      await this.onPlaybackStateChange(nextProps.playbackState)
+    }
   }
 
-  componentDidMount () {
-    if (this.props.url) {
-      this.setTrack(this.props)
+  async componentDidMount () {
+    if (this.props.audio) {
+      await this.setTrack(this.props)
+      const state = await TrackPlayer.getState()
+      if (state !== this.props.playbackState) {
+        this.props.setPlaybackState({ variables: {state} })
+      }
+      await this.onPlaybackStateChange(state)
     }
   }
 
@@ -163,32 +172,23 @@ class AudioPlayer extends Component {
         TrackPlayer.CAPABILITY_STOP
       ]
     })
-
-    TrackPlayer.registerEventHandler(async (data) => {
-      if (data.type === 'playback-state') {
-        this.onPlaybackStateChange(data.state)
-      }
-    })
   }
 
-  setTrack = async (props) => {
-    if (this.state.audioUrl === props.url) {
+  setTrack = async ({ audio }) => {
+    if (this.state.audio === audio) {
       return
     }
-    if (this.state.audioUrl) {
+    if (this.state.audio) {
       await this.clearTrack()
     }
     this.setState({
-      // loading: true,
-      audioUrl: props.url,
-      title: props.title,
-      sourcePath: props.sourcePath
+      audio
     })
     await this.setupPlayer()
     await TrackPlayer.add({
-      id: props.title,
-      url: props.url,
-      title: props.title,
+      id: audio.url,
+      url: audio.url,
+      title: audio.title,
       artist: 'Republik',
       artwork: Logo
     })
@@ -197,10 +197,7 @@ class AudioPlayer extends Component {
 
   clearTrack = async () => {
     this.setState({
-      loading: false,
-      audioUrl: undefined,
-      title: undefined,
-      sourcePath: undefined
+      audio: undefined
     })
     try {
       await TrackPlayer.stop()
@@ -229,10 +226,7 @@ class AudioPlayer extends Component {
         this.setState({ isPlaying: false })
         break
       case TrackPlayer.STATE_STOPPED:
-        // Delay change to make animation nicer
-        setTimeout(() => {
-          this.setState({ isPlaying: false, duration: null, position: 0 })
-        }, ANIMATION_DURATION)
+        this.setState({ isPlaying: false, duration: null, position: 0 })
         break
       case TrackPlayer.STATE_NONE:
         this.setState({
@@ -263,12 +257,12 @@ class AudioPlayer extends Component {
   }
 
   onTitlePress = () => {
-    const { sourcePath } = this.state
+    const { audio } = this.state
 
-    if (sourcePath) {
+    if (audio && audio.sourcePath) {
       this.props.setUrl({
         variables: {
-          url: `${FRONTEND_BASE_URL}${sourcePath}`
+          url: `${FRONTEND_BASE_URL}${audio.sourcePath}`
         }
       })
     }
@@ -306,7 +300,7 @@ class AudioPlayer extends Component {
 
   render () {
     const { setAudio } = this.props
-    const { title, loading, isPlaying, duration, position, bufferedPosition } = this.state
+    const { audio, isPlaying, duration, position, bufferedPosition } = this.state
     const icon = isPlaying ? 'pause' : 'play'
 
     return (
@@ -326,29 +320,30 @@ class AudioPlayer extends Component {
           onPress={() => this.onPlayPauseClick()}
         />
         <View style={styles.content}>
-          { loading
-            ? <ActivityIndicator />
-            : (
-              <Fragment>
-                <TouchableOpacity onPress={this.onTitlePress}>
-                  <Text numberOfLines={1} style={styles.title}>
-                    {title}
-                  </Text>
-                </TouchableOpacity>
-                <Time duration={duration} position={position} />
-              </Fragment>
-            )
-          }
+          <Fragment>
+            <TouchableOpacity onPress={this.onTitlePress}>
+              <Text numberOfLines={1} style={styles.title}>
+                {audio && audio.title}
+              </Text>
+            </TouchableOpacity>
+            <Time duration={duration} position={position} />
+          </Fragment>
         </View>
         <Icon
           type='close'
           size={35}
           style={{ marginRight: 15 }}
-          onPress={() => setAudio({ variables: { audio: null } })}
+          onPress={() => setAudio({
+            variables: { url: null }
+          })}
         />
       </Animated.View>
     )
   }
 }
 
-export default setAudio(AudioPlayer)
+export default compose(
+  withAudio,
+  setAudio,
+  setPlaybackState
+)(AudioPlayer)

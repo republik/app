@@ -13,7 +13,9 @@ const getCurrentAudioQuery = gql`
       url
       title
       sourcePath
+      opened
     }
+    playbackState @client
   }
 `
 
@@ -35,8 +37,9 @@ const withCurrentUrl = graphql(getCurrentUrlQuery, {
 })
 
 const withAudio = graphql(getCurrentAudioQuery, {
-  props: ({ data: { audio } }) => ({
-    audio
+  props: ({ data: { audio, playbackState } }) => ({
+    audio,
+    playbackState
   })
 })
 

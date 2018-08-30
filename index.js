@@ -5,6 +5,8 @@ import { client, setPlaybackStateMutation } from './src/apollo'
 
 AppRegistry.registerComponent('orbitingapp', () => App)
 
+// TrackPlayer.registerEventHandler should be registered right after registering your React application with AppRegistry:
+// https://github.com/react-native-kit/react-native-track-player/wiki/Documentation#registereventhandlerhandler
 TrackPlayer.registerEventHandler(async event => {
   switch (event.type) {
     case 'remote-play':
