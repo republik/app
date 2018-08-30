@@ -41,11 +41,6 @@ const rollDeviceToken = graphql(gql`
   }
 `, { name: 'rollDeviceToken' })
 
-const setPlaybackStateMutation = gql`
-  mutation SetPlaybackState($state: String!) {
-    setPlaybackState(state: $state) @client
-  }
-`
 
 export {
   login,
@@ -53,6 +48,5 @@ export {
   logout,
   setAudio,
   upsertDevice,
-  rollDeviceToken,
-  setPlaybackStateMutation
+  rollDeviceToken
 }

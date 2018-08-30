@@ -66,3 +66,5 @@ export default compose(
   cookies,
   settings
 )(App)
+
+console.ignoredYellowBox = ['Warning: isMounted(...) is deprecated in plain JavaScript React classes.']

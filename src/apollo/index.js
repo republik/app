@@ -1,7 +1,6 @@
 import React from 'react'
 import { AsyncStorage } from 'react-native'
 import { ApolloProvider } from 'react-apollo'
-import TrackPlayer from 'react-native-track-player'
 import ApolloClient from 'apollo-client'
 import { ApolloLink } from 'apollo-link'
 import { withClientState } from 'apollo-link-state'
@@ -13,8 +12,7 @@ import { link } from './link'
 const defaults = {
   url: LOGIN_URL,
   user: null,
-  audio: null,
-  playbackState: TrackPlayer.STATE_NONE
+  audio: null
 }
 
 const typeDefs = `
@@ -71,18 +69,12 @@ export const resolvers = {
             url,
             title,
             sourcePath
-          },
-          playbackState: TrackPlayer.STATE_PLAYING
+          }
         }
         : {
-          audio: null,
-          playbackState: TrackPlayer.STATE_NONE
+          audio: null
         }
       context.cache.writeData({ data })
-      return true
-    },
-    setPlaybackState: async (_, { state }, context) => {
-      context.cache.writeData({ data: { playbackState: state } })
       return true
     }
   }

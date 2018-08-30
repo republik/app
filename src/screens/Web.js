@@ -247,7 +247,6 @@ class Web extends Component {
     const {
       me, data,
       audio,
-      playbackState,
       setUrl,
       navigation
     } = this.props
@@ -269,7 +268,6 @@ class Web extends Component {
           <AudioPlayer
             {...audio}
             setUrl={setUrl}
-            playbackState={playbackState}
           />
         </SafeAreaView>
       </Fragment>
