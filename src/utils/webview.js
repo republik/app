@@ -35,21 +35,6 @@ export const injectedJavaScriptImpl = function () {
     updateNavState()
     return back.apply(window.history)
   }
-
-  document.addEventListener('message', function (event) {
-    var message = {}
-    try {
-      message = JSON.parse(event.data)
-    } catch (error) {}
-
-    if (message.type === 'scroll-to-top') {
-      window.scrollTo(0, 0)
-    } else if (message.type === 'pushRoute') {
-      window.Router.pushRoute(message.url).then(() => {
-        window.scrollTo(0, 0)
-      })
-    }
-  })
 }
 
 // Implementation IIFE ready to inject

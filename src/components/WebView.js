@@ -110,7 +110,7 @@ class WebView extends React.PureComponent {
       nextProps.source.uri !== this.props.source.uri &&
       nextProps.source.uri !== this.webview.uri
     ) {
-      this.postMessage({ type: 'pushRoute', url: nextUrl.path })
+      this.postMessage({ type: 'push-route', url: nextUrl.path })
     }
   }
 
@@ -134,7 +134,7 @@ class WebView extends React.PureComponent {
     if (this.webview.canGoBack) {
       this.webview.ref.goBack()
     } else {
-      this.postMessage({ type: 'pushRoute', url: FEED_PATH })
+      this.postMessage({ type: 'push-route', url: FEED_PATH })
     }
   }
 
