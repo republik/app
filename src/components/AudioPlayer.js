@@ -1,10 +1,11 @@
-import React, { Fragment } from 'react'
-import { View, Text, StyleSheet, Animated, ActivityIndicator, PanResponder, Dimensions, TouchableOpacity } from 'react-native'
+import React, { Component, Fragment } from 'react'
+import { View, Text, StyleSheet, Animated, PanResponder, Dimensions, TouchableOpacity } from 'react-native'
 import TrackPlayer from 'react-native-track-player'
 import Icon from './Icon'
-import { setAudio } from '../apollo'
+import { withAudio, setAudio, setPlaybackState } from '../apollo'
 import Logo from '../assets/images/playlist-logo.png'
 import { FRONTEND_BASE_URL } from '../constants'
+import { compose } from 'react-apollo'
 
 const AUDIO_PLAYER_HEIGHT = 65
 
@@ -64,33 +65,40 @@ const parseSeconds = (value) => {
   return minutes + ':' + (seconds < 10 ? '0' : '') + seconds
 }
 
-const Time = ({ duration, position }) => (
-  <Text style={styles.time}>
-    {parseSeconds(position)} / {parseSeconds(duration)}
-  </Text>
-)
+const Time = ({ duration, position }) => {
+  if (!duration) {
+    return null
+  }
+  return (
+    <Text style={styles.time}>
+      {parseSeconds(position)} / {parseSeconds(duration)}
+    </Text>
+  )
+}
 
-const height = new Animated.Value(5)
+const ANIMATION_DURATION = 250
 
-class ProgressBar extends React.Component {
-  constructor (props) {
-    super(props)
+class ProgressBar extends Component {
+  constructor (props, context) {
+    super(props, context)
 
-    const SCREEN_WIDTH = Dimensions.get('window').width
+    this.height = new Animated.Value(5)
 
     this.pan = PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: () => true,
       onPanResponderGrant: (evt, gestureState) => {
-        props.onPositionStart()
-        Animated.timing(height, { toValue: 15, duration: 250 }).start()
+        const { width } = Dimensions.get('window')
+        this.props.onPositionStart((gestureState.x0 / width) * this.props.duration)
+        Animated.timing(this.height, { toValue: 15, duration: ANIMATION_DURATION }).start()
       },
       onPanResponderMove: (evt, gestureState) => {
-        props.onPositionChange((gestureState.moveX / SCREEN_WIDTH) * this.props.duration)
+        const { width } = Dimensions.get('window')
+        this.props.onPositionChange((gestureState.moveX / width) * this.props.duration)
       },
       onPanResponderRelease: (evt, gestureState) => {
-        props.onPositionReleased()
-        Animated.timing(height, { toValue: 5, duration: 250 }).start()
+        this.props.onPositionReleased()
+        Animated.timing(this.height, { toValue: 5, duration: ANIMATION_DURATION }).start()
       }
     })
   }
@@ -102,7 +110,7 @@ class ProgressBar extends React.Component {
 
     return (
       <View style={styles.progressBarContainer} {...this.pan.panHandlers}>
-        <Animated.View style={[styles.progressBar, { height }]}>
+        <Animated.View style={[styles.progressBar, { height: this.height }]}>
           <View style={[styles.progressBuffer, { width: `${buffered}%` }]} />
           <View style={[styles.progressPosition, { width: `${progress}%` }]} />
         </Animated.View>
@@ -111,63 +119,51 @@ class ProgressBar extends React.Component {
   }
 }
 
-class AudioPlayer extends React.Component {
+class AudioPlayer extends Component {
   constructor (props) {
     super(props)
 
-    this.started = false
-    this.bottom = new Animated.Value(props.url ? 0 : -AUDIO_PLAYER_HEIGHT)
+    this.bottom = new Animated.Value(props.audio ? 0 : -AUDIO_PLAYER_HEIGHT)
     this.state = {
-      position: 0,
-      loading: false,
-      isPlaying: false,
-      bufferedPosition: 0,
-      audioUrl: props.url,
-      title: props.title,
-      sourcePath: props.sourcePath
+      isPlaying: false
     }
   }
 
   async componentWillReceiveProps (nextProps) {
-    if (!this.started && nextProps.url) {
-      await this.setupPlayer()
-      this.startIntervals()
-      this.started = true
-    }
-
-    if (!this.state.audioUrl && nextProps.url) {
-      this.setState({
-        loading: true,
-        audioUrl: nextProps.url,
-        title: nextProps.title,
-        sourcePath: nextProps.sourcePath
-      })
-      await this.startPlaying(nextProps)
-      Animated.timing(this.bottom, { toValue: 0, duration: 250 }).start()
-    } else if (this.state.audioUrl && !nextProps.url) {
-      await this.stopPlaying()
+    if (nextProps.audio) {
+      if (this.state.audio !== nextProps.audio) {
+        await this.setTrack(nextProps)
+        TrackPlayer.play()
+        Animated.timing(this.bottom, { toValue: 0, duration: ANIMATION_DURATION }).start()
+      }
+    } else if (this.state.audio) {
+      await this.clearTrack()
       Animated.timing(this.bottom, { toValue: -AUDIO_PLAYER_HEIGHT, duration: 250 }).start()
-      this.setState({ audioUrl: null })
-    } else if (this.state.audioUrl !== nextProps.url) {
-      this.setState({
-        audioUrl: nextProps.url,
-        title: nextProps.title,
-        sourcePath: nextProps.sourcePath
-      })
-      await this.stopPlaying()
-      await this.startPlaying(nextProps)
     }
-
+    // see TrackPlayer.registerEventHandler in the root index.js
     if (this.props.playbackState !== nextProps.playbackState) {
       await this.onPlaybackStateChange(nextProps.playbackState)
     }
   }
 
-  componentWillUnmount () {
-    this.stopIntervals()
+  async componentDidMount () {
+    if (this.props.audio) {
+      await this.setTrack(this.props)
+      const state = await TrackPlayer.getState()
+      if (state !== this.props.playbackState) {
+        this.props.setPlaybackState({ variables: {state} })
+      }
+      await this.onPlaybackStateChange(state)
+    }
   }
 
   setupPlayer = async () => {
+    if (this.started) {
+      return
+    }
+
+    this.started = true
+
     await TrackPlayer.setupPlayer()
     await TrackPlayer.updateOptions({
       capabilities: [
@@ -178,30 +174,38 @@ class AudioPlayer extends React.Component {
     })
   }
 
-  startPlaying = async (playback) => {
+  setTrack = async ({ audio }) => {
+    if (this.state.audio === audio) {
+      return
+    }
+    if (this.state.audio) {
+      await this.clearTrack()
+    }
+    this.setState({
+      audio
+    })
+    await this.setupPlayer()
     await TrackPlayer.add({
-      id: playback.title,
-      url: playback.url,
-      title: playback.title,
+      id: audio.url,
+      url: audio.url,
+      title: audio.title,
       artist: 'Republik',
       artwork: Logo
     })
-    TrackPlayer.play()
+    this.startUpdateInterval()
   }
 
-  stopPlaying = async () => {
-    await TrackPlayer.stop()
-    await TrackPlayer.reset()
-  }
-
-  startIntervals = () => {
-    this.progressTimer = setInterval(this.updateProgress, 1000)
-    this.bufferTimer = setInterval(this.updateBufferProgress, 300)
-  }
-
-  stopIntervals = () => {
-    clearInterval(this.progressTimer)
-    clearInterval(this.bufferTimer)
+  clearTrack = async () => {
+    this.setState({
+      audio: undefined
+    })
+    try {
+      await TrackPlayer.stop()
+      await TrackPlayer.reset()
+    } catch (e) {
+      console.warn('clearTrack failed', e)
+    }
+    this.stopUpdateInterval()
   }
 
   onPlayPauseClick = () => {
@@ -216,83 +220,87 @@ class AudioPlayer extends React.Component {
     switch (state) {
       case TrackPlayer.STATE_PLAYING:
         const duration = await TrackPlayer.getDuration()
-        if (this.state.loading) {
-          this.setState({ loading: false, duration })
-          TrackPlayer.pause()
-        } else {
-          this.setState({ isPlaying: true, duration })
-        }
+        this.setState({ isPlaying: true, duration })
         break
       case TrackPlayer.STATE_PAUSED:
         this.setState({ isPlaying: false })
         break
       case TrackPlayer.STATE_STOPPED:
-        setTimeout(() => { // Delay stte change to make animation nicer
-          this.setState({ isPlaying: false, duration: null, position: 0 })
-        }, 250)
-        break
-      case TrackPlayer.STATE_NONE:
         this.setState({ isPlaying: false, duration: null, position: 0 })
         break
+      case TrackPlayer.STATE_NONE:
+        this.setState({
+          isPlaying: false,
+          duration: undefined,
+          position: undefined
+        })
+        break
     }
+  }
+
+  onPositionStart = position => {
+    this.onPositionChange(position)
+    this.stopUpdateInterval()
   }
 
   onPositionChange = position => {
     this.setState({ position })
   }
 
-  onPositionStart = () => {
-    this.stopIntervals()
-  }
-
   onPositionReleased = () => {
     try {
       TrackPlayer.seekTo(this.state.position)
-      setTimeout(() => {
-        this.startIntervals()
-      }, 250)
     } catch (e) {
-      // The player is probably not initialized yet, we'll just ignore it
+      console.warn('onPositionReleased failed', e)
     }
-  }
-
-  updateProgress = async () => {
-    try {
-      const position = await TrackPlayer.getPosition()
-      if (this.state.position !== position) {
-        this.setState({ position })
-      }
-    } catch (e) {
-      // The player is probably not initialized yet, we'll just ignore it
-    }
-  }
-
-  updateBufferProgress = async () => {
-    try {
-      const bufferedPosition = await TrackPlayer.getBufferedPosition()
-      if (this.state.bufferedPosition !== bufferedPosition) {
-        this.setState({ bufferedPosition })
-      }
-    } catch (e) {
-      // The player is probably not initialized yet, we'll just ignore it
-    }
+    this.startUpdateInterval()
   }
 
   onTitlePress = () => {
-    const { sourcePath } = this.state
+    const { audio } = this.state
 
-    if (sourcePath) {
+    if (audio && audio.sourcePath) {
       this.props.setUrl({
         variables: {
-          url: `${FRONTEND_BASE_URL}${sourcePath}`
+          url: `${FRONTEND_BASE_URL}${audio.sourcePath}`
         }
       })
     }
   }
 
+  componentWillUnmount () {
+    this.stopUpdateInterval()
+  }
+
+  updateState = async () => {
+    try {
+      const position = Math.floor(await TrackPlayer.getPosition())
+      const bufferedPosition = Math.floor(await TrackPlayer.getBufferedPosition())
+      if (this.state.position !== position) {
+        this.setState({ position })
+      }
+      if (this.state.bufferedPosition !== bufferedPosition) {
+        this.setState({ bufferedPosition })
+      }
+    } catch (e) {
+      console.warn('updateState failed', e)
+    }
+  }
+
+  startUpdateInterval = () => {
+    if (this.updateInterval !== undefined) {
+      this.stopUpdateInterval()
+    }
+    this.updateInterval = setInterval(this.updateState, 200)
+  }
+
+  stopUpdateInterval = () => {
+    clearInterval(this.updateInterval)
+  }
+
   render () {
     const { setAudio } = this.props
-    const { title, loading, isPlaying, duration, position, bufferedPosition } = this.state
+    const { audio, isPlaying, duration, position, bufferedPosition } = this.state
     const icon = isPlaying ? 'pause' : 'play'
 
     return (
@@ -301,8 +309,8 @@ class AudioPlayer extends React.Component {
           position={position}
           duration={duration}
           bufferedPosition={bufferedPosition}
-          onPositionChange={this.onPositionChange}
           onPositionStart={this.onPositionStart}
+          onPositionChange={this.onPositionChange}
           onPositionReleased={this.onPositionReleased}
         />
         <Icon
@@ -312,29 +320,30 @@ class AudioPlayer extends React.Component {
           onPress={() => this.onPlayPauseClick()}
         />
         <View style={styles.content}>
-          { loading
-            ? <ActivityIndicator />
-            : (
-              <Fragment>
-                <TouchableOpacity onPress={this.onTitlePress}>
-                  <Text numberOfLines={1} style={styles.title}>
-                    {title}
-                  </Text>
-                </TouchableOpacity>
-                <Time duration={duration} position={position} />
-              </Fragment>
-            )
-          }
+          <Fragment>
+            <TouchableOpacity onPress={this.onTitlePress}>
+              <Text numberOfLines={1} style={styles.title}>
+                {audio && audio.title}
+              </Text>
+            </TouchableOpacity>
+            <Time duration={duration} position={position} />
+          </Fragment>
         </View>
         <Icon
-          type="close"
+          type='close'
           size={35}
           style={{ marginRight: 15 }}
-          onPress={() => setAudio({ variables: { audio: null } })}
+          onPress={() => setAudio({
+            variables: { url: null }
+          })}
         />
       </Animated.View>
     )
   }
 }
 
-export default setAudio(AudioPlayer)
+export default compose(
+  withAudio,
+  setAudio,
+  setPlaybackState
+)(AudioPlayer)

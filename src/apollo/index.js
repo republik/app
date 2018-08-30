@@ -1,7 +1,6 @@
 import React from 'react'
 import { AsyncStorage } from 'react-native'
 import { ApolloProvider } from 'react-apollo'
-import TrackPlayer from 'react-native-track-player'
 import ApolloClient from 'apollo-client'
 import { ApolloLink } from 'apollo-link'
 import { withClientState } from 'apollo-link-state'
@@ -9,12 +8,12 @@ import { InMemoryCache } from 'apollo-cache-inmemory'
 import { CachePersistor } from 'apollo-cache-persist'
 import { LOGIN_URL, HOME_URL } from '../constants'
 import { link } from './link'
+import TrackPlayer from 'react-native-track-player'
 
 const defaults = {
   url: LOGIN_URL,
   user: null,
-  audio: null,
-  playbackState: TrackPlayer.STATE_NONE
+  audio: null
 }
 
 const typeDefs = `
@@ -32,17 +31,7 @@ const typeDefs = `
     url: String!
     title: String
     sourcePath: String
-  }
-
-  type Mutation {
-    logout(): Boolean
-    login(user: User!): Boolean
-    setUrl(url: String!): Boolean
-  }
-
-  type Query {
-    me: User
-    withCurrentUrl: String
+    opened: String
   }
 `
 
@@ -53,37 +42,34 @@ export const resolvers = {
         url: HOME_URL,
         user: { ...user, __typename: 'User' }
       } })
-      return true
+      return null
     },
     logout: (_, variables, context) => {
       context.cache.writeData({ data: defaults })
-      return false
+      return null
     },
     setUrl: async (_, { url }, context) => {
       context.cache.writeData({ data: { url } })
-      return true
+      return null
     },
-    setAudio: async (_, { url, title, sourcePath }, context) => {
-      const data = url
+    setAudio: async (_, variables, context) => {
+      const { url, title, sourcePath } = variables
+      const audio = url
         ? {
-          audio: {
-            __typename: 'Audio',
-            url,
-            title,
-            sourcePath
-          },
-          playbackState: TrackPlayer.STATE_PLAYING
+          __typename: 'Audio',
+          url,
+          title,
+          sourcePath,
+          // track opening date: triggers a re-render and starts playing again
+          opened: (new Date()).toISOString()
         }
-        : {
-          audio: null,
-          playbackState: TrackPlayer.STATE_NONE
-        }
-      context.cache.writeData({ data })
-      return true
+        : null
+      context.cache.writeData({ data: { audio } })
+      return null
     },
     setPlaybackState: async (_, { state }, context) => {
       context.cache.writeData({ data: { playbackState: state } })
-      return true
+      return null
     }
   }
 }

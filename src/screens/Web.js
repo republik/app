@@ -17,7 +17,6 @@ import {
   logout,
   setUrl,
   setAudio,
-  withAudio,
   pendingAppSignIn
 } from '../apollo'
 import mkDebug from '../utils/debug'
@@ -246,8 +245,6 @@ class Web extends Component {
   render () {
     const {
       me, data,
-      audio,
-      playbackState,
       setUrl,
       navigation
     } = this.props
@@ -267,9 +264,7 @@ class Web extends Component {
             ref={node => { this.webview = node }}
           />
           <AudioPlayer
-            {...audio}
             setUrl={setUrl}
-            playbackState={playbackState}
           />
         </SafeAreaView>
       </Fragment>
@@ -290,6 +285,5 @@ export default compose(
   getData,
   setUrl,
   setAudio,
-  withAudio,
   pendingAppSignIn
 )(Web)

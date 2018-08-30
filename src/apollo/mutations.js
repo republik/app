@@ -47,6 +47,8 @@ const setPlaybackStateMutation = gql`
   }
 `
 
+const setPlaybackState = graphql(setPlaybackStateMutation, { name: 'setPlaybackState' })
+
 export {
   login,
   setUrl,
@@ -54,5 +56,6 @@ export {
   setAudio,
   upsertDevice,
   rollDeviceToken,
+  setPlaybackState,
   setPlaybackStateMutation
 }

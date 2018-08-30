@@ -13,6 +13,7 @@ const getCurrentAudioQuery = gql`
       url
       title
       sourcePath
+      opened
     }
     playbackState @client
   }
