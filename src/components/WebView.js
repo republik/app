@@ -139,38 +139,42 @@ class WebView extends React.PureComponent {
     this.webview.ref.reload()
   }
 
-  // Native onNavigationStateChange method shim.
-  // We call onNavigationStateChange either when the native calls, or onMessage
-  onNavigationStateChange = ({ url, canGoBack }) => {
+  // onNavigationStateChange callback
+  // - native when server side navigation
+  // - via onMessage when client side navigation
+  onNavigationStateChange = ({ url, canGoBack, onMessage }) => {
     debug('onNavigationStateChange', url, canGoBack)
-    const urlObject = parseUrl(url)
-    const { onNavigationStateChange } = this.props
+    const { onNavigationStateChange, onLoadStop } = this.props
 
     this.webview.canGoBack = this.webview.canGoBack || canGoBack
 
     if (this.webview.uri !== url) {
       this.webview.uri = url
 
-      let shouldOpen = true
-      // If user goes to a external or restricted path, we open it in system browser
-      // and prevent webview to go there.
-      if (isExternalURL(urlObject) || RESTRICTED_PATHS.includes(urlObject.pathname)) {
-        Linking.openURL(url)
-        shouldOpen = false
-      }
+      const urlObject = parseUrl(url)
+      let shouldOpen = (
+        !isExternalURL(urlObject) &&
+        !RESTRICTED_PATHS.includes(urlObject.pathname)
+      )
 
       if (
-        onNavigationStateChange &&
-        !onNavigationStateChange({ url, urlObject })
+        shouldOpen &&
+        onNavigationStateChange
       ) {
-        shouldOpen = false
+        shouldOpen = onNavigationStateChange({ url, urlObject })
       }
 
       if (!shouldOpen) {
+        // we open it in system browser
+        Linking.openURL(url)
+        // and prevent webview to go there
         this.webview.ref.stopLoading()
+        if (onLoadStop) {
+          onLoadStop()
+        }
 
-        // Only force back when navigating inside Republik's page
-        if (urlObject.host === FRONTEND_HOST) {
+        // and force back when navigating on message
+        if (onMessage) {
           this.webview.ref.goBack()
         }
         return false
@@ -228,7 +232,10 @@ class WebView extends React.PureComponent {
     switch (message.type) {
       case 'navigation':
         debug('onMessage', message.type, message.url)
-        return this.onNavigationStateChange(message)
+        return this.onNavigationStateChange({
+          ...message,
+          onMessage: true
+        })
       case 'share':
         debug('onMessage', message.type, message.payload.url)
         return this.share(message.payload)

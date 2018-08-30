@@ -117,6 +117,12 @@ class Web extends Component {
     }
   }
 
+  onLoadStop = () => {
+    this.setState({
+      networkActivity: false
+    })
+  }
+
   onLoadEnd = () => {
     debug('onLoadEnd')
 
@@ -250,6 +256,7 @@ class Web extends Component {
             onNetwork={this.onNetwork}
             onMessage={this.onMessage}
             onLoadEnd={this.onLoadEnd}
+            onLoadStop={this.onLoadStop}
             onLoadStart={this.onLoadStart}
             onNavigationStateChange={this.onNavigationStateChange}
             loading={{ status: loading || refreshing, showSpinner: !refreshing }}
