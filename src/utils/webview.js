@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 
 export const injectedJavaScriptImpl = function () {
-  // Navigation polyfills
+  // Navigation spy
   // Injected code to spy on browser's navigation history
   // Native WebView onNavigationStateChange does not recognize SPA page transitions,
   // so we inject code that enables to spy on changes, sending messages.
@@ -29,11 +29,6 @@ export const injectedJavaScriptImpl = function () {
   window.history.replaceState = function () {
     updateNavState(arguments[2])
     return replaceState.apply(window.history, arguments)
-  }
-
-  window.history.back = function () {
-    updateNavState()
-    return back.apply(window.history)
   }
 }
 

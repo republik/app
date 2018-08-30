@@ -130,17 +130,10 @@ class WebView extends React.PureComponent {
     this.webview.ref.reload()
   }
 
-  goBack = () => {
-    if (this.webview.canGoBack) {
-      this.webview.ref.goBack()
-    } else {
-      this.postMessage({ type: 'push-route', url: FEED_PATH })
-    }
-  }
-
   // Native onNavigationStateChange method shim.
   // We call onNavigationStateChange either when the native calls, or onMessage
   onNavigationStateChange = ({ url, canGoBack }) => {
+    debug('onNavigationStateChange', url, canGoBack)
     const { host } = parseUrl(url)
     const { onNavigationStateChange } = this.props
 
