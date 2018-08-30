@@ -198,7 +198,10 @@ class WebView extends React.PureComponent {
     let message
     try {
       message = JSON.parse(e.nativeEvent.data)
-    } catch (error) {
+    } catch (error) {}
+    // handle null and undefined
+    // - remember that typeof null === 'object'
+    if (!message) {
       message = {}
     }
 
