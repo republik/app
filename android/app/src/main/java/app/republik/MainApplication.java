@@ -11,6 +11,8 @@ import com.rnziparchive.RNZipArchivePackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
 import guichaguri.trackplayer.TrackPlayer;
 
+// react-native link: react-native-notifications is not used on Android
+
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.psykar.cookiemanager.CookieManagerPackage;
