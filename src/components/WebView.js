@@ -52,8 +52,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF'
   },
   errorContainer: {
-    padding: 20,
+    padding: 25,
     backgroundColor: '#E9A733'
+  },
+  errorTitle: {
+    color: '#FFF',
+    fontSize: 24,
+    textAlign: 'center',
+    marginBottom: 20,
+    fontFamily: 'GT America'
   },
   errorText: {
     color: '#FFF',
@@ -82,7 +89,7 @@ const LoadingState = ({ showSpinner }) => (
 
 const ErrorState = withT(({ t, onReload }) => (
   <View style={[styles.container, styles.errorContainer]}>
-    <Text style={styles.errorText}>{t('webview/error/title')}</Text>
+    <Text style={styles.errorTitle}>{t('webview/error/title')}</Text>
     <Text style={styles.errorText}>{t('webview/error/description')}</Text>
     <TouchableOpacity onPress={onReload} >
       <Text style={styles.button}>{t('webview/error/reload')}</Text>
