@@ -140,3 +140,12 @@ Scrolls to the top of the WebView's page
 | Key        | Description           | Value  |
 | ------------- |:-------------:| -----:|
 | type      | Message type | scroll-to-top |
+
+### push-route
+
+Navigate the website to a new url
+
+| Key        | Description           | Value  |
+| ------------- |:-------------:| -----:|
+| type      | Message type | push-route |
+| url | Url | 
