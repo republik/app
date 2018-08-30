@@ -16,10 +16,9 @@ class Login extends Component {
     }
   }
 
-  onNavigationStateChange = (data) => {
-    const url = parse(data.url)
+  onNavigationStateChange = ({ url, urlObject }) => {
     // close overlay instead of going elsewhere
-    if (url.pathname !== '/mitteilung') {
+    if (urlObject.pathname !== '/mitteilung') {
       this.authSuccessful = true
       navigator.goBack()
       return false

@@ -7,7 +7,8 @@ import {
   BackHandler,
   ActivityIndicator,
   Share,
-  Vibration
+  Vibration,
+  Linking
 } from 'react-native'
 import IOSWebView from 'react-native-wkwebview-reborn'
 import { parse } from 'graphql'
@@ -16,7 +17,7 @@ import { execute, makePromise } from 'apollo-link'
 import AndroidWebView from './AndroidWebView'
 import { injectedJavaScript } from '../utils/webview'
 import { link } from '../apollo'
-import { FRONTEND_HOST, FEED_PATH, USER_AGENT } from '../constants'
+import { FRONTEND_HOST, FEED_PATH, OFFERS_PATH, USER_AGENT } from '../constants'
 import withT from '../utils/withT'
 import mkDebug from '../utils/debug'
 import Config from 'react-native-config'
@@ -28,6 +29,14 @@ const NativeWebView = Platform.select({
   ios: IOSWebView,
   android: AndroidWebView
 })
+
+const RESTRICTED_PATHS = [OFFERS_PATH]
+const PERMITTED_PROTOCOLS = ['react-js-navigation']
+
+const isExternalURL = ({ host, protocol }) => (
+  FRONTEND_HOST !== host &&
+  !PERMITTED_PROTOCOLS.includes(protocol)
+)
 
 const styles = StyleSheet.create({
   container: {
@@ -134,7 +143,7 @@ class WebView extends React.PureComponent {
   // We call onNavigationStateChange either when the native calls, or onMessage
   onNavigationStateChange = ({ url, canGoBack }) => {
     debug('onNavigationStateChange', url, canGoBack)
-    const { host } = parseUrl(url)
+    const urlObject = parseUrl(url)
     const { onNavigationStateChange } = this.props
 
     this.webview.canGoBack = this.webview.canGoBack || canGoBack
@@ -142,18 +151,29 @@ class WebView extends React.PureComponent {
     if (this.webview.uri !== url) {
       this.webview.uri = url
 
-      if (onNavigationStateChange) {
-        const shouldFollowRedirect = onNavigationStateChange({ url })
+      let shouldOpen = true
+      // If user goes to a external or restricted path, we open it in system browser
+      // and prevent webview to go there.
+      if (isExternalURL(urlObject) || RESTRICTED_PATHS.includes(urlObject.pathname)) {
+        Linking.openURL(url)
+        shouldOpen = false
+      }
 
-        if (!shouldFollowRedirect) {
-          this.webview.ref.stopLoading()
+      if (
+        onNavigationStateChange &&
+        !onNavigationStateChange({ url, urlObject })
+      ) {
+        shouldOpen = false
+      }
 
-          // Only force back when navigating inside Republik's page
-          if (host === FRONTEND_HOST) {
-            this.webview.ref.goBack()
-          }
-          return false
+      if (!shouldOpen) {
+        this.webview.ref.stopLoading()
+
+        // Only force back when navigating inside Republik's page
+        if (urlObject.host === FRONTEND_HOST) {
+          this.webview.ref.goBack()
         }
+        return false
       }
     }
 

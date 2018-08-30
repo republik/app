@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react'
 import {
-  Linking, AppState, NetInfo, Platform
+  AppState, NetInfo, Platform
 } from 'react-native'
 import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'
@@ -10,7 +10,7 @@ import WebView from '../components/WebView'
 import AudioPlayer from '../components/AudioPlayer'
 import SafeAreaView from '../components/SafeAreaView'
 import navigator from '../services/navigation'
-import { FRONTEND_HOST, OFFERS_PATH, LOGIN_PATH } from '../constants'
+import { FRONTEND_HOST, LOGIN_PATH } from '../constants'
 import {
   me,
   login,
@@ -25,13 +25,6 @@ const debug = mkDebug('Web')
 
 const RELOAD_OFFSET_HEIGHT = 5
 const RELOAD_TIME_THRESHOLD = 60 * 60 * 1000 // 1hr
-const RESTRICTED_PATHS = [OFFERS_PATH]
-const PERMITTED_PROTOCOLS = ['react-js-navigation']
-
-const isExternalURL = ({ host, protocol }) => (
-  FRONTEND_HOST !== host &&
-  !PERMITTED_PROTOCOLS.includes(protocol)
-)
 
 class Web extends Component {
   constructor (props) {
@@ -86,15 +79,6 @@ class Web extends Component {
   }, 150)
 
   onNavigationStateChange = (data) => {
-    const url = parse(data.url || '')
-
-    // If user goes to a external or restricted path, we open it in system browser
-    // and prevent webview to go there.
-    if (isExternalURL(url) || RESTRICTED_PATHS.includes(url.pathname)) {
-      Linking.openURL(data.url)
-      return false
-    }
-
     this.props.setUrl({ variables: { url: data.url } })
     this.reloadIfNeccesary()
 
