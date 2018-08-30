@@ -110,12 +110,20 @@ class Web extends Component {
     if (this.props.screenProps.onLoadStart) {
       this.props.screenProps.onLoadStart()
     }
+    if (!this.state.loading) {
+      this.setState({
+        networkActivity: true
+      })
+    }
   }
 
   onLoadEnd = () => {
     debug('onLoadEnd')
 
     this.setLoading(false)
+    this.setState({
+      networkActivity: false
+    })
 
     if (this.state.refreshing) {
       this.setState({ refreshing: false })
@@ -232,11 +240,11 @@ class Web extends Component {
       setUrl,
       navigation
     } = this.props
-    const { loading, refreshing, fullscreen } = this.state
+    const { loading, refreshing, fullscreen, networkActivity } = this.state
 
     return (
       <Fragment>
-        <SafeAreaView fullscreen={fullscreen}>
+        <SafeAreaView fullscreen={fullscreen} networkActivity={networkActivity}>
           <WebView
             source={{ uri: data.url }}
             onNetwork={this.onNetwork}
