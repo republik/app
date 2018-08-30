@@ -194,7 +194,13 @@ class WebView extends React.PureComponent {
 
   onMessage = e => {
     const { onMessage } = this.props
-    const message = JSON.parse(e.nativeEvent.data)
+
+    let message
+    try {
+      message = JSON.parse(e.nativeEvent.data)
+    } catch (error) {
+      message = {}
+    }
 
     switch (message.type) {
       case 'navigation':
