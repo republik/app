@@ -17,7 +17,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.1.0</string>
+	<string>1.0.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -30,7 +30,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>38</string>
+	<string>40</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
@@ -61,12 +61,18 @@
 			</dict>
 		</dict>
 	</dict>
-	<key>NSLocationWhenInUseUsageDescription</key>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>The app will not request your location.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>The app will not request your location.</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>The app will not request your location.</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>GT-America-Standard-Medium.otf</string>
+		<string>GT-America-Standard-Regular-Italic.otf</string>
+		<string>GT-America-Standard-Regular.otf</string>
+	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>
@@ -87,11 +93,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>UIAppFonts</key>
-	<array>
-		<string>GT-America-Standard-Medium.otf</string>
-		<string>GT-America-Standard-Regular-Italic.otf</string>
-		<string>GT-America-Standard-Regular.otf</string>
-	</array>
 </dict>
 </plist>
