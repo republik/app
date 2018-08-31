@@ -20,7 +20,7 @@ const getSlotFile = (slotKey) =>
 // debounce
 let running = false
 
-const cookiesWrapper = WrappedComponent => (
+const otaWrapper = WrappedComponent => (
   class extends Component {
     componentDidMount () {
       // Force update everytime the app is started
@@ -141,4 +141,4 @@ const cookiesWrapper = WrappedComponent => (
   }
 )
 
-export default cookiesWrapper
+export default otaWrapper
