@@ -338,8 +338,8 @@ class WebView extends React.PureComponent {
     return true
   }
 
-  signInClient = async (user, { reload = true } = {}) => {
-    debug('signInClient', user.email, { reload })
+  signInClient = async (user) => {
+    debug('signInClient', user.email)
 
     await this.props.clientSignIn({ variables: { user: { id: user.id } } })
 
@@ -349,8 +349,8 @@ class WebView extends React.PureComponent {
     }
   }
 
-  signOutClient = async ({ reload = true } = {}) => {
-    debug('signOutClient', { reload })
+  signOutClient = async () => {
+    debug('signOutClient')
     await this.props.clientSignOut()
   }
 
@@ -359,11 +359,11 @@ class WebView extends React.PureComponent {
 
     debug('loadInitialState', 'props.me', !!me, 'payload.me', !!payload.me)
     if (payload.me && (!me || payload.me.id !== me.id)) {
-      return this.signInClient(payload.me, { reload: true })
+      return this.signInClient(payload.me)
     }
 
     if (!payload.me && me) {
-      return this.signOutClient({ reload: false })
+      return this.signOutClient()
     }
   }
 

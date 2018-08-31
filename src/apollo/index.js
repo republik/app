@@ -33,10 +33,11 @@ type Audio {
 export const resolvers = {
   Mutation: {
     signIn: (_, { user }, context) => {
-      context.cache.writeData({ data: {
-        url: HOME_URL,
-        user: { ...user, __typename: 'User' }
-      } })
+      context.cache.writeData({
+        data: {
+          user: { ...user, __typename: 'User' }
+        }
+      })
       return null
     },
     signOut: (_, variables, context) => {

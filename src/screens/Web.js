@@ -21,7 +21,6 @@ import mkDebug from '../utils/debug'
 
 const debug = mkDebug('Web')
 
-const RELOAD_OFFSET_HEIGHT = 5
 const RELOAD_TIME_THRESHOLD = 60 * 60 * 1000 // 1hr
 
 class Web extends Component {
