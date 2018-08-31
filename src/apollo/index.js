@@ -6,46 +6,40 @@ import { ApolloLink } from 'apollo-link'
 import { withClientState } from 'apollo-link-state'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import { CachePersistor } from 'apollo-cache-persist'
-import { LOGIN_URL, HOME_URL } from '../constants'
+import { HOME_URL } from '../constants'
 import { link } from './link'
 import TrackPlayer from 'react-native-track-player'
 
 const defaults = {
-  url: LOGIN_URL,
+  url: HOME_URL,
   user: null,
   audio: null,
   playbackState: null
 }
 
 const typeDefs = `
-  type User {
-    id: String
-    email: String
-    name: String
-    lastName: String
-    firstName: String
-    initials: String
-    portrait: String
-  }
+type User {
+  id: ID!
+}
 
-  type Audio {
-    url: String!
-    title: String
-    sourcePath: String
-    opened: String
-  }
+type Audio {
+  url: String!
+  title: String
+  sourcePath: String
+  opened: String
+}
 `
 
 export const resolvers = {
   Mutation: {
-    login: (_, { user }, context) => {
+    signIn: (_, { user }, context) => {
       context.cache.writeData({ data: {
         url: HOME_URL,
         user: { ...user, __typename: 'User' }
       } })
       return null
     },
-    logout: (_, variables, context) => {
+    signOut: (_, variables, context) => {
       context.cache.writeData({ data: defaults })
       return null
     },

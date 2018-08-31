@@ -5,7 +5,6 @@ import { compose } from 'react-apollo'
 import Web from './screens/Web'
 import Login from './screens/Login'
 import cookies from './services/cookies'
-import settings from './services/settings'
 import navigator from './services/navigation'
 import deepLinking from './services/deepLinking'
 import ota from './services/ota'
@@ -63,8 +62,7 @@ export default compose(
   ota,
   deepLinking,
   pushNotifications,
-  cookies,
-  settings
+  cookies
 )(App)
 
 console.ignoredYellowBox = ['Warning: isMounted(...) is deprecated in plain JavaScript React classes.']

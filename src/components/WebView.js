@@ -12,11 +12,17 @@ import {
 } from 'react-native'
 import IOSWebView from 'react-native-wkwebview-reborn'
 import { parse } from 'graphql'
+import { compose } from 'react-apollo'
 import { parse as parseUrl } from 'url'
 import { execute, makePromise } from 'apollo-link'
 import AndroidWebView from './AndroidWebView'
 import { injectedJavaScript } from '../utils/webview'
-import { link } from '../apollo'
+import {
+  link,
+  withMe,
+  withClientSignIn,
+  withClientSignOut
+} from '../apollo'
 import { FRONTEND_HOST, FEED_PATH, OFFERS_PATH, USER_AGENT } from '../constants'
 import withT from '../utils/withT'
 import mkDebug from '../utils/debug'
@@ -119,6 +125,7 @@ class WebView extends React.PureComponent {
     // If url host changes, we force the redirect
     // This might happen when user change settings in ios
     if (nextProps.forceRedirect || nextUrl.host !== previousUrl.host) {
+      debug('forceRedirect', nextProps.source.uri)
       return this.setState({ currentUrl: nextProps.source.uri })
     }
 
@@ -130,10 +137,21 @@ class WebView extends React.PureComponent {
     }
   }
 
+  clearSubscriptions () {
+    Object.keys(this.subscriptions).forEach(key => {
+      const subscription = this.subscriptions[key]
+      if (subscription) {
+        subscription.unsubscribe()
+      }
+    })
+    this.subscriptions = {}
+  }
+
   componentWillUnmount () {
     if (Platform.OS === 'android') {
       BackHandler.removeEventListener('hardwareBackPress')
     }
+    this.clearSubscriptions()
   }
 
   postMessage = message => {
@@ -237,6 +255,11 @@ class WebView extends React.PureComponent {
     }
 
     switch (message.type) {
+      case 'initial-state':
+        // a new apollo client was initiated
+        // - unsubscribe from all previously active subscriptions
+        this.clearSubscriptions()
+        return this.loadInitialState(message.payload)
       case 'navigation':
         debug('onMessage', message.type, message.url)
         return this.onNavigationStateChange({
@@ -269,16 +292,6 @@ class WebView extends React.PureComponent {
       case 'haptic':
         debug('onMessage', message.type, JSON.stringify(message.payload))
         return this.haptic(message.payload)
-      case 'initial-state':
-        // a new apollo client was initiated
-        // - unsubscribe from all previously active subscriptions
-        Object.keys(this.subscriptions).forEach(key => {
-          const subscription = this.subscriptions[key]
-          if (subscription) {
-            subscription.unsubscribe()
-          }
-        })
-        this.subscriptions = {}
       default:
         if (Config.ENV === 'development') {
           const payload = JSON.stringify(message.payload)
@@ -294,15 +307,74 @@ class WebView extends React.PureComponent {
     }
   }
 
-  handleGraphQLRequest = async (message) => {
-    const { onNetwork } = this.props
-    const data = await makePromise(execute(link, message.data.payload))
+  onGraphQLResponse = async ({ query, data }) => {
+    const { me } = this.props
+    const { definitions } = query
+    const operations = definitions.map(definition => definition.name && definition.name.value)
 
-    if (onNetwork) {
-      await onNetwork({ ...message.data.payload, data })
+    debug('onGraphQLResponse', operations, Object.keys(data.data).map(key => [key, !!data.data[key]]))
+
+    if (operations.includes('signOut')) {
+      if (me) {
+        await this.signOutClient()
+        return false
+      }
     }
 
-    this.postMessage({ id: message.data.id, type: 'graphql', payload: data })
+    // User logs in
+    if (operations.includes('me')) {
+      const newMe = data.data.me
+      if (newMe && (!me || (newMe !== me.id))) {
+        await this.signInClient(newMe)
+        return false
+      }
+
+      // User got unauthenticated
+      if (!newMe && me) {
+        await this.signOutClient()
+        return false
+      }
+    }
+    return true
+  }
+
+  signInClient = async (user, { reload = true } = {}) => {
+    debug('signInClient', user.email, { reload })
+
+    await this.props.clientSignIn({ variables: { user: { id: user.id } } })
+
+    const { onSignIn } = this.props
+    if (onSignIn) {
+      onSignIn()
+    }
+  }
+
+  signOutClient = async ({ reload = true } = {}) => {
+    debug('signOutClient', { reload })
+    await this.props.clientSignOut()
+  }
+
+  loadInitialState = (payload) => {
+    const { me } = this.props
+
+    debug('loadInitialState', 'props.me', !!me, 'payload.me', !!payload.me)
+    if (payload.me && (!me || payload.me.id !== me.id)) {
+      return this.signInClient(payload.me, { reload: true })
+    }
+
+    if (!payload.me && me) {
+      return this.signOutClient({ reload: false })
+    }
+  }
+
+  handleGraphQLRequest = async (message) => {
+    const data = await makePromise(execute(link, message.data.payload))
+
+    const forward = await this.onGraphQLResponse({ ...message.data.payload, data })
+
+    if (forward) {
+      this.postMessage({ id: message.data.id, type: 'graphql', payload: data })
+    }
   }
 
   handleGraphQLSubscription = (message) => {
@@ -385,4 +457,8 @@ WebView.defaultProps = {
   onFileChooserOpen: () => {}
 }
 
-export default WebView
+export default compose(
+  withMe,
+  withClientSignIn,
+  withClientSignOut
+)(WebView)

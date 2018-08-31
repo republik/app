@@ -7,8 +7,6 @@ import { handleEnv } from '../utils/url'
 import { pendingAppSignIn } from '../apollo'
 
 class Login extends Component {
-  authSuccessful = false
-
   componentWillUnmount () {
     const { refetchPendingSignInRequests } = this.props
     if (refetchPendingSignInRequests) {
@@ -19,7 +17,6 @@ class Login extends Component {
   onNavigationStateChange = ({ url, urlObject }) => {
     // close overlay instead of going elsewhere
     if (urlObject.pathname !== '/mitteilung') {
-      this.authSuccessful = true
       navigator.goBack()
       return false
     }
@@ -35,7 +32,6 @@ class Login extends Component {
           source={{ uri }}
           onMessage={this.onMessage}
           onNavigationStateChange={this.onNavigationStateChange}
-          ref={node => { this.webview = node }}
           forceRedirect
         />
       </SafeAreaView>

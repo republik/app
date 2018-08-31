@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react'
 import {
-  AppState, NetInfo, Platform
+  AppState, NetInfo, Platform, KeyboardAvoidingView
 } from 'react-native'
 import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'
@@ -10,11 +10,9 @@ import WebView from '../components/WebView'
 import AudioPlayer from '../components/AudioPlayer'
 import SafeAreaView from '../components/SafeAreaView'
 import navigator from '../services/navigation'
-import { FRONTEND_HOST, LOGIN_PATH } from '../constants'
+import { FRONTEND_HOST, SIGN_IN_PATH } from '../constants'
 import {
-  me,
-  login,
-  logout,
+  withMe,
   setUrl,
   setAudio,
   pendingAppSignIn
@@ -32,7 +30,7 @@ class Web extends Component {
 
     this.state = {
       loading: true,
-      refreshing: false
+      webInstance: 1
     }
 
     this.shouldReload = false
@@ -92,10 +90,12 @@ class Web extends Component {
     if (
       isConnected &&
       this.shouldReload &&
-      url.pathname !== LOGIN_PATH
+      url.pathname !== SIGN_IN_PATH
     ) {
-      this.setState({ loading: true })
-      this.webview.reload()
+      this.setState({
+        loading: true,
+        webInstance: this.state.webInstance + 1
+      })
       this.shouldReload = false
     }
   }
@@ -131,20 +131,17 @@ class Web extends Component {
       networkActivity: false
     })
 
-    if (this.state.refreshing) {
-      this.setState({ refreshing: false })
-      this.webview.postMessage({ type: 'scroll-to-top' })
-    }
-
     if (this.props.screenProps.onLoadEnd) {
       this.props.screenProps.onLoadEnd()
     }
   }
 
+  onSignIn = () => {
+    this.props.screenProps.getNotificationsToken()
+  }
+
   onMessage = message => {
     switch (message.type) {
-      case 'initial-state':
-        return this.loadInitialState(message.payload)
       case 'play-audio':
         return this.playAudio(message.payload)
       case 'fullscreen-enter':
@@ -157,78 +154,10 @@ class Web extends Component {
     }
   }
 
-  loadInitialState = (payload) => {
-    const { me } = this.props
-
-    debug('loadInitialState', 'props.me', !!me, 'payload.me', !!payload.me)
-    if (payload.me && !me) {
-      return this.loginUser(payload.me, { reload: true })
-    }
-
-    if (!payload.me && me) {
-      return this.logoutUser({ reload: false })
-    }
-  }
-
   playAudio = payload => {
     this.props.setAudio({
       variables: payload
     })
-  }
-
-  onNetwork = async ({ query, data }) => {
-    const { me, login } = this.props
-    const { definitions } = query
-    const operations = definitions.map(definition => definition.name && definition.name.value)
-
-    debug('onNetwork', operations, Object.keys(data.data).map(key => [key, !!data.data[key]]))
-
-    if (operations.includes('signOut')) {
-      await this.logoutUser()
-    }
-
-    // User logs in
-    if (operations.includes('me')) {
-      if (data.data.me && !me) {
-        await this.loginUser(data.data.me)
-      }
-
-      // User got unauthenticated
-      if (!data.data.me && me) {
-        await this.logoutUser()
-      }
-    }
-
-    // User is updated
-    if (operations.includes('updateMe')) {
-      await login({
-        variables: {
-          user: data.data.updateMe
-        }
-      })
-    }
-  }
-
-  onRefresh = () => {
-    this.setState({ refreshing: true })
-    this.webview.reload()
-  }
-
-  loginUser = async (user, { reload = true } = {}) => {
-    debug('loginUser', user.email, { reload })
-
-    await this.props.login({ variables: { user } })
-
-    // Force webview reload to update request cookies on iOS
-    if (reload && Platform.OS === 'ios') this.webview.reload()
-
-    this.props.screenProps.getNotificationsToken()
-  }
-
-  logoutUser = async ({ reload = true } = {}) => {
-    debug('logoutUser', { reload })
-    await this.props.logout()
-    if (reload && Platform.OS === 'ios') this.webview.reload()
   }
 
   componentWillReceiveProps (nextProps) {
@@ -246,21 +175,21 @@ class Web extends Component {
       setUrl,
       navigation
     } = this.props
-    const { loading, refreshing, fullscreen, networkActivity } = this.state
+    const { loading, fullscreen, networkActivity, webInstance } = this.state
 
     return (
       <Fragment>
         <SafeAreaView fullscreen={fullscreen} networkActivity={networkActivity}>
           <WebView
+            key={`${me ? me.id : 'anon'}:${webInstance}`}
             source={{ uri: data.url }}
-            onNetwork={this.onNetwork}
             onMessage={this.onMessage}
             onLoadEnd={this.onLoadEnd}
             onLoadStop={this.onLoadStop}
             onLoadStart={this.onLoadStart}
             onNavigationStateChange={this.onNavigationStateChange}
-            loading={{ status: loading || refreshing, showSpinner: !refreshing }}
-            ref={node => { this.webview = node }}
+            onSignIn={this.onSignIn}
+            loading={{ status: loading, showSpinner: true }}
           />
           <AudioPlayer
             setUrl={setUrl}
@@ -271,17 +200,15 @@ class Web extends Component {
   }
 }
 
-const getData = graphql(gql`
-  query GetData {
+const getUrl = graphql(gql`
+  query GetUrl {
     url @client
   }
 `)
 
 export default compose(
-  me,
-  login,
-  logout,
-  getData,
+  withMe,
+  getUrl,
   setUrl,
   setAudio,
   pendingAppSignIn
