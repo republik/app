@@ -150,7 +150,7 @@ class WebView extends React.PureComponent {
   // - native when server side navigation
   // - via onMessage when client side navigation
   onNavigationStateChange = ({ url, canGoBack, onMessage }) => {
-    debug('onNavigationStateChange', url, canGoBack)
+    debug('onNavigationStateChange', url, {canGoBack, onMessage})
     const { onNavigationStateChange, onLoadStop } = this.props
 
     this.webview.canGoBack = this.webview.canGoBack || canGoBack
