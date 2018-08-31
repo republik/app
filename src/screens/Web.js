@@ -10,9 +10,8 @@ import WebView from '../components/WebView'
 import AudioPlayer from '../components/AudioPlayer'
 import SafeAreaView from '../components/SafeAreaView'
 import navigator from '../services/navigation'
-import { FRONTEND_HOST, SIGN_IN_PATH } from '../constants'
+import { FRONTEND_HOST } from '../constants'
 import {
-  withMe,
   setUrl,
   setAudio,
   pendingAppSignIn
@@ -21,19 +20,13 @@ import mkDebug from '../utils/debug'
 
 const debug = mkDebug('Web')
 
-const RELOAD_TIME_THRESHOLD = 60 * 60 * 1000 // 1hr
-
 class Web extends Component {
   constructor (props) {
     super(props)
 
     this.state = {
-      loading: true,
-      webInstance: 1
+      loading: true
     }
-
-    this.shouldReload = false
-    this.lastActiveDate = null
   }
 
   componentDidMount () {
@@ -46,15 +39,8 @@ class Web extends Component {
     AppState.removeEventListener('change', this.handleAppStateChange)
   }
 
-  handleAppStateChange = async (nextAppState) => {
-    if (nextAppState.match(/inactive|background/)) {
-      this.lastActiveDate = Date.now()
-    } else {
-      if (this.lastActiveDate) {
-        this.shouldReload = this.shouldReload ||
-          Date.now() - this.lastActiveDate > RELOAD_TIME_THRESHOLD
-      }
-
+  handleAppStateChange = nextAppState => {
+    if (!nextAppState.match(/inactive|background/)) {
       this.goToLoginIfPendingRequest()
       this.props.screenProps.checkForUpdates()
     }
@@ -77,26 +63,8 @@ class Web extends Component {
 
   onNavigationStateChange = (data) => {
     this.props.setUrl({ variables: { url: data.url } })
-    this.reloadIfNeccesary()
 
     return true
-  }
-
-  reloadIfNeccesary = async () => {
-    const url = parse(this.props.data.url || '')
-    const isConnected = await NetInfo.isConnected.fetch()
-
-    if (
-      isConnected &&
-      this.shouldReload &&
-      url.pathname !== SIGN_IN_PATH
-    ) {
-      this.setState({
-        loading: true,
-        webInstance: this.state.webInstance + 1
-      })
-      this.shouldReload = false
-    }
   }
 
   onLoadStart = () => {
@@ -170,17 +138,16 @@ class Web extends Component {
 
   render () {
     const {
-      me, data,
+      data,
       setUrl,
       navigation
     } = this.props
-    const { loading, fullscreen, networkActivity, webInstance } = this.state
+    const { loading, fullscreen, networkActivity } = this.state
 
     return (
       <Fragment>
         <SafeAreaView fullscreen={fullscreen} networkActivity={networkActivity}>
           <WebView
-            key={`${me ? me.id : 'anon'}:${webInstance}`}
             source={{ uri: data.url }}
             onMessage={this.onMessage}
             onLoadEnd={this.onLoadEnd}
@@ -206,7 +173,6 @@ const getUrl = graphql(gql`
 `)
 
 export default compose(
-  withMe,
   getUrl,
   setUrl,
   setAudio,

@@ -22,6 +22,9 @@ class Login extends Component {
     }
     return true
   }
+  onSignIn = () => {
+    navigator.goBack()
+  }
 
   render () {
     const uri = handleEnv(this.props.navigation.getParam('url'))
@@ -32,6 +35,7 @@ class Login extends Component {
           source={{ uri }}
           onMessage={this.onMessage}
           onNavigationStateChange={this.onNavigationStateChange}
+          onSignIn={this.onSignIn}
           forceRedirect
         />
       </SafeAreaView>

@@ -1,5 +1,6 @@
 import React, { Fragment } from 'React'
-import { 
+import {
+  AppState,
   Text, View,
   StyleSheet,
   TouchableOpacity,
@@ -23,7 +24,11 @@ import {
   withClientSignIn,
   withClientSignOut
 } from '../apollo'
-import { FRONTEND_HOST, FEED_PATH, OFFERS_PATH, USER_AGENT } from '../constants'
+import {
+  FRONTEND_HOST,
+  FEED_PATH, OFFERS_PATH, SIGN_IN_PATH,
+  USER_AGENT
+} from '../constants'
 import withT from '../utils/withT'
 import mkDebug from '../utils/debug'
 import Config from 'react-native-config'
@@ -36,6 +41,7 @@ const NativeWebView = Platform.select({
   android: AndroidWebView
 })
 
+const RELOAD_TIME_THRESHOLD = 60 * 60 * 1000 // 1hr
 const RESTRICTED_PATHS = [OFFERS_PATH]
 const PERMITTED_PROTOCOLS = ['react-js-navigation']
 
@@ -108,19 +114,30 @@ class WebView extends React.PureComponent {
     super(props)
 
     this.subscriptions = {}
-    this.state = { currentUrl: props.source.uri }
+    this.state = {
+      webInstance: 1,
+      currentUrl: props.source.uri
+    }
     this.webview = { ref: null, uri: props.source.uri, canGoBack: false }
+
+    this.shouldReload = false
+    this.lastActiveDate = null
   }
 
   componentWillMount () {
     if (Platform.OS === 'android') {
       BackHandler.addEventListener('hardwareBackPress', this.onAndroidBackPress)
     }
+    AppState.addEventListener('change', this.handleAppStateChange)
   }
 
   componentWillReceiveProps (nextProps) {
     const nextUrl = parseUrl(nextProps.source.uri)
     const previousUrl = parseUrl(this.props.source.uri)
+
+    if (nextProps.me !== this.props.me) {
+      this.shouldReload = true
+    }
 
     // If url host changes, we force the redirect
     // This might happen when user change settings in ios
@@ -151,6 +168,7 @@ class WebView extends React.PureComponent {
     if (Platform.OS === 'android') {
       BackHandler.removeEventListener('hardwareBackPress')
     }
+    AppState.removeEventListener('change', this.handleAppStateChange)
     this.clearSubscriptions()
   }
 
@@ -160,15 +178,48 @@ class WebView extends React.PureComponent {
   }
 
   reload = () => {
-    this.setState({ currentUrl: this.props.source.uri })
     this.webview.ref.reload()
+  }
+
+  reloadIfNeccesary = async ({url, urlObject}) => {
+    if (!this.shouldReload) {
+      return
+    }
+
+    if (
+      urlObject.pathname !== SIGN_IN_PATH
+    ) {
+      this.setState({
+        currentUrl: url,
+        // hard reload: re-init webview
+        webInstance: this.state.webInstance + 1
+      })
+      // soft reload: just pull the reload
+      // this.webview.ref.reload()
+      this.shouldReload = false
+    }
+  }
+
+  handleAppStateChange = async (nextAppState) => {
+    if (nextAppState.match(/inactive|background/)) {
+      this.lastActiveDate = Date.now()
+    } else {
+      if (this.lastActiveDate) {
+        const shouldReload = Date.now() - this.lastActiveDate > RELOAD_TIME_THRESHOLD
+
+        if (shouldReload && !this.shouldReload) {
+          const isConnected = await NetInfo.isConnected.fetch()
+          this.shouldReload = this.shouldReload || (isConnected && shouldReload)
+        }
+      }
+    }
   }
 
   // onNavigationStateChange callback
   // - native when server side navigation
   // - via onMessage when client side navigation
   onNavigationStateChange = ({ url, canGoBack, onMessage }) => {
-    debug('onNavigationStateChange', url, {canGoBack, onMessage})
+    debug('onNavigationStateChange', url, {canGoBack, onMessage, shouldReload: this.shouldReload})
     const { onNavigationStateChange, onLoadStop } = this.props
 
     this.webview.canGoBack = this.webview.canGoBack || canGoBack
@@ -204,6 +255,8 @@ class WebView extends React.PureComponent {
         }
         return false
       }
+
+      this.reloadIfNeccesary({url, urlObject})
     }
 
     return true
@@ -317,7 +370,6 @@ class WebView extends React.PureComponent {
     if (operations.includes('signOut')) {
       if (me) {
         await this.signOutClient()
-        return false
       }
     }
 
@@ -326,23 +378,19 @@ class WebView extends React.PureComponent {
       const newMe = data.data.me
       if (newMe && (!me || (newMe !== me.id))) {
         await this.signInClient(newMe)
-        return false
       }
 
       // User got unauthenticated
       if (!newMe && me) {
         await this.signOutClient()
-        return false
       }
     }
-    return true
   }
 
   signInClient = async (user) => {
     debug('signInClient', user.email)
 
     await this.props.clientSignIn({ variables: { user: { id: user.id } } })
-
     const { onSignIn } = this.props
     if (onSignIn) {
       onSignIn()
@@ -370,11 +418,9 @@ class WebView extends React.PureComponent {
   handleGraphQLRequest = async (message) => {
     const data = await makePromise(execute(link, message.data.payload))
 
-    const forward = await this.onGraphQLResponse({ ...message.data.payload, data })
+    await this.onGraphQLResponse({ ...message.data.payload, data })
 
-    if (forward) {
-      this.postMessage({ id: message.data.id, type: 'graphql', payload: data })
-    }
+    this.postMessage({ id: message.data.id, type: 'graphql', payload: data })
   }
 
   handleGraphQLSubscription = (message) => {
@@ -423,13 +469,14 @@ class WebView extends React.PureComponent {
   }
 
   render () {
-    const { currentUrl } = this.state
+    const { currentUrl, webInstance } = this.state
     const { loading, onLoadEnd, onLoadStart, onFileChooserOpen } = this.props
 
     return (
       <Fragment>
         { loading.status && <LoadingState {...loading} /> }
         <NativeWebView
+          key={webInstance}
           source={{ uri: currentUrl }}
           ref={node => { this.webview.ref = node }}
           onMessage={this.onMessage}
