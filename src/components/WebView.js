@@ -254,7 +254,14 @@ class WebView extends React.PureComponent {
         debug('onMessage', message.type, message.id)
         return this.handleGraphQLSubscription(message)
       case 'log':
-        console.log('Webview >>>', message.data)
+        console.log('Webview Log:', message.data)
+        break
+      case 'warning':
+        console.log(message)
+        console.warn([
+          'Webview Warning',
+          message.data && message.data && message.data.error
+        ].filter(Boolean).join(': '))
         break
       case 'vibrate':
         debug('onMessage', message.type, JSON.stringify(message.payload))

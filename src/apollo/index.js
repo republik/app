@@ -13,7 +13,8 @@ import TrackPlayer from 'react-native-track-player'
 const defaults = {
   url: LOGIN_URL,
   user: null,
-  audio: null
+  audio: null,
+  playbackState: null
 }
 
 const typeDefs = `
