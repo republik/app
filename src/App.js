@@ -5,7 +5,6 @@ import { compose } from 'react-apollo'
 import Web from './screens/Web'
 import Login from './screens/Login'
 import cookies from './services/cookies'
-import settings from './services/settings'
 import navigator from './services/navigation'
 import deepLinking from './services/deepLinking'
 import ota from './services/ota'
@@ -42,16 +41,13 @@ class App extends Component {
   render () {
     if (!this.state.cacheLoaded) return null
 
-    const { getNotificationsToken } = this.props
-
     return (
       <Router
         ref={navigatorRef => navigator.setContainer(navigatorRef)}
         screenProps={{
           persistor: this.props.persistor,
           onLoadEnd: this.hideSplashScreen,
-          checkForUpdates: this.props.checkForUpdates,
-          getNotificationsToken
+          checkForUpdates: this.props.checkForUpdates
         }}
       />
     )
@@ -63,8 +59,7 @@ export default compose(
   ota,
   deepLinking,
   pushNotifications,
-  cookies,
-  settings
+  cookies
 )(App)
 
 console.ignoredYellowBox = ['Warning: isMounted(...) is deprecated in plain JavaScript React classes.']

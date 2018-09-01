@@ -4,6 +4,8 @@ import { WebSocketLink } from 'apollo-link-ws'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import { API_URL, API_WS_URL, USER_AGENT, API_AUTHORIZATION_HEADER } from '../constants'
 
+/* global fetch */
+
 const hasSubscriptionOperation = ({ query }) => (
   query.definitions.some(
     ({ kind, operation }) =>

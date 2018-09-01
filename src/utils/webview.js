@@ -8,7 +8,6 @@ export const injectedJavaScriptImpl = function () {
 
   var pushState = window.history.pushState
   var replaceState = window.history.replaceState
-  var back = window.history.back
 
   function updateNavState (url, canGoBack) {
     var hash = location.hash !== '' ? '?' + location.hash : ''

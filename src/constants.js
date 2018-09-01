@@ -18,7 +18,7 @@ export const HOME_PATH = `/`
 export const FEED_PATH = `/feed`
 export const SEARCH_PATH = '/suche'
 export const ACCOUNT_PATH = '/konto'
-export const LOGIN_PATH = `/anmelden`
+export const SIGN_IN_PATH = `/anmelden`
 export const OFFERS_PATH = '/angebote'
 export const FORMATS_PATH = '/rubriken'
 export const COMMUNITY_PATH = '/community'
@@ -30,7 +30,7 @@ export const CURTAIN_BACKDOOR_PATH = `/${Config.CURTAIN_BACKDOOR_PATH}`
 // App urls
 export const HOME_URL = `${FRONTEND_BASE_URL}${HOME_PATH}`
 export const FEED_URL = `${FRONTEND_BASE_URL}${FEED_PATH}`
-export const LOGIN_URL = `${FRONTEND_BASE_URL}${LOGIN_PATH}`
+export const SIGN_IN_URL = `${FRONTEND_BASE_URL}${SIGN_IN_PATH}`
 export const EVENTS_URL = `${FRONTEND_BASE_URL}${EVENTS_PATH}`
 export const SEARCH_URL = `${FRONTEND_BASE_URL}${SEARCH_PATH}`
 export const ACCOUNT_URL = `${FRONTEND_BASE_URL}${ACCOUNT_PATH}`

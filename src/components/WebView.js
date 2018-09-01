@@ -1,5 +1,6 @@
 import React, { Fragment } from 'React'
-import { 
+import {
+  AppState,
   Text, View,
   StyleSheet,
   TouchableOpacity,
@@ -8,16 +9,28 @@ import {
   ActivityIndicator,
   Share,
   Vibration,
-  Linking
+  Linking,
+  StatusBar,
+  NetInfo
 } from 'react-native'
 import IOSWebView from 'react-native-wkwebview-reborn'
 import { parse } from 'graphql'
+import { compose } from 'react-apollo'
 import { parse as parseUrl } from 'url'
 import { execute, makePromise } from 'apollo-link'
 import AndroidWebView from './AndroidWebView'
 import { injectedJavaScript } from '../utils/webview'
-import { link } from '../apollo'
-import { FRONTEND_HOST, FEED_PATH, OFFERS_PATH, USER_AGENT } from '../constants'
+import {
+  link,
+  withMe,
+  withClientSignIn,
+  withClientSignOut
+} from '../apollo'
+import {
+  FRONTEND_HOST,
+  OFFERS_PATH, SIGN_IN_PATH,
+  USER_AGENT
+} from '../constants'
 import withT from '../utils/withT'
 import mkDebug from '../utils/debug'
 import Config from 'react-native-config'
@@ -30,6 +43,7 @@ const NativeWebView = Platform.select({
   android: AndroidWebView
 })
 
+const RELOAD_TIME_THRESHOLD = 60 * 60 * 1000 // 1hr
 const RESTRICTED_PATHS = [OFFERS_PATH]
 const PERMITTED_PROTOCOLS = ['react-js-navigation']
 
@@ -79,11 +93,9 @@ const styles = StyleSheet.create({
   }
 })
 
-const LoadingState = ({ showSpinner }) => (
+const LoadingState = () => (
   <View style={styles.container}>
-    {showSpinner && (
-      <ActivityIndicator color="#999" size="large" />
-    )}
+    <ActivityIndicator color='#999' size='large' />
   </View>
 )
 
@@ -102,23 +114,36 @@ class WebView extends React.PureComponent {
     super(props)
 
     this.subscriptions = {}
-    this.state = { currentUrl: props.source.uri }
+    this.state = {
+      webInstance: 1,
+      currentUrl: props.source.uri,
+      loading: true
+    }
     this.webview = { ref: null, uri: props.source.uri, canGoBack: false }
+
+    this.shouldReload = false
+    this.lastActiveDate = null
   }
 
   componentWillMount () {
     if (Platform.OS === 'android') {
       BackHandler.addEventListener('hardwareBackPress', this.onAndroidBackPress)
     }
+    AppState.addEventListener('change', this.handleAppStateChange)
   }
 
   componentWillReceiveProps (nextProps) {
     const nextUrl = parseUrl(nextProps.source.uri)
     const previousUrl = parseUrl(this.props.source.uri)
 
+    if (nextProps.me !== this.props.me) {
+      this.shouldReload = true
+    }
+
     // If url host changes, we force the redirect
     // This might happen when user change settings in ios
     if (nextProps.forceRedirect || nextUrl.host !== previousUrl.host) {
+      debug('forceRedirect', nextProps.source.uri)
       return this.setState({ currentUrl: nextProps.source.uri })
     }
 
@@ -130,10 +155,22 @@ class WebView extends React.PureComponent {
     }
   }
 
+  clearSubscriptions () {
+    Object.keys(this.subscriptions).forEach(key => {
+      const subscription = this.subscriptions[key]
+      if (subscription) {
+        subscription.unsubscribe()
+      }
+    })
+    this.subscriptions = {}
+  }
+
   componentWillUnmount () {
     if (Platform.OS === 'android') {
       BackHandler.removeEventListener('hardwareBackPress')
     }
+    AppState.removeEventListener('change', this.handleAppStateChange)
+    this.clearSubscriptions()
   }
 
   postMessage = message => {
@@ -142,23 +179,58 @@ class WebView extends React.PureComponent {
   }
 
   reload = () => {
-    this.setState({ currentUrl: this.props.source.uri })
     this.webview.ref.reload()
+  }
+
+  reloadIfNecessary = async ({ url, urlObject }) => {
+    if (!this.shouldReload) {
+      return
+    }
+
+    if (
+      urlObject.pathname !== SIGN_IN_PATH
+    ) {
+      debug('reload necessary')
+      this.setState({
+        loading: true,
+        currentUrl: url,
+        // hard reload: re-init webview
+        webInstance: this.state.webInstance + 1
+      })
+      // soft reload: just trigger reload
+      // this.webview.ref.reload()
+      this.shouldReload = false
+    }
+  }
+
+  handleAppStateChange = async (nextAppState) => {
+    if (nextAppState.match(/inactive|background/)) {
+      this.lastActiveDate = Date.now()
+    } else {
+      if (this.lastActiveDate) {
+        const shouldReload = Date.now() - this.lastActiveDate > RELOAD_TIME_THRESHOLD
+
+        if (shouldReload && !this.shouldReload) {
+          const isConnected = await NetInfo.isConnected.fetch()
+          this.shouldReload = this.shouldReload || (isConnected && shouldReload)
+        }
+      }
+    }
   }
 
   // onNavigationStateChange callback
   // - native when server side navigation
   // - via onMessage when client side navigation
   onNavigationStateChange = ({ url, canGoBack, onMessage }) => {
-    debug('onNavigationStateChange', url, {canGoBack, onMessage})
-    const { onNavigationStateChange, onLoadStop } = this.props
+    debug('onNavigationStateChange', url, { canGoBack, onMessage, shouldReload: this.shouldReload })
+    const { onNavigationStateChange } = this.props
 
     this.webview.canGoBack = this.webview.canGoBack || canGoBack
 
+    const urlObject = parseUrl(url)
     if (this.webview.uri !== url) {
       this.webview.uri = url
 
-      const urlObject = parseUrl(url)
       let shouldOpen = (
         !isExternalURL(urlObject) &&
         !RESTRICTED_PATHS.includes(urlObject.pathname)
@@ -176,9 +248,7 @@ class WebView extends React.PureComponent {
         Linking.openURL(url)
         // and prevent webview to go there
         this.webview.ref.stopLoading()
-        if (onLoadStop) {
-          onLoadStop()
-        }
+        this.onLoadStop()
 
         // and force back when navigating on message
         if (onMessage) {
@@ -187,8 +257,39 @@ class WebView extends React.PureComponent {
         return false
       }
     }
+    this.reloadIfNecessary({ url, urlObject })
 
     return true
+  }
+
+  onLoadStart = () => {
+    debug('onLoadStart')
+    if (!this.state.loading) {
+      StatusBar.setNetworkActivityIndicatorVisible(true)
+    }
+    if (this.props.onLoadStart) {
+      this.props.onLoadStart()
+    }
+  }
+
+  onLoadStop = () => {
+    debug('onLoadStop')
+    StatusBar.setNetworkActivityIndicatorVisible(false)
+  }
+
+  onLoadEnd = () => {
+    debug('onLoadEnd')
+
+    if (this.state.loading) {
+      this.setState({
+        loading: false
+      })
+    }
+    StatusBar.setNetworkActivityIndicatorVisible(false)
+
+    if (this.props.onLoadEnd) {
+      this.props.onLoadEnd()
+    }
   }
 
   share = ({ url, title, message, subject, dialogTitle }) => {
@@ -237,6 +338,11 @@ class WebView extends React.PureComponent {
     }
 
     switch (message.type) {
+      case 'initial-state':
+        // a new apollo client was initiated
+        // - unsubscribe from all previously active subscriptions
+        this.clearSubscriptions()
+        return this.loadInitialState(message.payload)
       case 'navigation':
         debug('onMessage', message.type, message.url)
         return this.onNavigationStateChange({
@@ -269,21 +375,11 @@ class WebView extends React.PureComponent {
       case 'haptic':
         debug('onMessage', message.type, JSON.stringify(message.payload))
         return this.haptic(message.payload)
-      case 'initial-state':
-        // a new apollo client was initiated
-        // - unsubscribe from all previously active subscriptions
-        Object.keys(this.subscriptions).forEach(key => {
-          const subscription = this.subscriptions[key]
-          if (subscription) {
-            subscription.unsubscribe()
-          }
-        })
-        this.subscriptions = {}
       default:
         if (Config.ENV === 'development') {
           const payload = JSON.stringify(message.payload)
           debug(
-            'onMessage', 
+            'onMessage',
             message.type,
             payload && payload.length > 80
               ? payload.slice(0, 80) + '...'
@@ -294,13 +390,65 @@ class WebView extends React.PureComponent {
     }
   }
 
+  onGraphQLResponse = async ({ query, data }) => {
+    const { me } = this.props
+    const { definitions } = query
+    const operations = definitions.map(definition => definition.name && definition.name.value)
+
+    debug('onGraphQLResponse', operations, Object.keys(data.data).map(key => [key, !!data.data[key]]))
+
+    if (operations.includes('signOut')) {
+      if (me) {
+        await this.signOutClient()
+      }
+    }
+
+    // User logs in
+    if (operations.includes('me')) {
+      const newMe = data.data.me
+      if (newMe && (!me || (newMe !== me.id))) {
+        await this.signInClient(newMe)
+      }
+
+      // User got unauthenticated
+      if (!newMe && me) {
+        await this.signOutClient()
+      }
+    }
+  }
+
+  signInClient = async (user) => {
+    debug('signInClient', user.email)
+
+    await this.props.clientSignIn({ variables: { user: { id: user.id } } })
+    const { onSignIn } = this.props
+    if (onSignIn) {
+      onSignIn()
+    }
+  }
+
+  signOutClient = async () => {
+    debug('signOutClient')
+    await this.props.clientSignOut()
+  }
+
+  loadInitialState = (payload) => {
+    const { me } = this.props
+
+    debug('loadInitialState', 'props.me', !!me, 'payload.me', !!payload.me)
+    if (payload.me && (!me || payload.me.id !== me.id)) {
+      return this.signInClient(payload.me)
+    }
+
+    if (!payload.me && me) {
+      return this.signOutClient()
+    }
+  }
+
   handleGraphQLRequest = async (message) => {
-    const { onNetwork } = this.props
     const data = await makePromise(execute(link, message.data.payload))
 
-    if (onNetwork) {
-      await onNetwork({ ...message.data.payload, data })
-    }
+    await this.onGraphQLResponse({ ...message.data.payload, data })
 
     this.postMessage({ id: message.data.id, type: 'graphql', payload: data })
   }
@@ -351,13 +499,14 @@ class WebView extends React.PureComponent {
   }
 
   render () {
-    const { currentUrl } = this.state
-    const { loading, onLoadEnd, onLoadStart, onFileChooserOpen } = this.props
+    const { currentUrl, webInstance, loading } = this.state
+    const { onFileChooserOpen } = this.props
 
     return (
       <Fragment>
-        { loading.status && <LoadingState {...loading} /> }
+        { loading && <LoadingState /> }
         <NativeWebView
+          key={webInstance}
           source={{ uri: currentUrl }}
           ref={node => { this.webview.ref = node }}
           onMessage={this.onMessage}
@@ -366,8 +515,8 @@ class WebView extends React.PureComponent {
           userAgent={USER_AGENT}
           automaticallyAdjustContentInsets={false}
           injectedJavaScript={injectedJavaScript}
-          onLoadEnd={onLoadEnd}
-          onLoadStart={onLoadStart}
+          onLoadEnd={this.onLoadEnd}
+          onLoadStart={this.onLoadStart}
           onFileChooserOpen={onFileChooserOpen}
           allowsBackForwardNavigationGestures
           scalesPageToFit={false}
@@ -381,8 +530,11 @@ class WebView extends React.PureComponent {
 };
 
 WebView.defaultProps = {
-  loading: {},
   onFileChooserOpen: () => {}
 }
 
-export default WebView
+export default compose(
+  withMe,
+  withClientSignIn,
+  withClientSignOut
+)(WebView)

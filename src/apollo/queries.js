@@ -43,12 +43,10 @@ const withAudio = graphql(getCurrentAudioQuery, {
   })
 })
 
-const me = graphql(gql`
+const withMe = graphql(gql`
   query me {
     user @client {
       id
-      name
-      portrait
     }
   }
 `, {
@@ -60,13 +58,13 @@ const me = graphql(gql`
 })
 
 const pendingAppSignIn = compose(
-  me,
+  withMe,
   graphql(pendingAppSignInQuery, {
     skip: props => !props.me,
     options: {
       fetchPolicy: 'network-only'
     },
-    props: ({ data, ownProps: { me } }) => {
+    props: ({ data }) => {
       return {
         pendingAppSignIn: data.pendingAppSignIn,
         refetchPendingSignInRequests: data.refetch
@@ -76,7 +74,7 @@ const pendingAppSignIn = compose(
 )
 
 export {
-  me,
+  withMe,
   withAudio,
   withCurrentUrl,
   pendingAppSignIn

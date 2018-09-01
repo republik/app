@@ -45,7 +45,7 @@ const pustNotificationsWrapper = WrappedComponent => (
       }
     }
 
-    getNotificationsToken = async () => {
+    initNotifications = async () => {
       try {
         await firebase.messaging().requestPermission()
         const token = await firebase.messaging().getToken()
@@ -63,7 +63,7 @@ const pustNotificationsWrapper = WrappedComponent => (
             appVersion: APP_VERSION,
             userAgent: USER_AGENT
           }
-        }})
+        } })
       } catch (error) {
         throw error
       }
@@ -93,7 +93,7 @@ const pustNotificationsWrapper = WrappedComponent => (
     render () {
       return (
         <WrappedComponent
-          getNotificationsToken={this.getNotificationsToken}
+          initNotifications={this.initNotifications}
           {...this.props}
         />
       )

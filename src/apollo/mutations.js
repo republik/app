@@ -1,31 +1,31 @@
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 
-const login = graphql(gql`
-  mutation Login($user: User) {
-    login(user: $user) @client
+export const withClientSignIn = graphql(gql`
+  mutation ClientSignIn($user: User) {
+    signIn(user: $user) @client
   }
-`, { name: 'login' })
+`, { name: 'clientSignIn' })
 
-const logout = graphql(gql`
-  mutation Logout {
-    logout @client
+export const withClientSignOut = graphql(gql`
+  mutation ClientSignOut {
+    signOut @client
   }
-`, { name: 'logout' })
+`, { name: 'clientSignOut' })
 
-const setUrl = graphql(gql`
+export const setUrl = graphql(gql`
   mutation SetUrl($url: String!) {
     setUrl(url: $url) @client
   }
 `, { name: 'setUrl' })
 
-const setAudio = graphql(gql`
+export const setAudio = graphql(gql`
   mutation SetAudio($url: String, $title: String, $sourcePath: String) {
     setAudio(url: $url, title: $title, sourcePath: $sourcePath) @client
   }
 `, { name: 'setAudio' })
 
-const upsertDevice = graphql(gql`
+export const upsertDevice = graphql(gql`
   mutation UpsertDevice($token: ID!, $information: DeviceInformationInput!) {
     upsertDevice(token: $token, information: $information) {
       id
@@ -33,7 +33,7 @@ const upsertDevice = graphql(gql`
   }
 `, { name: 'upsertDevice' })
 
-const rollDeviceToken = graphql(gql`
+export const rollDeviceToken = graphql(gql`
   mutation RollDeviceToken($oldToken: String!, $newToken: String!) {
     rollDeviceToken(oldToken: $oldToken, newToken: $newToken) {
       id
@@ -41,21 +41,10 @@ const rollDeviceToken = graphql(gql`
   }
 `, { name: 'rollDeviceToken' })
 
-const setPlaybackStateMutation = gql`
+export const setPlaybackStateMutation = gql`
   mutation SetPlaybackState($state: String!) {
     setPlaybackState(state: $state) @client
   }
 `
 
-const setPlaybackState = graphql(setPlaybackStateMutation, { name: 'setPlaybackState' })
-
-export {
-  login,
-  setUrl,
-  logout,
-  setAudio,
-  upsertDevice,
-  rollDeviceToken,
-  setPlaybackState,
-  setPlaybackStateMutation
-}
+export const setPlaybackState = graphql(setPlaybackStateMutation, { name: 'setPlaybackState' })
