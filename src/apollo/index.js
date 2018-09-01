@@ -6,12 +6,12 @@ import { ApolloLink } from 'apollo-link'
 import { withClientState } from 'apollo-link-state'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import { CachePersistor } from 'apollo-cache-persist'
-import { HOME_URL } from '../constants'
+import { SIGN_IN_URL } from '../constants'
 import { link } from './link'
 import TrackPlayer from 'react-native-track-player'
 
 const defaults = {
-  url: HOME_URL,
+  url: SIGN_IN_URL,
   user: null,
   audio: null,
   playbackState: null
