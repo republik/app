@@ -117,8 +117,8 @@ android {
         applicationId "app.republik"
         minSdkVersion 19
         targetSdkVersion 26
-        versionCode 26
-        versionName "0.1.1"
+        versionCode 27
+        versionName "0.2.0"
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
