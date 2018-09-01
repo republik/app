@@ -22,6 +22,7 @@ class Login extends Component {
     }
     return true
   }
+
   onSignIn = () => {
     navigator.goBack()
   }

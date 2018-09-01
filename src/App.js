@@ -41,16 +41,13 @@ class App extends Component {
   render () {
     if (!this.state.cacheLoaded) return null
 
-    const { getNotificationsToken } = this.props
-
     return (
       <Router
         ref={navigatorRef => navigator.setContainer(navigatorRef)}
         screenProps={{
           persistor: this.props.persistor,
           onLoadEnd: this.hideSplashScreen,
-          checkForUpdates: this.props.checkForUpdates,
-          getNotificationsToken
+          checkForUpdates: this.props.checkForUpdates
         }}
       />
     )

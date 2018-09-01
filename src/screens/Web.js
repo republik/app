@@ -104,7 +104,8 @@ class Web extends Component {
   }
 
   onSignIn = () => {
-    this.props.screenProps.getNotificationsToken()
+    // do nothing
+    // - web view handles reload
   }
 
   onMessage = message => {

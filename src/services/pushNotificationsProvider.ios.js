@@ -54,7 +54,7 @@ const pustNotificationsWrapper = WrappedComponent => (
       }
     }
 
-    getNotificationsToken = async () => {
+    initNotifications = async () => {
       if (!DeviceInfo.isEmulator()) {
         NotificationsIOS.requestPermissions()
         NotificationsIOS.consumeBackgroundQueue()
@@ -64,7 +64,7 @@ const pustNotificationsWrapper = WrappedComponent => (
     render () {
       return (
         <WrappedComponent
-          getNotificationsToken={this.getNotificationsToken}
+          initNotifications={this.initNotifications}
           {...this.props}
         />
       )
