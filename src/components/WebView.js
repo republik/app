@@ -525,11 +525,13 @@ class WebView extends React.PureComponent {
           onLoadStart={this.onLoadStart}
           onFileChooserOpen={onFileChooserOpen}
           allowsBackForwardNavigationGestures
+          keyboardDisplayRequiresUserAction={false}
           scalesPageToFit={false}
           startInLoadingState
           javaScriptEnabled
           sendCookies
         />
+        {/* consider hideKeyboardAccessoryView once we can avoid the keyboard */}
       </Fragment>
     )
   }
