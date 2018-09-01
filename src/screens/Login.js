@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import { parse } from 'url'
 import WebView from '../components/WebView'
 import SafeAreaView from '../components/SafeAreaView'
 import navigator from '../services/navigation'

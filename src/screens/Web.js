@@ -1,15 +1,13 @@
 import React, { Component, Fragment } from 'react'
 import {
-  AppState, NetInfo, Platform, KeyboardAvoidingView
+  AppState
 } from 'react-native'
 import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'
-import { parse } from 'url'
 import WebView from '../components/WebView'
 import AudioPlayer from '../components/AudioPlayer'
 import SafeAreaView from '../components/SafeAreaView'
 import navigator from '../services/navigation'
-import { FRONTEND_HOST } from '../constants'
 import {
   setUrl,
   setAudio,
@@ -116,8 +114,7 @@ class Web extends Component {
   render () {
     const {
       data,
-      setUrl,
-      navigation
+      setUrl
     } = this.props
     const { loading, fullscreen } = this.state
 

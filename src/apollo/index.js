@@ -8,7 +8,6 @@ import { InMemoryCache } from 'apollo-cache-inmemory'
 import { CachePersistor } from 'apollo-cache-persist'
 import { SIGN_IN_URL } from '../constants'
 import { link } from './link'
-import TrackPlayer from 'react-native-track-player'
 
 const defaults = {
   url: SIGN_IN_URL,

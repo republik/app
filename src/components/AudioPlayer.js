@@ -151,7 +151,7 @@ class AudioPlayer extends Component {
       await this.setTrack(this.props)
       const state = await TrackPlayer.getState()
       if (state !== this.props.playbackState) {
-        this.props.setPlaybackState({ variables: {state} })
+        this.props.setPlaybackState({ variables: { state } })
       }
       await this.onPlaybackStateChange(state)
     }

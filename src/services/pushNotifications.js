@@ -11,9 +11,8 @@ const pustNotificationsWrapper = WrappedComponent => (
         this.props.initNotifications()
       }
     }
-
     render () {
-      const { initNotifications, ...props} = this.props
+      const { initNotifications, ...props } = this.props
       return (
         <WrappedComponent {...props} />
       )

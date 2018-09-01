@@ -41,7 +41,7 @@ class SafeAreaView extends Component {
         top: fullscreen ? 'never' : 'always'
       }}>
         <StatusBar hidden={hiddenStatusBar || fullscreen} />
-        <View style={{flex: 1}} onLayout={this.onLayout}>
+        <View style={{ flex: 1 }} onLayout={this.onLayout}>
           {children}
         </View>
       </RawSafeAreaView>

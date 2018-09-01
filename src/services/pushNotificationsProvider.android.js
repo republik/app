@@ -63,7 +63,7 @@ const pustNotificationsWrapper = WrappedComponent => (
             appVersion: APP_VERSION,
             userAgent: USER_AGENT
           }
-        }})
+        } })
       } catch (error) {
         throw error
       }

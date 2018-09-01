@@ -99,7 +99,7 @@ const otaWrapper = WrappedComponent => (
       running = true
       const shouldCheck = await this.shouldCheck()
       if (!force && !shouldCheck) {
-        console.log('ota-simple: skip checking for updates', {force, shouldCheck})
+        console.log('ota-simple: skip checking for updates', { force, shouldCheck })
         running = false
         return
       }
@@ -107,7 +107,7 @@ const otaWrapper = WrappedComponent => (
       console.log('ota-simple: checking for update...')
       try {
         const versionsResult = await RNFetchBlob.fetch('GET', VERSIONS_URL, {
-          'Cache-Control' : 'no-store'
+          'Cache-Control': 'no-store'
         })
 
         if (versionsResult && versionsResult.data) {

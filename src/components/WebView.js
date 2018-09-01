@@ -10,7 +10,8 @@ import {
   Share,
   Vibration,
   Linking,
-  StatusBar
+  StatusBar,
+  NetInfo
 } from 'react-native'
 import IOSWebView from 'react-native-wkwebview-reborn'
 import { parse } from 'graphql'
@@ -27,7 +28,7 @@ import {
 } from '../apollo'
 import {
   FRONTEND_HOST,
-  FEED_PATH, OFFERS_PATH, SIGN_IN_PATH,
+  OFFERS_PATH, SIGN_IN_PATH,
   USER_AGENT
 } from '../constants'
 import withT from '../utils/withT'
@@ -221,7 +222,7 @@ class WebView extends React.PureComponent {
   // - native when server side navigation
   // - via onMessage when client side navigation
   onNavigationStateChange = ({ url, canGoBack, onMessage }) => {
-    debug('onNavigationStateChange', url, {canGoBack, onMessage, shouldReload: this.shouldReload})
+    debug('onNavigationStateChange', url, { canGoBack, onMessage, shouldReload: this.shouldReload })
     const { onNavigationStateChange } = this.props
 
     this.webview.canGoBack = this.webview.canGoBack || canGoBack
@@ -256,7 +257,7 @@ class WebView extends React.PureComponent {
         return false
       }
     }
-    this.reloadIfNecessary({url, urlObject})
+    this.reloadIfNecessary({ url, urlObject })
 
     return true
   }
@@ -378,7 +379,7 @@ class WebView extends React.PureComponent {
         if (Config.ENV === 'development') {
           const payload = JSON.stringify(message.payload)
           debug(
-            'onMessage', 
+            'onMessage',
             message.type,
             payload && payload.length > 80
               ? payload.slice(0, 80) + '...'
