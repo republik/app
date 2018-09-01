@@ -137,7 +137,7 @@ class WebView extends React.PureComponent {
     const previousUrl = parseUrl(this.props.source.uri)
 
     if (nextProps.me !== this.props.me) {
-      this.shouldReload = true
+      this.shouldReload = 'hard'
     }
 
     // If url host changes, we force the redirect
@@ -190,20 +190,27 @@ class WebView extends React.PureComponent {
     if (
       urlObject.pathname !== SIGN_IN_PATH
     ) {
-      debug('reload necessary')
-      this.setState({
-        loading: true,
-        currentUrl: url,
-        // hard reload: re-init webview
-        webInstance: this.state.webInstance + 1
-      })
-      // soft reload: just trigger reload
-      // this.webview.ref.reload()
+      if (this.shouldReload === 'hard') {
+        debug('reload hard')
+        this.setState({
+          loading: true,
+          currentUrl: url,
+          // hard reload: re-init webview
+          webInstance: this.state.webInstance + 1
+        })
+      } else {
+        const isConnected = await NetInfo.isConnected.fetch()
+        if (isConnected) {
+          debug('reload soft')
+          // soft reload: just trigger reload
+          this.webview.ref.reload()
+        }
+      }
       this.shouldReload = false
     }
   }
 
-  handleAppStateChange = async (nextAppState) => {
+  handleAppStateChange = nextAppState => {
     if (nextAppState.match(/inactive|background/)) {
       this.lastActiveDate = Date.now()
     } else {
@@ -211,8 +218,7 @@ class WebView extends React.PureComponent {
         const shouldReload = Date.now() - this.lastActiveDate > RELOAD_TIME_THRESHOLD
 
         if (shouldReload && !this.shouldReload) {
-          const isConnected = await NetInfo.isConnected.fetch()
-          this.shouldReload = this.shouldReload || (isConnected && shouldReload)
+          this.shouldReload = 'soft'
         }
       }
     }
@@ -263,7 +269,7 @@ class WebView extends React.PureComponent {
   }
 
   onLoadStart = () => {
-    debug('onLoadStart')
+    debug('onLoadStart', {loading: this.state.loading})
     if (!this.state.loading) {
       StatusBar.setNetworkActivityIndicatorVisible(true)
     }
