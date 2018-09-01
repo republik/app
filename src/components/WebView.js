@@ -9,7 +9,8 @@ import {
   ActivityIndicator,
   Share,
   Vibration,
-  Linking
+  Linking,
+  StatusBar
 } from 'react-native'
 import IOSWebView from 'react-native-wkwebview-reborn'
 import { parse } from 'graphql'
@@ -91,11 +92,9 @@ const styles = StyleSheet.create({
   }
 })
 
-const LoadingState = ({ showSpinner }) => (
+const LoadingState = () => (
   <View style={styles.container}>
-    {showSpinner && (
-      <ActivityIndicator color="#999" size="large" />
-    )}
+    <ActivityIndicator color='#999' size='large' />
   </View>
 )
 
@@ -116,7 +115,8 @@ class WebView extends React.PureComponent {
     this.subscriptions = {}
     this.state = {
       webInstance: 1,
-      currentUrl: props.source.uri
+      currentUrl: props.source.uri,
+      loading: true
     }
     this.webview = { ref: null, uri: props.source.uri, canGoBack: false }
 
@@ -181,7 +181,7 @@ class WebView extends React.PureComponent {
     this.webview.ref.reload()
   }
 
-  reloadIfNeccesary = async ({url, urlObject}) => {
+  reloadIfNecessary = async ({ url, urlObject }) => {
     if (!this.shouldReload) {
       return
     }
@@ -189,12 +189,14 @@ class WebView extends React.PureComponent {
     if (
       urlObject.pathname !== SIGN_IN_PATH
     ) {
+      debug('reload necessary')
       this.setState({
+        loading: true,
         currentUrl: url,
         // hard reload: re-init webview
         webInstance: this.state.webInstance + 1
       })
-      // soft reload: just pull the reload
+      // soft reload: just trigger reload
       // this.webview.ref.reload()
       this.shouldReload = false
     }
@@ -220,14 +222,14 @@ class WebView extends React.PureComponent {
   // - via onMessage when client side navigation
   onNavigationStateChange = ({ url, canGoBack, onMessage }) => {
     debug('onNavigationStateChange', url, {canGoBack, onMessage, shouldReload: this.shouldReload})
-    const { onNavigationStateChange, onLoadStop } = this.props
+    const { onNavigationStateChange } = this.props
 
     this.webview.canGoBack = this.webview.canGoBack || canGoBack
 
+    const urlObject = parseUrl(url)
     if (this.webview.uri !== url) {
       this.webview.uri = url
 
-      const urlObject = parseUrl(url)
       let shouldOpen = (
         !isExternalURL(urlObject) &&
         !RESTRICTED_PATHS.includes(urlObject.pathname)
@@ -245,9 +247,7 @@ class WebView extends React.PureComponent {
         Linking.openURL(url)
         // and prevent webview to go there
         this.webview.ref.stopLoading()
-        if (onLoadStop) {
-          onLoadStop()
-        }
+        this.onLoadStop()
 
         // and force back when navigating on message
         if (onMessage) {
@@ -255,11 +255,40 @@ class WebView extends React.PureComponent {
         }
         return false
       }
-
-      this.reloadIfNeccesary({url, urlObject})
     }
+    this.reloadIfNecessary({url, urlObject})
 
     return true
+  }
+
+  onLoadStart = () => {
+    debug('onLoadStart')
+    if (!this.state.loading) {
+      StatusBar.setNetworkActivityIndicatorVisible(true)
+    }
+    if (this.props.onLoadStart) {
+      this.props.onLoadStart()
+    }
+  }
+
+  onLoadStop = () => {
+    debug('onLoadStop')
+    StatusBar.setNetworkActivityIndicatorVisible(false)
+  }
+
+  onLoadEnd = () => {
+    debug('onLoadEnd')
+
+    if (this.state.loading) {
+      this.setState({
+        loading: false
+      })
+    }
+    StatusBar.setNetworkActivityIndicatorVisible(false)
+
+    if (this.props.onLoadEnd) {
+      this.props.onLoadEnd()
+    }
   }
 
   share = ({ url, title, message, subject, dialogTitle }) => {
@@ -469,12 +498,12 @@ class WebView extends React.PureComponent {
   }
 
   render () {
-    const { currentUrl, webInstance } = this.state
-    const { loading, onLoadEnd, onLoadStart, onFileChooserOpen } = this.props
+    const { currentUrl, webInstance, loading } = this.state
+    const { onFileChooserOpen } = this.props
 
     return (
       <Fragment>
-        { loading.status && <LoadingState {...loading} /> }
+        { loading && <LoadingState /> }
         <NativeWebView
           key={webInstance}
           source={{ uri: currentUrl }}
@@ -485,8 +514,8 @@ class WebView extends React.PureComponent {
           userAgent={USER_AGENT}
           automaticallyAdjustContentInsets={false}
           injectedJavaScript={injectedJavaScript}
-          onLoadEnd={onLoadEnd}
-          onLoadStart={onLoadStart}
+          onLoadEnd={this.onLoadEnd}
+          onLoadStart={this.onLoadStart}
           onFileChooserOpen={onFileChooserOpen}
           allowsBackForwardNavigationGestures
           scalesPageToFit={false}
@@ -500,7 +529,6 @@ class WebView extends React.PureComponent {
 };
 
 WebView.defaultProps = {
-  loading: {},
   onFileChooserOpen: () => {}
 }
 

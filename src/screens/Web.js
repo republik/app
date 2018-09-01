@@ -4,7 +4,6 @@ import {
 } from 'react-native'
 import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'
-import debounce from 'lodash.debounce'
 import { parse } from 'url'
 import WebView from '../components/WebView'
 import AudioPlayer from '../components/AudioPlayer'
@@ -24,9 +23,7 @@ class Web extends Component {
   constructor (props) {
     super(props)
 
-    this.state = {
-      loading: true
-    }
+    this.state = {}
   }
 
   componentDidMount () {
@@ -57,10 +54,6 @@ class Web extends Component {
     }
   }
 
-  setLoading = debounce(value => {
-    this.setState({ loading: value })
-  }, 150)
-
   onNavigationStateChange = (data) => {
     this.props.setUrl({ variables: { url: data.url } })
 
@@ -77,27 +70,10 @@ class Web extends Component {
     if (this.props.screenProps.onLoadStart) {
       this.props.screenProps.onLoadStart()
     }
-    if (!this.state.loading) {
-      this.setState({
-        networkActivity: true
-      })
-    }
-  }
-
-  onLoadStop = () => {
-    this.setState({
-      networkActivity: false
-    })
   }
 
   onLoadEnd = () => {
     debug('onLoadEnd')
-
-    this.setLoading(false)
-    this.setState({
-      networkActivity: false
-    })
-
     if (this.props.screenProps.onLoadEnd) {
       this.props.screenProps.onLoadEnd()
     }
@@ -143,16 +119,15 @@ class Web extends Component {
       setUrl,
       navigation
     } = this.props
-    const { loading, fullscreen, networkActivity } = this.state
+    const { loading, fullscreen } = this.state
 
     return (
       <Fragment>
-        <SafeAreaView fullscreen={fullscreen} networkActivity={networkActivity}>
+        <SafeAreaView fullscreen={fullscreen}>
           <WebView
             source={{ uri: data.url }}
             onMessage={this.onMessage}
             onLoadEnd={this.onLoadEnd}
-            onLoadStop={this.onLoadStop}
             onLoadStart={this.onLoadStart}
             onNavigationStateChange={this.onNavigationStateChange}
             onSignIn={this.onSignIn}

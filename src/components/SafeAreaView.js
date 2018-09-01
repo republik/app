@@ -30,7 +30,7 @@ class SafeAreaView extends Component {
     }
   }
   render () {
-    const { children, fullscreen, networkActivity } = this.props
+    const { children, fullscreen } = this.props
     const { hiddenStatusBar } = this.state
     return (
       <RawSafeAreaView style={{
@@ -40,7 +40,7 @@ class SafeAreaView extends Component {
         bottom: 'never',
         top: fullscreen ? 'never' : 'always'
       }}>
-        <StatusBar hidden={hiddenStatusBar || fullscreen} networkActivityIndicatorVisible={networkActivity}  />
+        <StatusBar hidden={hiddenStatusBar || fullscreen} />
         <View style={{flex: 1}} onLayout={this.onLayout}>
           {children}
         </View>
