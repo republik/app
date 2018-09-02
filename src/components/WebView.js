@@ -270,7 +270,7 @@ class WebView extends React.PureComponent {
 
   onLoadStart = () => {
     debug('onLoadStart', {loading: this.state.loading})
-    if (!this.state.loading) {
+    if (!this.state.loading && Platform.OS === 'ios') {
       StatusBar.setNetworkActivityIndicatorVisible(true)
     }
     if (this.props.onLoadStart) {
@@ -280,7 +280,9 @@ class WebView extends React.PureComponent {
 
   onLoadStop = () => {
     debug('onLoadStop')
-    StatusBar.setNetworkActivityIndicatorVisible(false)
+    if (Platform.OS === 'ios') {
+      StatusBar.setNetworkActivityIndicatorVisible(false)
+    }
   }
 
   onLoadEnd = () => {
@@ -291,7 +293,9 @@ class WebView extends React.PureComponent {
         loading: false
       })
     }
-    StatusBar.setNetworkActivityIndicatorVisible(false)
+    if (Platform.OS === 'ios') {
+      StatusBar.setNetworkActivityIndicatorVisible(false)
+    }
 
     if (this.props.onLoadEnd) {
       this.props.onLoadEnd()
