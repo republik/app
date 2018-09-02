@@ -6,6 +6,13 @@ import pushNotificationProvider from './pushNotificationsProvider'
 
 const pustNotificationsWrapper = WrappedComponent => (
   class extends Component {
+    constructor (props, ...args) {
+      super(props, ...args)
+
+      if (props.me) {
+        props.initNotifications()
+      }
+    }
     componentWillReceiveProps (nextProps) {
       if (nextProps.me && nextProps.me !== this.props.me) {
         this.props.initNotifications()
@@ -13,6 +20,7 @@ const pustNotificationsWrapper = WrappedComponent => (
     }
     render () {
       const { initNotifications, ...props } = this.props
+
       return (
         <WrappedComponent {...props} />
       )

@@ -11,7 +11,9 @@ const TOKEN_KEY = 'notification_token'
 
 const pustNotificationsWrapper = WrappedComponent => (
   class extends Component {
-    componentDidMount () {
+    constructor (props, ...args) {
+      super(props, ...args)
+
       this.notificationListener = firebase.notifications().onNotification(this.onNotification)
       this.tokenRefreshListener = firebase.messaging().onTokenRefresh(this.onTokenRefresh)
       this.notificationOpenedListener = firebase.notifications().onNotificationOpened(this.onNotificationOpened)
@@ -45,10 +47,20 @@ const pustNotificationsWrapper = WrappedComponent => (
       }
     }
 
+    // called on launch if me is present or after sign in
     initNotifications = async () => {
       try {
         await firebase.messaging().requestPermission()
         const token = await firebase.messaging().getToken()
+
+        const oldToken = await AsyncStorage.getItem(TOKEN_KEY)
+
+        if (oldToken && oldToken !== token) {
+          await this.props.rollDeviceToken({ variables: {
+            newToken: token,
+            oldToken
+          } })
+        }
 
         await AsyncStorage.setItem(TOKEN_KEY, token)
 
@@ -65,7 +77,7 @@ const pustNotificationsWrapper = WrappedComponent => (
           }
         } })
       } catch (error) {
-        throw error
+        console.warn(error)
       }
     }
 
