@@ -123,7 +123,11 @@ class AudioPlayer extends Component {
   constructor (props) {
     super(props)
 
-    this.bottom = new Animated.Value(props.audio ? 0 : -AUDIO_PLAYER_HEIGHT)
+    this.bottom = new Animated.Value(
+      props.audio && !props.hidden
+        ? 0
+        : -AUDIO_PLAYER_HEIGHT
+    )
     this.state = {
       isPlaying: false
     }
@@ -134,6 +138,10 @@ class AudioPlayer extends Component {
       if (this.state.audio !== nextProps.audio) {
         await this.setTrack(nextProps)
         TrackPlayer.play()
+      }
+      if (nextProps.hidden) {
+        Animated.timing(this.bottom, { toValue:  -AUDIO_PLAYER_HEIGHT, duration: ANIMATION_DURATION }).start()
+      } else {
         Animated.timing(this.bottom, { toValue: 0, duration: ANIMATION_DURATION }).start()
       }
     } else if (this.state.audio) {

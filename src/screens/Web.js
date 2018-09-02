@@ -131,6 +131,7 @@ class Web extends Component {
             loading={{ status: loading, showSpinner: true }}
           />
           <AudioPlayer
+            hidden={fullscreen}
             setUrl={setUrl}
           />
         </SafeAreaView>

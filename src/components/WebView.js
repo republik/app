@@ -269,7 +269,7 @@ class WebView extends React.PureComponent {
   }
 
   onLoadStart = () => {
-    debug('onLoadStart', {loading: this.state.loading})
+    debug('onLoadStart', { loading: this.state.loading })
     if (!this.state.loading && Platform.OS === 'ios') {
       StatusBar.setNetworkActivityIndicatorVisible(true)
     }
