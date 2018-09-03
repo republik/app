@@ -237,10 +237,11 @@ class WebView extends React.PureComponent {
     if (this.webview.uri !== url) {
       this.webview.uri = url
 
-      let shouldOpen = (
-        !isExternalURL(urlObject) &&
-        !RESTRICTED_PATHS.includes(urlObject.pathname)
+      const shouldOpenInSystemBrowser = (
+        isExternalURL(urlObject) ||
+        RESTRICTED_PATHS.includes(urlObject.pathname)
       )
+      let shouldOpen = !shouldOpenInSystemBrowser
 
       if (
         shouldOpen &&
@@ -250,13 +251,15 @@ class WebView extends React.PureComponent {
       }
 
       if (!shouldOpen) {
-        // we open it in system browser
-        Linking.openURL(url)
-        // and prevent webview to go there
+        if (shouldOpenInSystemBrowser) {
+          // we open it in system browser
+          Linking.openURL(url)
+        }
+        // prevent webview to go there
         this.webview.ref.stopLoading()
         this.onLoadStop()
 
-        // and force back when navigating on message
+        // and force back when based on a postMessage (stopLoading won't stop history.pushState)
         if (onMessage) {
           this.webview.ref.goBack()
         }
