@@ -217,13 +217,18 @@ class WebView extends React.PureComponent {
         this.shouldReload = false
         return true
       } else if (this.shouldReload === 'soft') {
-        NetInfo.isConnected.fetch().then(isConnected => {
-          if (isConnected && this.shouldReload === 'soft') {
-            debug('reload soft')
-            this.shouldReload = false
-            // soft reload: just trigger reload
-            this.webview.ref.reload()
-          }
+        const netInfo = NetInfo.isConnected.fetch()
+        this.setState({
+          currentUrl: url
+        }, () => {
+          netInfo.then(isConnected => {
+            if (isConnected && this.shouldReload === 'soft') {
+              debug('reload soft')
+              this.shouldReload = false
+              // soft reload: just trigger reload
+              this.webview.ref.reload()
+            }
+          })
         })
         return undefined
       }
