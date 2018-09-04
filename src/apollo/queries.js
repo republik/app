@@ -15,6 +15,10 @@ const getCurrentAudioQuery = gql`
       sourcePath
       opened
     }
+  }
+`
+const getPlaybackStateQuery = gql`
+  query GetPlaybackState {
     playbackState @client
   }
 `
@@ -37,8 +41,13 @@ const withCurrentUrl = graphql(getCurrentUrlQuery, {
 })
 
 const withAudio = graphql(getCurrentAudioQuery, {
-  props: ({ data: { audio, playbackState } }) => ({
-    audio,
+  props: ({ data: { audio } }) => ({
+    audio
+  })
+})
+
+const withPlaybackState = graphql(getPlaybackStateQuery, {
+  props: ({ data: { playbackState } }) => ({
     playbackState
   })
 })
@@ -76,6 +85,7 @@ const pendingAppSignIn = compose(
 export {
   withMe,
   withAudio,
+  withPlaybackState,
   withCurrentUrl,
   pendingAppSignIn
 }
