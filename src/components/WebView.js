@@ -545,13 +545,15 @@ class WebView extends React.PureComponent {
           onLoadStart={this.onLoadStart}
           onFileChooserOpen={onFileChooserOpen}
           allowsBackForwardNavigationGestures
+          allowsInlineMediaPlayback
           keyboardDisplayRequiresUserAction={false}
           scalesPageToFit={false}
           startInLoadingState
           javaScriptEnabled
           sendCookies
         />
-        {/* consider hideKeyboardAccessoryView once we can avoid the keyboard */}
+        {/* We're using a WKWebView fork with hard coded allowsInlineMediaPlayback: the above flag has no effect. */}
+        {/* Consider hideKeyboardAccessoryView once we can avoid the keyboard */}
       </Fragment>
     )
   }
