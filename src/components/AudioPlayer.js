@@ -4,10 +4,11 @@ import TrackPlayer from 'react-native-track-player'
 import Icon from './Icon'
 import { withAudio, setAudio, withPlaybackState, setPlaybackState } from '../apollo'
 import Logo from '../assets/images/playlist-logo.png'
-import { FRONTEND_BASE_URL, ANIMATION_DURATION } from '../constants'
+import { FRONTEND_BASE_URL } from '../constants'
 import { compose } from 'react-apollo'
 
 export const AUDIO_PLAYER_HEIGHT = 65
+export const ANIMATION_DURATION = 250
 
 const styles = StyleSheet.create({
   container: {
@@ -138,7 +139,7 @@ class AudioPlayer extends Component {
         TrackPlayer.play()
       }
       if (nextProps.hidden) {
-        Animated.timing(this.bottom, { toValue:  -AUDIO_PLAYER_HEIGHT, duration: ANIMATION_DURATION }).start()
+        Animated.timing(this.bottom, { toValue: -AUDIO_PLAYER_HEIGHT, duration: ANIMATION_DURATION }).start()
       } else {
         Animated.timing(this.bottom, { toValue: 0, duration: ANIMATION_DURATION }).start()
       }

@@ -47,6 +47,3 @@ export let USER_AGENT = `${nativeUserAgent} RepublikApp/${APP_VERSION}`
 AsyncStorage.getItem('BUNDLE_VERSION_KEY').then(BUNDLE_VERSION => {
   USER_AGENT += BUNDLE_VERSION ? '/' + BUNDLE_VERSION : ''
 })
-
-// Default Animation Duration
-export const ANIMATION_DURATION = 250

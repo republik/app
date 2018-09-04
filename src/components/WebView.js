@@ -11,8 +11,7 @@ import {
   Vibration,
   Linking,
   StatusBar,
-  NetInfo,
-  LayoutAnimation
+  NetInfo
 } from 'react-native'
 import IOSWebView from 'react-native-wkwebview-reborn'
 import { parse } from 'graphql'
@@ -30,7 +29,7 @@ import {
 import {
   FRONTEND_HOST,
   OFFERS_PATH, SIGN_IN_PATH, SIGN_IN_URL,
-  USER_AGENT, ANIMATION_DURATION
+  USER_AGENT
 } from '../constants'
 import withT from '../utils/withT'
 import mkDebug from '../utils/debug'
@@ -130,8 +129,7 @@ class WebView extends React.PureComponent {
       currentUrl: isAllowedUrl(props.source.uri)
         ? props.source.uri
         : SIGN_IN_URL,
-      loading: true,
-      bottom: props.bottom
+      loading: true
     }
     this.webview = { ref: null, uri: props.source.uri, canGoBack: false }
 
@@ -170,16 +168,6 @@ class WebView extends React.PureComponent {
       nextProps.source.uri !== this.webview.uri
     ) {
       this.postMessage({ type: 'push-route', url: nextUrl.path })
-    }
-
-    if (nextProps.bottom !== this.props.bottom) {
-      const animationConfig = LayoutAnimation.create(
-        250,
-        LayoutAnimation.Types.easeIn,
-        LayoutAnimation.Properties.opacity,
-      )
-      LayoutAnimation.configureNext(animationConfig)
-      this.setState({bottom: nextProps.bottom})
     }
   }
 
@@ -537,7 +525,7 @@ class WebView extends React.PureComponent {
   }
 
   render () {
-    const { currentUrl, webInstance, loading, bottom } = this.state
+    const { currentUrl, webInstance, loading } = this.state
     const { onFileChooserOpen } = this.props
 
     return (
@@ -551,9 +539,6 @@ class WebView extends React.PureComponent {
           onNavigationStateChange={this.onNavigationStateChange}
           renderError={() => <ErrorState onReload={this.reload} />}
           userAgent={USER_AGENT}
-          style={{
-            marginBottom: bottom
-          }}
           automaticallyAdjustContentInsets={false}
           injectedJavaScript={injectedJavaScript}
           onLoadEnd={this.onLoadEnd}
