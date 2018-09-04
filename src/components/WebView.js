@@ -28,7 +28,7 @@ import {
 } from '../apollo'
 import {
   FRONTEND_HOST,
-  OFFERS_PATH, SIGN_IN_PATH,
+  OFFERS_PATH, SIGN_IN_PATH, SIGN_IN_URL,
   USER_AGENT
 } from '../constants'
 import withT from '../utils/withT'
@@ -47,10 +47,20 @@ const RELOAD_TIME_THRESHOLD = 60 * 60 * 1000 // 1hr
 const RESTRICTED_PATHS = [OFFERS_PATH]
 const PERMITTED_PROTOCOLS = ['react-js-navigation']
 
+const normalizeHost = host => host.replace(/^www\./, '')
+
 const isExternalURL = ({ host, protocol }) => (
-  FRONTEND_HOST !== host &&
+  normalizeHost(FRONTEND_HOST) !== normalizeHost(host) &&
   !PERMITTED_PROTOCOLS.includes(protocol)
 )
+
+const isAllowedUrl = url => {
+  const urlObject = typeof url === 'string'
+    ? parseUrl(url)
+    : url
+
+  return !isExternalURL(urlObject) && !RESTRICTED_PATHS.includes(urlObject.pathname)
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -116,7 +126,9 @@ class WebView extends React.PureComponent {
     this.subscriptions = {}
     this.state = {
       webInstance: 1,
-      currentUrl: props.source.uri,
+      currentUrl: isAllowedUrl(props.source.uri)
+        ? props.source.uri
+        : SIGN_IN_URL,
       loading: true
     }
     this.webview = { ref: null, uri: props.source.uri, canGoBack: false }
@@ -144,7 +156,11 @@ class WebView extends React.PureComponent {
     // This might happen when user change settings in ios
     if (nextProps.forceRedirect || nextUrl.host !== previousUrl.host) {
       debug('forceRedirect', nextProps.source.uri)
-      return this.setState({ currentUrl: nextProps.source.uri })
+      return this.setState({
+        currentUrl: isAllowedUrl(nextProps.source.uri)
+          ? nextProps.source.uri
+          : SIGN_IN_URL
+      })
     }
 
     if (
@@ -237,10 +253,7 @@ class WebView extends React.PureComponent {
     if (this.webview.uri !== url) {
       this.webview.uri = url
 
-      const shouldOpenInSystemBrowser = (
-        isExternalURL(urlObject) ||
-        RESTRICTED_PATHS.includes(urlObject.pathname)
-      )
+      const shouldOpenInSystemBrowser = !isAllowedUrl(urlObject)
       let shouldOpen = !shouldOpenInSystemBrowser
 
       if (
