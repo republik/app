@@ -198,9 +198,9 @@ class WebView extends React.PureComponent {
     this.webview.ref.reload()
   }
 
-  reloadIfNecessary = async ({ url, urlObject }) => {
+  reloadIfNecessary = ({ url, urlObject }) => {
     if (!this.shouldReload) {
-      return
+      return false
     }
 
     if (
@@ -214,16 +214,26 @@ class WebView extends React.PureComponent {
           // hard reload: re-init webview
           webInstance: this.state.webInstance + 1
         })
-      } else {
-        const isConnected = await NetInfo.isConnected.fetch()
-        if (isConnected) {
-          debug('reload soft')
-          // soft reload: just trigger reload
-          this.webview.ref.reload()
-        }
+        this.shouldReload = false
+        return true
+      } else if (this.shouldReload === 'soft') {
+        const netInfo = NetInfo.isConnected.fetch()
+        this.setState({
+          currentUrl: url
+        }, () => {
+          netInfo.then(isConnected => {
+            if (isConnected && this.shouldReload === 'soft') {
+              debug('reload soft')
+              this.shouldReload = false
+              // soft reload: just trigger reload
+              this.webview.ref.reload()
+            }
+          })
+        })
+        return undefined
       }
-      this.shouldReload = false
     }
+    return false
   }
 
   handleAppStateChange = nextAppState => {
@@ -240,12 +250,35 @@ class WebView extends React.PureComponent {
     }
   }
 
+  onShouldStartLoadWithRequest = ({ url }) => {
+    const urlObject = parseUrl(url)
+
+    const { onShouldLoad } = this.props
+    const shouldOpenInSystemBrowser = !isAllowedUrl(urlObject)
+    if (shouldOpenInSystemBrowser) {
+      // we open it in system browser
+      Linking.openURL(url)
+    }
+    let shouldLoad = !shouldOpenInSystemBrowser
+    if (
+      shouldLoad &&
+      onShouldLoad
+    ) {
+      shouldLoad = onShouldLoad({ url, urlObject })
+    }
+    if (shouldLoad) {
+      shouldLoad = !this.reloadIfNecessary({ url, urlObject })
+    }
+    debug('onShouldStartLoadWithRequest', shouldLoad, url)
+    return shouldLoad
+  }
+
   // onNavigationStateChange callback
   // - native when server side navigation
   // - via onMessage when client side navigation
   onNavigationStateChange = ({ url, canGoBack, onMessage }) => {
     debug('onNavigationStateChange', url, { canGoBack, onMessage, shouldReload: this.shouldReload })
-    const { onNavigationStateChange } = this.props
+    const { onShouldLoad } = this.props
 
     this.webview.canGoBack = this.webview.canGoBack || canGoBack
 
@@ -258,9 +291,9 @@ class WebView extends React.PureComponent {
 
       if (
         shouldOpen &&
-        onNavigationStateChange
+        onShouldLoad
       ) {
-        shouldOpen = onNavigationStateChange({ url, urlObject })
+        shouldOpen = onShouldLoad({ url, urlObject })
       }
 
       if (!shouldOpen) {
@@ -536,6 +569,7 @@ class WebView extends React.PureComponent {
           source={{ uri: currentUrl }}
           ref={node => { this.webview.ref = node }}
           onMessage={this.onMessage}
+          onShouldStartLoadWithRequest={this.onShouldStartLoadWithRequest}
           onNavigationStateChange={this.onNavigationStateChange}
           renderError={() => <ErrorState onReload={this.reload} />}
           userAgent={USER_AGENT}
