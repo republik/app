@@ -5,11 +5,12 @@ import {
 import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'
 import WebView from '../components/WebView'
-import AudioPlayer from '../components/AudioPlayer'
+import AudioPlayer, { AUDIO_PLAYER_HEIGHT } from '../components/AudioPlayer'
 import SafeAreaView from '../components/SafeAreaView'
 import navigator from '../services/navigation'
 import {
   setUrl,
+  withAudio,
   setAudio,
   pendingAppSignIn
 } from '../apollo'
@@ -114,7 +115,8 @@ class Web extends Component {
   render () {
     const {
       data,
-      setUrl
+      setUrl,
+      audio
     } = this.props
     const { loading, fullscreen } = this.state
 
@@ -129,6 +131,9 @@ class Web extends Component {
             onNavigationStateChange={this.onNavigationStateChange}
             onSignIn={this.onSignIn}
             loading={{ status: loading, showSpinner: true }}
+            bottom={!fullscreen && audio
+              ? AUDIO_PLAYER_HEIGHT
+              : 0}
           />
           <AudioPlayer
             hidden={fullscreen}
@@ -149,6 +154,7 @@ const getUrl = graphql(gql`
 export default compose(
   getUrl,
   setUrl,
+  withAudio,
   setAudio,
   pendingAppSignIn
 )(Web)

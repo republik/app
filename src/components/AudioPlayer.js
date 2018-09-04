@@ -2,12 +2,12 @@ import React, { Component, Fragment } from 'react'
 import { View, Text, StyleSheet, Animated, PanResponder, Dimensions, TouchableOpacity } from 'react-native'
 import TrackPlayer from 'react-native-track-player'
 import Icon from './Icon'
-import { withAudio, setAudio, setPlaybackState } from '../apollo'
+import { withAudio, setAudio, withPlaybackState, setPlaybackState } from '../apollo'
 import Logo from '../assets/images/playlist-logo.png'
-import { FRONTEND_BASE_URL } from '../constants'
+import { FRONTEND_BASE_URL, ANIMATION_DURATION } from '../constants'
 import { compose } from 'react-apollo'
 
-const AUDIO_PLAYER_HEIGHT = 65
+export const AUDIO_PLAYER_HEIGHT = 65
 
 const styles = StyleSheet.create({
   container: {
@@ -75,8 +75,6 @@ const Time = ({ duration, position }) => {
     </Text>
   )
 }
-
-const ANIMATION_DURATION = 250
 
 class ProgressBar extends Component {
   constructor (props, context) {
@@ -352,6 +350,7 @@ class AudioPlayer extends Component {
 
 export default compose(
   withAudio,
+  withPlaybackState,
   setAudio,
   setPlaybackState
 )(AudioPlayer)
