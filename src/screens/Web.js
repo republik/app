@@ -61,8 +61,8 @@ class Web extends Component {
     }
   }
 
-  onNavigationStateChange = (data) => {
-    this.props.setUrl({ variables: { url: data.url } })
+  onShouldLoad = ({ url }) => {
+    this.props.setUrl({ variables: { url } })
 
     return true
   }
@@ -150,7 +150,7 @@ class Web extends Component {
               onMessage={this.onMessage}
               onLoadEnd={this.onLoadEnd}
               onLoadStart={this.onLoadStart}
-              onNavigationStateChange={this.onNavigationStateChange}
+              onShouldLoad={this.onShouldLoad}
               onSignIn={this.onSignIn}
               loading={{ status: loading, showSpinner: true }}
               bottom={getBottom(this.state, this.props)}

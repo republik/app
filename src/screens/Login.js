@@ -13,7 +13,7 @@ class Login extends Component {
     }
   }
 
-  onNavigationStateChange = ({ url, urlObject }) => {
+  onShouldLoad = ({ url, urlObject }) => {
     // close overlay instead of going elsewhere
     if (urlObject.pathname !== '/mitteilung') {
       navigator.goBack()
@@ -34,7 +34,7 @@ class Login extends Component {
         <WebView
           source={{ uri }}
           onMessage={this.onMessage}
-          onNavigationStateChange={this.onNavigationStateChange}
+          onShouldLoad={this.onShouldLoad}
           onSignIn={this.onSignIn}
           forceRedirect
         />
