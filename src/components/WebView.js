@@ -148,7 +148,9 @@ class WebView extends React.PureComponent {
     const nextUrl = parseUrl(nextProps.source.uri)
     const previousUrl = parseUrl(this.props.source.uri)
 
-    if (nextProps.me !== this.props.me) {
+    if (
+      (nextProps.me && nextProps.me.id) !== (this.props.me && this.props.me.id)
+    ) {
       this.shouldReload = 'hard'
     }
 
@@ -465,7 +467,7 @@ class WebView extends React.PureComponent {
     // User logs in
     if (operations.includes('me')) {
       const newMe = data.data.me
-      if (newMe && (!me || (newMe !== me.id))) {
+      if (newMe && (!me || (newMe.id !== me.id))) {
         await this.signInClient(newMe)
       }
 

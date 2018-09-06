@@ -14,7 +14,10 @@ const pustNotificationsWrapper = WrappedComponent => (
       }
     }
     componentWillReceiveProps (nextProps) {
-      if (nextProps.me && nextProps.me !== this.props.me) {
+      if (
+        nextProps.me &&
+        nextProps.me.id !== (this.props.me && this.props.me.id)
+      ) {
         this.props.initNotifications()
       }
     }
