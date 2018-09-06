@@ -56,10 +56,15 @@ const pustNotificationsWrapper = WrappedComponent => (
         const oldToken = await AsyncStorage.getItem(TOKEN_KEY)
 
         if (oldToken && oldToken !== token) {
-          await this.props.rollDeviceToken({ variables: {
-            newToken: token,
-            oldToken
-          } })
+          try {
+            await this.props.rollDeviceToken({ variables: {
+              newToken: token,
+              oldToken
+            } })
+          } catch (error) {
+            console.warn('rollDeviceToken failed')
+            console.warn(error)
+          }
         }
 
         await AsyncStorage.setItem(TOKEN_KEY, token)
@@ -77,13 +82,14 @@ const pustNotificationsWrapper = WrappedComponent => (
           }
         } })
       } catch (error) {
+        console.warn('initNotifications failed')
         console.warn(error)
       }
     }
 
     onTokenRefresh = async newToken => {
       const oldToken = await AsyncStorage.getItem(TOKEN_KEY)
-      this.props.rollDeviceToken({ variables: { newToken, oldToken } })
+      await this.props.rollDeviceToken({ variables: { newToken, oldToken } })
       await AsyncStorage.setItem(TOKEN_KEY, newToken)
     }
 
