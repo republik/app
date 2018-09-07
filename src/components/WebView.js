@@ -583,6 +583,7 @@ class WebView extends React.PureComponent {
           allowsBackForwardNavigationGestures
           allowsInlineMediaPlayback
           keyboardDisplayRequiresUserAction={false}
+          mediaPlaybackRequiresUserAction={false}
           scalesPageToFit={false}
           startInLoadingState
           javaScriptEnabled
