@@ -51,18 +51,18 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new RNZipArchivePackage(),
-            new RNFetchBlobPackage(),
-            new TrackPlayer(),
-            new OTAPackage(),
-            new SplashScreenReactPackage(),
-            new RNFirebasePackage(),
-            new RNDeviceInfo(),
-            new CookieManagerPackage(),
-            new ReactNativeConfigPackage(),
-            new RNFirebaseMessagingPackage(),
-            new RNFirebaseNotificationsPackage(),
-            new CustomWebViewPackage()
+          new RNZipArchivePackage(),
+          new RNFetchBlobPackage(),
+          new TrackPlayer(),
+          new OTAPackage(),
+          new SplashScreenReactPackage(),
+          new RNFirebasePackage(),
+          new RNDeviceInfo(),
+          new CookieManagerPackage(),
+          new ReactNativeConfigPackage(),
+          new RNFirebaseMessagingPackage(),
+          new RNFirebaseNotificationsPackage(),
+          new CustomWebViewPackage()
       );
     }
 
