@@ -22,10 +22,10 @@ type User {
 }
 
 type Audio {
+  id: ID!
   url: String!
   title: String
   sourcePath: String
-  opened: String
 }
 `
 
@@ -52,11 +52,12 @@ export const resolvers = {
       const audio = url
         ? {
           __typename: 'Audio',
+          // new id on every open
+          // - triggers a re-render and starts playing again
+          id: url + (new Date()).toISOString(),
           url,
           title,
-          sourcePath,
-          // track opening date: triggers a re-render and starts playing again
-          opened: (new Date()).toISOString()
+          sourcePath
         }
         : null
       context.cache.writeData({ data: { audio } })

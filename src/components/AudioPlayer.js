@@ -134,7 +134,10 @@ class AudioPlayer extends Component {
 
   async componentWillReceiveProps (nextProps) {
     if (nextProps.audio) {
-      if (this.state.audio !== nextProps.audio) {
+      if (
+        (this.state.audio && this.state.audio.id) !==
+        (nextProps.audio && nextProps.audio.id)
+      ) {
         await this.setTrack(nextProps)
         TrackPlayer.play()
       }
@@ -193,7 +196,7 @@ class AudioPlayer extends Component {
     })
     await this.setupPlayer()
     await TrackPlayer.add({
-      id: audio.url,
+      id: audio.id,
       url: audio.url,
       title: audio.title,
       artist: 'Republik',
