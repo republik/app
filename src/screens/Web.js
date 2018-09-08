@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react'
 import {
-  AppState, Animated
+  AppState, Animated, Keyboard, Platform
 } from 'react-native'
 import { graphql, compose } from 'react-apollo'
 import gql from 'graphql-tag'
@@ -18,8 +18,8 @@ import mkDebug from '../utils/debug'
 
 const debug = mkDebug('Web')
 
-const getBottom = ({ fullscreen }, { audio }) => {
-  return !fullscreen && audio
+const getBottom = ({ fullscreen, keyboard }, { audio }) => {
+  return !fullscreen && !keyboard && audio
     ? AUDIO_PLAYER_HEIGHT
     : 0
 }
@@ -37,10 +37,26 @@ class Web extends Component {
     AppState.addEventListener('change', this.handleAppStateChange)
 
     this.goToLoginIfPendingRequest()
+
+    // on iOS the keyboard automatically goes over the audio player
+    // - no need to track / hide audio player manually
+    if (Platform.OS === 'android') {
+      this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+        this.setState({ keyboard: true })
+      })
+      this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+        this.setState({ keyboard: false })
+      })
+    }
   }
 
   componentWillUnmount () {
     AppState.removeEventListener('change', this.handleAppStateChange)
+
+    if (Platform.OS === 'android') {
+      this.keyboardDidShowListener.remove()
+      this.keyboardDidHideListener.remove()
+    }
   }
 
   handleAppStateChange = nextAppState => {
@@ -114,10 +130,13 @@ class Web extends Component {
   componentWillUpdate (nextProps, nextState) {
     const bottom = getBottom(this.state, this.props)
     const nextBottom = getBottom(nextState, nextProps)
+    this.keyboardChange = nextState.keyboard !== this.state.keyboard
     if (bottom !== nextBottom) {
       Animated.timing(this.bottom, {
         toValue: nextBottom,
-        duration: ANIMATION_DURATION
+        duration: this.keyboardChange
+          ? 0
+          : ANIMATION_DURATION
       }).start()
     }
   }
@@ -136,7 +155,7 @@ class Web extends Component {
       data,
       setUrl
     } = this.props
-    const { loading, fullscreen } = this.state
+    const { loading, fullscreen, keyboard } = this.state
 
     return (
       <Fragment>
@@ -153,11 +172,11 @@ class Web extends Component {
               onShouldLoad={this.onShouldLoad}
               onSignIn={this.onSignIn}
               loading={{ status: loading, showSpinner: true }}
-              bottom={getBottom(this.state, this.props)}
             />
           </Animated.View>
           <AudioPlayer
-            hidden={fullscreen}
+            hidden={fullscreen || keyboard}
+            animated={!this.keyboardChange}
             setUrl={setUrl}
           />
         </SafeAreaView>

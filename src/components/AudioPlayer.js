@@ -133,6 +133,9 @@ class AudioPlayer extends Component {
   }
 
   async componentWillReceiveProps (nextProps) {
+    const duration = nextProps.animated
+      ? ANIMATION_DURATION
+      : 0
     if (nextProps.audio) {
       if (
         (this.state.audio && this.state.audio.id) !==
@@ -142,13 +145,13 @@ class AudioPlayer extends Component {
         TrackPlayer.play()
       }
       if (nextProps.hidden) {
-        Animated.timing(this.bottom, { toValue: -AUDIO_PLAYER_HEIGHT, duration: ANIMATION_DURATION }).start()
+        Animated.timing(this.bottom, { toValue: -AUDIO_PLAYER_HEIGHT, duration }).start()
       } else {
-        Animated.timing(this.bottom, { toValue: 0, duration: ANIMATION_DURATION }).start()
+        Animated.timing(this.bottom, { toValue: 0, duration }).start()
       }
     } else if (this.state.audio) {
       await this.clearTrack()
-      Animated.timing(this.bottom, { toValue: -AUDIO_PLAYER_HEIGHT, duration: 250 }).start()
+      Animated.timing(this.bottom, { toValue: -AUDIO_PLAYER_HEIGHT, duration }).start()
     }
     // see TrackPlayer.registerEventHandler in the root index.js
     if (this.props.playbackState !== nextProps.playbackState) {
