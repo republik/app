@@ -235,10 +235,11 @@ class AudioPlayer extends Component {
       case TrackPlayer.STATE_PAUSED:
         this.setState({ isPlaying: false })
         break
-      case TrackPlayer.STATE_STOPPED:
-        this.setState({ isPlaying: false, duration: null, position: 0 })
-        break
       case TrackPlayer.STATE_NONE:
+      case TrackPlayer.STATE_STOPPED:
+        this.props.setAudio({
+          variables: { url: null }
+        })
         this.setState({
           isPlaying: false,
           duration: undefined,
