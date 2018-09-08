@@ -185,15 +185,19 @@ class AudioPlayer extends Component {
   }
 
   setTrack = async ({ audio }) => {
-    if (this.state.audio === audio) {
+    if (
+      (this.state.audio && this.state.audio.id) ===
+      (audio && audio.id)
+    ) {
       return
     }
-    if (this.state.audio) {
-      await this.clearTrack()
-    }
+    const prevAudio = this.state.audio
     this.setState({
       audio
     })
+    if (prevAudio) {
+      await this.clearTrack(false)
+    }
     await this.setupPlayer()
     await TrackPlayer.add({
       id: audio.id,
@@ -205,17 +209,17 @@ class AudioPlayer extends Component {
     this.startUpdateInterval()
   }
 
-  clearTrack = async () => {
-    this.setState({
+  clearTrack = async (setState = true) => {
+    setState && this.setState({
       audio: undefined
     })
+    this.stopUpdateInterval()
     try {
       await TrackPlayer.stop()
       await TrackPlayer.reset()
     } catch (e) {
       console.warn('clearTrack failed', e)
     }
-    this.stopUpdateInterval()
   }
 
   onPlayPauseClick = () => {
@@ -235,11 +239,8 @@ class AudioPlayer extends Component {
       case TrackPlayer.STATE_PAUSED:
         this.setState({ isPlaying: false })
         break
-      case TrackPlayer.STATE_NONE:
       case TrackPlayer.STATE_STOPPED:
-        this.props.setAudio({
-          variables: { url: null }
-        })
+      case TrackPlayer.STATE_NONE:
         this.setState({
           isPlaying: false,
           duration: undefined,

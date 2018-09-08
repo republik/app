@@ -19,11 +19,13 @@ export const setUrl = graphql(gql`
   }
 `, { name: 'setUrl' })
 
-export const setAudio = graphql(gql`
+export const setAudioMutation = gql`
   mutation SetAudio($url: String, $title: String, $sourcePath: String) {
     setAudio(url: $url, title: $title, sourcePath: $sourcePath) @client
   }
-`, { name: 'setAudio' })
+`
+
+export const setAudio = graphql(setAudioMutation, { name: 'setAudio' })
 
 export const upsertDevice = graphql(gql`
   mutation UpsertDevice($token: ID!, $information: DeviceInformationInput!) {

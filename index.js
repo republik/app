@@ -1,7 +1,7 @@
 import { AppRegistry } from 'react-native'
 import TrackPlayer from 'react-native-track-player'
 import App from './src/App'
-import { client, setPlaybackStateMutation } from './src/apollo'
+import { client, setAudioMutation, setPlaybackStateMutation } from './src/apollo'
 
 AppRegistry.registerComponent('orbitingapp', () => App)
 
@@ -14,7 +14,10 @@ TrackPlayer.registerEventHandler(async event => {
     case 'remote-pause':
       return TrackPlayer.pause()
     case 'remote-stop':
-      return TrackPlayer.reset()
+      return client.mutate({
+        variables: { url: null },
+        mutation: setAudioMutation
+      })
     case 'playback-state':
       return client.mutate({
         variables: { state: event.state },
