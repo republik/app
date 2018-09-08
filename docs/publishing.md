@@ -20,7 +20,7 @@ fastlane match development
 This will use `.env.staging`.
 
 ```sh
-yarn deploy-ios-beta
+yarn deploy-ios-staging
 ```
 
 #### Production version
@@ -76,7 +76,7 @@ Android native project has a separate .env file used in the publishing process. 
 This will use `.env.staging`.
 
 ```sh
-yarn deploy-android-alpha type:[version-type]
+yarn deploy-android-staging type:[version-type]
 ```
 
 `version-type` can be:
@@ -97,5 +97,15 @@ This process will:
 This will use `.env.production`.
 
 ```sh
-yarn deploy-android-alpha-prod type:[version-type]
+yarn deploy-android-staging type:[version-type]
+```
+
+## Tagging
+
+Make sure to tag versions that you release to production:
+
+```sh
+git tag v1.0.1-ios
+git tag v1.0.1-android
+git push --tags
 ```

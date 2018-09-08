@@ -18,7 +18,7 @@ default_platform(:ios)
 platform :ios do
   desc "Submit a new Beta Build to Apple TestFlight"
   desc "This will also make sure the profile is up to date"
-  lane :beta do
+  lane :staging do
     increment_build_number
     match(
       type: "appstore",
@@ -29,7 +29,7 @@ platform :ios do
     ) # Build your app - more options available
     pilot(skip_waiting_for_build_processing: true)
     slack(
-     message: "New beta version successfully uploaded to the Apple TestFlight.",
+     message: "New staging version successfully uploaded to the Apple TestFlight.",
      success: true,
      slack_url: ENV["SLACK_URL"],
      attachment_properties: {
@@ -53,7 +53,7 @@ platform :ios do
     ) # Build your app - more options available
     pilot(skip_waiting_for_build_processing: true)
     slack(
-     message: "New version successfully uploaded to Apple.",
+     message: "New production version successfully uploaded to Apple.",
      success: true,
      slack_url: ENV["SLACK_URL"],
      attachment_properties: {

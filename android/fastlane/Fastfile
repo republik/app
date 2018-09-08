@@ -18,7 +18,7 @@ fastlane_require 'dotenv'
 
 platform :android do
   desc "Deploy a new alpha version to the Google Play Store"
-  lane :alpha do |options|
+  lane :staging do |options|
     increment_version_code(
       app_project_dir: "./app"
     )
@@ -38,7 +38,7 @@ platform :android do
       skip_upload_screenshots: true
     )
     slack(
-     message: "New alpha version successfully uploaded to the GooglePlay store.",
+     message: "New staging version successfully uploaded to the GooglePlay store.",
      success: true,
      slack_url: ENV["SLACK_URL"],
      attachment_properties: {
@@ -56,13 +56,41 @@ platform :android do
    )
   end
 
-  lane :test do |options|
-
-  end
-
-  desc "Deploy a new version to the Google Play"
-  lane :deploy do
-    gradle(task: "clean assembleRelease")
-    upload_to_play_store
+  lane :production do |options|
+    increment_version_code(
+      app_project_dir: "./app"
+    )
+    increment_version_name(
+      bump_type: options[:type] || 'patch',
+      app_project_dir: "./app"
+    )
+    gradle(
+      task: "assemble",
+      build_type: "Release"
+    )
+    supply(
+      track: "alpha",
+      apk: "#{lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH]}",
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+    slack(
+     message: "New production version successfully uploaded to the GooglePlay store.",
+     success: true,
+     slack_url: ENV["SLACK_URL"],
+     attachment_properties: {
+       fields: [
+         {
+           title: "Build version",
+           value: lane_context[SharedValues::VERSION_NAME],
+         },
+         {
+           title: "Build code",
+           value: lane_context[SharedValues::VERSION_CODE],
+         },
+       ]
+     }
+   )
   end
 end
