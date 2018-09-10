@@ -71,7 +71,7 @@ Android native project has a separate .env file used in the publishing process. 
 
 ### Publish
 
-#### Alpha version
+#### Staging Version
 
 This will use `.env.staging`.
 
@@ -92,12 +92,12 @@ This process will:
 4. Upload APK to Google Play as new alpha version
 5. Post success message in Slack
 
-#### Alpha version pointing at Production
+#### Production Version
 
-This will use `.env.production`.
+Will do the same as above but with `.env.production`. Can then be released via [play.google.com/apps/publish](https://play.google.com/apps/publish).
 
 ```sh
-yarn deploy-android-staging type:[version-type]
+yarn deploy-android-production type:[version-type]
 ```
 
 ## Tagging
