@@ -18,9 +18,10 @@ Install and run:
 
 ```bash
 yarn
-yarn run run-ios-dev # or run via Xcode
-# Start your Android virtual device from Android Studio
+yarn run run-ios-dev # or run via Xcode to see logs
+# first start your Android virtual device from Android Studio then
 yarn run run-android-dev
+# adb logcat *:I # to see logs from the emulator
 ```
 
 For testing on real iOS devices: Make sure that automatic signing in the general project settings is on and your device is registered and provisioned.
