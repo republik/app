@@ -60,7 +60,7 @@
     "react-native-notifications": "^1.1.19",
     "react-native-splash-screen": "^3.0.6",
     "react-native-track-player": "^0.2.4",
-    "react-native-wkwebview-reborn": "https://github.com/orbiting/react-native-wkwebview#master",
+    "react-native-wkwebview-reborn": "https://github.com/orbiting/react-native-wkwebview#update",
     "react-native-zip-archive": "^2.2.6",
     "react-navigation": "^2.12.1",
     "rn-fetch-blob": "^0.10.12",

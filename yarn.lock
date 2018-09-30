@@ -6021,9 +6021,9 @@ react-native-track-player@^0.2.4:
   resolved "https://registry.yarnpkg.com/react-native-track-player/-/react-native-track-player-0.2.4.tgz#f215d00467229fb043548e347a0f2fa7ff970cfd"
   integrity sha512-hiAAFF2ToJiQ0H8CVwvdyFLrNqq2OcnPay+xo49cWTMuK1B5ubDkzgnu6mVNkJKKGtZb8EVQ9e3jXdzdon6yDA==
 
-"react-native-wkwebview-reborn@https://github.com/orbiting/react-native-wkwebview#master":
+"react-native-wkwebview-reborn@https://github.com/orbiting/react-native-wkwebview#update":
   version "1.21.0"
-  resolved "https://github.com/orbiting/react-native-wkwebview#84000fa5257147eb132916b3275fd43b4427d051"
+  resolved "https://github.com/orbiting/react-native-wkwebview#704627500edc1df709fa4beed34f0cb666523d44"
   dependencies:
     fbjs "^0.8.3"
 
