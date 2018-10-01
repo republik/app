@@ -1,5 +1,5 @@
 {
-  "updated": "2018-08-30T20:59:05.509Z",
+  "updated": "2018-10-01T08:35:26.964Z",
   "title": "live",
   "data": [
     {
@@ -8,7 +8,7 @@
     },
     {
       "key": "webview/error/description",
-      "value": "Bitte prüfen Sie ihre Internetverbindung."
+      "value": "Bitte prüfen Sie Ihre Internetverbindung."
     },
     {
       "key": "webview/error/reload",
