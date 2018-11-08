@@ -253,6 +253,16 @@ class WebView extends React.PureComponent {
   }
 
   onShouldStartLoadWithRequest = ({ url }) => {
+    if (Config.ENV === 'development') {
+      // the development next.js front end requests about:blank
+      // - maybe related to web hot reloading
+      // - the exact source of those requests is unclear
+      // - does not happen when running a prd next.js server locally
+      if (url === 'about:blank') {
+        return true
+      }
+    }
+
     const urlObject = parseUrl(url)
 
     const { onShouldLoad } = this.props
