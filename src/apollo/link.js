@@ -20,7 +20,11 @@ const customFetch = (url, opts) => {
   return fetch(url, opts)
 }
 
-const httpLink = new HttpLink({ uri: API_URL, fetch: customFetch })
+const httpLink = new HttpLink({
+  uri: API_URL,
+  credentials: 'include',
+  fetch: customFetch
+})
 
 const wsLink = new WebSocketLink({
   uri: API_WS_URL,
