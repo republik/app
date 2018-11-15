@@ -59,7 +59,7 @@
     "react-native-haptic": "^1.0.1",
     "react-native-notifications": "^1.1.19",
     "react-native-splash-screen": "^3.0.6",
-    "react-native-track-player": "^0.2.4",
+    "react-native-track-player": "^1.0.0",
     "react-native-wkwebview-reborn": "https://github.com/orbiting/react-native-wkwebview#update-2",
     "react-native-zip-archive": "^2.2.6",
     "react-navigation": "^2.18.2",

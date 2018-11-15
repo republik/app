@@ -113,6 +113,11 @@ def enableProguardInReleaseBuilds = false
 android {
     compileSdkVersion 27
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     defaultConfig {
         applicationId "app.republik"
         minSdkVersion 19
@@ -172,7 +177,7 @@ dependencies {
     implementation project(':react-native-config')
     implementation project(':react-native-splash-screen')
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation "com.android.support:appcompat-v7:23.0.1"
+    implementation "com.android.support:appcompat-v7:27.1.1"
     implementation "com.facebook.react:react-native:+"  // From node_modules
 
     // Firebase dependencies
