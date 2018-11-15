@@ -8,6 +8,9 @@ Most views are provided by [republik-frontend](https://github.com/orbiting/repub
 
 [Setup React Native for projects with native code](https://facebook.github.io/react-native/docs/getting-started.html).
 
+Make sure to use the «Legacy Build System» in XCode 10 or newer:
+https://github.com/facebook/react-native/issues/21168#issuecomment-422710485
+
 Bootstrap your .env file:
 
 ```bash

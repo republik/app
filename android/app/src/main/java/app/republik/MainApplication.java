@@ -9,7 +9,7 @@ import android.content.Context;
 import com.facebook.react.ReactApplication;
 import com.rnziparchive.RNZipArchivePackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
-import guichaguri.trackplayer.TrackPlayer;
+import com.guichaguri.trackplayer.TrackPlayer;
 
 // react-native link: react-native-notifications is not used on Android
 
