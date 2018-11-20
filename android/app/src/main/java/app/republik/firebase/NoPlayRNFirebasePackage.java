@@ -6,12 +6,14 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.invertase.firebase.RNFirebasePackage;
+
 /**
  * This class is needed as a wrapper to instantiate an object of @{@link NoPlayRNFirebaseModule}
  * instead of @{@link io.invertase.firebase.RNFirebaseModule}
  */
 @SuppressWarnings("unused")
-public class NoPlayRNFirebasePackage extends io.invertase.firebase.RNFirebasePackage {
+public class NoPlayRNFirebasePackage extends RNFirebasePackage {
 
   /**
    * @see @{@link io.invertase.firebase.RNFirebasePackage}

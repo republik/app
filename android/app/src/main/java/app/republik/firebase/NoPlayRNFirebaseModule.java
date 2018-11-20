@@ -11,11 +11,13 @@ import com.facebook.react.bridge.ReactMethod;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
+import io.invertase.firebase.RNFirebaseModule;
+
 /**
  * This class is introduced to prevent the repeated appearance of a prompt
  * to install the Google Play Services package if it is missing.
  */
-public class NoPlayRNFirebaseModule extends io.invertase.firebase.RNFirebaseModule {
+public class NoPlayRNFirebaseModule extends RNFirebaseModule {
 
     private static final String TAG = "RNFirebase";
     private static final String NO_PLAY_PREF_KEY = "acceptNoPlayLimitations";
