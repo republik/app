@@ -13,14 +13,13 @@ import com.guichaguri.trackplayer.TrackPlayer;
 
 // react-native link: react-native-notifications is not used on Android
 
-import com.facebook.react.bridge.ReactApplicationContext;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.psykar.cookiemanager.CookieManagerPackage;
-import io.invertase.firebase.RNFirebasePackage;
+
+import app.republik.firebase.NoPlayRNFirebasePackage;
 import io.invertase.firebase.messaging.RNFirebaseMessagingPackage;
 import io.invertase.firebase.notifications.RNFirebaseNotificationsPackage;
 import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
-import app.republik.BuildConfig;
 
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import com.facebook.react.ReactNativeHost;
@@ -28,7 +27,6 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -56,7 +54,7 @@ public class MainApplication extends Application implements ReactApplication {
           new TrackPlayer(),
           new OTAPackage(),
           new SplashScreenReactPackage(),
-          new RNFirebasePackage(),
+          new NoPlayRNFirebasePackage(),
           new RNDeviceInfo(),
           new CookieManagerPackage(),
           new ReactNativeConfigPackage(),
