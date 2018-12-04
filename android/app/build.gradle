@@ -185,6 +185,7 @@ dependencies {
     implementation "com.google.firebase:firebase-core:15.0.2"
     implementation "com.google.firebase:firebase-messaging:15.0.2"
     implementation 'me.leolin:ShortcutBadger:1.1.21@aar' // <-- Add this line if you wish to use badge on Android
+    implementation 'com.android.support:support-media-compat:27.1.1'
 }
 
 // Run this once to be able to run the application with BUCK
