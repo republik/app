@@ -44,7 +44,10 @@ const NativeWebView = Platform.select({
 })
 
 const RELOAD_TIME_THRESHOLD = 60 * 60 * 1000 // 1hr
-const RESTRICTED_PATHS = [OFFERS_PATH]
+const RESTRICTED_PATHS = Platform.select({
+  ios: [OFFERS_PATH],
+  android: []
+})
 const PERMITTED_PROTOCOLS = ['react-js-navigation']
 
 const normalizeHost = host => host.replace(/^www\./, '')
