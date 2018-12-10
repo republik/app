@@ -47,7 +47,7 @@ public class NoPlayRNFirebaseModule extends RNFirebaseModule {
                 Activity activity = getCurrentActivity();
                 if (activity != null) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                    builder.setMessage("Das Paket «Google Play Services» ist auf diesem Gerät nicht installiert. Push-Nachrichten und Login via App funktionieren deshalb nicht.")
+                    builder.setMessage("«Google Play Services» ist auf diesem Gerät nicht installiert. Benachrichtigungen und Anmelden per App funktionieren deshalb nicht.")
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
