@@ -112,6 +112,7 @@ def enableProguardInReleaseBuilds = false
 
 android {
     compileSdkVersion 27
+    buildToolsVersion '27.0.3'
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -122,8 +123,8 @@ android {
         applicationId "app.republik"
         minSdkVersion 19
         targetSdkVersion 26
-        versionCode 34
-        versionName "1.0.2"
+        versionCode 35
+        versionName "1.0.3"
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
