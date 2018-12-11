@@ -23,5 +23,17 @@ allprojects {
             // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
             url "$rootDir/../node_modules/react-native/android"
         }
+        maven { url "https://google.bintray.com/exoplayer/"  }
     }
+}
+
+subprojects { project ->
+    def name = project.name
+    if (name.contains('rn-fetch-blob')) {
+        buildscript {
+            repositories {
+                maven { url "https://dl.bintray.com/android/android-tools/"  }
+            }
+        }
+    } 
 }
