@@ -20,12 +20,27 @@ export const setUrl = graphql(gql`
 `, { name: 'setUrl' })
 
 export const setAudioMutation = gql`
-  mutation SetAudio($url: String, $title: String, $sourcePath: String) {
-    setAudio(url: $url, title: $title, sourcePath: $sourcePath) @client
+  mutation SetAudio($url: String, $title: String, $sourcePath: String, $mediaId: String) {
+    setAudio(url: $url, title: $title, sourcePath: $sourcePath, mediaId: $mediaId) @client
   }
 `
 
 export const setAudio = graphql(setAudioMutation, { name: 'setAudio' })
+
+const upsertCurrentMediaProgressMutation = gql`
+  mutation upsertMediaProgress($mediaId: ID!, $secs: Float!) {
+    upsertMediaProgress(mediaId: $mediaId, secs: $secs) {
+      id
+      mediaId
+      secs
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`
+
+export const upsertCurrentMediaProgress = graphql(upsertCurrentMediaProgressMutation, { name: 'upsertCurrentMediaProgress' }) 
 
 export const upsertDevice = graphql(gql`
   mutation UpsertDevice($token: ID!, $information: DeviceInformationInput!) {

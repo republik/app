@@ -1,11 +1,12 @@
 import React, { Component, Fragment } from 'react'
 import { View, Text, StyleSheet, Animated, PanResponder, Dimensions, TouchableOpacity } from 'react-native'
-import TrackPlayer from 'react-native-track-player'
+import TrackPlayer, { ProgressComponent } from 'react-native-track-player'
 import Icon from './Icon'
-import { withAudio, setAudio, withPlaybackState, setPlaybackState } from '../apollo'
+import { withAudio, setAudio, withPlaybackState, setPlaybackState, withCurrentMediaProgress, upsertCurrentMediaProgress } from '../apollo'
 import Logo from '../assets/images/playlist-logo.png'
 import { FRONTEND_BASE_URL } from '../constants'
 import { compose } from 'react-apollo'
+import debounce from 'lodash.debounce'
 
 export const AUDIO_PLAYER_HEIGHT = 65
 export const ANIMATION_DURATION = 250
@@ -75,6 +76,28 @@ const Time = ({ duration, position }) => {
       {parseSeconds(position)} / {parseSeconds(duration)}
     </Text>
   )
+}
+
+class ProgressReporter extends ProgressComponent {
+
+  constructor(props) {
+    super(props)
+    this.upsertProgress = debounce((mediaId, secs) => { 
+      props.upsertCurrentMediaProgress({ variables: { mediaId, secs } })
+    }, 500, { 'maxWait': 3000 })
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { mediaId, isPlaying } = nextProps
+    const { position } = this.state
+    if (isPlaying && position > 0) {
+      this.upsertProgress(mediaId, position)
+    }
+  }
+
+  render() {
+    return null
+  }
 }
 
 class ProgressBar extends Component {
@@ -187,7 +210,7 @@ class AudioPlayer extends Component {
     })
   }
 
-  setTrack = async ({ audio }) => {
+  setTrack = async ({ audio, mediaProgress }) => {
     if (
       (this.state.audio && this.state.audio.id) ===
       (audio && audio.id)
@@ -209,6 +232,8 @@ class AudioPlayer extends Component {
       artist: 'Republik',
       artwork: Logo
     })
+    TrackPlayer.seekTo(mediaProgress)
+    this.updateState()
     this.startUpdateInterval()
   }
 
@@ -314,8 +339,10 @@ class AudioPlayer extends Component {
   }
 
   render () {
-    const { setAudio } = this.props
+
+    const { setAudio, upsertCurrentMediaProgress } = this.props
     const { audio, isPlaying, duration, position, bufferedPosition } = this.state
+
     const icon = isPlaying ? 'pause' : 'play'
 
     return (
@@ -328,6 +355,13 @@ class AudioPlayer extends Component {
           onPositionChange={this.onPositionChange}
           onPositionReleased={this.onPositionReleased}
         />
+        { audio &&
+          <ProgressReporter
+            mediaId={audio.mediaId}
+            upsertCurrentMediaProgress={upsertCurrentMediaProgress}
+            isPlaying={isPlaying}
+          />
+        }
         <Icon
           type={icon}
           size={35}
@@ -359,6 +393,8 @@ class AudioPlayer extends Component {
 
 export default compose(
   withAudio,
+  withCurrentMediaProgress,
+  upsertCurrentMediaProgress,
   withPlaybackState,
   setAudio,
   setPlaybackState

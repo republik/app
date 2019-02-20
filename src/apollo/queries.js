@@ -14,9 +14,24 @@ const getCurrentAudioQuery = gql`
       url
       title
       sourcePath
+      mediaId
     }
   }
 `
+
+const getCurrentMediaProgressQuery = gql`
+  query GetCurrentMediaProgress($mediaId: ID!) {
+    mediaProgress(mediaId: $mediaId) {
+      id
+      mediaId
+      secs
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`
+
 const getPlaybackStateQuery = gql`
   query GetPlaybackState {
     playbackState @client
@@ -45,6 +60,19 @@ const withAudio = graphql(getCurrentAudioQuery, {
     audio
   })
 })
+
+const withCurrentMediaProgress = graphql(getCurrentMediaProgressQuery, {
+  options: ({audio}) => ({
+    variables: {
+      mediaId: audio.mediaId
+    },
+    fetchPolicy: 'network-only'
+  }),
+  skip: ({audio}) => !audio,
+  props: ({ data: { mediaProgress } }) => ({
+    mediaProgress: mediaProgress ? mediaProgress.secs : 0
+  })
+}) 
 
 const withPlaybackState = graphql(getPlaybackStateQuery, {
   props: ({ data: { playbackState } }) => ({
@@ -87,5 +115,6 @@ export {
   withAudio,
   withPlaybackState,
   withCurrentUrl,
-  pendingAppSignIn
+  pendingAppSignIn,
+  withCurrentMediaProgress,
 }
