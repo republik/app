@@ -78,28 +78,6 @@ const Time = ({ duration, position }) => {
   )
 }
 
-class ProgressReporter extends ProgressComponent {
-
-  constructor(props) {
-    super(props)
-    this.upsertProgress = debounce((mediaId, secs) => { 
-      props.upsertCurrentMediaProgress({ variables: { mediaId, secs } })
-    }, 500, { 'maxWait': 3000 })
-  }
-
-  componentWillReceiveProps(nextProps) {
-    const { mediaId, isPlaying } = nextProps
-    const { position } = this.state
-    if (isPlaying && position > 0) {
-      this.upsertProgress(mediaId, position)
-    }
-  }
-
-  render() {
-    return null
-  }
-}
-
 class ProgressBar extends ProgressComponent {
   constructor (props, context) {
     super(props, context)
