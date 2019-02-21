@@ -69,8 +69,9 @@ const withCurrentMediaProgress = graphql(getCurrentMediaProgressQuery, {
     fetchPolicy: 'network-only'
   }),
   skip: ({audio}) => !audio,
-  props: ({ data: { mediaProgress } }) => ({
-    mediaProgress: mediaProgress ? mediaProgress.secs : 0
+  props: ({ data: { mediaProgress, loading } }) => ({
+    mediaProgress: mediaProgress ? mediaProgress.secs : 0,
+    progressLoading: loading
   })
 }) 
 

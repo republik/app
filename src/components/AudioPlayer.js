@@ -100,9 +100,13 @@ class ProgressReporter extends ProgressComponent {
   }
 }
 
-class ProgressBar extends Component {
+class ProgressBar extends ProgressComponent {
   constructor (props, context) {
     super(props, context)
+
+    this.upsertProgress = debounce((mediaId, secs) => { 
+      props.upsertCurrentMediaProgress({ variables: { mediaId, secs } })
+    }, 1000, { 'maxWait': 5000 })
 
     this.height = new Animated.Value(5)
 
@@ -111,7 +115,7 @@ class ProgressBar extends Component {
       onMoveShouldSetPanResponder: () => true,
       onPanResponderGrant: (evt, gestureState) => {
         const { width } = Dimensions.get('window')
-        this.props.onPositionStart((gestureState.x0 / width) * this.props.duration)
+        this.props.onPositionStart((gestureState.x0 / width) * this.state.duration)
         Animated.timing(this.height, { toValue: 15, duration: ANIMATION_DURATION }).start()
       },
       onPanResponderMove: (evt, gestureState) => {
@@ -125,8 +129,16 @@ class ProgressBar extends Component {
     })
   }
 
+  componentDidUpdate() {
+    const { audio, isPlaying } = this.props
+    const { position } = this.state
+    if (audio && isPlaying && position > 0) {
+      this.upsertProgress(audio.mediaId, position)
+    }
+  }
+
   render () {
-    const { position, bufferedPosition, duration } = this.props
+    const { position, bufferedPosition, duration } = this.state
     const progress = (position / duration) * 100
     const buffered = (bufferedPosition / duration) * 100
 
@@ -161,6 +173,7 @@ class AudioPlayer extends Component {
       : 0
     if (nextProps.audio) {
       if (
+        !nextProps.progressLoading &&
         (this.state.audio && this.state.audio.id) !==
         (nextProps.audio && nextProps.audio.id)
       ) {
@@ -210,7 +223,7 @@ class AudioPlayer extends Component {
     })
   }
 
-  setTrack = async ({ audio, mediaProgress }) => {
+  setTrack = async ({ audio, mediaProgress, progressLoading }) => {
     if (
       (this.state.audio && this.state.audio.id) ===
       (audio && audio.id)
@@ -348,20 +361,13 @@ class AudioPlayer extends Component {
     return (
       <Animated.View style={[styles.container, { bottom: this.bottom }]}>
         <ProgressBar
-          position={position}
-          duration={duration}
-          bufferedPosition={bufferedPosition}
+          audio={audio}
+          upsertCurrentMediaProgress={upsertCurrentMediaProgress}
+          isPlaying={isPlaying}
           onPositionStart={this.onPositionStart}
           onPositionChange={this.onPositionChange}
           onPositionReleased={this.onPositionReleased}
         />
-        { audio &&
-          <ProgressReporter
-            mediaId={audio.mediaId}
-            upsertCurrentMediaProgress={upsertCurrentMediaProgress}
-            isPlaying={isPlaying}
-          />
-        }
         <Icon
           type={icon}
           size={35}
