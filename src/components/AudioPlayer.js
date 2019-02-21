@@ -84,7 +84,7 @@ class ProgressBar extends ProgressComponent {
 
     this.upsertProgress = debounce((mediaId, secs) => { 
       props.upsertCurrentMediaProgress({ variables: { mediaId, secs } })
-    }, 1000, { 'maxWait': 5000 })
+    }, 1000)
 
     this.height = new Animated.Value(5)
 
