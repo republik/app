@@ -58,7 +58,7 @@
     "react-native-firebase": "^4.2.0",
     "react-native-haptic": "^1.0.1",
     "react-native-notifications": "^1.2.51",
-    "react-native-splash-screen": "^3.1.1",
+    "react-native-splash-screen": "3.2",
     "react-native-track-player": "^1.1.2",
     "react-native-wkwebview-reborn": "https://github.com/orbiting/react-native-wkwebview#update-2",
     "react-native-zip-archive": "^2.2.6",
