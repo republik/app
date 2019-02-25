@@ -114,7 +114,7 @@ class ProgressBar extends ProgressComponent {
       if (audio.mediaId) {
         this.upsertProgress(audio.mediaId, position)
       } else {
-        //console.warn(`Audio element ${audio.id} has no mediaId`)
+        console.warn(`Audio element ${audio.id} has no mediaId`)
       }
     }
   }
@@ -339,6 +339,8 @@ class AudioPlayer extends Component {
   }
 
   render () {
+
+    console.log("this.props", this.props)
 
     const { setAudio, upsertCurrentMediaProgress } = this.props
     const { audio, isPlaying, duration, position, bufferedPosition } = this.state
