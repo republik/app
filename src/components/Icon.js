@@ -5,6 +5,7 @@ import Share from '../assets/images/share.png'
 import Play from '../assets/images/play.png'
 import Lock from '../assets/images/lock.png'
 import Pause from '../assets/images/pause.png'
+import Rewind from '../assets/images/rewind.png'
 import Close from '../assets/images/close.png'
 import Audio from '../assets/images/audio.png'
 import Search from '../assets/images/search.png'
@@ -17,6 +18,7 @@ import SearchActive from '../assets/images/search-active.png'
 const buttons = {
   pdf: PDF,
   play: Play,
+  rewind: Rewind,
   lock: Lock,
   pause: Pause,
   audio: Audio,

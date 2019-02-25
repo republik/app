@@ -111,7 +111,11 @@ class ProgressBar extends ProgressComponent {
     const { audio, isPlaying } = this.props
     const { position } = this.state
     if (audio && isPlaying && position > 0) {
-      this.upsertProgress(audio.mediaId, position)
+      if (audio.mediaId) {
+        this.upsertProgress(audio.mediaId, position)
+      } else {
+        //console.warn(`Audio element ${audio.id} has no mediaId`)
+      }
     }
   }
 
@@ -193,6 +197,7 @@ class AudioPlayer extends Component {
 
     await TrackPlayer.setupPlayer()
     await TrackPlayer.updateOptions({
+      stopWithApp: false,
       capabilities: [
         TrackPlayer.CAPABILITY_PLAY,
         TrackPlayer.CAPABILITY_PAUSE,
@@ -201,7 +206,7 @@ class AudioPlayer extends Component {
     })
   }
 
-  setTrack = async ({ audio, mediaProgress, progressLoading }) => {
+  setTrack = async ({ audio, mediaProgress }) => {
     if (
       (this.state.audio && this.state.audio.id) ===
       (audio && audio.id)
@@ -223,7 +228,7 @@ class AudioPlayer extends Component {
       artist: 'Republik',
       artwork: Logo
     })
-    TrackPlayer.seekTo(mediaProgress)
+    await TrackPlayer.seekTo(mediaProgress)
     this.updateState()
     this.startUpdateInterval()
   }
@@ -299,6 +304,10 @@ class AudioPlayer extends Component {
     }
   }
 
+  onRewind = () => {
+    TrackPlayer.seekTo(0)
+  }
+
   componentWillUnmount () {
     this.stopUpdateInterval()
   }
@@ -336,6 +345,8 @@ class AudioPlayer extends Component {
 
     const icon = isPlaying ? 'pause' : 'play'
 
+    const rewindIcon = 'rewind'
+
     return (
       <Animated.View style={[styles.container, { bottom: this.bottom }]}>
         <ProgressBar
@@ -347,9 +358,15 @@ class AudioPlayer extends Component {
           onPositionReleased={this.onPositionReleased}
         />
         <Icon
+          type={rewindIcon}
+          size={5}
+          style={{ marginLeft: 15 }}
+          onPress={() => this.onRewind()}
+        />
+        <Icon
           type={icon}
           size={35}
-          style={{ marginLeft: 15 }}
+          style={{ marginLeft: 0 }}
           onPress={() => this.onPlayPauseClick()}
         />
         <View style={styles.content}>
