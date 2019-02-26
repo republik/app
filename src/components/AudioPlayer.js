@@ -340,8 +340,6 @@ class AudioPlayer extends Component {
 
   render () {
 
-    console.log("this.props", this.props)
-
     const { setAudio, upsertCurrentMediaProgress } = this.props
     const { audio, isPlaying, duration, position, bufferedPosition } = this.state
 
@@ -361,14 +359,11 @@ class AudioPlayer extends Component {
         />
         <Icon
           type={rewindIcon}
-          size={5}
           style={{ marginLeft: 15 }}
           onPress={() => this.onRewind()}
         />
         <Icon
           type={icon}
-          size={35}
-          style={{ marginLeft: 0 }}
           onPress={() => this.onPlayPauseClick()}
         />
         <View style={styles.content}>
