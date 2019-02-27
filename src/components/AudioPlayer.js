@@ -78,7 +78,7 @@ const Time = ({ duration, position }) => {
   )
 }
 
-class ProgressBar extends ProgressComponent {
+class ProgressBar extends Component {
   constructor (props, context) {
     super(props, context)
 
@@ -93,7 +93,7 @@ class ProgressBar extends ProgressComponent {
       onMoveShouldSetPanResponder: () => true,
       onPanResponderGrant: (evt, gestureState) => {
         const { width } = Dimensions.get('window')
-        this.props.onPositionStart((gestureState.x0 / width) * this.state.duration)
+        this.props.onPositionStart((gestureState.x0 / width) * this.props.duration)
         Animated.timing(this.height, { toValue: 15, duration: ANIMATION_DURATION }).start()
       },
       onPanResponderMove: (evt, gestureState) => {
@@ -108,8 +108,7 @@ class ProgressBar extends ProgressComponent {
   }
 
   componentDidUpdate() {
-    const { audio, isPlaying } = this.props
-    const { position } = this.state
+    const { position, audio, isPlaying } = this.props
     if (audio && isPlaying && position > 0) {
       if (audio.mediaId) {
         this.upsertProgress(audio.mediaId, position)
@@ -120,7 +119,7 @@ class ProgressBar extends ProgressComponent {
   }
 
   render () {
-    const { position, bufferedPosition, duration } = this.state
+    const { position, bufferedPosition, duration } = this.props
     const progress = (position / duration) * 100
     const buffered = (bufferedPosition / duration) * 100
 
@@ -351,7 +350,10 @@ class AudioPlayer extends Component {
         <ProgressBar
           audio={audio}
           upsertCurrentMediaProgress={upsertCurrentMediaProgress}
+          position={position}
           isPlaying={isPlaying}
+          duration={duration}
+          bufferedPosition={bufferedPosition}		           
           onPositionStart={this.onPositionStart}
           onPositionChange={this.onPositionChange}
           onPositionReleased={this.onPositionReleased}
