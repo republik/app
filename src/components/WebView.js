@@ -231,7 +231,7 @@ class WebView extends React.PureComponent {
               debug('reload soft')
               this.shouldReload = false
               // soft reload: just trigger reload
-              this.webview.ref.reload()
+              this.reload()
             }
           })
         })
@@ -252,6 +252,20 @@ class WebView extends React.PureComponent {
           this.shouldReload = 'soft'
         }
       }
+    }
+    // Workaround for terminated or crashed webviews on iOS
+    // - see https://github.com/orbiting/app/issues/168
+    // - evaluateJavaScript is CRAWKWebView specific
+    if (Platform.OS === 'ios' && nextAppState === 'active' && this.webview.ref) {
+      debug('handleAppStateChange', 'alive check', 'start')
+      this.webview.ref.evaluateJavaScript('1')
+        .then(() => {
+          debug('handleAppStateChange', 'alive check', 'success')
+        })
+        .catch(() => {
+          debug('handleAppStateChange', 'alive check', 'failed', 'triggering reload')
+          this.reload()
+        })
     }
   }
 
