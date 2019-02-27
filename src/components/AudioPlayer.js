@@ -339,7 +339,7 @@ class AudioPlayer extends Component {
 
   render () {
 
-    const { setAudio, upsertCurrentMediaProgress } = this.props
+    const { setAudio, upsertCurrentMediaProgress, enableProgress } = this.props
     const { audio, isPlaying, duration, position, bufferedPosition } = this.state
 
     const icon = isPlaying ? 'pause' : 'play'
@@ -349,7 +349,7 @@ class AudioPlayer extends Component {
       <Animated.View style={[styles.container, { bottom: this.bottom }]}>
         <ProgressBar
           audio={audio}
-          upsertCurrentMediaProgress={upsertCurrentMediaProgress}
+          upsertCurrentMediaProgress={enableProgress ? upsertCurrentMediaProgress : () => {}}
           position={position}
           isPlaying={isPlaying}
           duration={duration}

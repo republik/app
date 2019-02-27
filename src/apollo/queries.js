@@ -21,6 +21,9 @@ const getCurrentAudioQuery = gql`
 
 const getCurrentMediaProgressQuery = gql`
   query GetCurrentMediaProgress($mediaId: ID!) {
+    me {
+      hasConsentedTo(name: "PROGRESS")
+    }  
     mediaProgress(mediaId: $mediaId) {
       id
       mediaId
@@ -69,9 +72,10 @@ const withCurrentMediaProgress = graphql(getCurrentMediaProgressQuery, {
     fetchPolicy: 'network-only'
   }),
   skip: ({audio}) => !audio,
-  props: ({ data: { mediaProgress, loading } }) => ({
+  props: ({ data: { me, mediaProgress, loading } }) => ({
     mediaProgress: mediaProgress ? mediaProgress.secs : 0,
-    progressLoading: loading
+    progressLoading: loading,
+    enableProgress: me && me.hasConsentedTo
   })
 }) 
 
