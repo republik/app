@@ -344,7 +344,6 @@ class AudioPlayer extends Component {
     const { audio, isPlaying, duration, position, bufferedPosition } = this.state
 
     const icon = isPlaying ? 'pause' : 'play'
-
     const rewindIcon = 'rewind'
 
     return (
@@ -358,13 +357,17 @@ class AudioPlayer extends Component {
           onPositionReleased={this.onPositionReleased}
         />
         <Icon
-          type={rewindIcon}
-          style={{ marginLeft: 15 }}
-          onPress={() => this.onRewind()}
+          type={icon}
+          style={{ marginLeft: 10 }}
+          size={35}
+          onPress={() => this.onPlayPauseClick()}
         />
         <Icon
-          type={icon}
-          onPress={() => this.onPlayPauseClick()}
+          type={rewindIcon}
+          disabled={position !== undefined && position < 0.1}
+          style={{ marginLeft: 5 }}
+          size={25}
+          onPress={() => this.onRewind()}
         />
         <View style={styles.content}>
           <Fragment>
@@ -379,7 +382,7 @@ class AudioPlayer extends Component {
         <Icon
           type='close'
           size={35}
-          style={{ marginRight: 15 }}
+          style={{ marginRight: 10 }}
           onPress={() => setAudio({
             variables: { url: null }
           })}

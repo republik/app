@@ -32,32 +32,22 @@ const buttons = {
   searchActive: SearchActive
 }
 
-const Icon = ({ type, side, size, onPress, style }) => {
-  if (typeof buttons[type] === 'number') {
-    const Wrapper = onPress ? TouchableOpacity : ({ children }) => children
-
-    return (
-      <Wrapper onPress={onPress}>
-        <Image
-          source={buttons[type]}
-          style={[style, { padding: 15, width: size, height: size }]}
-        />
-      </Wrapper>
-    )
-  }
-
-  const Button = buttons[type]
+const Icon = ({ type, size, onPress, style, disabled }) => {
+  const Wrapper = onPress ? TouchableOpacity : ({ children }) => children
 
   return (
-    <Button
-      style={[style, { padding: 10 }]}
-      onPress={onPress}
-    />
+    <Wrapper onPress={disabled ? null : onPress}>
+      <Image
+        source={buttons[type]}
+        style={{...style, width: size, height: size, opacity: disabled ? 0.3 : 1 }}
+      />
+    </Wrapper>
   )
 }
 
 Icon.defaultProps = {
-  size: 25
+  size: 25,
+  disabled: false
 }
 
 export default Icon
