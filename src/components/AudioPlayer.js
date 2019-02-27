@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react'
 import { View, Text, StyleSheet, Animated, PanResponder, Dimensions, TouchableOpacity } from 'react-native'
-import TrackPlayer, { ProgressComponent } from 'react-native-track-player'
+import TrackPlayer from 'react-native-track-player'
 import Icon from './Icon'
 import { withAudio, setAudio, withPlaybackState, setPlaybackState, withCurrentMediaProgress, upsertCurrentMediaProgress } from '../apollo'
 import Logo from '../assets/images/playlist-logo.png'
