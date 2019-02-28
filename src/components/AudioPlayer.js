@@ -108,8 +108,8 @@ class ProgressBar extends Component {
   }
 
   componentDidUpdate() {
-    const { position, audio, isPlaying } = this.props
-    if (audio && isPlaying && position > 0) {
+    const { position, audio, isPlaying, enableProgress } = this.props
+    if (enableProgress && audio && isPlaying && position > 0) {
       if (audio.mediaId) {
         this.upsertProgress(audio.mediaId, position)
       } else {
@@ -349,7 +349,8 @@ class AudioPlayer extends Component {
       <Animated.View style={[styles.container, { bottom: this.bottom }]}>
         <ProgressBar
           audio={audio}
-          upsertCurrentMediaProgress={enableProgress ? upsertCurrentMediaProgress : () => {}}
+          upsertCurrentMediaProgress={upsertCurrentMediaProgress}
+          enableProgress={enableProgress}
           position={position}
           isPlaying={isPlaying}
           duration={duration}
