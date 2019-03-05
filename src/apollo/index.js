@@ -24,6 +24,7 @@ type User {
 type Audio {
   id: ID!
   url: String!
+  mediaId: ID!
   title: String
   sourcePath: String
 }
@@ -48,7 +49,7 @@ export const resolvers = {
       return null
     },
     setAudio: async (_, variables, context) => {
-      const { url, title, sourcePath } = variables
+      const { url, title, sourcePath, mediaId } = variables
       const audio = url
         ? {
           __typename: 'Audio',
@@ -56,6 +57,7 @@ export const resolvers = {
           // - triggers a re-render and starts playing again
           id: url + (new Date()).toISOString(),
           url,
+          mediaId,
           title,
           sourcePath
         }

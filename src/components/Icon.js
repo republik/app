@@ -5,6 +5,7 @@ import Share from '../assets/images/share.png'
 import Play from '../assets/images/play.png'
 import Lock from '../assets/images/lock.png'
 import Pause from '../assets/images/pause.png'
+import Rewind from '../assets/images/rewind.png'
 import Close from '../assets/images/close.png'
 import Audio from '../assets/images/audio.png'
 import Search from '../assets/images/search.png'
@@ -17,6 +18,7 @@ import SearchActive from '../assets/images/search-active.png'
 const buttons = {
   pdf: PDF,
   play: Play,
+  rewind: Rewind,
   lock: Lock,
   pause: Pause,
   audio: Audio,
@@ -30,32 +32,22 @@ const buttons = {
   searchActive: SearchActive
 }
 
-const Icon = ({ type, side, size, onPress, style }) => {
-  if (typeof buttons[type] === 'number') {
-    const Wrapper = onPress ? TouchableOpacity : ({ children }) => children
-
-    return (
-      <Wrapper onPress={onPress}>
-        <Image
-          source={buttons[type]}
-          style={[style, { padding: 15, width: size, height: size }]}
-        />
-      </Wrapper>
-    )
-  }
-
-  const Button = buttons[type]
+const Icon = ({ type, size, onPress, style, disabled }) => {
+  const Wrapper = onPress ? TouchableOpacity : ({ children }) => children
 
   return (
-    <Button
-      style={[style, { padding: 10 }]}
-      onPress={onPress}
-    />
+    <Wrapper onPress={disabled ? null : onPress}>
+      <Image
+        source={buttons[type]}
+        style={{...style, width: size, height: size, opacity: disabled ? 0.3 : 1 }}
+      />
+    </Wrapper>
   )
 }
 
 Icon.defaultProps = {
-  size: 25
+  size: 25,
+  disabled: false
 }
 
 export default Icon

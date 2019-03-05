@@ -2,10 +2,11 @@ import React, { Component, Fragment } from 'react'
 import { View, Text, StyleSheet, Animated, PanResponder, Dimensions, TouchableOpacity } from 'react-native'
 import TrackPlayer from 'react-native-track-player'
 import Icon from './Icon'
-import { withAudio, setAudio, withPlaybackState, setPlaybackState } from '../apollo'
+import { withAudio, setAudio, withPlaybackState, setPlaybackState, withCurrentMediaProgress, upsertCurrentMediaProgress } from '../apollo'
 import Logo from '../assets/images/playlist-logo.png'
 import { FRONTEND_BASE_URL } from '../constants'
 import { compose } from 'react-apollo'
+import debounce from 'lodash.debounce'
 
 export const AUDIO_PLAYER_HEIGHT = 65
 export const ANIMATION_DURATION = 250
@@ -81,6 +82,10 @@ class ProgressBar extends Component {
   constructor (props, context) {
     super(props, context)
 
+    this.upsertProgress = debounce((mediaId, secs) => { 
+      props.upsertCurrentMediaProgress({ variables: { mediaId, secs } })
+    }, 1000)
+
     this.height = new Animated.Value(5)
 
     this.pan = PanResponder.create({
@@ -100,6 +105,17 @@ class ProgressBar extends Component {
         Animated.timing(this.height, { toValue: 5, duration: ANIMATION_DURATION }).start()
       }
     })
+  }
+
+  componentDidUpdate() {
+    const { position, audio, isPlaying, enableProgress } = this.props
+    if (enableProgress && audio && isPlaying && position > 0) {
+      if (audio.mediaId) {
+        this.upsertProgress(audio.mediaId, position)
+      } else {
+        console.warn(`Audio element ${audio.id} has no mediaId`)
+      }
+    }
   }
 
   render () {
@@ -138,6 +154,7 @@ class AudioPlayer extends Component {
       : 0
     if (nextProps.audio) {
       if (
+        !nextProps.progressLoading &&
         (this.state.audio && this.state.audio.id) !==
         (nextProps.audio && nextProps.audio.id)
       ) {
@@ -187,7 +204,7 @@ class AudioPlayer extends Component {
     })
   }
 
-  setTrack = async ({ audio }) => {
+  setTrack = async ({ audio, mediaProgress }) => {
     if (
       (this.state.audio && this.state.audio.id) ===
       (audio && audio.id)
@@ -209,6 +226,8 @@ class AudioPlayer extends Component {
       artist: 'Republik',
       artwork: Logo
     })
+    await TrackPlayer.seekTo(mediaProgress)
+    this.updateState()
     this.startUpdateInterval()
   }
 
@@ -283,6 +302,10 @@ class AudioPlayer extends Component {
     }
   }
 
+  onRewind = () => {
+    TrackPlayer.seekTo(0)
+  }
+
   componentWillUnmount () {
     this.stopUpdateInterval()
   }
@@ -314,25 +337,39 @@ class AudioPlayer extends Component {
   }
 
   render () {
-    const { setAudio } = this.props
+
+    const { setAudio, upsertCurrentMediaProgress, enableProgress } = this.props
     const { audio, isPlaying, duration, position, bufferedPosition } = this.state
+
     const icon = isPlaying ? 'pause' : 'play'
+    const rewindIcon = 'rewind'
 
     return (
       <Animated.View style={[styles.container, { bottom: this.bottom }]}>
         <ProgressBar
+          audio={audio}
+          upsertCurrentMediaProgress={upsertCurrentMediaProgress}
+          enableProgress={enableProgress}
           position={position}
+          isPlaying={isPlaying}
           duration={duration}
-          bufferedPosition={bufferedPosition}
+          bufferedPosition={bufferedPosition}		           
           onPositionStart={this.onPositionStart}
           onPositionChange={this.onPositionChange}
           onPositionReleased={this.onPositionReleased}
         />
         <Icon
           type={icon}
+          style={{ marginLeft: 10 }}
           size={35}
-          style={{ marginLeft: 15 }}
           onPress={() => this.onPlayPauseClick()}
+        />
+        <Icon
+          type={rewindIcon}
+          disabled={position !== undefined && position < 0.1}
+          style={{ marginLeft: 5 }}
+          size={25}
+          onPress={() => this.onRewind()}
         />
         <View style={styles.content}>
           <Fragment>
@@ -347,7 +384,7 @@ class AudioPlayer extends Component {
         <Icon
           type='close'
           size={35}
-          style={{ marginRight: 15 }}
+          style={{ marginRight: 10 }}
           onPress={() => setAudio({
             variables: { url: null }
           })}
@@ -359,6 +396,8 @@ class AudioPlayer extends Component {
 
 export default compose(
   withAudio,
+  withCurrentMediaProgress,
+  upsertCurrentMediaProgress,
   withPlaybackState,
   setAudio,
   setPlaybackState
