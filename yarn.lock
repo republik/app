@@ -7312,10 +7312,10 @@ react-native-tab-view@^1.0.0:
   dependencies:
     prop-types "^15.6.1"
 
-react-native-track-player@^1.1.2:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/react-native-track-player/-/react-native-track-player-1.1.2.tgz#c86e48f66ba0dd35b4ab1f75012a8757f65e4a73"
-  integrity sha512-1lkgO3y3qftbTwGuQUChQPJdR1jJirWgUYss9HWYNTZj4z4VTf8vkLwSdpF0EK+4VgH8TwVr2mktVBylE8MH2w==
+react-native-track-player@1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/react-native-track-player/-/react-native-track-player-1.0.2.tgz#b82cad971fc01e2f60b8fed9ad64574d082fe670"
+  integrity sha512-sXnVxekSNwOPGYtbu7GxJfkTkLwa7il+b9K2dkV9mbKZnuul99bTZu8AZ4pVqP/3q9utlUq1QiO/D8/6uuLdQQ==
 
 "react-native-wkwebview-reborn@https://github.com/orbiting/react-native-wkwebview#update-2":
   version "2.0.0"
