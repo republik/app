@@ -320,6 +320,10 @@ class AudioPlayer extends Component {
       if (this.state.bufferedPosition !== bufferedPosition) {
         this.setState({ bufferedPosition })
       }
+      if (!this.state.duration) {
+        const duration = await TrackPlayer.getDuration()
+        this.setState({ duration })
+      }
     } catch (e) {
       console.warn('updateState failed', e)
     }
