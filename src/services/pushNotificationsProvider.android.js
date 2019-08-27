@@ -53,20 +53,6 @@ const pustNotificationsWrapper = WrappedComponent => (
         await firebase.messaging().requestPermission()
         const token = await firebase.messaging().getToken()
 
-        const oldToken = await AsyncStorage.getItem(TOKEN_KEY)
-
-        if (oldToken && oldToken !== token) {
-          try {
-            await this.props.rollDeviceToken({ variables: {
-              newToken: token,
-              oldToken
-            } })
-          } catch (error) {
-            console.warn('rollDeviceToken failed')
-            console.warn(error)
-          }
-        }
-
         await AsyncStorage.setItem(TOKEN_KEY, token)
 
         this.createDefaultNotificationChannelForAndroid()
@@ -89,8 +75,10 @@ const pustNotificationsWrapper = WrappedComponent => (
 
     onTokenRefresh = async newToken => {
       const oldToken = await AsyncStorage.getItem(TOKEN_KEY)
-      await this.props.rollDeviceToken({ variables: { newToken, oldToken } })
       await AsyncStorage.setItem(TOKEN_KEY, newToken)
+      if (oldToken && oldToken.length && newToken && newToken.length && newToken !== oldToken) {
+        await this.props.rollDeviceToken({ variables: { newToken, oldToken } })
+      }
     }
 
     onNotification = notification => {
