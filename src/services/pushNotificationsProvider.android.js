@@ -9,7 +9,7 @@ import { APP_VERSION, USER_AGENT } from '../constants'
 
 const TOKEN_KEY = 'notification_token'
 
-const getInfo = () => ({
+const getInformation = () => ({
   os: Platform.OS,
   osVersion: Platform.Version,
   model: DeviceInfo.getModel(),
@@ -67,11 +67,10 @@ const pustNotificationsWrapper = WrappedComponent => (
 
         this.props.upsertDevice({ variables: {
           token,
-          information: getInfo()
+          information: getInformation()
         } })
       } catch (error) {
-        console.warn('initNotifications failed')
-        console.warn(error)
+        console.warn('initNotifications failed', error)
       }
     }
 
@@ -79,7 +78,7 @@ const pustNotificationsWrapper = WrappedComponent => (
       await AsyncStorage.setItem(TOKEN_KEY, newToken)
       await this.props.upsertDevice({ variables: {
         token: newToken,
-        information: getInfo()
+        information: getInformation()
       } })
     }
 
