@@ -9,6 +9,14 @@ import { APP_VERSION, USER_AGENT } from '../constants'
 
 const TOKEN_KEY = 'notification_token'
 
+const getInformation = () => ({
+  os: Platform.OS,
+  osVersion: Platform.Version,
+  model: DeviceInfo.getModel(),
+  appVersion: APP_VERSION,
+  userAgent: USER_AGENT
+})
+
 const pustNotificationsWrapper = WrappedComponent => (
   class extends Component {
     constructor (props, ...args) {
@@ -53,44 +61,25 @@ const pustNotificationsWrapper = WrappedComponent => (
         await firebase.messaging().requestPermission()
         const token = await firebase.messaging().getToken()
 
-        const oldToken = await AsyncStorage.getItem(TOKEN_KEY)
-
-        if (oldToken && oldToken !== token) {
-          try {
-            await this.props.rollDeviceToken({ variables: {
-              newToken: token,
-              oldToken
-            } })
-          } catch (error) {
-            console.warn('rollDeviceToken failed')
-            console.warn(error)
-          }
-        }
-
         await AsyncStorage.setItem(TOKEN_KEY, token)
 
         this.createDefaultNotificationChannelForAndroid()
 
         this.props.upsertDevice({ variables: {
           token,
-          information: {
-            os: Platform.OS,
-            osVersion: Platform.Version,
-            model: DeviceInfo.getModel(),
-            appVersion: APP_VERSION,
-            userAgent: USER_AGENT
-          }
+          information: getInformation()
         } })
       } catch (error) {
-        console.warn('initNotifications failed')
-        console.warn(error)
+        console.warn('initNotifications failed', error)
       }
     }
 
     onTokenRefresh = async newToken => {
-      const oldToken = await AsyncStorage.getItem(TOKEN_KEY)
-      await this.props.rollDeviceToken({ variables: { newToken, oldToken } })
       await AsyncStorage.setItem(TOKEN_KEY, newToken)
+      await this.props.upsertDevice({ variables: {
+        token: newToken,
+        information: getInformation()
+      } })
     }
 
     onNotification = notification => {
