@@ -20,7 +20,6 @@ DerivedData
 *.hmap
 *.ipa
 *.xcuserstate
-project.xcworkspace
 
 # Android/IntelliJ
 #
@@ -40,6 +39,7 @@ yarn-error.log
 buck-out/
 \.buckd/
 *.keystore
+!debug.keystore
 
 # fastlane
 #
@@ -55,21 +55,5 @@ buck-out/
 # Bundle artifact
 *.jsbundle
 
-# Certs
-*.cer
-api*.json
-google-services.json
-GoogleService-Info.plist
-
-# iOS
-Pods
-ios/orbitingapp.app.dSYM.zip
-
-# Env
-.env
-.env.dev
-.env.staging
-.env.production
-
-# Fonts
-*.otf
+# CocoaPods
+/ios/Pods/
