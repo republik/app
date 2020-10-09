@@ -19,7 +19,6 @@ export const FRONTEND_BASE_URL = handleEnv(env_FRONTEND_BASE_URL)
 export const FRONTEND_HOST = parse(FRONTEND_BASE_URL).host
 export const OTA_BASE_URL = handleEnv(env_OTA_BASE_URL)
 export const API_AUTHORIZATION_HEADER = env_API_AUTHORIZATION_HEADER
-console.warn(FRONTEND_BASE_URL)
 // App paths
 export const HOME_PATH = `/`
 export const FEED_PATH = `/feed`

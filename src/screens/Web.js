@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef, useEffect } from 'react'
 import { WebView } from 'react-native-webview'
 import { ActivityIndicator, SafeAreaView, View, StyleSheet } from 'react-native'
 import { SIGN_IN_URL } from '../constants'
@@ -10,10 +10,25 @@ const LoadingState = () => (
 )
 
 const Web = () => {
+  const runFirst = `
+    window.addEventListener('message', (event) => {
+      window.ReactNativeWebView.postMessage(
+        JSON.stringify({ data: event.data})
+      );
+    });
+    true; // note: this is required, or you'll sometimes get silent failures
+    `
   return (
     <>
       <SafeAreaView />
-      <WebView source={{ uri: SIGN_IN_URL }} />
+      <WebView
+        source={{ uri: SIGN_IN_URL }}
+        injectedJavaScript={runFirst}
+        onMessage={(e) => {
+          const data = JSON.parse(e.nativeEvent.data)
+          console.log(data)
+        }}
+      />
     </>
   )
 }
