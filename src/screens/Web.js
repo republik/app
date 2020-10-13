@@ -1,7 +1,8 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { WebView } from 'react-native-webview'
 import { ActivityIndicator, SafeAreaView, View, StyleSheet } from 'react-native'
 import { SIGN_IN_URL } from '../constants'
+import AsyncStorage from '@react-native-community/async-storage'
 
 const LoadingState = () => (
   <View style={styles.container}>
@@ -10,20 +11,47 @@ const LoadingState = () => (
 )
 
 const Web = () => {
-  const runFirst = `
-    window.addEventListener('message', (event) => {
-      window.ReactNativeWebView.postMessage(
-        JSON.stringify({ data: event.data})
-      );
-    });
-    true; // note: this is required, or you'll sometimes get silent failures
-    `
+  const [startURL, setStartURL] = useState(SIGN_IN_URL)
+
+  const getWebViewURL = async () => {
+    try {
+      const value = await AsyncStorage.getItem('currentUrl')
+      if (value !== null) {
+        setStartURL(value)
+      }
+    } catch (e) {
+      // error reading value
+    }
+  }
+
+  const onNavigationStateChange = async ({ url }) => {
+    try {
+      await AsyncStorage.setItem('currentUrl', url)
+    } catch (e) {
+      console.warn(e)
+    }
+  }
+
+  useEffect(() => {
+    getWebViewURL()
+  }, [])
+
+  const injectedJS = `
+  window.addEventListener('message', (event) => {
+    window.ReactNativeWebView.postMessage(
+      JSON.stringify({ data: event.data})
+    );
+  });
+  true; // note: this is required, or you'll sometimes get silent failures
+  `
+
   return (
     <>
       <SafeAreaView />
       <WebView
-        source={{ uri: SIGN_IN_URL }}
-        injectedJavaScript={runFirst}
+        source={{ uri: startURL }}
+        injectedJavaScript={injectedJS}
+        onNavigationStateChange={onNavigationStateChange}
         onMessage={(e) => {
           const data = JSON.parse(e.nativeEvent.data)
           console.log(data)
