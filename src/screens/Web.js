@@ -10,7 +10,6 @@ const Web = () => {
 
   const handleOpenURL = async (e) => {
     try {
-      await AsyncStorage.setItem('currentUrl', e.url)
       setWebURL(e.url)
     } catch (e) {
       console.warn(e)
@@ -19,6 +18,7 @@ const Web = () => {
 
   const getWebViewURL = async () => {
     try {
+      await AsyncStorage.clear()
       const value = await AsyncStorage.getItem('currentUrl')
       if (value !== null) {
         setWebURL(value)
