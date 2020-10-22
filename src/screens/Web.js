@@ -1,23 +1,27 @@
 import React, { useEffect, useState } from 'react'
 import { WebView } from 'react-native-webview'
-import { ActivityIndicator, SafeAreaView, View, StyleSheet } from 'react-native'
-import { SIGN_IN_URL } from '../constants'
+import { SafeAreaView, Linking } from 'react-native'
 import AsyncStorage from '@react-native-community/async-storage'
 
-const LoadingState = () => (
-  <View style={styles.container}>
-    <ActivityIndicator color="#999" size="large" />
-  </View>
-)
+import { SIGN_IN_URL } from '../constants'
 
 const Web = () => {
-  const [startURL, setStartURL] = useState(SIGN_IN_URL)
+  const [webURL, setWebURL] = useState(SIGN_IN_URL)
+
+  const handleOpenURL = async (e) => {
+    try {
+      await AsyncStorage.setItem('currentUrl', e.url)
+      setWebURL(e.url)
+    } catch (e) {
+      console.warn(e)
+    }
+  }
 
   const getWebViewURL = async () => {
     try {
       const value = await AsyncStorage.getItem('currentUrl')
       if (value !== null) {
-        setStartURL(value)
+        setWebURL(value)
       }
     } catch (e) {
       // error reading value
@@ -34,6 +38,13 @@ const Web = () => {
 
   useEffect(() => {
     getWebViewURL()
+    Linking.getInitialURL().then((url) => {
+      if (url) handleOpenURL({ url })
+    })
+    Linking.addEventListener('url', handleOpenURL)
+    return () => {
+      Linking.removeEventListener('url', handleOpenURL)
+    }
   }, [])
 
   const injectedJS = `
@@ -49,7 +60,7 @@ const Web = () => {
     <>
       <SafeAreaView />
       <WebView
-        source={{ uri: startURL }}
+        source={{ uri: webURL }}
         injectedJavaScript={injectedJS}
         onNavigationStateChange={onNavigationStateChange}
         onMessage={(e) => {
@@ -60,20 +71,5 @@ const Web = () => {
     </>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: 'blue',
-    flex: 1,
-    top: 0,
-    left: 0,
-    zIndex: 150,
-    width: '100%',
-    height: '100%',
-    position: 'absolute',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-})
 
 export default Web

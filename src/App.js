@@ -1,22 +1,22 @@
 import React, { useEffect } from 'react'
-import { StatusBar } from 'react-native'
+import { StatusBar, Platform } from 'react-native'
 import { Notifications } from 'react-native-notifications'
-import { isEmulator } from 'react-native-device-info'
+import { isEmulator, getModel } from 'react-native-device-info'
 import SplashScreen from 'react-native-splash-screen'
 
+import { APP_VERSION, USER_AGENT } from './constants'
 import Web from './screens/Web'
+
+//TOOD apollo
+const upsertDevice = () => {}
 
 const App = () => {
   useEffect(() => {
     isEmulator().then((isEmulator) => {
-      console.log(isEmulator)
       if (!isEmulator) {
         Notifications.registerRemoteNotifications()
-        Notifications.events().registerRemoteNotificationsRegistered(
-          (event) => {
-            // TODO: Send the token to my server so it could send back push notifications...
-            console.log('Device Token Received', event.deviceToken)
-          },
+        Notifications.events().registerRemoteNotificationsRegistered((event) =>
+          onPushRegistered(event),
         )
         Notifications.events().registerRemoteNotificationsRegistrationFailed(
           (event) => {
@@ -30,7 +30,18 @@ const App = () => {
         )
         Notifications.events().registerNotificationOpened(
           (notification, completion) => {
+            console.warn(notification)
+            onNotificationOpened(notification)
             completion()
+          },
+        )
+        Notifications.events().registerNotificationReceivedBackground(
+          (notification, completion) => {
+            console.warn(
+              'Notification Received - Background',
+              notification.payload,
+            )
+            completion({ alert: true, sound: true, badge: false })
           },
         )
         setTimeout(() => {
@@ -47,6 +58,32 @@ const App = () => {
     })
     SplashScreen.hide()
   }, [])
+
+  const onPushRegistered = (event) => {
+    upsertDevice({
+      variables: {
+        token: event.deviceToken,
+        information: {
+          os: Platform.OS,
+          osVersion: Platform.Version,
+          model: getModel(),
+          appVersion: APP_VERSION,
+          userAgent: USER_AGENT,
+        },
+      },
+    })
+  }
+
+  const onNotificationOpened = async (notification) => {
+    const data = notification.getData()
+
+    switch (data.type) {
+      case 'discussion':
+        return //setUrl({ variables: { url: data.url } })
+      case 'authorization':
+        return // navigator.navigate('Login', { url: data.url })
+    }
+  }
 
   return (
     <>
