@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { StatusBar } from 'react-native'
 import { Notifications } from 'react-native-notifications'
 import { isEmulator } from 'react-native-device-info'
+import SplashScreen from 'react-native-splash-screen'
 
 import Web from './screens/Web'
 
@@ -44,6 +45,7 @@ const App = () => {
         }, 3000)
       }
     })
+    SplashScreen.hide()
   }, [])
 
   return (

@@ -4,6 +4,7 @@
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTLinkingManager.h>
 #import <React/RCTRootView.h>
+#import "RNSplashScreen.h"
 #import "RNNotifications.h"
 
 #if DEBUG
@@ -46,6 +47,7 @@ static void InitializeFlipper(UIApplication *application) {
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
   [RNNotifications startMonitorNotifications];
+  [RNSplashScreen show];
   return YES;
 }
 
