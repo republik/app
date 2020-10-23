@@ -1,17 +1,27 @@
-import React, { useEffect } from 'react'
-import { StatusBar, Platform } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { StatusBar, Platform, Linking } from 'react-native'
 import { Notifications } from 'react-native-notifications'
 import { isEmulator, getModel } from 'react-native-device-info'
 import SplashScreen from 'react-native-splash-screen'
+import AsyncStorage from '@react-native-community/async-storage'
 
 import { APP_VERSION, USER_AGENT } from './constants'
 import Web from './screens/Web'
+import { SIGN_IN_URL } from './constants'
 
 //TOOD apollo
 const upsertDevice = () => {}
 
 const App = () => {
+  const [webUrl, setWebUrl] = useState(SIGN_IN_URL)
+
   useEffect(() => {
+    getWebViewURL()
+    Linking.getInitialURL().then((url) => {
+      if (url) handleOpenURL({ url })
+    })
+    Linking.addEventListener('url', handleOpenURL)
+
     isEmulator().then((isEmulator) => {
       if (!isEmulator) {
         Notifications.registerRemoteNotifications()
@@ -57,7 +67,30 @@ const App = () => {
       }
     })
     SplashScreen.hide()
+    return () => {
+      Linking.removeEventListener('url', handleOpenURL)
+    }
   }, [])
+
+  const getWebViewURL = async () => {
+    try {
+      await AsyncStorage.clear()
+      const value = await AsyncStorage.getItem('currentUrl')
+      if (value !== null) {
+        setWebUrl(value)
+      }
+    } catch (e) {
+      // error reading value
+    }
+  }
+
+  const handleOpenURL = async (e) => {
+    try {
+      setWebUrl(e.url)
+    } catch (e) {
+      console.warn(e)
+    }
+  }
 
   const onPushRegistered = (event) => {
     upsertDevice({
@@ -76,19 +109,22 @@ const App = () => {
 
   const onNotificationOpened = async (notification) => {
     const data = notification.getData()
+    setWebUrl(data.url)
+  }
 
-    switch (data.type) {
-      case 'discussion':
-        return //setUrl({ variables: { url: data.url } })
-      case 'authorization':
-        return // navigator.navigate('Login', { url: data.url })
+  const onNavigationStateChange = async ({ url }) => {
+    console.warn('onNavigationStateChange', url)
+    try {
+      await AsyncStorage.setItem('currentUrl', url)
+    } catch (e) {
+      console.warn(e)
     }
   }
 
   return (
     <>
       <StatusBar />
-      <Web />
+      <Web webUrl={webUrl} onNavigationStateChange={onNavigationStateChange} />
     </>
   )
 }

@@ -1,52 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { WebView } from 'react-native-webview'
-import { SafeAreaView, Linking } from 'react-native'
-import AsyncStorage from '@react-native-community/async-storage'
+import { SafeAreaView } from 'react-native'
 
-import { SIGN_IN_URL } from '../constants'
-
-const Web = () => {
-  const [webURL, setWebURL] = useState(SIGN_IN_URL)
-
-  const handleOpenURL = async (e) => {
-    try {
-      setWebURL(e.url)
-    } catch (e) {
-      console.warn(e)
-    }
-  }
-
-  const getWebViewURL = async () => {
-    try {
-      await AsyncStorage.clear()
-      const value = await AsyncStorage.getItem('currentUrl')
-      if (value !== null) {
-        setWebURL(value)
-      }
-    } catch (e) {
-      // error reading value
-    }
-  }
-
-  const onNavigationStateChange = async ({ url }) => {
-    try {
-      await AsyncStorage.setItem('currentUrl', url)
-    } catch (e) {
-      console.warn(e)
-    }
-  }
-
-  useEffect(() => {
-    getWebViewURL()
-    Linking.getInitialURL().then((url) => {
-      if (url) handleOpenURL({ url })
-    })
-    Linking.addEventListener('url', handleOpenURL)
-    return () => {
-      Linking.removeEventListener('url', handleOpenURL)
-    }
-  }, [])
-
+const Web = ({ webUrl, onNavigationStateChange }) => {
   const injectedJS = `
   window.addEventListener('message', (event) => {
     window.ReactNativeWebView.postMessage(
@@ -60,7 +16,7 @@ const Web = () => {
     <>
       <SafeAreaView />
       <WebView
-        source={{ uri: webURL }}
+        source={{ uri: webUrl }}
         injectedJavaScript={injectedJS}
         onNavigationStateChange={onNavigationStateChange}
         onMessage={(e) => {
