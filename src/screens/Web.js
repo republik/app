@@ -1,6 +1,6 @@
 import React from 'react'
 import { WebView } from 'react-native-webview'
-import { SafeAreaView } from 'react-native'
+import { SafeAreaView, Share, Platform } from 'react-native'
 
 const Web = ({ webUrl, onNavigationStateChange }) => {
   const injectedJS = `
@@ -11,6 +11,33 @@ const Web = ({ webUrl, onNavigationStateChange }) => {
   });
   true; // note: this is required, or you'll sometimes get silent failures
   `
+  const onMessage = (e) => {
+    const message = JSON.parse(e.nativeEvent.data) || {}
+    if (message.type === 'share') {
+      share(message.payload)
+    }
+  }
+
+  const share = async ({ url, title, message, subject, dialogTitle }) => {
+    try {
+      await Share.share(
+        Platform.OS === 'ios'
+          ? {
+              url,
+              title,
+              subject,
+              message,
+            }
+          : {
+              dialogTitle,
+              title,
+              message: [message, url].filter(Boolean).join('\n'),
+            },
+      )
+    } catch (error) {
+      console.warn(error.message)
+    }
+  }
 
   return (
     <>
@@ -19,10 +46,7 @@ const Web = ({ webUrl, onNavigationStateChange }) => {
         source={{ uri: webUrl }}
         injectedJavaScript={injectedJS}
         onNavigationStateChange={onNavigationStateChange}
-        onMessage={(e) => {
-          const data = JSON.parse(e.nativeEvent.data)
-          console.log(data)
-        }}
+        onMessage={(e) => onMessage(e)}
       />
     </>
   )
