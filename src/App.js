@@ -13,7 +13,7 @@ import { SIGN_IN_URL } from './constants'
 const upsertDevice = () => {}
 
 const App = () => {
-  const [webUrl, setWebUrl] = useState('http://localhost:3010')
+  const [webUrl, setWebUrl] = useState(SIGN_IN_URL)
 
   useEffect(() => {
     getWebViewURL()
