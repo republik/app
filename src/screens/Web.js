@@ -3,19 +3,15 @@ import { WebView } from 'react-native-webview'
 import { SafeAreaView, Share, Platform } from 'react-native'
 import { APP_VERSION } from '../constants'
 
-const Web = ({ webUrl, onNavigationStateChange }) => {
-  const injectedJS = `
-  window.addEventListener('message', (event) => {
-    window.ReactNativeWebView.postMessage(
-      JSON.stringify({ data: event.data})
-    );
-  });
-  true; // note: this is required, or you'll sometimes get silent failures
-  `
+const Web = ({ webUrl, onNavigationStateChange, onSignedIn }) => {
   const onMessage = (e) => {
     const message = JSON.parse(e.nativeEvent.data) || {}
     if (message.type === 'share') {
       share(message.payload)
+    } else if (message.type === 'isSignedIn') {
+      if (message.payload && onSignedIn) {
+        onSignedIn()
+      }
     }
   }
 
@@ -46,7 +42,6 @@ const Web = ({ webUrl, onNavigationStateChange }) => {
       <WebView
         source={{ uri: webUrl }}
         applicationNameForUserAgent={`RepublikApp/${APP_VERSION}`}
-        injectedJavaScript={injectedJS}
         onNavigationStateChange={onNavigationStateChange}
         onMessage={(e) => onMessage(e)}
       />

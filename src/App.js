@@ -22,50 +22,6 @@ const App = () => {
     })
     Linking.addEventListener('url', handleOpenURL)
 
-    isEmulator().then((isEmulator) => {
-      if (!isEmulator) {
-        Notifications.registerRemoteNotifications()
-        Notifications.events().registerRemoteNotificationsRegistered((event) =>
-          onPushRegistered(event),
-        )
-        Notifications.events().registerRemoteNotificationsRegistrationFailed(
-          (event) => {
-            console.warn(event)
-          },
-        )
-        Notifications.events().registerNotificationReceivedForeground(
-          (notification, completion) => {
-            completion({ alert: true, sound: true, badge: true })
-          },
-        )
-        Notifications.events().registerNotificationOpened(
-          (notification, completion) => {
-            console.warn(notification)
-            onNotificationOpened(notification)
-            completion()
-          },
-        )
-        Notifications.events().registerNotificationReceivedBackground(
-          (notification, completion) => {
-            console.warn(
-              'Notification Received - Background',
-              notification.payload,
-            )
-            completion({ alert: true, sound: true, badge: false })
-          },
-        )
-        setTimeout(() => {
-          Notifications.postLocalNotification({
-            body: 'Local notification!',
-            title: 'Local Notification Title',
-            sound: 'chime.aiff',
-            silent: false,
-            category: 'SOME_CATEGORY',
-            userInfo: {},
-          })
-        }, 3000)
-      }
-    })
     SplashScreen.hide()
     return () => {
       Linking.removeEventListener('url', handleOpenURL)
@@ -111,6 +67,53 @@ const App = () => {
     setWebUrl(data.url)
   }
 
+  const onSignedIn = () => {
+    isEmulator().then((isEmulator) => {
+      if (!isEmulator) {
+        Notifications.registerRemoteNotifications()
+        Notifications.events().registerRemoteNotificationsRegistered((event) =>
+          onPushRegistered(event),
+        )
+        Notifications.events().registerRemoteNotificationsRegistrationFailed(
+          (event) => {
+            console.warn(event)
+          },
+        )
+        Notifications.events().registerNotificationReceivedForeground(
+          (notification, completion) => {
+            completion({ alert: true, sound: true, badge: true })
+          },
+        )
+        Notifications.events().registerNotificationOpened(
+          (notification, completion) => {
+            console.warn(notification)
+            onNotificationOpened(notification)
+            completion()
+          },
+        )
+        Notifications.events().registerNotificationReceivedBackground(
+          (notification, completion) => {
+            console.warn(
+              'Notification Received - Background',
+              notification.payload,
+            )
+            completion({ alert: true, sound: true, badge: false })
+          },
+        )
+        setTimeout(() => {
+          Notifications.postLocalNotification({
+            body: 'Local notification!',
+            title: 'Local Notification Title',
+            sound: 'chime.aiff',
+            silent: false,
+            category: 'SOME_CATEGORY',
+            userInfo: {},
+          })
+        }, 3000)
+      }
+    })
+  }
+
   const onNavigationStateChange = async ({ url }) => {
     console.warn('onNavigationStateChange', url)
     try {
@@ -123,7 +126,7 @@ const App = () => {
   return (
     <>
       <StatusBar />
-      <Web webUrl={webUrl} onNavigationStateChange={onNavigationStateChange} />
+      <Web webUrl={webUrl} onNavigationStateChange={onNavigationStateChange} onSignedIn={onSignedIn} />
     </>
   )
 }
