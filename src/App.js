@@ -1,16 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { StatusBar, Platform, Linking } from 'react-native'
 import { Notifications } from 'react-native-notifications'
-import { isEmulator, getModel } from 'react-native-device-info'
+import { isEmulator, getModel, getDeviceId, getBrand } from 'react-native-device-info'
 import SplashScreen from 'react-native-splash-screen'
 import AsyncStorage from '@react-native-community/async-storage'
 
-import { APP_VERSION } from './constants'
 import Web from './screens/Web'
 import { SIGN_IN_URL } from './constants'
-
-//TOOD apollo
-const upsertDevice = () => {}
 
 const App = () => {
   const [webUrl, setWebUrl] = useState(SIGN_IN_URL)
@@ -48,32 +44,28 @@ const App = () => {
     }
   }
 
-  const onPushRegistered = (event) => {
-    upsertDevice({
-      variables: {
-        token: event.deviceToken,
-        information: {
-          os: Platform.OS,
-          osVersion: Platform.Version,
-          model: getModel(),
-          appVersion: APP_VERSION,
-        },
-      },
-    })
-  }
-
   const onNotificationOpened = async (notification) => {
     const data = notification.getData()
     setWebUrl(data.url)
   }
 
-  const onSignedIn = () => {
+  const onSignedIn = (postMessage) => {
     isEmulator().then((isEmulator) => {
       if (!isEmulator) {
         Notifications.registerRemoteNotifications()
-        Notifications.events().registerRemoteNotificationsRegistered((event) =>
-          onPushRegistered(event),
-        )
+        Notifications.events().registerRemoteNotificationsRegistered((event) => {
+          postMessage({
+            type: 'onPushRegistered',
+            data: {
+              token: event.deviceToken,
+              os: Platform.OS,
+              osVersion: Platform.Version,
+              brand: getBrand(),
+              model: getModel(),
+              deviceId: getDeviceId()
+            }
+          })
+        })
         Notifications.events().registerRemoteNotificationsRegistrationFailed(
           (event) => {
             console.warn(event)

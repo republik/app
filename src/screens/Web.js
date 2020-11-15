@@ -1,16 +1,22 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { WebView } from 'react-native-webview'
 import { SafeAreaView, Share, Platform } from 'react-native'
 import { APP_VERSION } from '../constants'
 
-const Web = ({ webUrl, onNavigationStateChange, onSignedIn }) => {
+const Web = ({ webUrl, onNavigationStateChange, onSignedIn, onReady }) => {
+  const webviewRef = useRef()
+
+  const postMessage = (message) => {
+    webviewRef.current.postMessage(JSON.stringify(message))
+  }
+
   const onMessage = (e) => {
     const message = JSON.parse(e.nativeEvent.data) || {}
     if (message.type === 'share') {
       share(message.payload)
     } else if (message.type === 'isSignedIn') {
       if (message.payload && onSignedIn) {
-        onSignedIn()
+        onSignedIn(postMessage)
       }
     }
   }
@@ -40,10 +46,14 @@ const Web = ({ webUrl, onNavigationStateChange, onSignedIn }) => {
     <>
       <SafeAreaView />
       <WebView
+        ref={webviewRef}
         source={{ uri: webUrl }}
         applicationNameForUserAgent={`RepublikApp/${APP_VERSION}`}
         onNavigationStateChange={onNavigationStateChange}
         onMessage={(e) => onMessage(e)}
+        onLoadEnd={() => {
+          // ready to receive postMessage
+        }}
       />
     </>
   )
