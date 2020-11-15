@@ -46,10 +46,3 @@ export const DISCUSSIONS_URL = `${FRONTEND_BASE_URL}${DISCUSSIONS_PATH}`
 
 // Misc
 export const APP_VERSION = DeviceInfo.getVersion()
-const nativeUserAgent = DeviceInfo.getUserAgent()
-export let USER_AGENT = `${nativeUserAgent} RepublikApp/${APP_VERSION}`
-
-// Append bundle version to user-agent header
-AsyncStorage.getItem('BUNDLE_VERSION_KEY').then((BUNDLE_VERSION) => {
-  USER_AGENT += BUNDLE_VERSION ? '/' + BUNDLE_VERSION : ''
-})

@@ -5,7 +5,7 @@ import { isEmulator, getModel } from 'react-native-device-info'
 import SplashScreen from 'react-native-splash-screen'
 import AsyncStorage from '@react-native-community/async-storage'
 
-import { APP_VERSION, USER_AGENT } from './constants'
+import { APP_VERSION } from './constants'
 import Web from './screens/Web'
 import { SIGN_IN_URL } from './constants'
 
@@ -101,7 +101,6 @@ const App = () => {
           osVersion: Platform.Version,
           model: getModel(),
           appVersion: APP_VERSION,
-          userAgent: USER_AGENT,
         },
       },
     })

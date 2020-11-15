@@ -1,6 +1,7 @@
 import React from 'react'
 import { WebView } from 'react-native-webview'
 import { SafeAreaView, Share, Platform } from 'react-native'
+import { APP_VERSION } from '../constants'
 
 const Web = ({ webUrl, onNavigationStateChange }) => {
   const injectedJS = `
@@ -44,6 +45,7 @@ const Web = ({ webUrl, onNavigationStateChange }) => {
       <SafeAreaView />
       <WebView
         source={{ uri: webUrl }}
+        applicationNameForUserAgent={`RepublikApp/${APP_VERSION}`}
         injectedJavaScript={injectedJS}
         onNavigationStateChange={onNavigationStateChange}
         onMessage={(e) => onMessage(e)}
