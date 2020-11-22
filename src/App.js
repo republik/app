@@ -1,125 +1,21 @@
-import React, { useEffect, useState } from 'react'
-import { StatusBar, Platform, Linking } from 'react-native'
-import { Notifications } from 'react-native-notifications'
-import { isEmulator, getModel, getDeviceId, getBrand } from 'react-native-device-info'
-import SplashScreen from 'react-native-splash-screen'
-import AsyncStorage from '@react-native-community/async-storage'
+import React from 'react'
+import { StatusBar } from 'react-native'
+
+import PushService from './services/Push'
+import DeepLinkingService from './services/DeepLinking'
 
 import Web from './screens/Web'
-import { SIGN_IN_URL } from './constants'
+
+import { GlobalStateProvider } from './GlobalState'
 
 const App = () => {
-  const [webUrl, setWebUrl] = useState(SIGN_IN_URL)
-
-  useEffect(() => {
-    getWebViewURL()
-    Linking.getInitialURL().then((url) => {
-      if (url) handleOpenURL({ url })
-    })
-    Linking.addEventListener('url', handleOpenURL)
-
-    SplashScreen.hide()
-    return () => {
-      Linking.removeEventListener('url', handleOpenURL)
-    }
-  }, [])
-
-  const getWebViewURL = async () => {
-    try {
-      await AsyncStorage.clear()
-      const value = await AsyncStorage.getItem('currentUrl')
-      if (value !== null) {
-        setWebUrl(value)
-      }
-    } catch (e) {
-      // error reading value
-    }
-  }
-
-  const handleOpenURL = async (e) => {
-    try {
-      setWebUrl(e.url)
-    } catch (e) {
-      console.warn(e)
-    }
-  }
-
-  const onNotificationOpened = async (notification) => {
-    const data = notification.getData()
-    setWebUrl(data.url)
-  }
-
-  const onSignedIn = (postMessage) => {
-    isEmulator().then((isEmulator) => {
-      if (!isEmulator) {
-        Notifications.registerRemoteNotifications()
-        Notifications.events().registerRemoteNotificationsRegistered((event) => {
-          postMessage({
-            type: 'onPushRegistered',
-            data: {
-              token: event.deviceToken,
-              os: Platform.OS,
-              osVersion: Platform.Version,
-              brand: getBrand(),
-              model: getModel(),
-              deviceId: getDeviceId()
-            }
-          })
-        })
-        Notifications.events().registerRemoteNotificationsRegistrationFailed(
-          (event) => {
-            console.warn(event)
-          },
-        )
-        Notifications.events().registerNotificationReceivedForeground(
-          (notification, completion) => {
-            completion({ alert: true, sound: true, badge: true })
-          },
-        )
-        Notifications.events().registerNotificationOpened(
-          (notification, completion) => {
-            console.warn(notification)
-            onNotificationOpened(notification)
-            completion()
-          },
-        )
-        Notifications.events().registerNotificationReceivedBackground(
-          (notification, completion) => {
-            console.warn(
-              'Notification Received - Background',
-              notification.payload,
-            )
-            completion({ alert: true, sound: true, badge: false })
-          },
-        )
-        setTimeout(() => {
-          Notifications.postLocalNotification({
-            body: 'Local notification!',
-            title: 'Local Notification Title',
-            sound: 'chime.aiff',
-            silent: false,
-            category: 'SOME_CATEGORY',
-            userInfo: {},
-          })
-        }, 3000)
-      }
-    })
-  }
-
-  const onNavigationStateChange = async ({ url }) => {
-    console.warn('onNavigationStateChange', url)
-    try {
-      await AsyncStorage.setItem('currentUrl', url)
-    } catch (e) {
-      console.warn(e)
-    }
-  }
-
   return (
-    <>
+    <GlobalStateProvider>
       <StatusBar />
-      <Web webUrl={webUrl} onNavigationStateChange={onNavigationStateChange} onSignedIn={onSignedIn} />
-    </>
+      <Web />
+      <PushService />
+      <DeepLinkingService />
+    </GlobalStateProvider>
   )
 }
 
