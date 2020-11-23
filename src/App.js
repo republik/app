@@ -3,6 +3,7 @@ import { StatusBar } from 'react-native'
 
 import PushService from './services/Push'
 import DeepLinkingService from './services/DeepLinking'
+import AppStateService from './services/AppState'
 
 import Web from './screens/Web'
 
@@ -15,6 +16,7 @@ const App = () => {
       <Web />
       <PushService />
       <DeepLinkingService />
+      <AppStateService />
     </GlobalStateProvider>
   )
 }

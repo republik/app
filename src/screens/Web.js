@@ -6,7 +6,7 @@ import { useGlobalState } from '../GlobalState'
 import SplashScreen from 'react-native-splash-screen'
 
 const Web = () => {
-  const { globalState, setGlobalState, persistedState, setPersistedState } = useGlobalState()
+  const { globalState, setGlobalState, persistedState, setPersistedState, pendingMessages, dispatch } = useGlobalState()
 
   const webviewRef = useRef()
   const [ webUrl, setWebUrl ] = useState()
@@ -32,16 +32,44 @@ const Web = () => {
     }
   }, [webUrl, globalState, persistedState])
 
-  const postMessage = (message) => {
+  const [ isReady, setIsReady ] = useState(false)
+  const [ sentMessages, setSentMessages ] = useState(false)
+  useEffect(() => {
+    if (!isReady) {
+      return
+    }
+    const message = pendingMessages.filter(msg => !msg.mark)[0]
+    if (!message) {
+      return
+    }
+    console.log('postMessage', message)
     webviewRef.current.postMessage(JSON.stringify(message))
-  }
+    dispatch({
+      type: 'markMessage',
+      id: message.id,
+      mark: true
+    })
+    setTimeout(() => {
+      dispatch({
+        type: 'markMessage',
+        id: message.id,
+        mark: false
+      })
+    }, 5 * 1000)
+  }, [isReady, pendingMessages])
 
   const onMessage = (e) => {
     const message = JSON.parse(e.nativeEvent.data) || {}
+    console.log('onMessage', message)
     if (message.type === 'share') {
       share(message.payload)
     } else if (message.type === 'isSignedIn') {
       setPersistedState({ isSignedIn: message.payload })
+    } else if (message.type === 'ackMessage') {
+      dispatch({
+        type: 'clearMessage',
+        id: message.id
+      })
     }
   }
 
@@ -78,8 +106,13 @@ const Web = () => {
           setPersistedState({ url })
         }}
         onMessage={(e) => onMessage(e)}
-        onLoadEnd={() => {
-          // ready to receive postMessage
+        onLoadStart={() => {
+          console.log('onLoadStart', 'ready', false)
+          setIsReady(false)
+        }}
+        onLoad={() => {
+          console.log('onLoad', 'ready', true)
+          setIsReady(true)
         }}
       />}
     </>

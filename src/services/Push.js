@@ -5,7 +5,7 @@ import { Notifications } from 'react-native-notifications'
 
 import { useGlobalState } from '../GlobalState'
 
-const init = async ({ isSignedIn, setGlobalState }) => {
+const init = async ({ isSignedIn, setGlobalState, dispatch }) => {
   if (!isSignedIn) {
     setGlobalState({ pushReady: true })
     return
@@ -30,15 +30,18 @@ const init = async ({ isSignedIn, setGlobalState }) => {
 
   Notifications.registerRemoteNotifications()
   Notifications.events().registerRemoteNotificationsRegistered((event) => {
-    postMessage({
-      type: 'onPushRegistered',
-      data: {
-        token: event.deviceToken,
-        os: Platform.OS,
-        osVersion: Platform.Version,
-        brand: getBrand(),
-        model: getModel(),
-        deviceId: getDeviceId()
+    dispatch({
+      type: 'postMessage',
+      message: {
+        type: 'onPushRegistered',
+        data: {
+          token: event.deviceToken,
+          os: Platform.OS,
+          osVersion: Platform.Version,
+          brand: getBrand(),
+          model: getModel(),
+          deviceId: getDeviceId()
+        }
       }
     })
   })
@@ -85,13 +88,15 @@ const PushService = () => {
     persistedState: {
       isSignedIn
     },
-    setGlobalState
+    setGlobalState,
+    dispatch
   } = useGlobalState()
 
   useEffect(() => {
     init({
       isSignedIn,
-      setGlobalState
+      setGlobalState,
+      dispatch
     })
   }, [isSignedIn])
 

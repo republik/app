@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useCallback, useContext } from 'react'
+import React, { useState, useEffect, useCallback, useContext, useReducer } from 'react'
 import AsyncStorage from '@react-native-community/async-storage'
 import { SIGN_IN_URL } from './constants'
+import 'react-native-get-random-values'
+import { v4 as uuidv4 } from 'uuid'
 
 const defaultPersistedState = {
   url: SIGN_IN_URL,
@@ -34,6 +36,34 @@ const writeStore = async ({ persistedState, setError }) => {
   }
 }
 
+const messageReducer = (state, action) => {
+  switch (action.type) {
+    case 'postMessage':
+      return state.concat({
+        id: uuidv4(),
+        content: action.content
+      })
+    case 'clearMessage':
+      return state.filter(msg => msg.id !== action.id)
+    case 'markMessage':
+      const message = state.find(msg => msg.id === action.id)
+      if (!message) {
+        if (action.mark) {
+          console.warn('message to mark not found')
+        }
+        return state
+      }
+      return state.map(msg => msg.id === message.id
+        ? {
+          ...message,
+          mark: action.mark
+        }
+        : msg)
+    default:
+      throw new Error()
+  }
+}
+
 export const GlobalStateProvider = ({ children }) => {
   const [error, setError] = useState()
 
@@ -48,6 +78,8 @@ export const GlobalStateProvider = ({ children }) => {
     newState => setGlobalStateRaw(state => ({ ...state, ...newState })),
     []
   )
+
+  const [pendingMessages, dispatch] = useReducer(messageReducer, [])
 
   useEffect(() => {
     readStore({
@@ -69,7 +101,9 @@ export const GlobalStateProvider = ({ children }) => {
     persistedState,
     setPersistedState,
     globalState,
-    setGlobalState
+    setGlobalState,
+    pendingMessages,
+    dispatch
   }
 
   return <GlobalState.Provider value={context}>
