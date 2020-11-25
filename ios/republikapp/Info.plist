@@ -49,10 +49,15 @@
 		</dict>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string/>
 	<key>UIAppFonts</key>
 	<array>
 		<string>MaterialIcons.ttf</string>
+		<string>GTAmerica-Bold.otf</string>
+		<string>GTAmerica-Light.otf</string>
+		<string>GTAmerica-Medium.otf</string>
+		<string>GTAmerica-Regular.otf</string>
+		<string>GTAmerica-RegularItalic.otf</string>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>

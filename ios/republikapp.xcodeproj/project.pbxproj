@@ -22,6 +22,11 @@
 		E4A0AA6E256E39640095E291 /* libswiftCoreMIDI.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = E4A0AA6D256E39640095E291 /* libswiftCoreMIDI.tbd */; };
 		E4A0AA74256E39750095E291 /* libswiftUniformTypeIdentifiers.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = E4A0AA73256E39750095E291 /* libswiftUniformTypeIdentifiers.tbd */; };
 		E4C7F4AC2541ACB00036B95E /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E4C7F4AB2541ACB00036B95E /* Launch Screen.storyboard */; };
+		FC79E7CA5C234A50AF7960E0 /* GTAmerica-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 259BD78F01E0483BB9F8D9B7 /* GTAmerica-Bold.otf */; };
+		EF8431770C9F4FF9A7E9BE75 /* GTAmerica-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = 77BFE8E5B6E94A0CA68AF7D6 /* GTAmerica-Light.otf */; };
+		F95DB5B67D564EF39E178BD8 /* GTAmerica-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = AC0F7C35271842F486F68956 /* GTAmerica-Medium.otf */; };
+		9F4D57CD6FA344CDB1F909D8 /* GTAmerica-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = A3AE0977D59B49B68B70B92C /* GTAmerica-Regular.otf */; };
+		92C0D75D174541CF8120033C /* GTAmerica-RegularItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 98F3DC804A0E4F659FE07A1C /* GTAmerica-RegularItalic.otf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -99,6 +104,11 @@
 		EB911BC27FE577AC760BC58C /* Pods-republikapp-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-republikapp-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-republikapp-tvOSTests/Pods-republikapp-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
+		259BD78F01E0483BB9F8D9B7 /* GTAmerica-Bold.otf */ = {isa = PBXFileReference; name = "GTAmerica-Bold.otf"; path = "../src/assets/fonts/GTAmerica-Bold.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		77BFE8E5B6E94A0CA68AF7D6 /* GTAmerica-Light.otf */ = {isa = PBXFileReference; name = "GTAmerica-Light.otf"; path = "../src/assets/fonts/GTAmerica-Light.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		AC0F7C35271842F486F68956 /* GTAmerica-Medium.otf */ = {isa = PBXFileReference; name = "GTAmerica-Medium.otf"; path = "../src/assets/fonts/GTAmerica-Medium.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		A3AE0977D59B49B68B70B92C /* GTAmerica-Regular.otf */ = {isa = PBXFileReference; name = "GTAmerica-Regular.otf"; path = "../src/assets/fonts/GTAmerica-Regular.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		98F3DC804A0E4F659FE07A1C /* GTAmerica-RegularItalic.otf */ = {isa = PBXFileReference; name = "GTAmerica-RegularItalic.otf"; path = "../src/assets/fonts/GTAmerica-RegularItalic.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -225,6 +235,11 @@
 			isa = PBXGroup;
 			children = (
 				DBB0B9879D1D4BB5BFE4A962 /* MaterialIcons.ttf */,
+				259BD78F01E0483BB9F8D9B7 /* GTAmerica-Bold.otf */,
+				77BFE8E5B6E94A0CA68AF7D6 /* GTAmerica-Light.otf */,
+				AC0F7C35271842F486F68956 /* GTAmerica-Medium.otf */,
+				A3AE0977D59B49B68B70B92C /* GTAmerica-Regular.otf */,
+				98F3DC804A0E4F659FE07A1C /* GTAmerica-RegularItalic.otf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -391,6 +406,11 @@
 			files = (
 				E4C7F4AC2541ACB00036B95E /* Launch Screen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				FC79E7CA5C234A50AF7960E0 /* GTAmerica-Bold.otf in Resources */,
+				EF8431770C9F4FF9A7E9BE75 /* GTAmerica-Light.otf in Resources */,
+				F95DB5B67D564EF39E178BD8 /* GTAmerica-Medium.otf in Resources */,
+				9F4D57CD6FA344CDB1F909D8 /* GTAmerica-Regular.otf in Resources */,
+				92C0D75D174541CF8120033C /* GTAmerica-RegularItalic.otf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

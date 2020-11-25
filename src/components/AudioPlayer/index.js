@@ -62,61 +62,18 @@ const Time = ({ duration, position }) => {
   )
 }
 
-// const AudioPlayer = ({
-//   setAudio,
-//   upsertCurrentMediaProgress,
-//   enableProgress,
-//   hidden,
-//   audio,
-//   animated,
-//   progressLoading,
-// }) => {
-//   const [audioState, setAudioState] = useState()
-//   const [isPlaying, setIsPlaying] = useState()
-//   const [duration, setDuration] = useState()
-//   const [position, setPosition] = useState()
-//   const [bufferedPosition, setBufferedPosition] = useState()
+// const AudioPlayer = ({ enableProgress, hidden, animated }) => {
+//   const {
+//     globalState,
+//     setGlobalState,
+//     persistedState,
+//     setPersistedState,
+//   } = useGlobalState()
+//   const { audio, audioPosition,  } = persistedState
 //   const bottom = new Animated.Value(audio && !hidden ? 0 : 100)
-//   const prevHidden = useRef(hidden)
-//   const prevAudio = useRef(audio)
-//   const prevAnimated = useRef(animated)
+//   const icon = persistedState.isPlaying ? 'pause' : 'play-arrow'
+//   const rewindIcon = 'fast-rewind'
 
-//   useEffect(() => {
-//     const functionQuestionMark = async () => {
-//       const duration = animated ? ANIMATION_DURATION : 0
-//       if (audio) {
-//         if (
-//           !progressLoading &&
-//           (audioState && audioState.id) !== (audio && audio.id)
-//         ) {
-//           await setTrack(nextProps)
-//           TrackPlayer.play()
-//         }
-//         if (nextProps.hidden) {
-//           Animated.timing(this.bottom, {
-//             toValue: -AUDIO_PLAYER_HEIGHT,
-//             duration,
-//           }).start()
-//         } else {
-//           Animated.timing(this.bottom, { toValue: 0, duration }).start()
-//         }
-//       } else if (this.state.audio) {
-//         await this.clearTrack()
-//         Animated.timing(this.bottom, {
-//           toValue: -AUDIO_PLAYER_HEIGHT,
-//           duration,
-//         }).start()
-//       }
-//       // see TrackPlayer.registerEventHandler in the root index.js
-//       if (this.props.playbackState !== nextProps.playbackState) {
-//         await this.onPlaybackStateChange(nextProps.playbackState)
-//       }
-//     }
-//     functionQuestionMark()
-//     return () => {
-//       cleanup
-//     }
-//   }, [input])
 //   return (
 //     <Animated.View style={[styles.container, { bottom: this.bottom }]}>
 //       <ProgressBar
@@ -137,13 +94,13 @@ const Time = ({ duration, position }) => {
 //         size={35}
 //         onPress={() => this.onPlayPauseClick()}
 //       />
-//       <Icon
+//       {/* <Icon
 //         name={rewindIcon}
 //         disabled={position !== undefined && position < 0.1}
 //         style={{ marginLeft: 5 }}
 //         size={25}
 //         onPress={() => this.onRewind()}
-//       />
+//       /> */}
 //       <View style={styles.content}>
 //         <Fragment>
 //           <TouchableOpacity onPress={this.onTitlePress}>
@@ -159,8 +116,8 @@ const Time = ({ duration, position }) => {
 //         size={35}
 //         style={{ marginRight: 10 }}
 //         onPress={() =>
-//           setAudio({
-//             variables: { url: null },
+//           setPersistedState({
+//             audio: {},
 //           })
 //         }
 //       />
@@ -214,20 +171,19 @@ class AudioPlayerOld extends Component {
       }).start()
     }
     // see TrackPlayer.registerEventHandler in the root index.js
-    // if (this.props.playbackState !== nextProps.playbackState) {
-    //   await this.onPlaybackStateChange(nextProps.playbackState)
-    // }
+    if (this.props.playbackState !== nextProps.playbackState) {
+      await this.onPlaybackStateChange(nextProps.playbackState)
+    }
   }
 
   async componentDidMount() {
-    console.warn('componentDidMount', this.props, this.props.audio)
     if (this.props.audio) {
       await this.setTrack(this.props)
       const state = await TrackPlayer.getState()
-      // if (state !== this.props.playbackState) {
-      //   this.props.setPlaybackState({ variables: { state } })
-      // }
-      // await this.onPlaybackStateChange(state)
+      if (state !== this.props.playbackState) {
+        this.props.setPersistedState({ playbackState: { state } })
+      }
+      await this.onPlaybackStateChange(state)
     }
   }
 
@@ -296,30 +252,29 @@ class AudioPlayerOld extends Component {
     if (this.state.isPlaying) {
       TrackPlayer.pause()
     } else {
-      console.warn('play')
       TrackPlayer.play()
     }
   }
 
-  // onPlaybackStateChange = async (state) => {
-  //   switch (state) {
-  //     case TrackPlayer.STATE_PLAYING:
-  //       const duration = await TrackPlayer.getDuration()
-  //       this.setState({ isPlaying: true, duration })
-  //       break
-  //     case TrackPlayer.STATE_PAUSED:
-  //       this.setState({ isPlaying: false })
-  //       break
-  //     case TrackPlayer.STATE_STOPPED:
-  //     case TrackPlayer.STATE_NONE:
-  //       this.setState({
-  //         isPlaying: false,
-  //         duration: undefined,
-  //         position: undefined,
-  //       })
-  //       break
-  //   }
-  // }
+  onPlaybackStateChange = async (state) => {
+    switch (state) {
+      case TrackPlayer.STATE_PLAYING:
+        const duration = await TrackPlayer.getDuration()
+        this.setState({ isPlaying: true, duration })
+        break
+      case TrackPlayer.STATE_PAUSED:
+        this.setState({ isPlaying: false })
+        break
+      case TrackPlayer.STATE_STOPPED:
+      case TrackPlayer.STATE_NONE:
+        this.setState({
+          isPlaying: false,
+          duration: undefined,
+          position: undefined,
+        })
+        break
+    }
+  }
 
   onPositionStart = (position) => {
     this.onPositionChange(position)
@@ -470,6 +425,7 @@ const WrappedAudioPlayer = ({ ...props }) => {
       setGlobalState={setGlobalState}
       setPersistedState={setPersistedState}
       audio={persistedState.audio}
+      playbackState={persistedState.playbackState}
       hidden={false}
     />
   )
