@@ -1,6 +1,11 @@
 import React, { useEffect } from 'react'
 import { Platform } from 'react-native'
-import { isEmulator, getModel, getDeviceId, getBrand } from 'react-native-device-info'
+import {
+  isEmulator,
+  getModel,
+  getDeviceId,
+  getBrand,
+} from 'react-native-device-info'
 import { Notifications } from 'react-native-notifications'
 
 import { useGlobalState } from '../GlobalState'
@@ -40,9 +45,9 @@ const init = async ({ isSignedIn, setGlobalState, dispatch }) => {
           osVersion: Platform.Version,
           brand: getBrand(),
           model: getModel(),
-          deviceId: getDeviceId()
-        }
-      }
+          deviceId: getDeviceId(),
+        },
+      },
     })
   })
   Notifications.events().registerRemoteNotificationsRegistrationFailed(
@@ -64,10 +69,7 @@ const init = async ({ isSignedIn, setGlobalState, dispatch }) => {
   )
   Notifications.events().registerNotificationReceivedBackground(
     (notification, completion) => {
-      console.warn(
-        'Notification Received - Background',
-        notification.payload,
-      )
+      console.warn('Notification Received - Background', notification.payload)
       completion({ alert: true, sound: true, badge: false })
     },
   )
@@ -85,20 +87,18 @@ const init = async ({ isSignedIn, setGlobalState, dispatch }) => {
 
 const PushService = () => {
   const {
-    persistedState: {
-      isSignedIn
-    },
+    persistedState: { isSignedIn },
     setGlobalState,
-    dispatch
+    dispatch,
   } = useGlobalState()
 
   useEffect(() => {
     init({
       isSignedIn,
       setGlobalState,
-      dispatch
+      dispatch,
     })
-  }, [isSignedIn])
+  }, [isSignedIn, dispatch, setGlobalState])
 
   return null
 }

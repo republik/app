@@ -75,7 +75,7 @@ const Web = () => {
     if (message.type === 'share') {
       share(message.payload)
     } else if (message.type === 'play-audio') {
-      setGlobalState({ audio: message.payload })
+      setPersistedState({ audio: message.payload })
     } else if (message.type === 'isSignedIn') {
       setPersistedState({ isSignedIn: message.payload })
     } else if (message.type === 'ackMessage') {

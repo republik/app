@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react'
+import React, { Component, Fragment, useState, useEffect, useRef } from 'react'
 import {
   View,
   Text,
@@ -62,17 +62,126 @@ const Time = ({ duration, position }) => {
   )
 }
 
-class AudioPlayer extends Component {
+// const AudioPlayer = ({
+//   setAudio,
+//   upsertCurrentMediaProgress,
+//   enableProgress,
+//   hidden,
+//   audio,
+//   animated,
+//   progressLoading,
+// }) => {
+//   const [audioState, setAudioState] = useState()
+//   const [isPlaying, setIsPlaying] = useState()
+//   const [duration, setDuration] = useState()
+//   const [position, setPosition] = useState()
+//   const [bufferedPosition, setBufferedPosition] = useState()
+//   const bottom = new Animated.Value(audio && !hidden ? 0 : 100)
+//   const prevHidden = useRef(hidden)
+//   const prevAudio = useRef(audio)
+//   const prevAnimated = useRef(animated)
+
+//   useEffect(() => {
+//     const functionQuestionMark = async () => {
+//       const duration = animated ? ANIMATION_DURATION : 0
+//       if (audio) {
+//         if (
+//           !progressLoading &&
+//           (audioState && audioState.id) !== (audio && audio.id)
+//         ) {
+//           await setTrack(nextProps)
+//           TrackPlayer.play()
+//         }
+//         if (nextProps.hidden) {
+//           Animated.timing(this.bottom, {
+//             toValue: -AUDIO_PLAYER_HEIGHT,
+//             duration,
+//           }).start()
+//         } else {
+//           Animated.timing(this.bottom, { toValue: 0, duration }).start()
+//         }
+//       } else if (this.state.audio) {
+//         await this.clearTrack()
+//         Animated.timing(this.bottom, {
+//           toValue: -AUDIO_PLAYER_HEIGHT,
+//           duration,
+//         }).start()
+//       }
+//       // see TrackPlayer.registerEventHandler in the root index.js
+//       if (this.props.playbackState !== nextProps.playbackState) {
+//         await this.onPlaybackStateChange(nextProps.playbackState)
+//       }
+//     }
+//     functionQuestionMark()
+//     return () => {
+//       cleanup
+//     }
+//   }, [input])
+//   return (
+//     <Animated.View style={[styles.container, { bottom: this.bottom }]}>
+//       <ProgressBar
+//         audio={audio}
+//         upsertCurrentMediaProgress={upsertCurrentMediaProgress}
+//         enableProgress={enableProgress}
+//         position={position}
+//         isPlaying={isPlaying}
+//         duration={duration}
+//         bufferedPosition={bufferedPosition}
+//         onPositionStart={this.onPositionStart}
+//         onPositionChange={this.onPositionChange}
+//         onPositionReleased={this.onPositionReleased}
+//       />
+//       <Icon
+//         name={icon}
+//         style={{ marginLeft: 10 }}
+//         size={35}
+//         onPress={() => this.onPlayPauseClick()}
+//       />
+//       <Icon
+//         name={rewindIcon}
+//         disabled={position !== undefined && position < 0.1}
+//         style={{ marginLeft: 5 }}
+//         size={25}
+//         onPress={() => this.onRewind()}
+//       />
+//       <View style={styles.content}>
+//         <Fragment>
+//           <TouchableOpacity onPress={this.onTitlePress}>
+//             <Text numberOfLines={1} style={styles.title}>
+//               {audio && audio.title}
+//             </Text>
+//           </TouchableOpacity>
+//           <Time duration={duration} position={position} />
+//         </Fragment>
+//       </View>
+//       <Icon
+//         name="close"
+//         size={35}
+//         style={{ marginRight: 10 }}
+//         onPress={() =>
+//           setAudio({
+//             variables: { url: null },
+//           })
+//         }
+//       />
+//     </Animated.View>
+//   )
+// }
+
+class AudioPlayerOld extends Component {
   constructor(props) {
     super(props)
 
-    this.bottom = new Animated.Value(props.audio && !props.hidden ? 0 : 100)
+    this.bottom = new Animated.Value(
+      props.audio && !props.hidden ? 0 : -AUDIO_PLAYER_HEIGHT,
+    )
     this.state = {
       isPlaying: false,
     }
   }
 
   async componentWillReceiveProps(nextProps) {
+    console.warn('componentWillRecieve', nextProps)
     const duration = nextProps.animated ? ANIMATION_DURATION : 0
     if (nextProps.audio) {
       if (
@@ -87,31 +196,38 @@ class AudioPlayer extends Component {
         Animated.timing(this.bottom, {
           toValue: -AUDIO_PLAYER_HEIGHT,
           duration,
+          useNativeDriver: false,
         }).start()
       } else {
-        Animated.timing(this.bottom, { toValue: 0, duration }).start()
+        Animated.timing(this.bottom, {
+          toValue: 0,
+          duration,
+          useNativeDriver: false,
+        }).start()
       }
     } else if (this.state.audio) {
       await this.clearTrack()
       Animated.timing(this.bottom, {
         toValue: -AUDIO_PLAYER_HEIGHT,
         duration,
+        useNativeDriver: false,
       }).start()
     }
     // see TrackPlayer.registerEventHandler in the root index.js
-    if (this.props.playbackState !== nextProps.playbackState) {
-      await this.onPlaybackStateChange(nextProps.playbackState)
-    }
+    // if (this.props.playbackState !== nextProps.playbackState) {
+    //   await this.onPlaybackStateChange(nextProps.playbackState)
+    // }
   }
 
   async componentDidMount() {
+    console.warn('componentDidMount', this.props, this.props.audio)
     if (this.props.audio) {
       await this.setTrack(this.props)
       const state = await TrackPlayer.getState()
-      if (state !== this.props.playbackState) {
-        this.props.setPlaybackState({ variables: { state } })
-      }
-      await this.onPlaybackStateChange(state)
+      // if (state !== this.props.playbackState) {
+      //   this.props.setPlaybackState({ variables: { state } })
+      // }
+      // await this.onPlaybackStateChange(state)
     }
   }
 
@@ -138,9 +254,10 @@ class AudioPlayer extends Component {
   }
 
   setTrack = async ({ audio, mediaProgress }) => {
-    if ((this.state.audio && this.state.audio.id) === (audio && audio.id)) {
-      return
-    }
+    console.warn('setTrack', audio)
+    // if ((this.state.audio && this.state.audio.id) === (audio && audio.id)) {
+    //   return
+    // }
     const prevAudio = this.state.audio
     this.setState({
       audio,
@@ -156,7 +273,7 @@ class AudioPlayer extends Component {
       artist: 'Republik',
       artwork: Logo,
     })
-    await TrackPlayer.seekTo(mediaProgress)
+    await TrackPlayer.seekTo(0)
     this.updateState()
     this.startUpdateInterval()
   }
@@ -179,29 +296,30 @@ class AudioPlayer extends Component {
     if (this.state.isPlaying) {
       TrackPlayer.pause()
     } else {
+      console.warn('play')
       TrackPlayer.play()
     }
   }
 
-  onPlaybackStateChange = async (state) => {
-    switch (state) {
-      case TrackPlayer.STATE_PLAYING:
-        const duration = await TrackPlayer.getDuration()
-        this.setState({ isPlaying: true, duration })
-        break
-      case TrackPlayer.STATE_PAUSED:
-        this.setState({ isPlaying: false })
-        break
-      case TrackPlayer.STATE_STOPPED:
-      case TrackPlayer.STATE_NONE:
-        this.setState({
-          isPlaying: false,
-          duration: undefined,
-          position: undefined,
-        })
-        break
-    }
-  }
+  // onPlaybackStateChange = async (state) => {
+  //   switch (state) {
+  //     case TrackPlayer.STATE_PLAYING:
+  //       const duration = await TrackPlayer.getDuration()
+  //       this.setState({ isPlaying: true, duration })
+  //       break
+  //     case TrackPlayer.STATE_PAUSED:
+  //       this.setState({ isPlaying: false })
+  //       break
+  //     case TrackPlayer.STATE_STOPPED:
+  //     case TrackPlayer.STATE_NONE:
+  //       this.setState({
+  //         isPlaying: false,
+  //         duration: undefined,
+  //         position: undefined,
+  //       })
+  //       break
+  //   }
+  // }
 
   onPositionStart = (position) => {
     this.onPositionChange(position)
@@ -225,10 +343,8 @@ class AudioPlayer extends Component {
     const { audio } = this.state
 
     if (audio && audio.sourcePath) {
-      this.props.setUrl({
-        variables: {
-          url: `${FRONTEND_BASE_URL}${audio.sourcePath}`,
-        },
+      this.props.setGlobalState({
+        pendingUrl: `${FRONTEND_BASE_URL}${audio.sourcePath}`,
       })
     }
   }
@@ -274,7 +390,11 @@ class AudioPlayer extends Component {
   }
 
   render() {
-    const { setAudio, upsertCurrentMediaProgress, enableProgress } = this.props
+    const {
+      clearAudio,
+      upsertCurrentMediaProgress,
+      enableProgress,
+    } = this.props
     const {
       audio,
       isPlaying,
@@ -284,8 +404,7 @@ class AudioPlayer extends Component {
     } = this.state
 
     const icon = isPlaying ? 'pause' : 'play-arrow'
-    const rewindIcon = 'rewind'
-
+    const rewindIcon = 'fast-rewind'
     return (
       <Animated.View style={[styles.container, { bottom: this.bottom }]}>
         <ProgressBar
@@ -328,8 +447,8 @@ class AudioPlayer extends Component {
           size={35}
           style={{ marginRight: 10 }}
           onPress={() =>
-            setAudio({
-              variables: { url: null },
+            this.props.setPersistedState({
+              audio: {},
             })
           }
         />
@@ -339,8 +458,24 @@ class AudioPlayer extends Component {
 }
 
 const WrappedAudioPlayer = ({ ...props }) => {
-  const { globalState } = useGlobalState()
-  return <AudioPlayer {...props} audio={globalState.audio} />
+  const {
+    globalState,
+    setGlobalState,
+    persistedState,
+    setPersistedState,
+  } = useGlobalState()
+  return (
+    <AudioPlayerOld
+      {...props}
+      setGlobalState={setGlobalState}
+      setPersistedState={setPersistedState}
+      audio={persistedState.audio}
+      hidden={false}
+    />
+  )
 }
+
+// globalState for stuff like fullscreen or messages, which should be deleted when restart
+// persited : audio, darkmode, signin -> things that should persist on shutdown
 
 export default WrappedAudioPlayer

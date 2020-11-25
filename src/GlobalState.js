@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback, useContext, useReducer } from 'react'
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useContext,
+  useReducer,
+} from 'react'
 import AsyncStorage from '@react-native-community/async-storage'
 import { SIGN_IN_URL } from './constants'
 import 'react-native-get-random-values'
@@ -6,7 +12,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 const defaultPersistedState = {
   url: SIGN_IN_URL,
-  isSignedIn: false
+  isSignedIn: false,
 }
 
 const GlobalState = React.createContext()
@@ -41,24 +47,26 @@ const messageReducer = (state, action) => {
     case 'postMessage':
       return state.concat({
         id: uuidv4(),
-        content: action.content
+        content: action.content,
       })
     case 'clearMessage':
-      return state.filter(msg => msg.id !== action.id)
+      return state.filter((msg) => msg.id !== action.id)
     case 'markMessage':
-      const message = state.find(msg => msg.id === action.id)
+      const message = state.find((msg) => msg.id === action.id)
       if (!message) {
         if (action.mark) {
           console.warn('message to mark not found')
         }
         return state
       }
-      return state.map(msg => msg.id === message.id
-        ? {
-          ...message,
-          mark: action.mark
-        }
-        : msg)
+      return state.map((msg) =>
+        msg.id === message.id
+          ? {
+              ...message,
+              mark: action.mark,
+            }
+          : msg,
+      )
     default:
       throw new Error()
   }
@@ -69,14 +77,14 @@ export const GlobalStateProvider = ({ children }) => {
 
   const [persistedState, setPersistedStateRaw] = useState(defaultPersistedState)
   const setPersistedState = useCallback(
-    newState => setPersistedStateRaw(state => ({ ...state, ...newState })),
-    []
+    (newState) => setPersistedStateRaw((state) => ({ ...state, ...newState })),
+    [],
   )
 
   const [globalState, setGlobalStateRaw] = useState({})
   const setGlobalState = useCallback(
-    newState => setGlobalStateRaw(state => ({ ...state, ...newState })),
-    []
+    (newState) => setGlobalStateRaw((state) => ({ ...state, ...newState })),
+    [],
   )
 
   const [pendingMessages, dispatch] = useReducer(messageReducer, [])
@@ -85,14 +93,14 @@ export const GlobalStateProvider = ({ children }) => {
     readStore({
       setPersistedState,
       setGlobalState,
-      setError
+      setError,
     })
-  }, [])
+  }, [setGlobalState, setPersistedState])
 
   useEffect(() => {
     writeStore({
       persistedState,
-      setError
+      setError,
     })
   }, [persistedState])
 
@@ -103,10 +111,8 @@ export const GlobalStateProvider = ({ children }) => {
     globalState,
     setGlobalState,
     pendingMessages,
-    dispatch
+    dispatch,
   }
 
-  return <GlobalState.Provider value={context}>
-    {children}
-  </GlobalState.Provider>
+  return <GlobalState.Provider value={context}>{children}</GlobalState.Provider>
 }

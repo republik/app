@@ -13,7 +13,6 @@ const colorScheme = Appearance.getColorScheme()
 const isDark = colorScheme === 'dark'
 
 const App = () => {
-
   return (
     <GlobalStateProvider>
       <StatusBar barStyle={isDark ? 'dark-content' : 'light-content'} />
