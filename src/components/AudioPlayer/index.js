@@ -15,6 +15,7 @@ import {
   AUDIO_PLAYER_HEIGHT,
   ANIMATION_DURATION,
 } from '../../constants'
+import { useGlobalState } from '../../GlobalState'
 
 import ProgressBar from './ProgressBar'
 
@@ -127,7 +128,12 @@ class AudioPlayer extends Component {
         TrackPlayer.CAPABILITY_PLAY,
         TrackPlayer.CAPABILITY_PAUSE,
         TrackPlayer.CAPABILITY_STOP,
+        TrackPlayer.CAPABILITY_JUMP_FORWARD,
+        TrackPlayer.CAPABILITY_JUMP_BACKWARD,
       ],
+      options: {
+        jumpInterval: 15,
+      },
     })
   }
 
@@ -277,7 +283,7 @@ class AudioPlayer extends Component {
       bufferedPosition,
     } = this.state
 
-    const icon = isPlaying ? 'pause' : 'play_arrow'
+    const icon = isPlaying ? 'pause' : 'play-arrow'
     const rewindIcon = 'rewind'
 
     return (
@@ -332,4 +338,9 @@ class AudioPlayer extends Component {
   }
 }
 
-export default AudioPlayer
+const WrappedAudioPlayer = ({ ...props }) => {
+  const { globalState } = useGlobalState()
+  return <AudioPlayer {...props} audio={globalState.audio} />
+}
+
+export default WrappedAudioPlayer

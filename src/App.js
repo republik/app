@@ -13,6 +13,7 @@ const colorScheme = Appearance.getColorScheme()
 const isDark = colorScheme === 'dark'
 
 const App = () => {
+
   return (
     <GlobalStateProvider>
       <StatusBar barStyle={isDark ? 'dark-content' : 'light-content'} />
@@ -20,7 +21,7 @@ const App = () => {
       <PushService />
       <DeepLinkingService />
       <AppStateService />
-      <AudioPlayer isDark={isDark} />
+      <AudioPlayer />
     </GlobalStateProvider>
   )
 }

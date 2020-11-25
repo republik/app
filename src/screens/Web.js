@@ -6,14 +6,25 @@ import { useGlobalState } from '../GlobalState'
 import SplashScreen from 'react-native-splash-screen'
 
 const Web = () => {
-  const { globalState, setGlobalState, persistedState, setPersistedState, pendingMessages, dispatch } = useGlobalState()
+  const {
+    globalState,
+    setGlobalState,
+    persistedState,
+    setPersistedState,
+    pendingMessages,
+    dispatch,
+  } = useGlobalState()
 
   const webviewRef = useRef()
-  const [ webUrl, setWebUrl ] = useState()
+  const [webUrl, setWebUrl] = useState()
 
   useEffect(() => {
     // wait for all services
-    if (!globalState.deepLinkingReady || !globalState.pushReady || !globalState.persistedStateReady) {
+    if (
+      !globalState.deepLinkingReady ||
+      !globalState.pushReady ||
+      !globalState.persistedStateReady
+    ) {
       return
     }
 
@@ -30,15 +41,15 @@ const Web = () => {
     if (!webUrl) {
       SplashScreen.hide()
     }
-  }, [webUrl, globalState, persistedState])
+  }, [webUrl, globalState, persistedState, setGlobalState])
 
-  const [ isReady, setIsReady ] = useState(false)
-  const [ sentMessages, setSentMessages ] = useState(false)
+  const [isReady, setIsReady] = useState(false)
+  const [sentMessages, setSentMessages] = useState(false)
   useEffect(() => {
     if (!isReady) {
       return
     }
-    const message = pendingMessages.filter(msg => !msg.mark)[0]
+    const message = pendingMessages.filter((msg) => !msg.mark)[0]
     if (!message) {
       return
     }
@@ -47,28 +58,30 @@ const Web = () => {
     dispatch({
       type: 'markMessage',
       id: message.id,
-      mark: true
+      mark: true,
     })
     setTimeout(() => {
       dispatch({
         type: 'markMessage',
         id: message.id,
-        mark: false
+        mark: false,
       })
     }, 5 * 1000)
-  }, [isReady, pendingMessages])
+  }, [isReady, pendingMessages, dispatch])
 
   const onMessage = (e) => {
     const message = JSON.parse(e.nativeEvent.data) || {}
     console.log('onMessage', message)
     if (message.type === 'share') {
       share(message.payload)
+    } else if (message.type === 'play-audio') {
+      setGlobalState({ audio: message.payload })
     } else if (message.type === 'isSignedIn') {
       setPersistedState({ isSignedIn: message.payload })
     } else if (message.type === 'ackMessage') {
       dispatch({
         type: 'clearMessage',
-        id: message.id
+        id: message.id,
       })
     }
   }
@@ -97,24 +110,26 @@ const Web = () => {
   return (
     <>
       <SafeAreaView />
-      {webUrl && <WebView
-        ref={webviewRef}
-        source={{ uri: webUrl }}
-        applicationNameForUserAgent={`RepublikApp/${APP_VERSION}`}
-        onNavigationStateChange={({ url }) => {
-          console.log('onNavigationStateChange', url)
-          setPersistedState({ url })
-        }}
-        onMessage={(e) => onMessage(e)}
-        onLoadStart={() => {
-          console.log('onLoadStart', 'ready', false)
-          setIsReady(false)
-        }}
-        onLoad={() => {
-          console.log('onLoad', 'ready', true)
-          setIsReady(true)
-        }}
-      />}
+      {webUrl && (
+        <WebView
+          ref={webviewRef}
+          source={{ uri: webUrl }}
+          applicationNameForUserAgent={`RepublikApp/${APP_VERSION}`}
+          onNavigationStateChange={({ url }) => {
+            console.log('onNavigationStateChange', url)
+            setPersistedState({ url })
+          }}
+          onMessage={(e) => onMessage(e)}
+          onLoadStart={() => {
+            console.log('onLoadStart', 'ready', false)
+            setIsReady(false)
+          }}
+          onLoad={() => {
+            console.log('onLoad', 'ready', true)
+            setIsReady(true)
+          }}
+        />
+      )}
     </>
   )
 }
