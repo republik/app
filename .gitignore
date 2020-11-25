@@ -67,3 +67,4 @@ buck-out/
 
 # Fonts
 *.otf
+src/assets/fonts

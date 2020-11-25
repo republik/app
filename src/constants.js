@@ -46,3 +46,7 @@ export const DISCUSSIONS_URL = `${FRONTEND_BASE_URL}${DISCUSSIONS_PATH}`
 
 // Misc
 export const APP_VERSION = DeviceInfo.getVersion()
+
+// Audio
+export const AUDIO_PLAYER_HEIGHT = 65
+export const ANIMATION_DURATION = 250
