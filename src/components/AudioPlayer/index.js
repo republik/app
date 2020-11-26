@@ -1,4 +1,4 @@
-import React, { Component, Fragment, useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
   View,
   Text,
@@ -16,7 +16,7 @@ import {
   ANIMATION_DURATION,
 } from '../../constants'
 import { useGlobalState } from '../../GlobalState'
-
+import { usePrevious } from '../../utils/usePrevious'
 import ProgressBar from './ProgressBar'
 
 const styles = StyleSheet.create({
@@ -62,184 +62,29 @@ const Time = ({ duration, position }) => {
   )
 }
 
-// const AudioPlayer = ({ enableProgress, hidden, animated }) => {
-//   const {
-//     globalState,
-//     setGlobalState,
-//     persistedState,
-//     setPersistedState,
-//   } = useGlobalState()
-//   const { audio, audioPosition,  } = persistedState
-//   const bottom = new Animated.Value(audio && !hidden ? 0 : 100)
-//   const icon = persistedState.isPlaying ? 'pause' : 'play-arrow'
-//   const rewindIcon = 'fast-rewind'
+// globalState for stuff like fullscreen or messages, which should be deleted when restart
+// persited : audio, darkmode, signin -> things that should persist on shutdown
 
-//   return (
-//     <Animated.View style={[styles.container, { bottom: this.bottom }]}>
-//       <ProgressBar
-//         audio={audio}
-//         upsertCurrentMediaProgress={upsertCurrentMediaProgress}
-//         enableProgress={enableProgress}
-//         position={position}
-//         isPlaying={isPlaying}
-//         duration={duration}
-//         bufferedPosition={bufferedPosition}
-//         onPositionStart={this.onPositionStart}
-//         onPositionChange={this.onPositionChange}
-//         onPositionReleased={this.onPositionReleased}
-//       />
-//       <Icon
-//         name={icon}
-//         style={{ marginLeft: 10 }}
-//         size={35}
-//         onPress={() => this.onPlayPauseClick()}
-//       />
-//       {/* <Icon
-//         name={rewindIcon}
-//         disabled={position !== undefined && position < 0.1}
-//         style={{ marginLeft: 5 }}
-//         size={25}
-//         onPress={() => this.onRewind()}
-//       /> */}
-//       <View style={styles.content}>
-//         <Fragment>
-//           <TouchableOpacity onPress={this.onTitlePress}>
-//             <Text numberOfLines={1} style={styles.title}>
-//               {audio && audio.title}
-//             </Text>
-//           </TouchableOpacity>
-//           <Time duration={duration} position={position} />
-//         </Fragment>
-//       </View>
-//       <Icon
-//         name="close"
-//         size={35}
-//         style={{ marginRight: 10 }}
-//         onPress={() =>
-//           setPersistedState({
-//             audio: {},
-//           })
-//         }
-//       />
-//     </Animated.View>
-//   )
-// }
+const AudioPlayer = ({ enableProgress, hidden, animated }) => {
+  const { persistedState, setPersistedState, setGlobalState } = useGlobalState()
 
-class AudioPlayerOld extends Component {
-  constructor(props) {
-    super(props)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [duration, setDuration] = useState()
+  const [position, setPosition] = useState()
+  const [bufferedPosition, setBufferedPosition] = useState()
+  const [trackReady, setTrackReady] = useState()
 
-    this.bottom = new Animated.Value(
-      props.audio && !props.hidden ? 0 : -AUDIO_PLAYER_HEIGHT,
-    )
-    this.state = {
-      isPlaying: false,
-    }
-  }
+  const intervalRef = useRef()
 
-  async componentWillReceiveProps(nextProps) {
-    console.warn('componentWillRecieve', nextProps)
-    const duration = nextProps.animated ? ANIMATION_DURATION : 0
-    if (nextProps.audio) {
-      if (
-        !nextProps.progressLoading &&
-        (this.state.audio && this.state.audio.id) !==
-          (nextProps.audio && nextProps.audio.id)
-      ) {
-        await this.setTrack(nextProps)
-        TrackPlayer.play()
-      }
-      if (nextProps.hidden) {
-        Animated.timing(this.bottom, {
-          toValue: -AUDIO_PLAYER_HEIGHT,
-          duration,
-          useNativeDriver: false,
-        }).start()
-      } else {
-        Animated.timing(this.bottom, {
-          toValue: 0,
-          duration,
-          useNativeDriver: false,
-        }).start()
-      }
-    } else if (this.state.audio) {
-      await this.clearTrack()
-      Animated.timing(this.bottom, {
-        toValue: -AUDIO_PLAYER_HEIGHT,
-        duration,
-        useNativeDriver: false,
-      }).start()
-    }
-    // see TrackPlayer.registerEventHandler in the root index.js
-    if (this.props.playbackState !== nextProps.playbackState) {
-      await this.onPlaybackStateChange(nextProps.playbackState)
-    }
-  }
+  const { audio } = persistedState
+  const previousAudio = usePrevious(audio)
 
-  async componentDidMount() {
-    if (this.props.audio) {
-      await this.setTrack(this.props)
-      const state = await TrackPlayer.getState()
-      if (state !== this.props.playbackState) {
-        this.props.setPersistedState({ playbackState: { state } })
-      }
-      await this.onPlaybackStateChange(state)
-    }
-  }
+  const icon = isPlaying ? 'pause' : 'play-arrow'
+  const rewindIcon = 'fast-rewind'
+  const animationDuration = animated ? ANIMATION_DURATION : 0
 
-  setupPlayer = async () => {
-    if (this.started) {
-      return
-    }
-
-    this.started = true
-
-    await TrackPlayer.setupPlayer()
-    await TrackPlayer.updateOptions({
-      capabilities: [
-        TrackPlayer.CAPABILITY_PLAY,
-        TrackPlayer.CAPABILITY_PAUSE,
-        TrackPlayer.CAPABILITY_STOP,
-        TrackPlayer.CAPABILITY_JUMP_FORWARD,
-        TrackPlayer.CAPABILITY_JUMP_BACKWARD,
-      ],
-      options: {
-        jumpInterval: 15,
-      },
-    })
-  }
-
-  setTrack = async ({ audio, mediaProgress }) => {
-    console.warn('setTrack', audio)
-    // if ((this.state.audio && this.state.audio.id) === (audio && audio.id)) {
-    //   return
-    // }
-    const prevAudio = this.state.audio
-    this.setState({
-      audio,
-    })
-    if (prevAudio) {
-      await this.clearTrack(false)
-    }
-    await this.setupPlayer()
-    await TrackPlayer.add({
-      id: audio.id,
-      url: audio.url,
-      title: audio.title,
-      artist: 'Republik',
-      artwork: Logo,
-    })
-    await TrackPlayer.seekTo(0)
-    this.updateState()
-    this.startUpdateInterval()
-  }
-
-  clearTrack = async (setState = true) => {
-    setState &&
-      this.setState({
-        audio: undefined,
-      })
-    this.stopUpdateInterval()
+  const clearTrack = async () => {
+    clearInterval(intervalRef.current)
     try {
       await TrackPlayer.stop()
       await TrackPlayer.reset()
@@ -248,190 +93,191 @@ class AudioPlayerOld extends Component {
     }
   }
 
-  onPlayPauseClick = () => {
-    if (this.state.isPlaying) {
+  const onPlayerStateChange = (playerState) => {
+    switch (playerState) {
+      case TrackPlayer.STATE_PLAYING:
+        TrackPlayer.getDuration().then((newDuration) => {
+          setDuration(newDuration)
+          setIsPlaying(true)
+        })
+        break
+      case TrackPlayer.STATE_PAUSED:
+        setIsPlaying(false)
+        break
+      case TrackPlayer.STATE_STOPPED:
+      case TrackPlayer.STATE_NONE:
+        setIsPlaying(false)
+        setDuration(undefined)
+        setPosition(undefined)
+        break
+    }
+  }
+
+  useEffect(() => {
+    const updatePlayerState = async () => {
+      try {
+        const updatedPosition = Math.floor(await TrackPlayer.getPosition())
+        const updatedBufferedPosition = Math.floor(
+          await TrackPlayer.getBufferedPosition(),
+        )
+        const updatedDuration = await TrackPlayer.getDuration()
+        setPosition(updatedPosition)
+        setBufferedPosition(updatedBufferedPosition)
+        setDuration(updatedDuration)
+      } catch (e) {
+        console.warn('updateState failed', e)
+      }
+    }
+
+    const startUpdatePlayerState = () => {
+      if (intervalRef.current !== undefined) {
+        clearInterval(intervalRef.current)
+      }
+      intervalRef.current = setInterval(updatePlayerState, 200)
+    }
+
+    if (trackReady) {
+      updatePlayerState()
+      startUpdatePlayerState()
+    }
+    return () => {
+      clearInterval(intervalRef.current)
+    }
+  }, [trackReady])
+
+  useEffect(() => {
+    const setTrack = async () => {
+      await TrackPlayer.setupPlayer({
+        capabilities: [
+          TrackPlayer.CAPABILITY_PLAY,
+          TrackPlayer.CAPABILITY_PAUSE,
+          TrackPlayer.CAPABILITY_STOP,
+          TrackPlayer.CAPABILITY_JUMP_FORWARD,
+          TrackPlayer.CAPABILITY_JUMP_BACKWARD,
+        ],
+        options: {
+          jumpInterval: 15,
+        },
+      }).then(() => {
+        TrackPlayer.add({
+          id: audio.id,
+          url: audio.url,
+          title: audio.title,
+          artist: 'Republik',
+          artwork: Logo,
+        })
+      })
+      setTrackReady(true)
+    }
+    const updateAudio = async () => {
+      if (audio) {
+        const isSameAudio =
+          (audio && audio.id) !== (previousAudio && previousAudio.audio.id)
+        if (isSameAudio) {
+          return
+        }
+        if (previousAudio) {
+          clearTrack(false)
+        }
+        await setTrack()
+        TrackPlayer.play().then(() => {
+          TrackPlayer.getState().then((playerState) => {
+            onPlayerStateChange(playerState)
+          })
+        })
+      }
+    }
+    updateAudio()
+    return () => {
+      clearInterval(intervalRef.current)
+    }
+  }, [audio, previousAudio])
+
+  const onPlayPauseClick = () => {
+    if (isPlaying) {
       TrackPlayer.pause()
     } else {
       TrackPlayer.play()
     }
   }
 
-  onPlaybackStateChange = async (state) => {
-    switch (state) {
-      case TrackPlayer.STATE_PLAYING:
-        const duration = await TrackPlayer.getDuration()
-        this.setState({ isPlaying: true, duration })
-        break
-      case TrackPlayer.STATE_PAUSED:
-        this.setState({ isPlaying: false })
-        break
-      case TrackPlayer.STATE_STOPPED:
-      case TrackPlayer.STATE_NONE:
-        this.setState({
-          isPlaying: false,
-          duration: undefined,
-          position: undefined,
-        })
-        break
-    }
+  const onPositionStart = (newPosition) => {
+    setPosition(newPosition)
+    clearInterval(intervalRef.current)
   }
 
-  onPositionStart = (position) => {
-    this.onPositionChange(position)
-    this.stopUpdateInterval()
-  }
-
-  onPositionChange = (position) => {
-    this.setState({ position })
-  }
-
-  onPositionReleased = () => {
+  const onPositionReleased = () => {
     try {
-      TrackPlayer.seekTo(this.state.position)
+      TrackPlayer.seekTo(position)
     } catch (e) {
       console.warn('onPositionReleased failed', e)
     }
-    this.startUpdateInterval()
+    // startUpdatePlayerState()
   }
 
-  onTitlePress = () => {
-    const { audio } = this.state
+  const onRewind = () => {
+    TrackPlayer.seekTo(0)
+  }
 
+  const onTitlePress = () => {
     if (audio && audio.sourcePath) {
-      this.props.setGlobalState({
+      setGlobalState({
         pendingUrl: `${FRONTEND_BASE_URL}${audio.sourcePath}`,
       })
     }
   }
 
-  onRewind = () => {
-    TrackPlayer.seekTo(0)
-  }
-
-  componentWillUnmount() {
-    this.stopUpdateInterval()
-  }
-
-  updateState = async () => {
-    try {
-      const position = Math.floor(await TrackPlayer.getPosition())
-      const bufferedPosition = Math.floor(
-        await TrackPlayer.getBufferedPosition(),
-      )
-      if (this.state.position !== position) {
-        this.setState({ position })
-      }
-      if (this.state.bufferedPosition !== bufferedPosition) {
-        this.setState({ bufferedPosition })
-      }
-      if (!this.state.duration) {
-        const duration = await TrackPlayer.getDuration()
-        this.setState({ duration })
-      }
-    } catch (e) {
-      console.warn('updateState failed', e)
-    }
-  }
-
-  startUpdateInterval = () => {
-    if (this.updateInterval !== undefined) {
-      this.stopUpdateInterval()
-    }
-    this.updateInterval = setInterval(this.updateState, 200)
-  }
-
-  stopUpdateInterval = () => {
-    clearInterval(this.updateInterval)
-  }
-
-  render() {
-    const {
-      clearAudio,
-      upsertCurrentMediaProgress,
-      enableProgress,
-    } = this.props
-    const {
-      audio,
-      isPlaying,
-      duration,
-      position,
-      bufferedPosition,
-    } = this.state
-
-    const icon = isPlaying ? 'pause' : 'play-arrow'
-    const rewindIcon = 'fast-rewind'
-    return (
-      <Animated.View style={[styles.container, { bottom: this.bottom }]}>
-        <ProgressBar
-          audio={audio}
-          upsertCurrentMediaProgress={upsertCurrentMediaProgress}
-          enableProgress={enableProgress}
-          position={position}
-          isPlaying={isPlaying}
-          duration={duration}
-          bufferedPosition={bufferedPosition}
-          onPositionStart={this.onPositionStart}
-          onPositionChange={this.onPositionChange}
-          onPositionReleased={this.onPositionReleased}
-        />
-        <Icon
-          name={icon}
-          style={{ marginLeft: 10 }}
-          size={35}
-          onPress={() => this.onPlayPauseClick()}
-        />
-        <Icon
-          name={rewindIcon}
-          disabled={position !== undefined && position < 0.1}
-          style={{ marginLeft: 5 }}
-          size={25}
-          onPress={() => this.onRewind()}
-        />
-        <View style={styles.content}>
-          <Fragment>
-            <TouchableOpacity onPress={this.onTitlePress}>
-              <Text numberOfLines={1} style={styles.title}>
-                {audio && audio.title}
-              </Text>
-            </TouchableOpacity>
-            <Time duration={duration} position={position} />
-          </Fragment>
-        </View>
-        <Icon
-          name="close"
-          size={35}
-          style={{ marginRight: 10 }}
-          onPress={() =>
-            this.props.setPersistedState({
-              audio: {},
-            })
-          }
-        />
-      </Animated.View>
-    )
-  }
-}
-
-const WrappedAudioPlayer = ({ ...props }) => {
-  const {
-    globalState,
-    setGlobalState,
-    persistedState,
-    setPersistedState,
-  } = useGlobalState()
   return (
-    <AudioPlayerOld
-      {...props}
-      setGlobalState={setGlobalState}
-      setPersistedState={setPersistedState}
-      audio={persistedState.audio}
-      playbackState={persistedState.playbackState}
-      hidden={false}
-    />
+    <Animated.View style={[styles.container, { bottom: this.bottom }]}>
+      <ProgressBar
+        audio={audio}
+        upsertCurrentMediaProgress={(progress) =>
+          setPersistedState({ mediaProgress: progress.varibles })
+        }
+        enableProgress={enableProgress}
+        position={position}
+        isPlaying={isPlaying}
+        duration={duration}
+        bufferedPosition={bufferedPosition}
+        onPositionStart={onPositionStart}
+        onPositionChange={setPosition(position)}
+        onPositionReleased={onPositionReleased}
+      />
+      <Icon
+        name={icon}
+        style={{ marginLeft: 10 }}
+        size={35}
+        onPress={() => onPlayPauseClick()}
+      />
+      <Icon
+        name={rewindIcon}
+        disabled={position !== undefined && position < 0.1}
+        style={{ marginLeft: 5 }}
+        size={25}
+        onPress={() => onRewind()}
+      />
+      <View style={styles.content}>
+        <>
+          <TouchableOpacity onPress={onTitlePress}>
+            <Text numberOfLines={1} style={styles.title}>
+              {audio && audio.title}
+            </Text>
+          </TouchableOpacity>
+          <Time duration={duration} position={position} />
+        </>
+      </View>
+      <Icon
+        name="close"
+        size={35}
+        style={{ marginRight: 10 }}
+        onPress={() =>
+          setPersistedState({
+            audio: {},
+          })
+        }
+      />
+    </Animated.View>
   )
 }
 
-// globalState for stuff like fullscreen or messages, which should be deleted when restart
-// persited : audio, darkmode, signin -> things that should persist on shutdown
-
-export default WrappedAudioPlayer
+export default AudioPlayer
