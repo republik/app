@@ -240,7 +240,7 @@ const AudioPlayer = ({ enableProgress, hidden, animated }) => {
         duration={duration}
         bufferedPosition={bufferedPosition}
         onPositionStart={onPositionStart}
-        onPositionChange={setPosition(position)}
+        onPositionChange={setPosition}
         onPositionReleased={onPositionReleased}
       />
       <Icon
