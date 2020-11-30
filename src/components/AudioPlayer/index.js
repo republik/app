@@ -35,11 +35,11 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    fontFamily: 'GTAmerica-Regular',
+    fontFamily: 'GT America',
   },
   time: {
     fontSize: 14,
-    fontFamily: 'GTAmerica-Regular',
+    fontFamily: 'GT America',
     fontVariant: ['tabular-nums'],
   },
 })
@@ -65,7 +65,7 @@ const Time = ({ duration, position }) => {
 // globalState for stuff like fullscreen or messages, which should be deleted when restart
 // persited : audio, darkmode, signin -> things that should persist on shutdown
 
-const AudioPlayer = ({ enableProgress, hidden, animated }) => {
+const AudioPlayer = ({ enableProgress, hidden, animated = true }) => {
   const { persistedState, setPersistedState, setGlobalState } = useGlobalState()
 
   const [isPlaying, setIsPlaying] = useState(false)
@@ -78,6 +78,29 @@ const AudioPlayer = ({ enableProgress, hidden, animated }) => {
 
   const { audio } = persistedState
   const previousAudio = usePrevious(audio)
+
+  const bottomStyleValue = useRef()
+  if (!bottomStyleValue.current) {
+    bottomStyleValue.current = new Animated.Value(
+      audio && !hidden
+        ? 0
+        : -AUDIO_PLAYER_HEIGHT
+    )
+  }
+  useEffect(() => {
+    const duration = animated
+      ? ANIMATION_DURATION
+      : 0
+    if (!audio) {
+      Animated.timing(bottomStyleValue.current, { useNativeDriver: false, toValue: -AUDIO_PLAYER_HEIGHT, duration }).start()
+      return
+    }
+    if (hidden) {
+      Animated.timing(bottomStyleValue.current, { useNativeDriver: false, toValue: -AUDIO_PLAYER_HEIGHT, duration }).start()
+    } else {
+      Animated.timing(bottomStyleValue.current, { useNativeDriver: false, toValue: 0, duration }).start()
+    }
+  }, [audio, animated, hidden])
 
   const icon = isPlaying ? 'pause' : 'play-arrow'
   const rewindIcon = 'fast-rewind'
@@ -114,6 +137,9 @@ const AudioPlayer = ({ enableProgress, hidden, animated }) => {
   }
 
   useEffect(() => {
+    if (!trackReady) {
+      return
+    }
     const updatePlayerState = async () => {
       try {
         const updatedPosition = Math.floor(await TrackPlayer.getPosition())
@@ -136,10 +162,8 @@ const AudioPlayer = ({ enableProgress, hidden, animated }) => {
       intervalRef.current = setInterval(updatePlayerState, 200)
     }
 
-    if (trackReady) {
-      updatePlayerState()
-      startUpdatePlayerState()
-    }
+    updatePlayerState()
+    startUpdatePlayerState()
     return () => {
       clearInterval(intervalRef.current)
     }
@@ -170,15 +194,15 @@ const AudioPlayer = ({ enableProgress, hidden, animated }) => {
       setTrackReady(true)
     }
     const updateAudio = async () => {
+      const isSameAudio =
+        (audio && audio.id) !== (previousAudio && previousAudio.id)
+      if (isSameAudio) {
+        return
+      }
+      if (previousAudio) {
+        await clearTrack()
+      }
       if (audio) {
-        const isSameAudio =
-          (audio && audio.id) !== (previousAudio && previousAudio.audio.id)
-        if (isSameAudio) {
-          return
-        }
-        if (previousAudio) {
-          clearTrack(false)
-        }
         await setTrack()
         TrackPlayer.play().then(() => {
           TrackPlayer.getState().then((playerState) => {
@@ -228,7 +252,7 @@ const AudioPlayer = ({ enableProgress, hidden, animated }) => {
   }
 
   return (
-    <Animated.View style={[styles.container, { bottom: this.bottom }]}>
+    <Animated.View style={[styles.container, { bottom: bottomStyleValue.current }]}>
       <ProgressBar
         audio={audio}
         upsertCurrentMediaProgress={(progress) =>
@@ -267,12 +291,12 @@ const AudioPlayer = ({ enableProgress, hidden, animated }) => {
         </>
       </View>
       <Icon
-        name="close"
+        name='close'
         size={35}
         style={{ marginRight: 10 }}
         onPress={() =>
           setPersistedState({
-            audio: {},
+            audio: null,
           })
         }
       />
