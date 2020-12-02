@@ -112,7 +112,7 @@ const Web = () => {
   return (
     <>
       {webUrl && (
-        <SafeAreaView style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1 }} edges={['right', 'top', 'left']}>
           <WebView
             ref={webviewRef}
             source={{ uri: webUrl }}
