@@ -1,6 +1,8 @@
 import React, { useRef, useState, useEffect } from 'react'
 import { WebView } from 'react-native-webview'
-import { SafeAreaView, Share, Platform } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+
+import { Share, Platform } from 'react-native'
 import { APP_VERSION } from '../constants'
 import { useGlobalState } from '../GlobalState'
 import SplashScreen from 'react-native-splash-screen'
@@ -109,26 +111,27 @@ const Web = () => {
 
   return (
     <>
-      <SafeAreaView />
       {webUrl && (
-        <WebView
-          ref={webviewRef}
-          source={{ uri: webUrl }}
-          applicationNameForUserAgent={`RepublikApp/${APP_VERSION}`}
-          onNavigationStateChange={({ url }) => {
-            console.log('onNavigationStateChange', url)
-            setPersistedState({ url })
-          }}
-          onMessage={(e) => onMessage(e)}
-          onLoadStart={() => {
-            console.log('onLoadStart', 'ready', false)
-            setIsReady(false)
-          }}
-          onLoad={() => {
-            console.log('onLoad', 'ready', true)
-            setIsReady(true)
-          }}
-        />
+        <SafeAreaView style={{ flex: 1 }}>
+          <WebView
+            ref={webviewRef}
+            source={{ uri: webUrl }}
+            applicationNameForUserAgent={`RepublikApp/${APP_VERSION}`}
+            onNavigationStateChange={({ url }) => {
+              console.log('onNavigationStateChange', url)
+              setPersistedState({ url })
+            }}
+            onMessage={(e) => onMessage(e)}
+            onLoadStart={() => {
+              console.log('onLoadStart', 'ready', false)
+              setIsReady(false)
+            }}
+            onLoad={() => {
+              console.log('onLoad', 'ready', true)
+              setIsReady(true)
+            }}
+          />
+        </SafeAreaView>
       )}
     </>
   )

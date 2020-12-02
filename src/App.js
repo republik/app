@@ -1,5 +1,6 @@
 import React from 'react'
-import { StatusBar, Appearance } from 'react-native'
+import { StatusBar, Appearance, SafeAreaView } from 'react-native'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 
 import PushService from './services/Push'
 import DeepLinkingService from './services/DeepLinking'
@@ -15,12 +16,14 @@ const isDark = colorScheme === 'dark'
 const App = () => {
   return (
     <GlobalStateProvider>
-      <StatusBar barStyle={isDark ? 'dark-content' : 'light-content'} />
-      <Web />
       <PushService />
       <DeepLinkingService />
       <AppStateService />
-      <AudioPlayer />
+      <StatusBar barStyle={isDark ? 'dark-content' : 'light-content'} />
+      <SafeAreaProvider>
+        <Web />
+        <AudioPlayer />
+      </SafeAreaProvider>
     </GlobalStateProvider>
   )
 }

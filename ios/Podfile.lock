@@ -237,6 +237,8 @@ PODS:
     - React
   - react-native-notifications (3.3.4):
     - React
+  - react-native-safe-area-context (3.1.9):
+    - React-Core
   - react-native-splash-screen (3.2.0):
     - React
   - react-native-track-player (1.2.3):
@@ -350,6 +352,7 @@ DEPENDENCIES:
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - react-native-get-random-values (from `../node_modules/react-native-get-random-values`)
   - react-native-notifications (from `../node_modules/react-native-notifications`)
+  - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-splash-screen (from `../node_modules/react-native-splash-screen`)
   - react-native-track-player (from `../node_modules/react-native-track-player`)
   - react-native-webview (from `../node_modules/react-native-webview`)
@@ -417,6 +420,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-get-random-values"
   react-native-notifications:
     :path: "../node_modules/react-native-notifications"
+  react-native-safe-area-context:
+    :path: "../node_modules/react-native-safe-area-context"
   react-native-splash-screen:
     :path: "../node_modules/react-native-splash-screen"
   react-native-track-player:
@@ -480,6 +485,7 @@ SPEC CHECKSUMS:
   React-jsinspector: 512e560d0e985d0e8c479a54a4e5c147a9c83493
   react-native-get-random-values: 1404bd5cc0ab0e287f75ee1c489555688fc65f89
   react-native-notifications: 09086eb278cde6ccb463fe5f1dbd57e315c7f642
+  react-native-safe-area-context: b6e0e284002381d2ff29fa4fff42b4d8282e3c94
   react-native-splash-screen: 200d11d188e2e78cea3ad319964f6142b6384865
   react-native-track-player: 28b96dd6404dea3eee80e67b74507679235a8dfb
   react-native-webview: 4e96d493f9f90ba4f03b28933f30b2964df07e39
@@ -499,6 +505,6 @@ SPEC CHECKSUMS:
   Yoga: 3ebccbdd559724312790e7742142d062476b698e
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: 27089b5ce5c6a77fabb61e9884e96ee4056d3cb2
+PODFILE CHECKSUM: b98463d71d7a0b059a0b98ef299c5ddea25f20a3
 
 COCOAPODS: 1.10.0
