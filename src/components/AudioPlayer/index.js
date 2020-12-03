@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import {
   View,
@@ -11,7 +11,6 @@ import {
 import TrackPlayer, {
   useTrackPlayerProgress,
   usePlaybackState,
-  use,
 } from 'react-native-track-player'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 
@@ -25,7 +24,6 @@ import {
   AUDIO_PLAYER_MAX_WIDTH,
 } from '../../constants'
 import { useGlobalState } from '../../GlobalState'
-import { usePrevious } from '../../utils/usePrevious'
 import ProgressBar from './ProgressBar'
 
 const parseSeconds = (value) => {
@@ -52,10 +50,13 @@ const AudioPlayer = () => {
     await TrackPlayer.setupPlayer({})
     await TrackPlayer.updateOptions({
       stopWithApp: true,
+      jumpInterval: 15,
       capabilities: [
         TrackPlayer.CAPABILITY_PLAY,
         TrackPlayer.CAPABILITY_PAUSE,
         TrackPlayer.CAPABILITY_STOP,
+        TrackPlayer.CAPABILITY_JUMP_FORWARD,
+        TrackPlayer.CAPABILITY_JUMP_BACKWARD,
       ],
     })
   }
