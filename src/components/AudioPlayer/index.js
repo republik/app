@@ -78,6 +78,7 @@ const AudioPlayer = () => {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   async function togglePlayback() {
+    console.log(audio)
     const currentTrack = await TrackPlayer.getCurrentTrack()
     if (currentTrack == null) {
       await TrackPlayer.reset()
@@ -130,12 +131,15 @@ const AudioPlayer = () => {
       style={[
         styles.container,
         {
-          height: AUDIO_PLAYER_HEIGHT + insets.bottom,
+          height: AUDIO_PLAYER_HEIGHT + Math.max(insets.bottom, 16),
           transform: [
             {
               translateY: fadeAnim.interpolate({
                 inputRange: [0, 1],
-                outputRange: [0, AUDIO_PLAYER_HEIGHT + insets.bottom],
+                outputRange: [
+                  0,
+                  AUDIO_PLAYER_HEIGHT + Math.max(insets.bottom, 16),
+                ],
               }),
             },
           ],

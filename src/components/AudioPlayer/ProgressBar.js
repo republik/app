@@ -91,8 +91,8 @@ const ProgressBar = ({
           styles.progressBar,
           {
             transform: [
+              { scaleY },
               {
-                scaleY,
                 translateY: scaleY.interpolate({
                   inputRange: [1, 2.5],
                   outputRange: [0, -AUDIO_PLAYER_PROGRESS_HEIGHT / 3],
