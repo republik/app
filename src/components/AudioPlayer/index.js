@@ -11,6 +11,7 @@ import {
 import TrackPlayer, {
   useTrackPlayerProgress,
   usePlaybackState,
+  use,
 } from 'react-native-track-player'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 
@@ -18,11 +19,14 @@ import Logo from '../../assets/images/playlist-logo.png'
 import {
   FRONTEND_BASE_URL,
   AUDIO_PLAYER_HEIGHT,
+  AUDIO_PLAYER_PROGRESS_HEIGHT,
   ANIMATION_DURATION,
+  AUDIO_PLAYER_PADDING,
+  AUDIO_PLAYER_MAX_WIDTH,
 } from '../../constants'
 import { useGlobalState } from '../../GlobalState'
 import { usePrevious } from '../../utils/usePrevious'
-// import ProgressBar from './ProgressBar'
+import ProgressBar from './ProgressBar'
 
 const parseSeconds = (value) => {
   if (value === null || value === undefined) return ''
@@ -74,9 +78,6 @@ const AudioPlayer = () => {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   async function togglePlayback() {
-    if (audio == null) {
-      return
-    }
     const currentTrack = await TrackPlayer.getCurrentTrack()
     if (currentTrack == null) {
       await TrackPlayer.reset()
@@ -101,7 +102,7 @@ const AudioPlayer = () => {
   const slideIn = () => {
     Animated.timing(fadeAnim, {
       toValue: 1,
-      duration: 400,
+      duration: ANIMATION_DURATION,
       easing: Easing.in(Easing.ease),
       useNativeDriver: true,
     }).start()
@@ -110,10 +111,18 @@ const AudioPlayer = () => {
   const slideOut = () => {
     Animated.timing(fadeAnim, {
       toValue: 0,
-      duration: 400,
+      duration: ANIMATION_DURATION,
       easing: Easing.out(Easing.ease),
       useNativeDriver: true,
     }).start()
+  }
+
+  const onTitlePress = () => {
+    if (audio && audio.sourcePath) {
+      setGlobalState({
+        pendingUrl: `${FRONTEND_BASE_URL}${audio.sourcePath}`,
+      })
+    }
   }
 
   return (
@@ -133,36 +142,58 @@ const AudioPlayer = () => {
         },
       ]}>
       <View style={styles.player}>
-        <Icon
-          name={
-            playbackState == TrackPlayer.STATE_PAUSED ? 'play-arrow' : 'pause'
-          }
-          size={35}
-          onPress={() => togglePlayback()}
-        />
-        <Icon name="fast-rewind" size={25} onPress={() => {}} />
-        <View style={styles.content}>
-          <TouchableOpacity>
-            <Text numberOfLines={1} style={styles.title}>
-              Autio Title
+        <View style={styles.controls}>
+          <Icon
+            name={
+              playbackState == TrackPlayer.STATE_PAUSED ? 'play-arrow' : 'pause'
+            }
+            size={35}
+            onPress={() => togglePlayback()}
+          />
+          <Icon name="fast-rewind" size={25} onPress={() => {}} />
+          <View style={styles.content}>
+            <TouchableOpacity onPress={onTitlePress}>
+              <Text numberOfLines={1} style={styles.title}>
+                {audio && audio.title}
+              </Text>
+            </TouchableOpacity>
+            <Text style={styles.time}>
+              {parseSeconds(progress.position)} /{' '}
+              {parseSeconds(progress.duration)}
             </Text>
-          </TouchableOpacity>
-          <Text style={styles.time}>
-            {parseSeconds(progress.position)} /{' '}
-            {parseSeconds(progress.duration)}
-          </Text>
+          </View>
+          <Icon
+            name="close"
+            size={35}
+            onPress={() =>
+              setPersistedState({
+                audio: null,
+              })
+            }
+          />
         </View>
-        <Icon
-          name="close"
-          size={35}
-          onPress={() =>
+        <ProgressBar
+          audio={audio}
+          upsertCurrentMediaProgress={() =>
             setPersistedState({
-              audio: null,
+              mediaProgress: {
+                mediaId: audio.mediaId,
+                secs: progress.position,
+              },
             })
           }
+          enableProgress={true}
+          position={progress.position}
+          isPlaying={playbackState == TrackPlayer.STATE_PLAYING}
+          duration={progress.duration}
+          bufferedPosition={progress.bufferedPosition}
+          onProgressPanReleased={(newPosition) => {
+            TrackPlayer.seekTo(newPosition)
+            TrackPlayer.play()
+          }}
         />
-        <SafeAreaView edges={['right', 'bottom', 'left']} />
       </View>
+      <SafeAreaView edges={['right', 'bottom', 'left']} />
     </Animated.View>
   )
 }
@@ -175,13 +206,29 @@ const styles = StyleSheet.create({
   },
   player: {
     backgroundColor: '#ffffff',
-    borderWidth: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 15,
-    marginHorizontal: 15,
-    maxWidth: 400,
+    alignSelf: 'flex-end',
+    justifyContent: 'center',
+    flexDirection: 'column',
+    marginHorizontal: AUDIO_PLAYER_PADDING,
+    maxWidth: AUDIO_PLAYER_MAX_WIDTH,
     height: AUDIO_PLAYER_HEIGHT,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 4.65,
+
+    elevation: 7,
+  },
+  controls: {
+    width: '100%',
+    paddingHorizontal: 8,
+    flexDirection: 'row',
+    alignSelf: 'center',
+    alignItems: 'center',
+    marginBottom: AUDIO_PLAYER_PROGRESS_HEIGHT,
   },
   content: {
     flex: 1,
