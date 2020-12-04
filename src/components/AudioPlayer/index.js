@@ -79,7 +79,6 @@ const AudioPlayer = () => {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   async function togglePlayback() {
-    console.log(audio)
     const currentTrack = await TrackPlayer.getCurrentTrack()
     if (currentTrack == null) {
       await TrackPlayer.reset()
@@ -192,9 +191,9 @@ const AudioPlayer = () => {
           isPlaying={playbackState == TrackPlayer.STATE_PLAYING}
           duration={progress.duration}
           bufferedPosition={progress.bufferedPosition}
-          onProgressPanReleased={(newPosition) => {
-            TrackPlayer.seekTo(newPosition)
-            TrackPlayer.play()
+          onProgressPanReleased={async (newPosition) => {
+            await TrackPlayer.seekTo(newPosition)
+            await TrackPlayer.play()
           }}
         />
       </View>
