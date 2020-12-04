@@ -6,6 +6,7 @@ import {
   AUDIO_PLAYER_PROGRESS_HEIGHT,
   AUDIO_PLAYER_PADDING,
 } from '../../constants'
+import { useColorContext } from '../../utils/colors'
 
 const ProgressBar = ({
   position,
@@ -20,7 +21,7 @@ const ProgressBar = ({
   const [isPanning, setIsPanning] = useState(false)
   const [panProgress, setPanProgress] = useState(0)
   const [playerWidth, setPlayerWidth] = useState(0)
-
+  const colorScheme = useColorContext()
   const scaleY = useRef(new Animated.Value(1)).current
 
   const upsertProgress = debounce(() => {
@@ -89,6 +90,7 @@ const ProgressBar = ({
       <Animated.View
         style={[
           styles.progressBar,
+          { backgroundColor: colorScheme.progress },
           {
             transform: [
               { scaleY },
@@ -101,8 +103,21 @@ const ProgressBar = ({
             ],
           },
         ]}>
-        <View style={[styles.progressBuffer, { width: `${buffered}%` }]} />
-        <View style={[styles.progressPosition, { width: `${progress}%` }]} />
+        <View
+          style={[
+            styles.progressBuffer,
+            {
+              backgroundColor: colorScheme.progressBuffer,
+              width: `${buffered}%`,
+            },
+          ]}
+        />
+        <View
+          style={[
+            styles.progressPosition,
+            { backgroundColor: colorScheme.primary, width: `${progress}%` },
+          ]}
+        />
       </Animated.View>
     </View>
   )
@@ -118,7 +133,6 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     width: '100%',
-    backgroundColor: '#e8e8ed',
     height: AUDIO_PLAYER_PROGRESS_HEIGHT,
   },
   progressPosition: {
@@ -126,7 +140,6 @@ const styles = StyleSheet.create({
     left: 0,
     height: '100%',
     position: 'absolute',
-    backgroundColor: '#3cad01',
   },
   progressBuffer: {
     top: 0,

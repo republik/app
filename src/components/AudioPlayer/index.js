@@ -25,6 +25,7 @@ import {
 } from '../../constants'
 import { useGlobalState } from '../../GlobalState'
 import ProgressBar from './ProgressBar'
+import { useColorContext } from '../../utils/colors'
 
 const parseSeconds = (value) => {
   if (value === null || value === undefined) return ''
@@ -40,6 +41,7 @@ const AudioPlayer = () => {
   const { persistedState, setPersistedState, setGlobalState } = useGlobalState()
   const { audio } = persistedState
   const fadeAnim = useRef(new Animated.Value(0)).current
+  const colorScheme = useColorContext()
 
   // Initializes the player
   useEffect(() => {
@@ -145,23 +147,31 @@ const AudioPlayer = () => {
           ],
         },
       ]}>
-      <View style={styles.player}>
+      <View style={[styles.player, { backgroundColor: colorScheme.overlay }]}>
         <View style={styles.controls}>
           <Icon
             name={
               playbackState == TrackPlayer.STATE_PAUSED ? 'play-arrow' : 'pause'
             }
             size={35}
+            color={colorScheme.text}
             onPress={() => togglePlayback()}
           />
-          <Icon name="fast-rewind" size={25} onPress={() => {}} />
+          <Icon
+            name="fast-rewind"
+            size={25}
+            color={colorScheme.text}
+            onPress={() => {}}
+          />
           <View style={styles.content}>
             <TouchableOpacity onPress={onTitlePress}>
-              <Text numberOfLines={1} style={styles.title}>
+              <Text
+                numberOfLines={1}
+                style={[styles.title, { color: colorScheme.text }]}>
                 {audio && audio.title}
               </Text>
             </TouchableOpacity>
-            <Text style={styles.time}>
+            <Text style={[styles.time, { color: colorScheme.text }]}>
               {parseSeconds(progress.position)} /{' '}
               {parseSeconds(progress.duration)}
             </Text>
@@ -169,6 +179,7 @@ const AudioPlayer = () => {
           <Icon
             name="close"
             size={35}
+            color={colorScheme.text}
             onPress={() =>
               setPersistedState({
                 audio: null,
@@ -209,7 +220,6 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   player: {
-    backgroundColor: '#ffffff',
     alignSelf: 'flex-end',
     justifyContent: 'center',
     flexDirection: 'column',
