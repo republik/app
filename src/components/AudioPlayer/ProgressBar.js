@@ -28,45 +28,42 @@ const ProgressBar = ({
     upsertCurrentMediaProgress()
   }, 1000)
 
-  const expandAnim = () => {
-    Animated.timing(scaleY, {
-      toValue: 2.5,
-      easing: Easing.in(Easing.ease),
-      duration: ANIMATION_DURATION,
-      useNativeDriver: true,
-    }).start()
-  }
+  const panResponder = useMemo(() => {
+    const expandAnim = () => {
+      Animated.timing(scaleY, {
+        toValue: 2.5,
+        easing: Easing.in(Easing.ease),
+        duration: ANIMATION_DURATION,
+        useNativeDriver: true,
+      }).start()
+    }
 
-  const collapseAnim = () => {
-    Animated.timing(scaleY, {
-      toValue: 1,
-      duration: ANIMATION_DURATION,
-      easing: Easing.in(Easing.ease),
-      useNativeDriver: true,
-    }).start()
-  }
-
-  const panResponder = useMemo(
-    () =>
-      PanResponder.create({
-        onStartShouldSetPanResponder: () => true,
-        onMoveShouldSetPanResponder: () => true,
-        onPanResponderGrant: (evt, gestureState) => {
-          setIsPanning(true)
-          setPanProgress(gestureState.x0 - AUDIO_PLAYER_PADDING)
-          expandAnim()
-        },
-        onPanResponderMove: (evt, gestureState) => {
-          setPanProgress(gestureState.moveX - AUDIO_PLAYER_PADDING)
-        },
-        onPanResponderRelease: (evt, gestureState) => {
-          setIsPanning(false)
-          onProgressPanReleased((panProgress / playerWidth) * duration)
-          collapseAnim()
-        },
-      }),
-    [duration, playerWidth, panProgress],
-  )
+    const collapseAnim = () => {
+      Animated.timing(scaleY, {
+        toValue: 1,
+        duration: ANIMATION_DURATION,
+        easing: Easing.in(Easing.ease),
+        useNativeDriver: true,
+      }).start()
+    }
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderGrant: (evt, gestureState) => {
+        setIsPanning(true)
+        setPanProgress(gestureState.x0 - AUDIO_PLAYER_PADDING)
+        expandAnim()
+      },
+      onPanResponderMove: (evt, gestureState) => {
+        setPanProgress(gestureState.moveX - AUDIO_PLAYER_PADDING)
+      },
+      onPanResponderRelease: (evt, gestureState) => {
+        setIsPanning(false)
+        onProgressPanReleased((panProgress / playerWidth) * duration)
+        collapseAnim()
+      },
+    })
+  }, [scaleY, onProgressPanReleased, panProgress, playerWidth, duration])
 
   useEffect(() => {
     if (enableProgress && audio && isPlaying && position > 0) {

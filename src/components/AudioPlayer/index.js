@@ -68,8 +68,24 @@ const AudioPlayer = () => {
   // once the audio object is wiped from persistedState
   // also triggers playback when a new audio object is set to persistedState,
   // which happens via message API.
-
   useEffect(() => {
+    // Animation definitions
+    const slideIn = () => {
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: ANIMATION_DURATION,
+        easing: Easing.in(Easing.ease),
+        useNativeDriver: true,
+      }).start()
+    }
+    const slideOut = () => {
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: ANIMATION_DURATION,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }).start()
+    }
     if (audio == null) {
       slideIn()
       togglePlayback()
@@ -77,10 +93,10 @@ const AudioPlayer = () => {
       slideOut()
       togglePlayback()
     }
-  }, [audio])
+  }, [audio, fadeAnim, togglePlayback])
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  async function togglePlayback() {
+  const togglePlayback = async () => {
     const currentTrack = await TrackPlayer.getCurrentTrack()
     if (currentTrack == null) {
       await TrackPlayer.reset()
@@ -99,25 +115,6 @@ const AudioPlayer = () => {
         await TrackPlayer.pause()
       }
     }
-  }
-
-  // Animation definitions
-  const slideIn = () => {
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: ANIMATION_DURATION,
-      easing: Easing.in(Easing.ease),
-      useNativeDriver: true,
-    }).start()
-  }
-
-  const slideOut = () => {
-    Animated.timing(fadeAnim, {
-      toValue: 0,
-      duration: ANIMATION_DURATION,
-      easing: Easing.out(Easing.ease),
-      useNativeDriver: true,
-    }).start()
   }
 
   const onTitlePress = () => {
