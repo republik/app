@@ -28,24 +28,25 @@ const ProgressBar = ({
     upsertCurrentMediaProgress()
   }, 1000)
 
-  const panResponder = useMemo(() => {
-    const expandAnim = () => {
-      Animated.timing(scaleY, {
-        toValue: 2.5,
-        easing: Easing.in(Easing.ease),
-        duration: ANIMATION_DURATION,
-        useNativeDriver: true,
-      }).start()
-    }
+  const expandAnim = () => {
+    Animated.timing(scaleY, {
+      toValue: 2.5,
+      easing: Easing.in(Easing.ease),
+      duration: ANIMATION_DURATION,
+      useNativeDriver: true,
+    }).start()
+  }
 
-    const collapseAnim = () => {
-      Animated.timing(scaleY, {
-        toValue: 1,
-        duration: ANIMATION_DURATION,
-        easing: Easing.in(Easing.ease),
-        useNativeDriver: true,
-      }).start()
-    }
+  const collapseAnim = () => {
+    Animated.timing(scaleY, {
+      toValue: 1,
+      duration: ANIMATION_DURATION,
+      easing: Easing.in(Easing.ease),
+      useNativeDriver: true,
+    }).start()
+  }
+
+  const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: () => true,
@@ -62,8 +63,8 @@ const ProgressBar = ({
         onProgressPanReleased((panProgress / playerWidth) * duration)
         collapseAnim()
       },
-    })
-  }, [scaleY, onProgressPanReleased, panProgress, playerWidth, duration])
+    }),
+  ).current
 
   useEffect(() => {
     if (enableProgress && audio && isPlaying && position > 0) {
