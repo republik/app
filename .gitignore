@@ -68,3 +68,5 @@ buck-out/
 # Fonts
 *.otf
 src/assets/fonts
+
+android/app/google-services.json
