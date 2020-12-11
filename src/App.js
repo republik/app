@@ -1,5 +1,5 @@
 import React from 'react'
-import { StatusBar, Appearance } from 'react-native'
+import { View, StatusBar, Appearance } from 'react-native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 
 import PushService from './services/Push'
@@ -19,7 +19,9 @@ const App = () => {
       <DeepLinkingService />
       <AppStateService />
       <StatusBar
-        barStyle={colorScheme === 'dark' ? 'dark-content' : 'light-content'}
+        barStyle={colorScheme === 'dark' ? 'light-content' : 'dark-content'}
+        backgroundColor={colorScheme === 'dark' ? '#000000' : '#FFFFFF'}
+        hidden={false} // TODO Gallery expanded
       />
       <SafeAreaProvider>
         <ColorContextProvider>
