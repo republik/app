@@ -1,26 +1,32 @@
 import React from 'react'
 import { StatusBar, Appearance } from 'react-native'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 
 import PushService from './services/Push'
 import DeepLinkingService from './services/DeepLinking'
 import AppStateService from './services/AppState'
-
+import { ColorContextProvider } from './utils/colors'
 import Web from './screens/Web'
 import AudioPlayer from './components/AudioPlayer'
 import { GlobalStateProvider } from './GlobalState'
 
 const colorScheme = Appearance.getColorScheme()
-const isDark = colorScheme === 'dark'
 
 const App = () => {
   return (
     <GlobalStateProvider>
-      <StatusBar barStyle={isDark ? 'dark-content' : 'light-content'} />
-      <Web />
       <PushService />
       <DeepLinkingService />
       <AppStateService />
-      <AudioPlayer />
+      <StatusBar
+        barStyle={colorScheme === 'dark' ? 'dark-content' : 'light-content'}
+      />
+      <SafeAreaProvider>
+        <ColorContextProvider>
+          <Web />
+          <AudioPlayer />
+        </ColorContextProvider>
+      </SafeAreaProvider>
     </GlobalStateProvider>
   )
 }

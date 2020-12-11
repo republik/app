@@ -5657,6 +5657,11 @@ react-native-notifications@^3.3.4:
   resolved "https://registry.yarnpkg.com/react-native-notifications/-/react-native-notifications-3.3.4.tgz#ade029e623380113f06f8d5b7759ad36e27c9566"
   integrity sha512-oJuuUxKh/82HI7kgWUBlxf3d0/ngfX1Lp1meeESySA6u0I+jeTS0EOPDAVD6bGrfAywCi3d4elY7QbGTy6MWGQ==
 
+react-native-safe-area-context@^3.1.9:
+  version "3.1.9"
+  resolved "https://registry.yarnpkg.com/react-native-safe-area-context/-/react-native-safe-area-context-3.1.9.tgz#48864ea976b0fa57142a2cc523e1fd3314e7247e"
+  integrity sha512-wmcGbdyE/vBSL5IjDPReoJUEqxkZsywZw5gPwsVUV1NBpw5eTIdnL6Y0uNKHE25Z661moxPHQz6kwAkYQyorxA==
+
 react-native-splash-screen@^3.2.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/react-native-splash-screen/-/react-native-splash-screen-3.2.0.tgz#d47ec8557b1ba988ee3ea98d01463081b60fff45"

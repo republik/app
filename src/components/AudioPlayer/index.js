@@ -1,32 +1,245 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import {
   View,
   Text,
   StyleSheet,
   Animated,
   TouchableOpacity,
+  Easing,
 } from 'react-native'
-import TrackPlayer from 'react-native-track-player'
+import TrackPlayer, {
+  useTrackPlayerProgress,
+  usePlaybackState,
+} from 'react-native-track-player'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 
 import Logo from '../../assets/images/playlist-logo.png'
 import {
   FRONTEND_BASE_URL,
   AUDIO_PLAYER_HEIGHT,
+  AUDIO_PLAYER_PROGRESS_HEIGHT,
   ANIMATION_DURATION,
+  AUDIO_PLAYER_PADDING,
+  AUDIO_PLAYER_MAX_WIDTH,
 } from '../../constants'
 import { useGlobalState } from '../../GlobalState'
-import { usePrevious } from '../../utils/usePrevious'
 import ProgressBar from './ProgressBar'
+import { useColorContext } from '../../utils/colors'
+
+const parseSeconds = (value) => {
+  if (value === null || value === undefined) return ''
+  const minutes = Math.floor(value / 60)
+  const seconds = Math.floor(value - minutes * 60)
+  return minutes + ':' + (seconds < 10 ? '0' : '') + seconds
+}
+
+const AudioPlayer = () => {
+  const insets = useSafeAreaInsets()
+  const progress = useTrackPlayerProgress()
+  const playbackState = usePlaybackState()
+  const { persistedState, setPersistedState, setGlobalState } = useGlobalState()
+  const { audio } = persistedState
+  const fadeAnim = useRef(new Animated.Value(0)).current
+  const colorScheme = useColorContext()
+
+  // Initializes the player
+  useEffect(() => {
+    setup()
+  }, [])
+
+  async function setup() {
+    await TrackPlayer.setupPlayer({})
+    await TrackPlayer.updateOptions({
+      stopWithApp: true,
+      jumpInterval: 15,
+      capabilities: [
+        TrackPlayer.CAPABILITY_PLAY,
+        TrackPlayer.CAPABILITY_PAUSE,
+        TrackPlayer.CAPABILITY_STOP,
+        TrackPlayer.CAPABILITY_JUMP_FORWARD,
+        TrackPlayer.CAPABILITY_JUMP_BACKWARD,
+      ],
+    })
+  }
+
+  // Handles changes in the audio persisted state, sliding the
+  // player in when there is an audio object vs sliding it out
+  // once the audio object is wiped from persistedState
+  // also triggers playback when a new audio object is set to persistedState,
+  // which happens via message API.
+  useEffect(() => {
+    // Animation definitions
+    const slideIn = () => {
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: ANIMATION_DURATION,
+        easing: Easing.in(Easing.ease),
+        useNativeDriver: true,
+      }).start()
+    }
+    const slideOut = () => {
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: ANIMATION_DURATION,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }).start()
+    }
+    if (audio == null) {
+      slideIn()
+      togglePlayback()
+    } else {
+      slideOut()
+      togglePlayback()
+    }
+  }, [audio, fadeAnim, togglePlayback])
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const togglePlayback = async () => {
+    const currentTrack = await TrackPlayer.getCurrentTrack()
+    if (currentTrack == null) {
+      await TrackPlayer.reset()
+      await TrackPlayer.add({
+        id: audio.mediaId,
+        url: audio.url,
+        title: audio.title,
+        artist: 'Republik',
+        artwork: Logo,
+      })
+      await TrackPlayer.play()
+    } else {
+      if (playbackState === TrackPlayer.STATE_PAUSED) {
+        await TrackPlayer.play()
+      } else {
+        await TrackPlayer.pause()
+      }
+    }
+  }
+
+  const onTitlePress = () => {
+    if (audio && audio.sourcePath) {
+      setGlobalState({
+        pendingUrl: `${FRONTEND_BASE_URL}${audio.sourcePath}`,
+      })
+    }
+  }
+
+  return (
+    <Animated.View
+      style={[
+        styles.container,
+        {
+          height: AUDIO_PLAYER_HEIGHT + Math.max(insets.bottom, 16),
+          transform: [
+            {
+              translateY: fadeAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [
+                  0,
+                  AUDIO_PLAYER_HEIGHT + Math.max(insets.bottom, 16),
+                ],
+              }),
+            },
+          ],
+        },
+      ]}>
+      <View style={[styles.player, { backgroundColor: colorScheme.overlay }]}>
+        <View style={styles.controls}>
+          <Icon
+            name={
+              playbackState == TrackPlayer.STATE_PAUSED ? 'play-arrow' : 'pause'
+            }
+            size={35}
+            color={colorScheme.text}
+            onPress={() => togglePlayback()}
+          />
+          <Icon
+            name="fast-rewind"
+            size={25}
+            color={colorScheme.text}
+            onPress={() => {}}
+          />
+          <View style={styles.content}>
+            <TouchableOpacity onPress={onTitlePress}>
+              <Text
+                numberOfLines={1}
+                style={[styles.title, { color: colorScheme.text }]}>
+                {audio && audio.title}
+              </Text>
+            </TouchableOpacity>
+            <Text style={[styles.time, { color: colorScheme.text }]}>
+              {parseSeconds(progress.position)} /{' '}
+              {parseSeconds(progress.duration)}
+            </Text>
+          </View>
+          <Icon
+            name="close"
+            size={35}
+            color={colorScheme.text}
+            onPress={() =>
+              setPersistedState({
+                audio: null,
+              })
+            }
+          />
+        </View>
+        <ProgressBar
+          audio={audio}
+          upsertCurrentMediaProgress={() =>
+            setPersistedState({
+              mediaProgress: {
+                mediaId: audio.mediaId,
+                secs: progress.position,
+              },
+            })
+          }
+          enableProgress={true}
+          position={progress.position}
+          isPlaying={playbackState == TrackPlayer.STATE_PLAYING}
+          duration={progress.duration}
+          bufferedPosition={progress.bufferedPosition}
+          onProgressPanReleased={async (newPosition) => {
+            await TrackPlayer.seekTo(newPosition)
+            await TrackPlayer.play()
+          }}
+        />
+      </View>
+      <SafeAreaView edges={['right', 'bottom', 'left']} />
+    </Animated.View>
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    flexDirection: 'row',
     position: 'absolute',
-    alignItems: 'center',
-    backgroundColor: '#FFF',
+    bottom: 0,
+  },
+  player: {
+    alignSelf: 'flex-end',
+    justifyContent: 'center',
+    flexDirection: 'column',
+    marginHorizontal: AUDIO_PLAYER_PADDING,
+    maxWidth: AUDIO_PLAYER_MAX_WIDTH,
     height: AUDIO_PLAYER_HEIGHT,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 4.65,
+
+    elevation: 7,
+  },
+  controls: {
+    width: '100%',
+    paddingHorizontal: 8,
+    flexDirection: 'row',
+    alignSelf: 'center',
+    alignItems: 'center',
+    marginBottom: AUDIO_PLAYER_PROGRESS_HEIGHT,
   },
   content: {
     flex: 1,
@@ -43,265 +256,5 @@ const styles = StyleSheet.create({
     fontVariant: ['tabular-nums'],
   },
 })
-
-const parseSeconds = (value) => {
-  if (value === null || value === undefined) return ''
-  const minutes = Math.floor(value / 60)
-  const seconds = Math.floor(value - minutes * 60)
-  return minutes + ':' + (seconds < 10 ? '0' : '') + seconds
-}
-
-const Time = ({ duration, position }) => {
-  if (!duration) {
-    return null
-  }
-  return (
-    <Text style={styles.time}>
-      {parseSeconds(position)} / {parseSeconds(duration)}
-    </Text>
-  )
-}
-
-// globalState for stuff like fullscreen or messages, which should be deleted when restart
-// persited : audio, darkmode, signin -> things that should persist on shutdown
-
-const AudioPlayer = ({ enableProgress, hidden, animated = true }) => {
-  const { persistedState, setPersistedState, setGlobalState } = useGlobalState()
-
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [duration, setDuration] = useState()
-  const [position, setPosition] = useState()
-  const [bufferedPosition, setBufferedPosition] = useState()
-  const [trackReady, setTrackReady] = useState()
-
-  const intervalRef = useRef()
-
-  const { audio } = persistedState
-  const previousAudio = usePrevious(audio)
-
-  const bottomStyleValue = useRef()
-  if (!bottomStyleValue.current) {
-    bottomStyleValue.current = new Animated.Value(
-      audio && !hidden
-        ? 0
-        : -AUDIO_PLAYER_HEIGHT
-    )
-  }
-  useEffect(() => {
-    const duration = animated
-      ? ANIMATION_DURATION
-      : 0
-    if (!audio) {
-      Animated.timing(bottomStyleValue.current, { useNativeDriver: false, toValue: -AUDIO_PLAYER_HEIGHT, duration }).start()
-      return
-    }
-    if (hidden) {
-      Animated.timing(bottomStyleValue.current, { useNativeDriver: false, toValue: -AUDIO_PLAYER_HEIGHT, duration }).start()
-    } else {
-      Animated.timing(bottomStyleValue.current, { useNativeDriver: false, toValue: 0, duration }).start()
-    }
-  }, [audio, animated, hidden])
-
-  const icon = isPlaying ? 'pause' : 'play-arrow'
-  const rewindIcon = 'fast-rewind'
-  const animationDuration = animated ? ANIMATION_DURATION : 0
-
-  const clearTrack = async () => {
-    clearInterval(intervalRef.current)
-    try {
-      await TrackPlayer.stop()
-      await TrackPlayer.reset()
-    } catch (e) {
-      console.warn('clearTrack failed', e)
-    }
-  }
-
-  const onPlayerStateChange = (playerState) => {
-    switch (playerState) {
-      case TrackPlayer.STATE_PLAYING:
-        TrackPlayer.getDuration().then((newDuration) => {
-          setDuration(newDuration)
-          setIsPlaying(true)
-        })
-        break
-      case TrackPlayer.STATE_PAUSED:
-        setIsPlaying(false)
-        break
-      case TrackPlayer.STATE_STOPPED:
-      case TrackPlayer.STATE_NONE:
-        setIsPlaying(false)
-        setDuration(undefined)
-        setPosition(undefined)
-        break
-    }
-  }
-
-  useEffect(() => {
-    if (!trackReady) {
-      return
-    }
-    const updatePlayerState = async () => {
-      try {
-        const updatedPosition = Math.floor(await TrackPlayer.getPosition())
-        const updatedBufferedPosition = Math.floor(
-          await TrackPlayer.getBufferedPosition(),
-        )
-        const updatedDuration = await TrackPlayer.getDuration()
-        setPosition(updatedPosition)
-        setBufferedPosition(updatedBufferedPosition)
-        setDuration(updatedDuration)
-      } catch (e) {
-        console.warn('updateState failed', e)
-      }
-    }
-
-    const startUpdatePlayerState = () => {
-      if (intervalRef.current !== undefined) {
-        clearInterval(intervalRef.current)
-      }
-      intervalRef.current = setInterval(updatePlayerState, 200)
-    }
-
-    updatePlayerState()
-    startUpdatePlayerState()
-    return () => {
-      clearInterval(intervalRef.current)
-    }
-  }, [trackReady])
-
-  useEffect(() => {
-    const setTrack = async () => {
-      await TrackPlayer.setupPlayer({
-        capabilities: [
-          TrackPlayer.CAPABILITY_PLAY,
-          TrackPlayer.CAPABILITY_PAUSE,
-          TrackPlayer.CAPABILITY_STOP,
-          TrackPlayer.CAPABILITY_JUMP_FORWARD,
-          TrackPlayer.CAPABILITY_JUMP_BACKWARD,
-        ],
-        options: {
-          jumpInterval: 15,
-        },
-      }).then(() => {
-        TrackPlayer.add({
-          id: audio.id,
-          url: audio.url,
-          title: audio.title,
-          artist: 'Republik',
-          artwork: Logo,
-        })
-      })
-      setTrackReady(true)
-    }
-    const updateAudio = async () => {
-      const isSameAudio =
-        (audio && audio.id) !== (previousAudio && previousAudio.id)
-      if (isSameAudio) {
-        return
-      }
-      if (previousAudio) {
-        await clearTrack()
-      }
-      if (audio) {
-        await setTrack()
-        TrackPlayer.play().then(() => {
-          TrackPlayer.getState().then((playerState) => {
-            onPlayerStateChange(playerState)
-          })
-        })
-      }
-    }
-    updateAudio()
-    return () => {
-      clearInterval(intervalRef.current)
-    }
-  }, [audio, previousAudio])
-
-  const onPlayPauseClick = () => {
-    if (isPlaying) {
-      TrackPlayer.pause()
-    } else {
-      TrackPlayer.play()
-    }
-  }
-
-  const onPositionStart = (newPosition) => {
-    setPosition(newPosition)
-    clearInterval(intervalRef.current)
-  }
-
-  const onPositionReleased = () => {
-    try {
-      TrackPlayer.seekTo(position)
-    } catch (e) {
-      console.warn('onPositionReleased failed', e)
-    }
-    // startUpdatePlayerState()
-  }
-
-  const onRewind = () => {
-    TrackPlayer.seekTo(0)
-  }
-
-  const onTitlePress = () => {
-    if (audio && audio.sourcePath) {
-      setGlobalState({
-        pendingUrl: `${FRONTEND_BASE_URL}${audio.sourcePath}`,
-      })
-    }
-  }
-
-  return (
-    <Animated.View style={[styles.container, { bottom: bottomStyleValue.current }]}>
-      <ProgressBar
-        audio={audio}
-        upsertCurrentMediaProgress={(progress) =>
-          setPersistedState({ mediaProgress: progress.varibles })
-        }
-        enableProgress={enableProgress}
-        position={position}
-        isPlaying={isPlaying}
-        duration={duration}
-        bufferedPosition={bufferedPosition}
-        onPositionStart={onPositionStart}
-        onPositionChange={setPosition}
-        onPositionReleased={onPositionReleased}
-      />
-      <Icon
-        name={icon}
-        style={{ marginLeft: 10 }}
-        size={35}
-        onPress={() => onPlayPauseClick()}
-      />
-      <Icon
-        name={rewindIcon}
-        disabled={position !== undefined && position < 0.1}
-        style={{ marginLeft: 5 }}
-        size={25}
-        onPress={() => onRewind()}
-      />
-      <View style={styles.content}>
-        <>
-          <TouchableOpacity onPress={onTitlePress}>
-            <Text numberOfLines={1} style={styles.title}>
-              {audio && audio.title}
-            </Text>
-          </TouchableOpacity>
-          <Time duration={duration} position={position} />
-        </>
-      </View>
-      <Icon
-        name='close'
-        size={35}
-        style={{ marginRight: 10 }}
-        onPress={() =>
-          setPersistedState({
-            audio: null,
-          })
-        }
-      />
-    </Animated.View>
-  )
-}
 
 export default AudioPlayer
