@@ -6,6 +6,7 @@ import { Share, Platform } from 'react-native'
 import { APP_VERSION } from '../constants'
 import { useGlobalState } from '../GlobalState'
 import SplashScreen from 'react-native-splash-screen'
+import { useColorContext } from '../utils/colors'
 
 const Web = () => {
   const {
@@ -16,10 +17,9 @@ const Web = () => {
     pendingMessages,
     dispatch,
   } = useGlobalState()
-
   const webviewRef = useRef()
   const [webUrl, setWebUrl] = useState()
-
+  const colorScheme = useColorContext()
   useEffect(() => {
     // wait for all services
     if (
@@ -80,6 +80,10 @@ const Web = () => {
       setPersistedState({ audio: message.payload })
     } else if (message.type === 'isSignedIn') {
       setPersistedState({ isSignedIn: message.payload })
+    } else if (message.type === 'fullscreen-enter') {
+      setPersistedState({ isFullscreen: true })
+    } else if (message.type === 'fullscreen-exit') {
+      setPersistedState({ isFullscreen: false })
     } else if (message.type === 'ackMessage') {
       dispatch({
         type: 'clearMessage',
@@ -108,11 +112,17 @@ const Web = () => {
       alert(error.message)
     }
   }
-
   return (
     <>
       {webUrl && (
-        <SafeAreaView style={{ flex: 1 }} edges={['right', 'top', 'left']}>
+        <SafeAreaView
+          style={{ flex: 1 }}
+          edges={['right', 'left']}
+          backgroundColor={
+            persistedState.isFullscreen
+              ? colorScheme.fullScreenStatusBar
+              : colorScheme.default
+          }>
           <WebView
             ref={webviewRef}
             source={{ uri: webUrl }}

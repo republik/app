@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, StatusBar, Appearance } from 'react-native'
+import { Appearance } from 'react-native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 
 import PushService from './services/Push'
@@ -8,6 +8,7 @@ import AppStateService from './services/AppState'
 import { ColorContextProvider } from './utils/colors'
 import Web from './screens/Web'
 import AudioPlayer from './components/AudioPlayer'
+import StatusBar from './components/StatusBar'
 import { GlobalStateProvider } from './GlobalState'
 
 const colorScheme = Appearance.getColorScheme()
@@ -18,13 +19,12 @@ const App = () => {
       <PushService />
       <DeepLinkingService />
       <AppStateService />
-      <StatusBar
-        barStyle={colorScheme === 'dark' ? 'light-content' : 'dark-content'}
-        backgroundColor={colorScheme === 'dark' ? '#000000' : '#FFFFFF'}
-        hidden={false} // TODO Gallery expanded
-      />
       <SafeAreaProvider>
         <ColorContextProvider>
+          <StatusBar
+            barStyle={colorScheme === 'dark' ? 'light-content' : 'dark-content'}
+            hidden={false} // TODO Gallery expanded
+          />
           <Web />
           <AudioPlayer />
         </ColorContextProvider>
