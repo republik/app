@@ -12,7 +12,7 @@ const colors = {
     primary: '#00AA00',
     progress: '#DADDDC',
     progressBuffer: '#7D7D7D',
-    fullScreenStatusBar: '#FFFFFF',
+    fullScreenStatusBar: '#000000',
   },
   dark: {
     default: '#191919',
