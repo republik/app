@@ -6,6 +6,7 @@ import { Share, Platform } from 'react-native'
 import { APP_VERSION } from '../constants'
 import { useGlobalState } from '../GlobalState'
 import SplashScreen from 'react-native-splash-screen'
+import Loader from '../components/Loader'
 import { useColorContext } from '../utils/colors'
 
 const Web = () => {
@@ -19,7 +20,10 @@ const Web = () => {
   } = useGlobalState()
   const webviewRef = useRef()
   const [webUrl, setWebUrl] = useState()
+  const [isReady, setIsReady] = useState(false)
+  const [sentMessages, setSentMessages] = useState(false)
   const colorScheme = useColorContext()
+
   useEffect(() => {
     // wait for all services
     if (
@@ -45,8 +49,6 @@ const Web = () => {
     }
   }, [webUrl, globalState, persistedState, setGlobalState])
 
-  const [isReady, setIsReady] = useState(false)
-  const [sentMessages, setSentMessages] = useState(false)
   useEffect(() => {
     if (!isReady) {
       return
@@ -123,6 +125,7 @@ const Web = () => {
               ? colorScheme.fullScreenStatusBar
               : colorScheme.default
           }>
+          {!isReady ? <Loader loading={!isReady} /> : null}
           <WebView
             ref={webviewRef}
             source={{ uri: webUrl }}
