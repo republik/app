@@ -38,7 +38,12 @@ const AudioPlayer = () => {
   const insets = useSafeAreaInsets()
   const progress = useTrackPlayerProgress()
   const playbackState = usePlaybackState()
-  const { persistedState, setPersistedState, setGlobalState } = useGlobalState()
+  const {
+    persistedState,
+    setPersistedState,
+    setGlobalState,
+    dispatch,
+  } = useGlobalState()
   const { audio } = persistedState
   const slideAnim = useRef(new Animated.Value(0)).current
   const colorScheme = useColorContext()
@@ -76,7 +81,14 @@ const AudioPlayer = () => {
         easing: Easing.in(Easing.ease),
         useNativeDriver: true,
       }).start()
-      setPersistedState({ audioplayerVisible: true })
+      // dispatch to webview
+      dispatch({
+        type: 'postMessage',
+        content: {
+          type: 'onAudioPlayerVisibilityChange',
+          isVisible: true,
+        },
+      })
     }
     const slideOut = () => {
       Animated.timing(slideAnim, {
@@ -85,7 +97,14 @@ const AudioPlayer = () => {
         easing: Easing.out(Easing.ease),
         useNativeDriver: true,
       }).start()
-      setPersistedState({ audioplayerVisible: false })
+      // dispatch to webview
+      dispatch({
+        type: 'postMessage',
+        content: {
+          type: 'onAudioPlayerVisibilityChange',
+          isVisible: false,
+        },
+      })
     }
     if (!!audio) {
       slideIn()

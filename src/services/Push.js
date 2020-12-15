@@ -37,7 +37,7 @@ const init = async ({ isSignedIn, setGlobalState, dispatch }) => {
   Notifications.events().registerRemoteNotificationsRegistered((event) => {
     dispatch({
       type: 'postMessage',
-      message: {
+      content: {
         type: 'onPushRegistered',
         data: {
           token: event.deviceToken,
