@@ -40,7 +40,7 @@ const AudioPlayer = () => {
   const playbackState = usePlaybackState()
   const { persistedState, setPersistedState, setGlobalState } = useGlobalState()
   const { audio } = persistedState
-  const fadeAnim = useRef(new Animated.Value(0)).current
+  const slideAnim = useRef(new Animated.Value(0)).current
   const colorScheme = useColorContext()
 
   // Initializes the player
@@ -69,34 +69,39 @@ const AudioPlayer = () => {
   // also triggers playback when a new audio object is set to persistedState,
   // which happens via message API.
   useEffect(() => {
-    // Animation definitions
     const slideIn = () => {
-      Animated.timing(fadeAnim, {
+      Animated.timing(slideAnim, {
         toValue: 1,
         duration: ANIMATION_DURATION,
         easing: Easing.in(Easing.ease),
         useNativeDriver: true,
       }).start()
+      setPersistedState({ audioplayerVisible: true })
     }
     const slideOut = () => {
-      Animated.timing(fadeAnim, {
+      Animated.timing(slideAnim, {
         toValue: 0,
         duration: ANIMATION_DURATION,
         easing: Easing.out(Easing.ease),
         useNativeDriver: true,
       }).start()
+      setPersistedState({ audioplayerVisible: false })
     }
-    if (audio == null) {
+    if (!!audio) {
       slideIn()
       togglePlayback()
     } else {
       slideOut()
       togglePlayback()
     }
-  }, [audio, fadeAnim, togglePlayback])
+  }, [audio, slideAnim, togglePlayback, setPersistedState])
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const togglePlayback = async () => {
+    if (audio == null) {
+      await TrackPlayer.pause()
+      return
+    }
     const currentTrack = await TrackPlayer.getCurrentTrack()
     if (currentTrack == null) {
       await TrackPlayer.reset()
@@ -133,11 +138,11 @@ const AudioPlayer = () => {
           height: AUDIO_PLAYER_HEIGHT + Math.max(insets.bottom, 16),
           transform: [
             {
-              translateY: fadeAnim.interpolate({
+              translateY: slideAnim.interpolate({
                 inputRange: [0, 1],
                 outputRange: [
-                  0,
                   AUDIO_PLAYER_HEIGHT + Math.max(insets.bottom, 16),
+                  0,
                 ],
               }),
             },
