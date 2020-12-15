@@ -3,7 +3,7 @@ import { WebView } from 'react-native-webview'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { Share, Platform } from 'react-native'
-import { APP_VERSION } from '../constants'
+import { APP_VERSION, FRONTEND_BASE_URL } from '../constants'
 import { useGlobalState } from '../GlobalState'
 import SplashScreen from 'react-native-splash-screen'
 import Loader from '../components/Loader'
@@ -22,7 +22,7 @@ const Web = () => {
   const [webUrl, setWebUrl] = useState()
   const [isReady, setIsReady] = useState(false)
   const [sentMessages, setSentMessages] = useState(false)
-  const colorScheme = useColorContext()
+  const { colors } = useColorContext()
 
   useEffect(() => {
     // wait for all services
@@ -86,6 +86,8 @@ const Web = () => {
       setPersistedState({ isFullscreen: true })
     } else if (message.type === 'fullscreen-exit') {
       setPersistedState({ isFullscreen: false })
+    } else if (message.type === 'setColorScheme') {
+      setPersistedState({ userSetColorScheme: message.colorSchemeKey })
     } else if (message.type === 'ackMessage') {
       dispatch({
         type: 'clearMessage',
@@ -122,8 +124,8 @@ const Web = () => {
           edges={['right', 'left']}
           backgroundColor={
             persistedState.isFullscreen
-              ? colorScheme.fullScreenStatusBar
-              : colorScheme.default
+              ? colors.fullScreenStatusBar
+              : colors.default
           }>
           {!isReady ? <Loader loading={!isReady} /> : null}
           <WebView
@@ -143,6 +145,7 @@ const Web = () => {
               console.log('onLoad', 'ready', true)
               setIsReady(true)
             }}
+            originWhitelist={[`${FRONTEND_BASE_URL}*`]}
           />
         </SafeAreaView>
       )}

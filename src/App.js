@@ -21,10 +21,7 @@ const App = () => {
       <AppStateService />
       <SafeAreaProvider>
         <ColorContextProvider>
-          <StatusBar
-            barStyle={colorScheme === 'dark' ? 'light-content' : 'dark-content'}
-            hidden={false} // TODO Gallery expanded
-          />
+          <StatusBar />
           <Web />
           <AudioPlayer />
         </ColorContextProvider>

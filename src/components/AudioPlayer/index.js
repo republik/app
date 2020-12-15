@@ -46,7 +46,7 @@ const AudioPlayer = () => {
   } = useGlobalState()
   const { audio } = persistedState
   const slideAnim = useRef(new Animated.Value(0)).current
-  const colorScheme = useColorContext()
+  const { colors } = useColorContext()
 
   // Initializes the player
   useEffect(() => {
@@ -113,7 +113,7 @@ const AudioPlayer = () => {
       slideOut()
       togglePlayback()
     }
-  }, [audio, slideAnim, togglePlayback, setPersistedState])
+  }, [audio, slideAnim, togglePlayback, setPersistedState, dispatch])
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const togglePlayback = async () => {
@@ -168,31 +168,31 @@ const AudioPlayer = () => {
           ],
         },
       ]}>
-      <View style={[styles.player, { backgroundColor: colorScheme.overlay }]}>
+      <View style={[styles.player, { backgroundColor: colors.overlay }]}>
         <View style={styles.controls}>
           <Icon
             name={
               playbackState == TrackPlayer.STATE_PAUSED ? 'play-arrow' : 'pause'
             }
             size={35}
-            color={colorScheme.text}
+            color={colors.text}
             onPress={() => togglePlayback()}
           />
           <Icon
             name="fast-rewind"
             size={25}
-            color={colorScheme.text}
+            color={colors.text}
             onPress={() => {}}
           />
           <View style={styles.content}>
             <TouchableOpacity onPress={onTitlePress}>
               <Text
                 numberOfLines={1}
-                style={[styles.title, { color: colorScheme.text }]}>
+                style={[styles.title, { color: colors.text }]}>
                 {audio && audio.title}
               </Text>
             </TouchableOpacity>
-            <Text style={[styles.time, { color: colorScheme.text }]}>
+            <Text style={[styles.time, { color: colors.text }]}>
               {parseSeconds(progress.position)} /{' '}
               {parseSeconds(progress.duration)}
             </Text>
@@ -200,7 +200,7 @@ const AudioPlayer = () => {
           <Icon
             name="close"
             size={35}
-            color={colorScheme.text}
+            color={colors.text}
             onPress={() =>
               setPersistedState({
                 audio: null,

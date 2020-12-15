@@ -21,7 +21,7 @@ const ProgressBar = ({
   const [isPanning, setIsPanning] = useState(false)
   const [panProgress, setPanProgress] = useState(0)
   const [playerWidth, setPlayerWidth] = useState(0)
-  const colorScheme = useColorContext()
+  const { colors } = useColorContext()
   const scaleY = useRef(new Animated.Value(1)).current
 
   const upsertProgress = debounce(() => {
@@ -88,7 +88,7 @@ const ProgressBar = ({
       <Animated.View
         style={[
           styles.progressBar,
-          { backgroundColor: colorScheme.progress },
+          { backgroundColor: colors.progress },
           {
             transform: [
               { scaleY },
@@ -105,7 +105,7 @@ const ProgressBar = ({
           style={[
             styles.progressBuffer,
             {
-              backgroundColor: colorScheme.progressBuffer,
+              backgroundColor: colors.progressBuffer,
               width: `${buffered}%`,
             },
           ]}
@@ -113,7 +113,7 @@ const ProgressBar = ({
         <View
           style={[
             styles.progressPosition,
-            { backgroundColor: colorScheme.primary, width: `${progress}%` },
+            { backgroundColor: colors.primary, width: `${progress}%` },
           ]}
         />
       </Animated.View>

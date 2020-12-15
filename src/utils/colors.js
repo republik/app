@@ -1,5 +1,6 @@
 import React, { useContext } from 'react'
 import { useColorScheme } from 'react-native'
+import { useGlobalState } from '../GlobalState'
 
 //TODO get colors from styleguide
 const colors = {
@@ -27,13 +28,25 @@ const colors = {
   },
 }
 
-const ColorContext = React.createContext(colors.light)
+const ColorContext = React.createContext({
+  colors: colors.light,
+  colorSchemeKey: 'light',
+})
 
 export const ColorContextProvider = ({ children }) => {
   const colorScheme = useColorScheme()
+  const { persistedState } = useGlobalState()
+  const { userSetColorScheme } = persistedState
+  const colorSchemeKey =
+    !userSetColorScheme || userSetColorScheme == 'auto'
+      ? colorScheme
+      : userSetColorScheme
   return (
     <ColorContext.Provider
-      value={colorScheme === 'dark' ? colors.dark : colors.light}>
+      value={{
+        colors: colorSchemeKey === 'dark' ? colors.dark : colors.light,
+        colorSchemeKey,
+      }}>
       {children}
     </ColorContext.Provider>
   )

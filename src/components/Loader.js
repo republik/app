@@ -3,12 +3,12 @@ import { View, ActivityIndicator, StyleSheet } from 'react-native'
 import { useColorContext } from '../utils/colors'
 
 const Loader = ({ loading }) => {
-  const colorScheme = useColorContext()
+  const { colors } = useColorContext()
   return (
-    <View style={[styles.container, { backgroundColor: colorScheme.default }]}>
+    <View style={[styles.container, { backgroundColor: colors.default }]}>
       <ActivityIndicator
         animating={loading}
-        color={colorScheme.textSoft}
+        color={colors.textSoft}
         size="large"
       />
     </View>

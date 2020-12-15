@@ -20,8 +20,8 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true)
 }
 
-const CustomStatusBar = ({ barStyle }) => {
-  const colorScheme = useColorContext()
+const CustomStatusBar = () => {
+  const { colors, colorSchemeKey } = useColorContext()
   const statusBarHeight = getStatusBarHeight()
   const orientation = useOrientation()
 
@@ -30,9 +30,9 @@ const CustomStatusBar = ({ barStyle }) => {
   } = useGlobalState()
 
   const backgroundColor = isFullscreen
-    ? colorScheme.fullScreenStatusBar
-    : colorScheme.default
-
+    ? colors.fullScreenStatusBar
+    : colors.default
+  const barStyle = colorSchemeKey === 'dark' ? 'light-content' : 'dark-content'
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
   }, [isFullscreen])
