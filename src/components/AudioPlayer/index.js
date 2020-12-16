@@ -11,6 +11,8 @@ import {
 import TrackPlayer, {
   useTrackPlayerProgress,
   usePlaybackState,
+  TrackPlayerEvents,
+  useTrackPlayerEvents,
 } from 'react-native-track-player'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 
@@ -34,6 +36,14 @@ const parseSeconds = (value) => {
   return minutes + ':' + (seconds < 10 ? '0' : '') + seconds
 }
 
+// const events = [
+//   TrackPlayerEvents.REMOTE_PLAY,
+//   TrackPlayerEvents.REMOTE_PAUSE,
+//   TrackPlayerEvents.REMOTE_SEEK,
+//   TrackPlayerEvents.REMOTE_JUMP_FORWARD,
+//   TrackPlayerEvents.REMOTE_JUMP_BACKWARD,
+// ]
+
 const AudioPlayer = () => {
   const insets = useSafeAreaInsets()
   const progress = useTrackPlayerProgress()
@@ -47,6 +57,25 @@ const AudioPlayer = () => {
   const { audio } = persistedState
   const slideAnim = useRef(new Animated.Value(0)).current
   const { colors } = useColorContext()
+
+  // listens to remote events (outside App)
+  // useTrackPlayerEvents(events, (event) => {
+  //   if (event.type === TrackPlayerEvents.REMOTE_PLAY) {
+  //     console.warn(event.type)
+  //   }
+  //   if (event.type === TrackPlayerEvents.REMOTE_PAUSE) {
+  //     console.warn(event.type)
+  //   }
+  //   if (event.type === TrackPlayerEvents.REMOTE_SEEK) {
+  //     console.warn(event.type)
+  //   }
+  //   if (event.type === TrackPlayerEvents.REMOTE_JUMP_FORWARD) {
+  //     console.warn(event.type)
+  //   }
+  //   if (event.type === TrackPlayerEvents.REMOTE_JUMP_BACKWARD) {
+  //     console.warn(event.type)
+  //   }
+  // })
 
   // Initializes the player
   useEffect(() => {
@@ -149,6 +178,10 @@ const AudioPlayer = () => {
     }
   }
 
+  const seekTo = async (sec) => {
+    await TrackPlayer.seekTo(progress.position + sec)
+  }
+
   return (
     <Animated.View
       style={[
@@ -168,68 +201,77 @@ const AudioPlayer = () => {
           ],
         },
       ]}>
-      <View style={[styles.player, { backgroundColor: colors.overlay }]}>
-        <View style={styles.controls}>
-          <Icon
-            name={
-              playbackState == TrackPlayer.STATE_PAUSED ? 'play-arrow' : 'pause'
-            }
-            size={35}
-            color={colors.text}
-            onPress={() => togglePlayback()}
-          />
-          <Icon
-            name="fast-rewind"
-            size={25}
-            color={colors.text}
-            onPress={() => {}}
-          />
-          <View style={styles.content}>
-            <TouchableOpacity onPress={onTitlePress}>
-              <Text
-                numberOfLines={1}
-                style={[styles.title, { color: colors.text }]}>
-                {audio && audio.title}
+      <SafeAreaView edges={['right', 'left']}>
+        <View style={[styles.player, { backgroundColor: colors.overlay }]}>
+          <View style={styles.controls}>
+            <Icon
+              name="replay-10"
+              size={28}
+              color={colors.text}
+              onPress={() => seekTo(-10)}
+            />
+            <Icon
+              name={
+                playbackState == TrackPlayer.STATE_PAUSED
+                  ? 'play-arrow'
+                  : 'pause'
+              }
+              size={46}
+              color={colors.text}
+              onPress={() => togglePlayback()}
+            />
+            <Icon
+              name="forward-30"
+              size={28}
+              color={colors.text}
+              onPress={() => seekTo(30)}
+            />
+            <View style={styles.content}>
+              <TouchableOpacity onPress={onTitlePress}>
+                <Text
+                  numberOfLines={1}
+                  style={[styles.title, { color: colors.text }]}>
+                  {audio && audio.title}
+                </Text>
+              </TouchableOpacity>
+              <Text style={[styles.time, { color: colors.text }]}>
+                {parseSeconds(progress.position)} /{' '}
+                {parseSeconds(progress.duration)}
               </Text>
-            </TouchableOpacity>
-            <Text style={[styles.time, { color: colors.text }]}>
-              {parseSeconds(progress.position)} /{' '}
-              {parseSeconds(progress.duration)}
-            </Text>
+            </View>
+            <Icon
+              name="close"
+              size={35}
+              color={colors.text}
+              onPress={() =>
+                setPersistedState({
+                  audio: null,
+                })
+              }
+            />
           </View>
-          <Icon
-            name="close"
-            size={35}
-            color={colors.text}
-            onPress={() =>
+          <ProgressBar
+            audio={audio}
+            upsertCurrentMediaProgress={() =>
               setPersistedState({
-                audio: null,
+                mediaProgress: {
+                  mediaId: audio.mediaId,
+                  secs: progress.position,
+                },
               })
             }
+            enableProgress={true}
+            position={progress.position}
+            isPlaying={playbackState == TrackPlayer.STATE_PLAYING}
+            duration={progress.duration}
+            bufferedPosition={progress.bufferedPosition}
+            onProgressPanReleased={async (newPosition) => {
+              await TrackPlayer.seekTo(newPosition)
+              await TrackPlayer.play()
+            }}
           />
         </View>
-        <ProgressBar
-          audio={audio}
-          upsertCurrentMediaProgress={() =>
-            setPersistedState({
-              mediaProgress: {
-                mediaId: audio.mediaId,
-                secs: progress.position,
-              },
-            })
-          }
-          enableProgress={true}
-          position={progress.position}
-          isPlaying={playbackState == TrackPlayer.STATE_PLAYING}
-          duration={progress.duration}
-          bufferedPosition={progress.bufferedPosition}
-          onProgressPanReleased={async (newPosition) => {
-            await TrackPlayer.seekTo(newPosition)
-            await TrackPlayer.play()
-          }}
-        />
-      </View>
-      <SafeAreaView edges={['right', 'bottom', 'left']} />
+      </SafeAreaView>
     </Animated.View>
   )
 }
