@@ -9,21 +9,21 @@ import {
 import { Notifications } from 'react-native-notifications'
 
 import { useGlobalState } from '../GlobalState'
-
+import { APP_VERSION, USER_AGENT } from '../constants'
 const init = async ({ isSignedIn, setGlobalState, dispatch }) => {
   if (!isSignedIn) {
     setGlobalState({ pushReady: true })
     return
   }
 
-  const isInEmulator = await isEmulator()
-  if (isInEmulator) {
-    setGlobalState({ pushReady: true })
-    return
-  }
+  // const isInEmulator = await isEmulator()
+  // if (isInEmulator) {
+  //   setGlobalState({ pushReady: true })
+  //   return
+  // }
 
   const onNotificationOpened = (notification) => {
-    const data = notification.getData()
+    const data = notification.payload.data
     setGlobalState({ pendingUrl: data.url })
   }
 
@@ -46,6 +46,8 @@ const init = async ({ isSignedIn, setGlobalState, dispatch }) => {
           brand: getBrand(),
           model: getModel(),
           deviceId: getDeviceId(),
+          appVersion: APP_VERSION,
+          userAgent: USER_AGENT,
         },
       },
     })
