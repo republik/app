@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState, useMemo } from 'react'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import {
   View,
@@ -36,14 +36,6 @@ const parseSeconds = (value) => {
   return minutes + ':' + (seconds < 10 ? '0' : '') + seconds
 }
 
-// const events = [
-//   TrackPlayerEvents.REMOTE_PLAY,
-//   TrackPlayerEvents.REMOTE_PAUSE,
-//   TrackPlayerEvents.REMOTE_SEEK,
-//   TrackPlayerEvents.REMOTE_JUMP_FORWARD,
-//   TrackPlayerEvents.REMOTE_JUMP_BACKWARD,
-// ]
-
 const AudioPlayer = () => {
   const insets = useSafeAreaInsets()
   const progress = useTrackPlayerProgress()
@@ -57,25 +49,7 @@ const AudioPlayer = () => {
   const { audio } = persistedState
   const slideAnim = useRef(new Animated.Value(0)).current
   const { colors } = useColorContext()
-
-  // listens to remote events (outside App)
-  // useTrackPlayerEvents(events, (event) => {
-  //   if (event.type === TrackPlayerEvents.REMOTE_PLAY) {
-  //     console.warn(event.type)
-  //   }
-  //   if (event.type === TrackPlayerEvents.REMOTE_PAUSE) {
-  //     console.warn(event.type)
-  //   }
-  //   if (event.type === TrackPlayerEvents.REMOTE_SEEK) {
-  //     console.warn(event.type)
-  //   }
-  //   if (event.type === TrackPlayerEvents.REMOTE_JUMP_FORWARD) {
-  //     console.warn(event.type)
-  //   }
-  //   if (event.type === TrackPlayerEvents.REMOTE_JUMP_BACKWARD) {
-  //     console.warn(event.type)
-  //   }
-  // })
+  const [panProgress, setPanProgress] = useState(0)
 
   // Initializes the player
   useEffect(() => {
@@ -160,9 +134,19 @@ const AudioPlayer = () => {
         artist: 'Republik',
         artwork: Logo,
       })
+      if (audio.currentTime) {
+        await TrackPlayer.seekTo(audio.currentTime)
+        await TrackPlayer.play()
+        return
+      }
       await TrackPlayer.play()
     } else {
       if (playbackState === TrackPlayer.STATE_PAUSED) {
+        if (audio.currentTime) {
+          await TrackPlayer.seekTo(audio.currentTime)
+          await TrackPlayer.play()
+          return
+        }
         await TrackPlayer.play()
       } else {
         await TrackPlayer.pause()
@@ -179,7 +163,7 @@ const AudioPlayer = () => {
   }
 
   const seekTo = async (sec) => {
-    await TrackPlayer.seekTo(progress.position + sec)
+    await TrackPlayer.seekTo(sec)
   }
 
   return (
@@ -208,7 +192,7 @@ const AudioPlayer = () => {
               name="replay-10"
               size={28}
               color={colors.text}
-              onPress={() => seekTo(-10)}
+              onPress={() => seekTo(progress.position - 10)}
             />
             <Icon
               name={
@@ -224,7 +208,7 @@ const AudioPlayer = () => {
               name="forward-30"
               size={28}
               color={colors.text}
-              onPress={() => seekTo(30)}
+              onPress={() => seekTo(progress.position + 30)}
             />
             <View style={styles.content}>
               <TouchableOpacity onPress={onTitlePress}>
@@ -252,22 +236,32 @@ const AudioPlayer = () => {
           </View>
           <ProgressBar
             audio={audio}
-            upsertCurrentMediaProgress={() =>
+            upsertCurrentMediaProgress={() => {
               setPersistedState({
                 mediaProgress: {
                   mediaId: audio.mediaId,
                   secs: progress.position,
                 },
               })
-            }
+              // dispatch({
+              //   type: 'postMessage',
+              //   content: {
+              //     type: 'onAppMediaProgressUpdate',
+              //     mediaId: audio.mediaId,
+              //     currentTime: progress.position,
+              //   },
+              // })
+            }}
             enableProgress={true}
             position={progress.position}
             isPlaying={playbackState == TrackPlayer.STATE_PLAYING}
             duration={progress.duration}
             bufferedPosition={progress.bufferedPosition}
-            onProgressPanReleased={async (newPosition) => {
-              await TrackPlayer.seekTo(newPosition)
-              await TrackPlayer.play()
+            panProgress={panProgress}
+            onPanStart={(pan) => setPanProgress(pan)}
+            onPanMove={(pan) => setPanProgress(pan)}
+            onPanReleased={() => {
+              seekTo(panProgress * progress.duration)
             }}
           />
         </View>
