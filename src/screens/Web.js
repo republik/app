@@ -21,8 +21,15 @@ const Web = () => {
   const webviewRef = useRef()
   const [webUrl, setWebUrl] = useState()
   const [isReady, setIsReady] = useState(false)
-  const [sentMessages, setSentMessages] = useState(false)
+  const [showLoader, setShowLoader] = useState(true)
   const { colors } = useColorContext()
+
+  // Make sure loader is only shown on first mount
+  useEffect(() => {
+    if (isReady && showLoader) {
+      setShowLoader(false)
+    }
+  }, [isReady, showLoader])
 
   useEffect(() => {
     // wait for all services
@@ -33,7 +40,6 @@ const Web = () => {
     ) {
       return
     }
-    console.warn(globalState.pendingUrl)
     if (globalState.pendingUrl) {
       // navigate to pendingUrl a service
       setWebUrl(globalState.pendingUrl)
@@ -119,6 +125,7 @@ const Web = () => {
       alert(error.message)
     }
   }
+  console.warn(showLoader, isReady)
   return (
     <>
       {webUrl && (
@@ -130,8 +137,6 @@ const Web = () => {
               ? colors.fullScreenStatusBar
               : colors.default
           }>
-          {/* Todo: Loader only on firt app open, not on every webview load */}
-          {/* {!isReady ? <Loader loading={!isReady} /> : null} */}
           <WebView
             ref={webviewRef}
             source={{ uri: webUrl }}
@@ -149,12 +154,19 @@ const Web = () => {
               console.log('onLoad', 'ready', true)
               setIsReady(true)
             }}
-            originWhitelist={[`${FRONTEND_BASE_URL}*`]}
+            originWhitelist={[
+              `${FRONTEND_BASE_URL}*`,
+              'https://www.filmingo.ch/',
+            ]}
             pullToRefreshEnabled={false}
             bounce={false}
+            allowsFullscreenVideo={true}
+            allowsInlineMediaPlayback={true}
           />
         </SafeAreaView>
       )}
+      {/* Todo: Loader only on firt app open, not on every webview load */}
+      {showLoader && !isReady && <Loader loading={!isReady} />}
     </>
   )
 }

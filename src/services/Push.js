@@ -24,10 +24,8 @@ const init = async ({ isSignedIn, setGlobalState, dispatch }) => {
   // }
 
   const onNotificationOpened = (notification) => {
-    console.warn(notification.payload.data)
     const data = notification.payload.data
     if (data?.type === 'authorization') {
-      console.warn('authorization')
       // authorization only doesn't trigger navigation
       // webview listens to appstate and triggers login overlay
       return
