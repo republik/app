@@ -46,7 +46,7 @@ const AudioPlayer = () => {
     setGlobalState,
     dispatch,
   } = useGlobalState()
-  const { audio } = persistedState
+  const { audio, currentMediaTime } = persistedState
   const slideAnim = useRef(new Animated.Value(0)).current
   const { colors } = useColorContext()
   const [panProgress, setPanProgress] = useState(0)
@@ -134,16 +134,16 @@ const AudioPlayer = () => {
         artist: 'Republik',
         artwork: Logo,
       })
-      if (audio.currentTime) {
-        await TrackPlayer.seekTo(audio.currentTime)
+      if (currentMediaTime) {
+        await TrackPlayer.seekTo(currentMediaTime)
         await TrackPlayer.play()
         return
       }
       await TrackPlayer.play()
     } else {
       if (playbackState === TrackPlayer.STATE_PAUSED) {
-        if (audio.currentTime) {
-          await TrackPlayer.seekTo(audio.currentTime)
+        if (currentMediaTime) {
+          await TrackPlayer.seekTo(currentMediaTime)
           await TrackPlayer.play()
           return
         }
@@ -243,6 +243,7 @@ const AudioPlayer = () => {
                   secs: progress.position,
                 },
               })
+              // Todo: get rid of infinite loop
               // dispatch({
               //   type: 'postMessage',
               //   content: {

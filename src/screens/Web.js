@@ -33,7 +33,7 @@ const Web = () => {
     ) {
       return
     }
-
+    console.warn(globalState.pendingUrl)
     if (globalState.pendingUrl) {
       // navigate to pendingUrl a service
       setWebUrl(globalState.pendingUrl)
@@ -79,7 +79,10 @@ const Web = () => {
     if (message.type === 'share') {
       share(message.payload)
     } else if (message.type === 'play-audio') {
-      setPersistedState({ audio: message.payload })
+      setPersistedState({
+        audio: message.payload.audio,
+        currentMediaTime: message.payload.currentTime,
+      })
     } else if (message.type === 'isSignedIn') {
       setPersistedState({ isSignedIn: message.payload })
     } else if (message.type === 'fullscreen-enter') {
@@ -127,7 +130,8 @@ const Web = () => {
               ? colors.fullScreenStatusBar
               : colors.default
           }>
-          {!isReady ? <Loader loading={!isReady} /> : null}
+          {/* Todo: Loader only on firt app open, not on every webview load */}
+          {/* {!isReady ? <Loader loading={!isReady} /> : null} */}
           <WebView
             ref={webviewRef}
             source={{ uri: webUrl }}
@@ -146,6 +150,8 @@ const Web = () => {
               setIsReady(true)
             }}
             originWhitelist={[`${FRONTEND_BASE_URL}*`]}
+            pullToRefreshEnabled={false}
+            bounce={false}
           />
         </SafeAreaView>
       )}

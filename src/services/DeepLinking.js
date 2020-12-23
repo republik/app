@@ -4,9 +4,7 @@ import { Linking } from 'react-native'
 import { useGlobalState } from '../GlobalState'
 
 const DeepLinkingService = () => {
-  const {
-    setGlobalState
-  } = useGlobalState()
+  const { setGlobalState } = useGlobalState()
 
   useEffect(() => {
     const handleOpenURL = ({ url }) => {

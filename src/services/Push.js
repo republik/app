@@ -16,6 +16,7 @@ const init = async ({ isSignedIn, setGlobalState, dispatch }) => {
     return
   }
 
+  // Todo: remove this commented section when releasing
   // const isInEmulator = await isEmulator()
   // if (isInEmulator) {
   //   setGlobalState({ pushReady: true })
@@ -23,7 +24,14 @@ const init = async ({ isSignedIn, setGlobalState, dispatch }) => {
   // }
 
   const onNotificationOpened = (notification) => {
+    console.warn(notification.payload.data)
     const data = notification.payload.data
+    if (data?.type === 'authorization') {
+      console.warn('authorization')
+      // authorization only doesn't trigger navigation
+      // webview listens to appstate and triggers login overlay
+      return
+    }
     setGlobalState({ pendingUrl: data.url })
   }
 
@@ -59,32 +67,27 @@ const init = async ({ isSignedIn, setGlobalState, dispatch }) => {
   )
   Notifications.events().registerNotificationReceivedForeground(
     (notification, completion) => {
+      const data = notification.payload.data
+      if (data?.type === 'authorization') {
+        // authorization only triggers a notification if the app is in
+        // background.
+        return
+      }
       completion({ alert: true, sound: true, badge: true })
     },
   )
   Notifications.events().registerNotificationOpened(
     (notification, completion) => {
-      console.warn(notification)
       onNotificationOpened(notification)
       completion()
     },
   )
   Notifications.events().registerNotificationReceivedBackground(
     (notification, completion) => {
-      console.warn('Notification Received - Background', notification.payload)
+      console.log('Notification Received - Background', notification.payload)
       completion({ alert: true, sound: true, badge: false })
     },
   )
-  setTimeout(() => {
-    Notifications.postLocalNotification({
-      body: 'Local notification!',
-      title: 'Local Notification Title',
-      sound: 'chime.aiff',
-      silent: false,
-      category: 'SOME_CATEGORY',
-      userInfo: {},
-    })
-  }, 3000)
 }
 
 const PushService = () => {
