@@ -125,7 +125,6 @@ const Web = () => {
       alert(error.message)
     }
   }
-  console.warn(showLoader, isReady)
   return (
     <>
       {webUrl && (
@@ -165,7 +164,6 @@ const Web = () => {
           />
         </SafeAreaView>
       )}
-      {/* Todo: Loader only on firt app open, not on every webview load */}
       {showLoader && !isReady && <Loader loading={!isReady} />}
     </>
   )
