@@ -5,4 +5,18 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <style name="LightTheme" parent="AppTheme">
+        <item name="textColor">#191919</item>
+        <item name="backgroundColor">#ffffff</item>
+        <item name="splashLogo">@drawable/launch_screen_logo</item>
+        <item name="android:navigationBarColor">#ffffff</item>
+    </style>
+
+    <style name="DarkTheme" parent="AppTheme">
+        <item name="textColor">#ffffff</item>
+        <item name="backgroundColor">#191919</item>
+        <item name="splashLogo">@drawable/launch_screen_logo_white</item>
+        <item name="android:navigationBarColor">#191919</item>
+    </style>
+
 </resources>

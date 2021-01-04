@@ -1,11 +1,22 @@
 package com.republikapp;
 
+import android.content.res.Configuration;
 import com.facebook.react.ReactActivity;
 import org.devio.rn.splashscreen.SplashScreen;
 
 public class MainActivity extends ReactActivity {
-  @Override
+    @Override
     protected void onCreate(android.os.Bundle savedInstanceState) {
+      switch (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) {
+          case Configuration.UI_MODE_NIGHT_YES:
+              setTheme(R.style.DarkTheme);
+              break;
+          case Configuration.UI_MODE_NIGHT_NO:
+              setTheme(R.style.LightTheme);
+              break;
+          default:
+              setTheme(R.style.LightTheme);
+      }
         SplashScreen.show(this);  // here
         super.onCreate(savedInstanceState);
     }
