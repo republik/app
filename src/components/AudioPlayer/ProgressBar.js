@@ -125,7 +125,7 @@ export default ProgressBar
 
 const styles = StyleSheet.create({
   progressBarContainer: {
-    bottom: 0,
+    top: 0,
     width: '100%',
     position: 'absolute',
   },

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import {
   View,
@@ -82,32 +82,16 @@ const AudioPlayer = () => {
         toValue: 1,
         duration: ANIMATION_DURATION,
         easing: Easing.in(Easing.ease),
-        useNativeDriver: true,
+        useNativeDriver: false,
       }).start()
-      // dispatch to webview
-      dispatch({
-        type: 'postMessage',
-        content: {
-          type: 'onAudioPlayerVisibilityChange',
-          isVisible: true,
-        },
-      })
     }
     const slideOut = () => {
       Animated.timing(slideAnim, {
         toValue: 0,
         duration: ANIMATION_DURATION,
         easing: Easing.out(Easing.ease),
-        useNativeDriver: true,
+        useNativeDriver: false,
       }).start()
-      // dispatch to webview
-      dispatch({
-        type: 'postMessage',
-        content: {
-          type: 'onAudioPlayerVisibilityChange',
-          isVisible: false,
-        },
-      })
     }
     if (!!audio) {
       slideIn()
@@ -171,22 +155,46 @@ const AudioPlayer = () => {
       style={[
         styles.container,
         {
-          height: AUDIO_PLAYER_HEIGHT + Math.max(insets.bottom, 16),
-          transform: [
-            {
-              translateY: slideAnim.interpolate({
-                inputRange: [0, 1],
-                outputRange: [
-                  AUDIO_PLAYER_HEIGHT + Math.max(insets.bottom, 16),
-                  0,
-                ],
-              }),
-            },
-          ],
+          backgroundColor: colors.overlay,
+          height: slideAnim.interpolate({
+            inputRange: [0, 1],
+            outputRange: [0, AUDIO_PLAYER_HEIGHT + Math.max(insets.bottom, 16)],
+          }),
         },
       ]}>
       <SafeAreaView edges={['right', 'left']}>
-        <View style={[styles.player, { backgroundColor: colors.overlay }]}>
+        <View style={[styles.player]}>
+          <ProgressBar
+            audio={audio}
+            upsertCurrentMediaProgress={() => {
+              setPersistedState({
+                mediaProgress: {
+                  mediaId: audio.mediaId,
+                  secs: progress.position,
+                },
+              })
+              // Todo: get rid of infinite loop
+              // dispatch({
+              //   type: 'postMessage',
+              //   content: {
+              //     type: 'onAppMediaProgressUpdate',
+              //     mediaId: audio.mediaId,
+              //     currentTime: progress.position,
+              //   },
+              // })
+            }}
+            enableProgress={true}
+            position={progress.position}
+            isPlaying={playbackState == TrackPlayer.STATE_PLAYING}
+            duration={progress.duration}
+            bufferedPosition={progress.bufferedPosition}
+            panProgress={panProgress}
+            onPanStart={(pan) => setPanProgress(pan)}
+            onPanMove={(pan) => setPanProgress(pan)}
+            onPanReleased={() => {
+              seekTo(panProgress * progress.duration)
+            }}
+          />
           <View style={styles.controls}>
             <Icon
               name="replay-10"
@@ -234,37 +242,6 @@ const AudioPlayer = () => {
               }
             />
           </View>
-          <ProgressBar
-            audio={audio}
-            upsertCurrentMediaProgress={() => {
-              setPersistedState({
-                mediaProgress: {
-                  mediaId: audio.mediaId,
-                  secs: progress.position,
-                },
-              })
-              // Todo: get rid of infinite loop
-              // dispatch({
-              //   type: 'postMessage',
-              //   content: {
-              //     type: 'onAppMediaProgressUpdate',
-              //     mediaId: audio.mediaId,
-              //     currentTime: progress.position,
-              //   },
-              // })
-            }}
-            enableProgress={true}
-            position={progress.position}
-            isPlaying={playbackState == TrackPlayer.STATE_PLAYING}
-            duration={progress.duration}
-            bufferedPosition={progress.bufferedPosition}
-            panProgress={panProgress}
-            onPanStart={(pan) => setPanProgress(pan)}
-            onPanMove={(pan) => setPanProgress(pan)}
-            onPanReleased={() => {
-              seekTo(panProgress * progress.duration)
-            }}
-          />
         </View>
       </SafeAreaView>
     </Animated.View>
@@ -274,16 +251,7 @@ const AudioPlayer = () => {
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    position: 'absolute',
     bottom: 0,
-  },
-  player: {
-    alignSelf: 'flex-end',
-    justifyContent: 'center',
-    flexDirection: 'column',
-    marginHorizontal: AUDIO_PLAYER_PADDING,
-    maxWidth: AUDIO_PLAYER_MAX_WIDTH,
-    height: AUDIO_PLAYER_HEIGHT,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -293,6 +261,11 @@ const styles = StyleSheet.create({
     shadowRadius: 4.65,
 
     elevation: 7,
+  },
+  player: {
+    justifyContent: 'center',
+    flexDirection: 'column',
+    height: AUDIO_PLAYER_HEIGHT,
   },
   controls: {
     width: '100%',
