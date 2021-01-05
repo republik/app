@@ -53,5 +53,3 @@ export let USER_AGENT = `${nativeUserAgent} RepublikApp/${APP_VERSION}`
 export const AUDIO_PLAYER_HEIGHT = 68
 export const ANIMATION_DURATION = 250
 export const AUDIO_PLAYER_PROGRESS_HEIGHT = 5
-export const AUDIO_PLAYER_MAX_WIDTH = 414
-export const AUDIO_PLAYER_PADDING = 16

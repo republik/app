@@ -1,55 +1,26 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
-import {
-  View,
-  Text,
-  StyleSheet,
-  Animated,
-  TouchableOpacity,
-  Easing,
-} from 'react-native'
-import TrackPlayer, {
-  useTrackPlayerProgress,
-  usePlaybackState,
-  TrackPlayerEvents,
-  useTrackPlayerEvents,
-} from 'react-native-track-player'
-import Icon from 'react-native-vector-icons/MaterialIcons'
+import { View, StyleSheet, Animated, Easing } from 'react-native'
+import TrackPlayer, { usePlaybackState } from 'react-native-track-player'
 
 import Logo from '../../assets/images/playlist-logo.png'
 import {
-  FRONTEND_BASE_URL,
   AUDIO_PLAYER_HEIGHT,
   AUDIO_PLAYER_PROGRESS_HEIGHT,
   ANIMATION_DURATION,
-  AUDIO_PLAYER_PADDING,
-  AUDIO_PLAYER_MAX_WIDTH,
 } from '../../constants'
 import { useGlobalState } from '../../GlobalState'
-import ProgressBar from './ProgressBar'
 import { useColorContext } from '../../utils/colors'
-
-const parseSeconds = (value) => {
-  if (value === null || value === undefined) return ''
-  const minutes = Math.floor(value / 60)
-  const seconds = Math.floor(value - minutes * 60)
-  return minutes + ':' + (seconds < 10 ? '0' : '') + seconds
-}
+import ProgressBar from './ProgressBar'
+import Controls from './Controls'
 
 const AudioPlayer = () => {
   const insets = useSafeAreaInsets()
-  const progress = useTrackPlayerProgress()
   const playbackState = usePlaybackState()
-  const {
-    persistedState,
-    setPersistedState,
-    setGlobalState,
-    dispatch,
-  } = useGlobalState()
+  const { persistedState, setPersistedState, dispatch } = useGlobalState()
   const { audio, currentMediaTime } = persistedState
   const slideAnim = useRef(new Animated.Value(0)).current
   const { colors } = useColorContext()
-  const [panProgress, setPanProgress] = useState(0)
 
   // Initializes the player
   useEffect(() => {
@@ -138,14 +109,6 @@ const AudioPlayer = () => {
     }
   }
 
-  const onTitlePress = () => {
-    if (audio && audio.sourcePath) {
-      setGlobalState({
-        pendingUrl: `${FRONTEND_BASE_URL}${audio.sourcePath}`,
-      })
-    }
-  }
-
   const seekTo = async (sec) => {
     await TrackPlayer.seekTo(sec)
   }
@@ -166,82 +129,16 @@ const AudioPlayer = () => {
         <View style={[styles.player]}>
           <ProgressBar
             audio={audio}
-            upsertCurrentMediaProgress={() => {
-              setPersistedState({
-                mediaProgress: {
-                  mediaId: audio.mediaId,
-                  secs: progress.position,
-                },
-              })
-              // Todo: get rid of infinite loop
-              // dispatch({
-              //   type: 'postMessage',
-              //   content: {
-              //     type: 'onAppMediaProgressUpdate',
-              //     mediaId: audio.mediaId,
-              //     currentTime: progress.position,
-              //   },
-              // })
-            }}
             enableProgress={true}
-            position={progress.position}
             isPlaying={playbackState == TrackPlayer.STATE_PLAYING}
-            duration={progress.duration}
-            bufferedPosition={progress.bufferedPosition}
-            panProgress={panProgress}
-            onPanStart={(pan) => setPanProgress(pan)}
-            onPanMove={(pan) => setPanProgress(pan)}
-            onPanReleased={() => {
-              seekTo(panProgress * progress.duration)
-            }}
+            seekTo={(position) => seekTo(position)}
           />
-          <View style={styles.controls}>
-            <Icon
-              name="replay-10"
-              size={28}
-              color={colors.text}
-              onPress={() => seekTo(progress.position - 10)}
-            />
-            <Icon
-              name={
-                playbackState == TrackPlayer.STATE_PAUSED
-                  ? 'play-arrow'
-                  : 'pause'
-              }
-              size={46}
-              color={colors.text}
-              onPress={() => togglePlayback()}
-            />
-            <Icon
-              name="forward-30"
-              size={28}
-              color={colors.text}
-              onPress={() => seekTo(progress.position + 30)}
-            />
-            <View style={styles.content}>
-              <TouchableOpacity onPress={onTitlePress}>
-                <Text
-                  numberOfLines={1}
-                  style={[styles.title, { color: colors.text }]}>
-                  {audio && audio.title}
-                </Text>
-              </TouchableOpacity>
-              <Text style={[styles.time, { color: colors.text }]}>
-                {parseSeconds(progress.position)} /{' '}
-                {parseSeconds(progress.duration)}
-              </Text>
-            </View>
-            <Icon
-              name="close"
-              size={35}
-              color={colors.text}
-              onPress={() =>
-                setPersistedState({
-                  audio: null,
-                })
-              }
-            />
-          </View>
+          <Controls
+            seekTo={(position) => seekTo(position)}
+            audio={audio}
+            togglePlayback={() => togglePlayback()}
+            paused={TrackPlayer.STATE_PAUSED}
+          />
         </View>
       </SafeAreaView>
     </Animated.View>

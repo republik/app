@@ -24,11 +24,9 @@ const CustomStatusBar = () => {
   const { colors, colorSchemeKey } = useColorContext()
   const statusBarHeight = getStatusBarHeight()
   const orientation = useOrientation()
-
   const {
     persistedState: { isFullscreen },
   } = useGlobalState()
-
   const backgroundColor = isFullscreen
     ? colors.fullScreenStatusBar
     : colors.default
@@ -51,7 +49,8 @@ const CustomStatusBar = () => {
         animated
         translucent
         barStyle={barStyle}
-        backgroundColor={backgroundColor}
+        // workaround: needs to be transparent on Android, else it overlaps because it's too big
+        backgroundColor={'rgba(0,0,0,0)'}
         hidden={isFullscreen}
       />
     </Animated.View>

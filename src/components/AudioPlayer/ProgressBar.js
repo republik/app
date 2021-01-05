@@ -4,31 +4,40 @@ import debounce from 'lodash.debounce'
 import {
   ANIMATION_DURATION,
   AUDIO_PLAYER_PROGRESS_HEIGHT,
-  AUDIO_PLAYER_PADDING,
 } from '../../constants'
+import { useTrackPlayerProgress } from 'react-native-track-player'
 import { useColorContext } from '../../utils/colors'
+import { useGlobalState } from '../../GlobalState'
 
-const ProgressBar = ({
-  position,
-  bufferedPosition,
-  duration,
-  audio,
-  isPlaying,
-  enableProgress,
-  upsertCurrentMediaProgress,
-  panProgress,
-  onPanStart,
-  onPanMove,
-  onPanReleased,
-}) => {
+const ProgressBar = ({ audio, isPlaying, enableProgress, seekTo }) => {
   const [isPanning, setIsPanning] = useState(false)
   const [playerWidth, setPlayerWidth] = useState(0)
+  const [panProgress, setPanProgress] = useState(0)
   const { colors } = useColorContext()
+  const { position, duration, bufferedPosition } = useTrackPlayerProgress()
+  const { setPersistedState, dispatch } = useGlobalState()
   const scaleY = useRef(new Animated.Value(1)).current
 
-  const upsertProgress = debounce(() => {
-    upsertCurrentMediaProgress()
-  }, 1000)
+  const upsertCurrentMediaProgress = useMemo(() => {
+    return debounce((audio, position) => {
+      if (!!audio) {
+        setPersistedState({
+          mediaProgress: {
+            mediaId: audio.mediaId,
+            secs: position,
+          },
+        })
+        dispatch({
+          type: 'postMessage',
+          content: {
+            type: 'onAppMediaProgressUpdate',
+            mediaId: audio.mediaId,
+            currentTime: position,
+          },
+        })
+      }
+    }, 1000)
+  }, [dispatch, setPersistedState])
 
   const panResponder = useMemo(() => {
     const expandAnim = () => {
@@ -53,29 +62,29 @@ const ProgressBar = ({
       onMoveShouldSetPanResponder: () => true,
       onPanResponderGrant: (evt, gestureState) => {
         setIsPanning(true)
-        onPanStart((gestureState.x0 - AUDIO_PLAYER_PADDING) / playerWidth)
+        setPanProgress(gestureState.x0 / playerWidth)
         expandAnim()
       },
       onPanResponderMove: (evt, gestureState) => {
-        onPanMove((gestureState.moveX - AUDIO_PLAYER_PADDING) / playerWidth)
+        setPanProgress(gestureState.moveX / playerWidth)
       },
       onPanResponderRelease: (evt, gestureState) => {
         setIsPanning(false)
-        onPanReleased()
+        seekTo(panProgress * duration)
         collapseAnim()
       },
     })
-  }, [scaleY, onPanStart, playerWidth, onPanMove, onPanReleased])
+  }, [scaleY, playerWidth, duration, panProgress, seekTo])
 
   useEffect(() => {
     if (enableProgress && audio && isPlaying && position > 0) {
       if (audio.mediaId) {
-        upsertProgress()
+        upsertCurrentMediaProgress(audio, position)
       } else {
         console.warn(`Audio element ${audio.id} has no mediaId`)
       }
     }
-  }, [upsertProgress, audio, enableProgress, isPlaying, position])
+  }, [upsertCurrentMediaProgress, audio, enableProgress, isPlaying, position])
 
   const progress = isPanning ? panProgress * 100 : (position / duration) * 100
   const buffered = (bufferedPosition / duration) * 100

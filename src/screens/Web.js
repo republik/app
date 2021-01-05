@@ -153,10 +153,7 @@ const Web = () => {
               console.log('onLoad', 'ready', true)
               setIsReady(true)
             }}
-            originWhitelist={[
-              `${FRONTEND_BASE_URL}*`,
-              'https://www.filmingo.ch/',
-            ]}
+            originWhitelist={[`${FRONTEND_BASE_URL}*`]}
             pullToRefreshEnabled={false}
             bounce={false}
             allowsFullscreenVideo={true}
