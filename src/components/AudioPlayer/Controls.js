@@ -26,7 +26,6 @@ const Controls = ({ seekTo, audio, togglePlayback, paused }) => {
 
   const onTitlePress = () => {
     if (audio && audio.sourcePath) {
-      console.warn(`${FRONTEND_BASE_URL}${audio.sourcePath}`)
       setGlobalState({
         pendingUrl: `${FRONTEND_BASE_URL}${audio.sourcePath}`,
       })

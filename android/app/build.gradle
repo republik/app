@@ -129,7 +129,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.republikapp"
+        applicationId "app.republik"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 2

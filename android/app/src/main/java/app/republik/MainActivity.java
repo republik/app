@@ -1,7 +1,9 @@
-package com.republikapp;
+package app.republik;
 
 import android.content.res.Configuration;
 import com.facebook.react.ReactActivity;
+import app.republik.R;
+
 import org.devio.rn.splashscreen.SplashScreen;
 
 public class MainActivity extends ReactActivity {
