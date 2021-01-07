@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from 'react'
 import { WebView } from 'react-native-webview'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-import { Share, Platform } from 'react-native'
+import { Share, Platform, BackHandler } from 'react-native'
 import { APP_VERSION, FRONTEND_BASE_URL } from '../constants'
 import { useGlobalState } from '../GlobalState'
 import SplashScreen from 'react-native-splash-screen'
@@ -30,6 +30,22 @@ const Web = () => {
       setShowLoader(false)
     }
   }, [isReady, showLoader])
+
+  // Capture Android back button press
+  useEffect(() => {
+    const CurrentWebView = webviewRef.current
+    if (Platform.OS === 'android') {
+      BackHandler.addEventListener('hardwareBackPress', CurrentWebView.goBack())
+    }
+    return () => {
+      if (Platform.OS === 'android') {
+        BackHandler.removeEventListener(
+          'hardwareBackPress',
+          CurrentWebView.goBack(),
+        )
+      }
+    }
+  }, [])
 
   useEffect(() => {
     // wait for all services
@@ -160,6 +176,7 @@ const Web = () => {
             allowsFullscreenVideo={true}
             allowsInlineMediaPlayback={true}
             sharedCookiesEnabled={true}
+            allowsBackForwardNavigationGestures={true}
           />
         </SafeAreaView>
       )}
