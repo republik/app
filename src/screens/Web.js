@@ -36,7 +36,8 @@ const Web = () => {
     if (
       !globalState.deepLinkingReady ||
       !globalState.pushReady ||
-      !globalState.persistedStateReady
+      !globalState.persistedStateReady ||
+      !globalState.cookiesLoaded
     ) {
       return
     }

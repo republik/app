@@ -26,7 +26,7 @@ const AppStateService = () => {
         current: appState,
       },
     })
-  }, [appState])
+  }, [appState, dispatch])
 
   return null
 }

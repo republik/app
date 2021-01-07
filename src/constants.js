@@ -4,7 +4,6 @@ import Config from 'react-native-config'
 import { handleEnv } from './utils/url'
 
 // Base urls
-export const ENV = Config.ENV
 export const API_URL = handleEnv(Config.API_URL)
 export const API_WS_URL = handleEnv(Config.API_WS_URL)
 export const FRONTEND_BASE_URL = handleEnv(Config.FRONTEND_BASE_URL)

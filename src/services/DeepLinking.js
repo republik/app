@@ -21,7 +21,7 @@ const DeepLinkingService = () => {
     return () => {
       Linking.removeEventListener('url', handleOpenURL)
     }
-  }, [])
+  }, [setGlobalState])
 
   return null
 }
