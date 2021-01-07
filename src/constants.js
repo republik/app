@@ -23,7 +23,7 @@ export const COMMUNITY_PATH = '/community'
 export const EVENTS_PATH = '/veranstaltungen'
 export const DISCUSSIONS_PATH = '/diskussion'
 export const NOTIFICATIONS_PATH = '/mitteilung'
-export const CURTAIN_BACKDOOR_PATH = `/${Config.CURTAIN_BACKDOOR_PATH}`
+export const CURTAIN_BACKDOOR_PATH = `${Config.CURTAIN_BACKDOOR_PATH}`
 
 // App urls
 export const HOME_URL = `${FRONTEND_BASE_URL}${HOME_PATH}`

@@ -10,15 +10,15 @@ const CookieService = () => {
   useEffect(() => {
     const setCookies = async () => {
       if (CURTAIN_BACKDOOR_PATH) {
-        let cookies = `OpenSesame=${encodeURIComponent(
-          CURTAIN_BACKDOOR_PATH,
-        )}; Path=/; Expires=Thu, 01 Jan 2030 00:00:00 GMT; HttpOnly`
-
-        await CookieManager.setFromResponse(FRONTEND_BASE_URL, cookies).then(
-          () => {
-            setGlobalState({ cookiesLoaded: true })
-          },
-        )
+        CookieManager.set(FRONTEND_BASE_URL, {
+          name: 'OpenSesame',
+          value: encodeURIComponent(CURTAIN_BACKDOOR_PATH),
+          path: '/',
+          version: '1',
+          expires: '2030-05-30T12:30:00.00-05:00',
+        }).then(() => {
+          setGlobalState({ cookiesLoaded: true })
+        })
       }
     }
     setCookies()
