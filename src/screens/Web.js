@@ -158,6 +158,7 @@ const Web = () => {
             bounce={false}
             allowsFullscreenVideo={true}
             allowsInlineMediaPlayback={true}
+            sharedCookiesEnabled={true}
           />
         </SafeAreaView>
       )}
