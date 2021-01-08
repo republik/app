@@ -1,47 +1,26 @@
 import React, { useEffect, useRef } from 'react'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
-import {
-  View,
-  Text,
-  StyleSheet,
-  Animated,
-  TouchableOpacity,
-  Easing,
-} from 'react-native'
-import TrackPlayer, {
-  useTrackPlayerProgress,
-  usePlaybackState,
-} from 'react-native-track-player'
-import Icon from 'react-native-vector-icons/MaterialIcons'
+import { View, StyleSheet, Animated, Easing } from 'react-native'
+import TrackPlayer, { usePlaybackState } from 'react-native-track-player'
 
 import Logo from '../../assets/images/playlist-logo.png'
 import {
-  FRONTEND_BASE_URL,
   AUDIO_PLAYER_HEIGHT,
   AUDIO_PLAYER_PROGRESS_HEIGHT,
   ANIMATION_DURATION,
-  AUDIO_PLAYER_PADDING,
-  AUDIO_PLAYER_MAX_WIDTH,
 } from '../../constants'
 import { useGlobalState } from '../../GlobalState'
-import ProgressBar from './ProgressBar'
 import { useColorContext } from '../../utils/colors'
-
-const parseSeconds = (value) => {
-  if (value === null || value === undefined) return ''
-  const minutes = Math.floor(value / 60)
-  const seconds = Math.floor(value - minutes * 60)
-  return minutes + ':' + (seconds < 10 ? '0' : '') + seconds
-}
+import ProgressBar from './ProgressBar'
+import Controls from './Controls'
 
 const AudioPlayer = () => {
   const insets = useSafeAreaInsets()
-  const progress = useTrackPlayerProgress()
   const playbackState = usePlaybackState()
-  const { persistedState, setPersistedState, setGlobalState } = useGlobalState()
-  const { audio } = persistedState
-  const fadeAnim = useRef(new Animated.Value(0)).current
-  const colorScheme = useColorContext()
+  const { persistedState, setPersistedState, dispatch } = useGlobalState()
+  const { audio, currentMediaTime } = persistedState
+  const slideAnim = useRef(new Animated.Value(0)).current
+  const { colors } = useColorContext()
 
   // Initializes the player
   useEffect(() => {
@@ -69,34 +48,37 @@ const AudioPlayer = () => {
   // also triggers playback when a new audio object is set to persistedState,
   // which happens via message API.
   useEffect(() => {
-    // Animation definitions
     const slideIn = () => {
-      Animated.timing(fadeAnim, {
+      Animated.timing(slideAnim, {
         toValue: 1,
         duration: ANIMATION_DURATION,
         easing: Easing.in(Easing.ease),
-        useNativeDriver: true,
+        useNativeDriver: false,
       }).start()
     }
     const slideOut = () => {
-      Animated.timing(fadeAnim, {
+      Animated.timing(slideAnim, {
         toValue: 0,
         duration: ANIMATION_DURATION,
         easing: Easing.out(Easing.ease),
-        useNativeDriver: true,
+        useNativeDriver: false,
       }).start()
     }
-    if (audio == null) {
+    if (!!audio) {
       slideIn()
       togglePlayback()
     } else {
       slideOut()
       togglePlayback()
     }
-  }, [audio, fadeAnim, togglePlayback])
+  }, [audio, slideAnim, togglePlayback, setPersistedState, dispatch])
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const togglePlayback = async () => {
+    if (audio == null) {
+      await TrackPlayer.pause()
+      return
+    }
     const currentTrack = await TrackPlayer.getCurrentTrack()
     if (currentTrack == null) {
       await TrackPlayer.reset()
@@ -107,9 +89,19 @@ const AudioPlayer = () => {
         artist: 'Republik',
         artwork: Logo,
       })
+      if (currentMediaTime) {
+        await TrackPlayer.seekTo(currentMediaTime)
+        await TrackPlayer.play()
+        return
+      }
       await TrackPlayer.play()
     } else {
       if (playbackState === TrackPlayer.STATE_PAUSED) {
+        if (currentMediaTime) {
+          await TrackPlayer.seekTo(currentMediaTime)
+          await TrackPlayer.play()
+          return
+        }
         await TrackPlayer.play()
       } else {
         await TrackPlayer.pause()
@@ -117,12 +109,8 @@ const AudioPlayer = () => {
     }
   }
 
-  const onTitlePress = () => {
-    if (audio && audio.sourcePath) {
-      setGlobalState({
-        pendingUrl: `${FRONTEND_BASE_URL}${audio.sourcePath}`,
-      })
-    }
+  const seekTo = async (sec) => {
+    await TrackPlayer.seekTo(sec)
   }
 
   return (
@@ -130,82 +118,29 @@ const AudioPlayer = () => {
       style={[
         styles.container,
         {
-          height: AUDIO_PLAYER_HEIGHT + Math.max(insets.bottom, 16),
-          transform: [
-            {
-              translateY: fadeAnim.interpolate({
-                inputRange: [0, 1],
-                outputRange: [
-                  0,
-                  AUDIO_PLAYER_HEIGHT + Math.max(insets.bottom, 16),
-                ],
-              }),
-            },
-          ],
+          backgroundColor: colors.overlay,
+          height: slideAnim.interpolate({
+            inputRange: [0, 1],
+            outputRange: [0, AUDIO_PLAYER_HEIGHT + Math.max(insets.bottom, 16)],
+          }),
         },
       ]}>
-      <View style={[styles.player, { backgroundColor: colorScheme.overlay }]}>
-        <View style={styles.controls}>
-          <Icon
-            name={
-              playbackState == TrackPlayer.STATE_PAUSED ? 'play-arrow' : 'pause'
-            }
-            size={35}
-            color={colorScheme.text}
-            onPress={() => togglePlayback()}
+      <SafeAreaView edges={['right', 'left']}>
+        <View style={[styles.player]}>
+          <ProgressBar
+            audio={audio}
+            enableProgress={true}
+            isPlaying={playbackState == TrackPlayer.STATE_PLAYING}
+            seekTo={(position) => seekTo(position)}
           />
-          <Icon
-            name="fast-rewind"
-            size={25}
-            color={colorScheme.text}
-            onPress={() => {}}
-          />
-          <View style={styles.content}>
-            <TouchableOpacity onPress={onTitlePress}>
-              <Text
-                numberOfLines={1}
-                style={[styles.title, { color: colorScheme.text }]}>
-                {audio && audio.title}
-              </Text>
-            </TouchableOpacity>
-            <Text style={[styles.time, { color: colorScheme.text }]}>
-              {parseSeconds(progress.position)} /{' '}
-              {parseSeconds(progress.duration)}
-            </Text>
-          </View>
-          <Icon
-            name="close"
-            size={35}
-            color={colorScheme.text}
-            onPress={() =>
-              setPersistedState({
-                audio: null,
-              })
-            }
+          <Controls
+            seekTo={(position) => seekTo(position)}
+            audio={audio}
+            togglePlayback={() => togglePlayback()}
+            paused={TrackPlayer.STATE_PAUSED}
           />
         </View>
-        <ProgressBar
-          audio={audio}
-          upsertCurrentMediaProgress={() =>
-            setPersistedState({
-              mediaProgress: {
-                mediaId: audio.mediaId,
-                secs: progress.position,
-              },
-            })
-          }
-          enableProgress={true}
-          position={progress.position}
-          isPlaying={playbackState == TrackPlayer.STATE_PLAYING}
-          duration={progress.duration}
-          bufferedPosition={progress.bufferedPosition}
-          onProgressPanReleased={async (newPosition) => {
-            await TrackPlayer.seekTo(newPosition)
-            await TrackPlayer.play()
-          }}
-        />
-      </View>
-      <SafeAreaView edges={['right', 'bottom', 'left']} />
+      </SafeAreaView>
     </Animated.View>
   )
 }
@@ -213,16 +148,7 @@ const AudioPlayer = () => {
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    position: 'absolute',
     bottom: 0,
-  },
-  player: {
-    alignSelf: 'flex-end',
-    justifyContent: 'center',
-    flexDirection: 'column',
-    marginHorizontal: AUDIO_PLAYER_PADDING,
-    maxWidth: AUDIO_PLAYER_MAX_WIDTH,
-    height: AUDIO_PLAYER_HEIGHT,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -232,6 +158,11 @@ const styles = StyleSheet.create({
     shadowRadius: 4.65,
 
     elevation: 7,
+  },
+  player: {
+    justifyContent: 'center',
+    flexDirection: 'column',
+    height: AUDIO_PLAYER_HEIGHT,
   },
   controls: {
     width: '100%',

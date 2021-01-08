@@ -2,10 +2,12 @@ import React, { useRef, useState, useEffect } from 'react'
 import { WebView } from 'react-native-webview'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-import { Share, Platform } from 'react-native'
-import { APP_VERSION } from '../constants'
+import { Share, Platform, BackHandler } from 'react-native'
+import { APP_VERSION, FRONTEND_BASE_URL } from '../constants'
 import { useGlobalState } from '../GlobalState'
 import SplashScreen from 'react-native-splash-screen'
+import Loader from '../components/Loader'
+import { useColorContext } from '../utils/colors'
 
 const Web = () => {
   const {
@@ -16,20 +18,45 @@ const Web = () => {
     pendingMessages,
     dispatch,
   } = useGlobalState()
-
   const webviewRef = useRef()
   const [webUrl, setWebUrl] = useState()
+  const [isReady, setIsReady] = useState(false)
+  const [showLoader, setShowLoader] = useState(true)
+  const { colors } = useColorContext()
+
+  // Make sure loader is only shown on first mount
+  useEffect(() => {
+    if (isReady && showLoader) {
+      setShowLoader(false)
+    }
+  }, [isReady, showLoader])
+
+  // Capture Android back button press
+  useEffect(() => {
+    const CurrentWebView = webviewRef.current
+    if (Platform.OS === 'android') {
+      BackHandler.addEventListener('hardwareBackPress', CurrentWebView.goBack())
+    }
+    return () => {
+      if (Platform.OS === 'android') {
+        BackHandler.removeEventListener(
+          'hardwareBackPress',
+          CurrentWebView.goBack(),
+        )
+      }
+    }
+  }, [])
 
   useEffect(() => {
     // wait for all services
     if (
       !globalState.deepLinkingReady ||
       !globalState.pushReady ||
-      !globalState.persistedStateReady
+      !globalState.persistedStateReady ||
+      !globalState.cookiesLoaded
     ) {
       return
     }
-
     if (globalState.pendingUrl) {
       // navigate to pendingUrl a service
       setWebUrl(globalState.pendingUrl)
@@ -45,8 +72,6 @@ const Web = () => {
     }
   }, [webUrl, globalState, persistedState, setGlobalState])
 
-  const [isReady, setIsReady] = useState(false)
-  const [sentMessages, setSentMessages] = useState(false)
   useEffect(() => {
     if (!isReady) {
       return
@@ -77,9 +102,18 @@ const Web = () => {
     if (message.type === 'share') {
       share(message.payload)
     } else if (message.type === 'play-audio') {
-      setPersistedState({ audio: message.payload })
+      setPersistedState({
+        audio: message.payload.audio,
+        currentMediaTime: message.payload.currentTime,
+      })
     } else if (message.type === 'isSignedIn') {
       setPersistedState({ isSignedIn: message.payload })
+    } else if (message.type === 'fullscreen-enter') {
+      setPersistedState({ isFullscreen: true })
+    } else if (message.type === 'fullscreen-exit') {
+      setPersistedState({ isFullscreen: false })
+    } else if (message.type === 'setColorScheme') {
+      setPersistedState({ userSetColorScheme: message.colorSchemeKey })
     } else if (message.type === 'ackMessage') {
       dispatch({
         type: 'clearMessage',
@@ -108,11 +142,17 @@ const Web = () => {
       alert(error.message)
     }
   }
-
   return (
     <>
       {webUrl && (
-        <SafeAreaView style={{ flex: 1 }} edges={['right', 'top', 'left']}>
+        <SafeAreaView
+          style={{ flex: 1 }}
+          edges={['right', 'left']}
+          backgroundColor={
+            persistedState.isFullscreen
+              ? colors.fullScreenStatusBar
+              : colors.default
+          }>
           <WebView
             ref={webviewRef}
             source={{ uri: webUrl }}
@@ -130,9 +170,17 @@ const Web = () => {
               console.log('onLoad', 'ready', true)
               setIsReady(true)
             }}
+            originWhitelist={[`${FRONTEND_BASE_URL}*`]}
+            pullToRefreshEnabled={false}
+            bounce={false}
+            allowsFullscreenVideo={true}
+            allowsInlineMediaPlayback={true}
+            sharedCookiesEnabled={true}
+            allowsBackForwardNavigationGestures={true}
           />
         </SafeAreaView>
       )}
+      {showLoader && !isReady && <Loader loading={!isReady} />}
     </>
   )
 }

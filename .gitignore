@@ -69,4 +69,16 @@ buck-out/
 *.otf
 src/assets/fonts
 
-android/app/google-services.json
+# Fastlane
+*/fastlane/report.xml
+*/fastlane/Preview.html
+*/fastlane/screenshots
+
+# Certs
+*.cer
+api*.json
+google-services.json
+GoogleService-Info.plist
+
+# iOS
+*.dSYM.zip

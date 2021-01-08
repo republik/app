@@ -4,9 +4,7 @@ import { AppState } from 'react-native'
 import { useGlobalState } from '../GlobalState'
 
 const AppStateService = () => {
-  const {
-    dispatch
-  } = useGlobalState()
+  const { dispatch } = useGlobalState()
 
   const [appState, setAppState] = useState(AppState.currentState)
 
@@ -25,13 +23,12 @@ const AppStateService = () => {
       type: 'postMessage',
       content: {
         type: 'appState',
-        current: appState
-      }
+        current: appState,
+      },
     })
-  }, [ appState ])
+  }, [appState, dispatch])
 
   return null
 }
 
 export default AppStateService
-
