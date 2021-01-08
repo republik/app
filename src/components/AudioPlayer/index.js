@@ -80,7 +80,10 @@ const AudioPlayer = () => {
       return
     }
     const currentTrack = await TrackPlayer.getCurrentTrack()
+
+    // check if there's already a track loaded in the player
     if (currentTrack == null) {
+      // if not, add the audio object provided and
       await TrackPlayer.reset()
       await TrackPlayer.add({
         id: audio.mediaId,
@@ -90,13 +93,25 @@ const AudioPlayer = () => {
         artwork: Logo,
       })
       if (currentMediaTime) {
+        // if a current time is provided play from there
         await TrackPlayer.seekTo(currentMediaTime)
         await TrackPlayer.play()
         return
       }
+      // if no current time, just play
       await TrackPlayer.play()
     } else {
-      if (playbackState === TrackPlayer.STATE_PAUSED) {
+      // if there's already a current track check if a the audio file provided is a new track
+      if (currentTrack !== audio.mediaId) {
+        // if so, reset the player, add new track and play
+        await TrackPlayer.reset()
+        await TrackPlayer.add({
+          id: audio.mediaId,
+          url: audio.url,
+          title: audio.title,
+          artist: 'Republik',
+          artwork: Logo,
+        })
         if (currentMediaTime) {
           await TrackPlayer.seekTo(currentMediaTime)
           await TrackPlayer.play()
@@ -104,7 +119,14 @@ const AudioPlayer = () => {
         }
         await TrackPlayer.play()
       } else {
-        await TrackPlayer.pause()
+        // if it's the same audio, check if the player is paused
+        if (playbackState === TrackPlayer.STATE_PAUSED) {
+          // if so, start playback
+          await TrackPlayer.play()
+        } else {
+          // else pause the player
+          await TrackPlayer.pause()
+        }
       }
     }
   }
