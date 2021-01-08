@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import { Platform } from 'react-native'
 import CookieManager from '@react-native-community/cookies'
 import { FRONTEND_BASE_URL, CURTAIN_BACKDOOR_PATH } from '../constants'
 import { useGlobalState } from '../GlobalState'
@@ -17,8 +18,10 @@ const CookieService = () => {
           version: '1',
           expires: '2030-05-30T12:30:00.00-05:00',
         }).then(() => {
-          setGlobalState({ cookiesLoaded: true })
+          setGlobalState({ cookiesReady: true })
         })
+      } else {
+        setGlobalState({ cookiesReady: true })
       }
       return
     }

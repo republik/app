@@ -53,7 +53,7 @@ const Web = () => {
       !globalState.deepLinkingReady ||
       !globalState.pushReady ||
       !globalState.persistedStateReady ||
-      !globalState.cookiesLoaded
+      !globalState.cookiesReady
     ) {
       return
     }
