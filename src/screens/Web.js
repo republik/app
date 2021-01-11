@@ -59,7 +59,10 @@ const Web = () => {
     }
     if (globalState.pendingUrl) {
       // navigate to pendingUrl a service
-      setWebUrl(globalState.pendingUrl)
+      // the date is added so that when a page is set via setWebUrl
+      // and a user navigates away but then tries to return to the page
+      // (e.g. via AudioPlayer Title-Link), the state change is registered
+      setWebUrl(`${globalState.pendingUrl}?t=${Date.now()}`)
       setGlobalState({ pendingUrl: null })
     } else if (!webUrl) {
       // if nothing is pending navigate to saved url
