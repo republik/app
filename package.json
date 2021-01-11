@@ -3,12 +3,13 @@
   "version": "1.2.0",
   "private": true,
   "scripts": {
-    "android": "react-native run-android",
+    "android": "ENVFILE=.env.development react-native run-android",
     "android-staging": "ENVFILE=.env.staging react-native run-android",
     "android-production": "ENVFILE=.env.production react-native run-android",
     "ios": "react-native run-ios --scheme 'republikapp'",
     "ios-staging": "react-native run-ios --scheme 'republikapp (staging)'",
     "ios-production": "react-native run-ios --scheme 'republikapp (production)'",
+    "deploy-ios-staging": "cd ./ios && fastlane ios staging",
     "start": "react-native start",
     "test": "jest",
     "lint": "eslint ."
