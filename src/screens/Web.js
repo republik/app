@@ -142,6 +142,7 @@ const Web = () => {
       alert(error.message)
     }
   }
+
   return (
     <>
       {webUrl && (
@@ -177,6 +178,10 @@ const Web = () => {
             allowsInlineMediaPlayback={true}
             sharedCookiesEnabled={true}
             allowsBackForwardNavigationGestures={true}
+            automaticallyAdjustContentInsets={false}
+            keyboardDisplayRequiresUserAction={false}
+            mediaPlaybackRequiresUserAction={false}
+            scalesPageToFit={false}
           />
         </SafeAreaView>
       )}
