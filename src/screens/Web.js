@@ -8,6 +8,7 @@ import { useGlobalState } from '../GlobalState'
 import SplashScreen from 'react-native-splash-screen'
 import Loader from '../components/Loader'
 import { useColorContext } from '../utils/colors'
+import ReactNativeHapticFeedback from 'react-native-haptic-feedback'
 
 const Web = () => {
   const {
@@ -104,6 +105,8 @@ const Web = () => {
     console.log('onMessage', message)
     if (message.type === 'share') {
       share(message.payload)
+    } else if (message.type === 'haptic') {
+      ReactNativeHapticFeedback.trigger(message.payload.type)
     } else if (message.type === 'play-audio') {
       setPersistedState({
         audio: message.payload.audio,
