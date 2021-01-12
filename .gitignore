@@ -24,6 +24,7 @@ DerivedData
 # Android/IntelliJ
 #
 build/
+release/
 .idea
 .gradle
 local.properties
@@ -51,6 +52,7 @@ buck-out/
 */fastlane/report.xml
 */fastlane/Preview.html
 */fastlane/screenshots
+*/fastlane/metadata
 
 # Bundle artifact
 *.jsbundle
@@ -69,16 +71,12 @@ buck-out/
 *.otf
 src/assets/fonts
 
-# Fastlane
-*/fastlane/report.xml
-*/fastlane/Preview.html
-*/fastlane/screenshots
-
 # Certs
 *.cer
 api*.json
 google-services.json
 GoogleService-Info.plist
+*.der
 
 # iOS
 *.dSYM.zip

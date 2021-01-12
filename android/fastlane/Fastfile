@@ -14,25 +14,45 @@
 # update_fastlane
 
 default_platform(:android)
+fastlane_require 'dotenv'
 
 platform :android do
-  desc "Runs all the tests"
-  lane :test do
-    gradle(task: "test")
+  desc "Deploy a new alpha version to the Google Play Store"
+  lane :staging do |options|
+    increment_version_code(
+      app_project_dir: "./app"
+    )
+    gradle(
+      task: "assemble",
+      build_type: "Release"
+    )
+    supply(
+      track: "alpha",
+      apk: "#{lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH]}",
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
   end
 
-  desc "Submit a new Beta Build to Crashlytics Beta"
-  lane :beta do
-    gradle(task: "clean assembleRelease")
-    crashlytics
-  
-    # sh "your_script.sh"
-    # You can also use other beta testing services here
-  end
-
-  desc "Deploy a new version to the Google Play"
-  lane :deploy do
-    gradle(task: "clean assembleRelease")
-    upload_to_play_store
+  lane :production do |options|
+    increment_version_code(
+      app_project_dir: "./app"
+    )
+    increment_version_name(
+      bump_type: options[:type] || 'patch',
+      app_project_dir: "./app"
+    )
+    gradle(
+      task: "assemble",
+      build_type: "Release"
+    )
+    supply(
+      track: "alpha",
+      apk: "#{lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH]}",
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
   end
 end

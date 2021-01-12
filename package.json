@@ -10,6 +10,7 @@
     "ios-staging": "react-native run-ios --scheme 'republikapp (staging)'",
     "ios-production": "react-native run-ios --scheme 'republikapp (production)'",
     "deploy-ios-staging": "cd ./ios && fastlane ios staging",
+    "deploy-android-staging": "cd ./android && ENVFILE=.env.staging fastlane staging",
     "start": "react-native start",
     "test": "jest",
     "lint": "eslint ."

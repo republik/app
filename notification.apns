@@ -1,0 +1,20 @@
+{
+    "Simulator Target Bundle": "app.republik",
+    "aps": {
+        "alert": {
+            "body": "Test",
+            "title": "Test Title"
+        },
+        "sound": "default",
+        "badge": 1
+    },
+    "data": {
+        "tag": "republik/wdwww-woche-43-20",
+        "url": "http://localhost:3010/2020/10/30/europa-in-der-zweiten-welle-abtreibungs-verbot-in-polen-abwehr-schlacht-in-der-aegaeis-und-macron-gegen-erdogan",
+        "body": "Das Nachrichtenbriefing: Europa in der zweiten Welle, Abtreibungsverbot in Polen, Abwehrschlacht in der Ägäis und Macron gegen Erdoğan",
+        "type": "something",
+        "title": "«Was diese Woche wichtig war» jetzt online"
+    }
+}
+
+
