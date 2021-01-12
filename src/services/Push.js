@@ -20,13 +20,13 @@ const init = async ({ isSignedIn, setGlobalState, dispatch }) => {
   // }
 
   const onNotificationOpened = (notification) => {
-    const data = notification.payload.data
-    if (data?.type === 'authorization') {
+    const payload = notification.payload
+    if (payload?.type === 'authorization') {
       // authorization only doesn't trigger navigation
       // webview listens to appstate and triggers login overlay
       return
     }
-    setGlobalState({ pendingUrl: data.url })
+    setGlobalState({ pendingUrl: payload.url })
   }
 
   const initialNotification = await Notifications.getInitialNotification()
@@ -74,8 +74,8 @@ const init = async ({ isSignedIn, setGlobalState, dispatch }) => {
   )
   Notifications.events().registerNotificationReceivedForeground(
     (notification, completion) => {
-      const data = notification.payload.data
-      if (data?.type === 'authorization') {
+      const payload = notification.payload
+      if (payload?.type === 'authorization') {
         // authorization only triggers a notification if the app is in
         // background.
         return
