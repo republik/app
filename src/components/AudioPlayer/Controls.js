@@ -82,9 +82,7 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingHorizontal: 8,
     flexDirection: 'row',
-    alignSelf: 'center',
     alignItems: 'center',
-    marginBottom: AUDIO_PLAYER_PROGRESS_HEIGHT,
   },
   content: {
     flex: 1,

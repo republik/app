@@ -134,7 +134,6 @@ const AudioPlayer = () => {
   const seekTo = async (sec) => {
     await TrackPlayer.seekTo(sec)
   }
-
   return (
     <Animated.View
       style={[
@@ -143,7 +142,7 @@ const AudioPlayer = () => {
           backgroundColor: colors.overlay,
           height: slideAnim.interpolate({
             inputRange: [0, 1],
-            outputRange: [0, AUDIO_PLAYER_HEIGHT + Math.max(insets.bottom, 16)],
+            outputRange: [0, AUDIO_PLAYER_HEIGHT + insets.bottom],
           }),
         },
       ]}>
@@ -178,35 +177,12 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.2,
     shadowRadius: 4.65,
-
     elevation: 7,
   },
   player: {
     justifyContent: 'center',
     flexDirection: 'column',
     height: AUDIO_PLAYER_HEIGHT,
-  },
-  controls: {
-    width: '100%',
-    paddingHorizontal: 8,
-    flexDirection: 'row',
-    alignSelf: 'center',
-    alignItems: 'center',
-    marginBottom: AUDIO_PLAYER_PROGRESS_HEIGHT,
-  },
-  content: {
-    flex: 1,
-    marginLeft: 10,
-    alignItems: 'flex-start',
-  },
-  title: {
-    fontSize: 18,
-    fontFamily: 'GT America',
-  },
-  time: {
-    fontSize: 14,
-    fontFamily: 'GT America',
-    fontVariant: ['tabular-nums'],
   },
 })
 

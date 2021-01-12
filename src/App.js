@@ -1,5 +1,4 @@
 import React from 'react'
-import { Appearance } from 'react-native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 
 import PushService from './services/Push'
@@ -11,8 +10,6 @@ import Web from './screens/Web'
 import AudioPlayer from './components/AudioPlayer'
 import StatusBar from './components/StatusBar'
 import { GlobalStateProvider } from './GlobalState'
-
-const colorScheme = Appearance.getColorScheme()
 
 const App = () => {
   return (
