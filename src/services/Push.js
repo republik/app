@@ -1,15 +1,11 @@
 import React, { useEffect } from 'react'
 import { Platform } from 'react-native'
-import {
-  isEmulator,
-  getModel,
-  getDeviceId,
-  getBrand,
-} from 'react-native-device-info'
+import DeviceInfo from 'react-native-device-info'
+import { getModel, getDeviceId, getBrand } from 'react-native-device-info'
 import { Notifications } from 'react-native-notifications'
 
 import { useGlobalState } from '../GlobalState'
-import { APP_VERSION, USER_AGENT } from '../constants'
+import { APP_VERSION } from '../constants'
 const init = async ({ isSignedIn, setGlobalState, dispatch }) => {
   if (!isSignedIn) {
     setGlobalState({ pushReady: true })
@@ -40,24 +36,37 @@ const init = async ({ isSignedIn, setGlobalState, dispatch }) => {
   setGlobalState({ pushReady: true })
 
   Notifications.registerRemoteNotifications()
-  Notifications.events().registerRemoteNotificationsRegistered((event) => {
-    dispatch({
-      type: 'postMessage',
-      content: {
-        type: 'onPushRegistered',
-        data: {
-          token: event.deviceToken,
-          os: Platform.OS,
-          osVersion: Platform.Version,
-          brand: getBrand(),
-          model: getModel(),
-          deviceId: getDeviceId(),
-          appVersion: APP_VERSION,
-          userAgent: USER_AGENT,
+  Notifications.events().registerRemoteNotificationsRegistered(
+    async (event) => {
+      const nativeUserAgent = await DeviceInfo.getUserAgent()
+      console.log('onPushRegistered', {
+        token: event.deviceToken,
+        os: Platform.OS,
+        osVersion: Platform.Version,
+        brand: getBrand(),
+        model: getModel(),
+        deviceId: getDeviceId(),
+        appVersion: APP_VERSION,
+        userAgent: `${nativeUserAgent} RepublikApp/${APP_VERSION}`,
+      })
+      dispatch({
+        type: 'postMessage',
+        content: {
+          type: 'onPushRegistered',
+          data: {
+            token: event.deviceToken,
+            os: Platform.OS,
+            osVersion: Platform.Version,
+            brand: getBrand(),
+            model: getModel(),
+            deviceId: getDeviceId(),
+            appVersion: APP_VERSION,
+            userAgent: `${nativeUserAgent} RepublikApp/${APP_VERSION}`,
+          },
         },
-      },
-    })
-  })
+      })
+    },
+  )
   Notifications.events().registerRemoteNotificationsRegistrationFailed(
     (event) => {
       console.warn(event)

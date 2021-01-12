@@ -22,15 +22,8 @@ const Web = () => {
   const webviewRef = useRef()
   const [webUrl, setWebUrl] = useState()
   const [isReady, setIsReady] = useState(false)
-  const [showLoader, setShowLoader] = useState(true)
+  const [showLoader, setShowLoader] = useState(false)
   const { colors } = useColorContext()
-
-  // Make sure loader is only shown on first mount
-  useEffect(() => {
-    if (isReady && showLoader) {
-      setShowLoader(false)
-    }
-  }, [isReady, showLoader])
 
   // Capture Android back button press
   useEffect(() => {
@@ -163,19 +156,24 @@ const Web = () => {
           <WebView
             ref={webviewRef}
             source={{ uri: webUrl }}
+            // Loader for first mount
+            startInLoadingState={true}
+            renderLoading={() => <Loader loading={!isReady} />}
             applicationNameForUserAgent={`RepublikApp/${APP_VERSION}`}
             onNavigationStateChange={({ url }) => {
               console.log('onNavigationStateChange', url)
               setPersistedState({ url })
             }}
             onMessage={(e) => onMessage(e)}
-            onLoadStart={() => {
-              console.log('onLoadStart', 'ready', false)
+            onLoadStart={(event) => {
+              console.log('onLoadStart', 'ready', false, webUrl, event)
               setIsReady(false)
+              setShowLoader(true)
             }}
             onLoad={() => {
               console.log('onLoad', 'ready', true)
               setIsReady(true)
+              setShowLoader(false)
             }}
             originWhitelist={[`${FRONTEND_BASE_URL}*`]}
             pullToRefreshEnabled={false}
@@ -191,6 +189,7 @@ const Web = () => {
           />
         </SafeAreaView>
       )}
+      {/* used to indicate loading when navigation is initiated from the app */}
       {showLoader && !isReady && <Loader loading={!isReady} />}
     </>
   )
