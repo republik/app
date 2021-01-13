@@ -1,11 +1,5 @@
-import React, { useLayoutEffect, useRef } from 'react'
-import {
-  LayoutAnimation,
-  Animated,
-  StatusBar,
-  Platform,
-  UIManager,
-} from 'react-native'
+import React, { useEffect, useRef } from 'react'
+import { Animated, StatusBar, Easing } from 'react-native'
 import {
   getStatusBarHeight,
   isIPhoneWithMonobrow,
@@ -13,12 +7,7 @@ import {
 import { useColorContext } from '../utils/colors'
 import { useOrientation } from '../utils/useOrientation'
 import { useGlobalState } from '../GlobalState'
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
-  UIManager.setLayoutAnimationEnabledExperimental(true)
-}
+import { ANIMATION_DURATION } from '../constants'
 
 const CustomStatusBar = () => {
   const { colors, colorSchemeKey } = useColorContext()
@@ -31,23 +20,41 @@ const CustomStatusBar = () => {
     ? colors.fullScreenStatusBar
     : colors.default
   const barStyle = colorSchemeKey === 'dark' ? 'light-content' : 'dark-content'
-  const firstUpdate = useRef(true)
-  useLayoutEffect(() => {
-    if (firstUpdate.current) {
-      firstUpdate.current = false
+  const slideAnim = useRef(new Animated.Value(0)).current
+  useEffect(() => {
+    const slideIn = () => {
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: ANIMATION_DURATION,
+        easing: Easing.in(Easing.ease),
+        useNativeDriver: false,
+      }).start()
+    }
+    const slideOut = () => {
+      Animated.timing(slideAnim, {
+        toValue: 1,
+        duration: ANIMATION_DURATION,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: false,
+      }).start()
+    }
+    if (isFullscreen) {
+      slideOut()
       return
     }
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
-  }, [isFullscreen])
+    slideIn()
+  }, [isFullscreen, slideAnim])
+
+  const animationStatusBarHeight =
+    orientation === 'landscape' || !isIPhoneWithMonobrow() ? 0 : statusBarHeight
 
   return (
     <Animated.View
       style={{
-        height:
-          orientation === 'landscape' ||
-          (isFullscreen && !isIPhoneWithMonobrow())
-            ? 0
-            : statusBarHeight,
+        height: slideAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [statusBarHeight, animationStatusBarHeight],
+        }),
         backgroundColor,
       }}>
       <StatusBar
