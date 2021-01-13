@@ -1,6 +1,5 @@
 import React from 'react'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-
 import PushService from './services/Push'
 import DeepLinkingService from './services/DeepLinking'
 import AppStateService from './services/AppState'

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useLayoutEffect, useRef } from 'react'
 import {
   LayoutAnimation,
   Animated,
@@ -31,7 +31,12 @@ const CustomStatusBar = () => {
     ? colors.fullScreenStatusBar
     : colors.default
   const barStyle = colorSchemeKey === 'dark' ? 'light-content' : 'dark-content'
-  useEffect(() => {
+  const firstUpdate = useRef(true)
+  useLayoutEffect(() => {
+    if (firstUpdate.current) {
+      firstUpdate.current = false
+      return
+    }
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
   }, [isFullscreen])
 

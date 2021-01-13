@@ -1,14 +1,14 @@
 import React, { useRef, useState, useEffect } from 'react'
 import { WebView } from 'react-native-webview'
 import { SafeAreaView } from 'react-native-safe-area-context'
-
+import ReactNativeHapticFeedback from 'react-native-haptic-feedback'
 import { Share, Platform, BackHandler } from 'react-native'
+import SplashScreen from 'react-native-splash-screen'
+
 import { APP_VERSION, FRONTEND_BASE_URL } from '../constants'
 import { useGlobalState } from '../GlobalState'
-import SplashScreen from 'react-native-splash-screen'
 import Loader from '../components/Loader'
 import { useColorContext } from '../utils/colors'
-import ReactNativeHapticFeedback from 'react-native-haptic-feedback'
 
 const Web = () => {
   const {

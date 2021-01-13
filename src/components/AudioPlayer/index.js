@@ -4,11 +4,7 @@ import { View, StyleSheet, Animated, Easing } from 'react-native'
 import TrackPlayer, { usePlaybackState } from 'react-native-track-player'
 
 import Logo from '../../assets/images/playlist-logo.png'
-import {
-  AUDIO_PLAYER_HEIGHT,
-  AUDIO_PLAYER_PROGRESS_HEIGHT,
-  ANIMATION_DURATION,
-} from '../../constants'
+import { AUDIO_PLAYER_HEIGHT, ANIMATION_DURATION } from '../../constants'
 import { useGlobalState } from '../../GlobalState'
 import { useColorContext } from '../../utils/colors'
 import ProgressBar from './ProgressBar'
@@ -169,7 +165,6 @@ const AudioPlayer = () => {
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    bottom: 0,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
