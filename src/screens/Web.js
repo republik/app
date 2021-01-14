@@ -26,20 +26,20 @@ const Web = () => {
   const { colors } = useColorContext()
 
   // Capture Android back button press
+  const hasWebUrl = !!webUrl
   useEffect(() => {
-    const CurrentWebView = webviewRef.current
-    if (Platform.OS === 'android') {
-      BackHandler.addEventListener('hardwareBackPress', CurrentWebView.goBack())
+    if (!hasWebUrl || Platform.OS !== 'android') {
+      return
     }
+    const currentWebView = webviewRef.current
+    BackHandler.addEventListener('hardwareBackPress', currentWebView.goBack())
     return () => {
-      if (Platform.OS === 'android') {
-        BackHandler.removeEventListener(
-          'hardwareBackPress',
-          CurrentWebView.goBack(),
-        )
-      }
+      BackHandler.removeEventListener(
+        'hardwareBackPress',
+        currentWebView.goBack(),
+      )
     }
-  }, [])
+  }, [hasWebUrl])
 
   useEffect(() => {
     // wait for all services
