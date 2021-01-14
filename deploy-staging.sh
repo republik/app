@@ -13,8 +13,8 @@ yarn lint
 yarn version --no-git-tag-version || exit 1
 
 # build and push to stores (remember error traps do not work on chained &&)
-pushd deploy-ios-staging && popd || exit 1
-pushd deploy-android-staging && popd || exit 1
+yarn deploy-ios-staging || exit 1
+yarn deploy-android-staging || exit 1
 
 # commit
 git add package.json
