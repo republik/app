@@ -7,10 +7,7 @@ import {
   usePlaybackState,
 } from 'react-native-track-player'
 import { useGlobalState } from '../../GlobalState'
-import {
-  FRONTEND_BASE_URL,
-  AUDIO_PLAYER_PROGRESS_HEIGHT,
-} from '../../constants'
+import { FRONTEND_BASE_URL } from '../../constants'
 const Controls = ({ seekTo, audio, togglePlayback, paused }) => {
   const { setPersistedState, setGlobalState } = useGlobalState()
   const { colors } = useColorContext()

@@ -1,7 +1,12 @@
 import React, { useEffect, useRef } from 'react'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { View, StyleSheet, Animated, Easing } from 'react-native'
-import TrackPlayer, { usePlaybackState } from 'react-native-track-player'
+import TrackPlayer, {
+  usePlaybackState,
+  TrackPlayerEvents,
+  useTrackPlayerEvents,
+  useTrackPlayerProgress,
+} from 'react-native-track-player'
 
 import Logo from '../../assets/images/playlist-logo.png'
 import { AUDIO_PLAYER_HEIGHT, ANIMATION_DURATION } from '../../constants'
@@ -10,6 +15,14 @@ import { useColorContext } from '../../utils/colors'
 import ProgressBar from './ProgressBar'
 import Controls from './Controls'
 
+const events = [
+  TrackPlayerEvents.REMOTE_PLAY,
+  TrackPlayerEvents.REMOTE_PAUSE,
+  TrackPlayerEvents.REMOTE_SEEK,
+  TrackPlayerEvents.REMOTE_JUMP_FORWARD,
+  TrackPlayerEvents.REMOTE_JUMP_BACKWARD,
+]
+
 const AudioPlayer = () => {
   const insets = useSafeAreaInsets()
   const playbackState = usePlaybackState()
@@ -17,11 +30,35 @@ const AudioPlayer = () => {
   const { audio, currentMediaTime } = persistedState
   const slideAnim = useRef(new Animated.Value(0)).current
   const { colors } = useColorContext()
+  const { position } = useTrackPlayerProgress()
 
   // Initializes the player
   useEffect(() => {
     setup()
   }, [])
+
+  useTrackPlayerEvents(events, async (event) => {
+    if (event.type === TrackPlayerEvents.REMOTE_PLAY) {
+      await TrackPlayer.play()
+      return
+    }
+    if (event.type === TrackPlayerEvents.REMOTE_PAUSE) {
+      await TrackPlayer.pause()
+      return
+    }
+    if (event.type === TrackPlayerEvents.REMOTE_SEEK) {
+      await TrackPlayer.seekTo(event.position)
+      return
+    }
+    if (event.type === TrackPlayerEvents.REMOTE_JUMP_FORWARD) {
+      await TrackPlayer.seekTo(position + 15)
+      return
+    }
+    if (event.type === TrackPlayerEvents.REMOTE_JUMP_BACKWARD) {
+      await TrackPlayer.seekTo(position - 15)
+      return
+    }
+  })
 
   async function setup() {
     await TrackPlayer.setupPlayer({})
@@ -34,6 +71,7 @@ const AudioPlayer = () => {
         TrackPlayer.CAPABILITY_STOP,
         TrackPlayer.CAPABILITY_JUMP_FORWARD,
         TrackPlayer.CAPABILITY_JUMP_BACKWARD,
+        TrackPlayer.CAPABILITY_SEEK_TO,
       ],
     })
   }

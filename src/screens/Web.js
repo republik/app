@@ -186,6 +186,7 @@ const Web = () => {
             keyboardDisplayRequiresUserAction={false}
             mediaPlaybackRequiresUserAction={false}
             scalesPageToFit={false}
+            decelerationRate="normal"
           />
         </SafeAreaView>
       )}
