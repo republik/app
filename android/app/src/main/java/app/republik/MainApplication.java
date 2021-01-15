@@ -10,6 +10,7 @@ import com.facebook.react.ReactPackage;
 import com.facebook.soloader.SoLoader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import com.wix.reactnativenotifications.RNNotificationsPackage;
 
 import app.republik.BuildConfig;
 

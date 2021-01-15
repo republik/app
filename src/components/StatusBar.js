@@ -4,6 +4,8 @@ import {
   getStatusBarHeight,
   isIPhoneWithMonobrow,
 } from 'react-native-status-bar-height'
+import changeNavigationBarColor from 'react-native-navigation-bar-color'
+
 import { useColorContext } from '../utils/colors'
 import { useOrientation } from '../utils/useOrientation'
 import { useGlobalState } from '../GlobalState'
@@ -21,6 +23,11 @@ const CustomStatusBar = () => {
     : colors.default
   const barStyle = colorSchemeKey === 'dark' ? 'light-content' : 'dark-content'
   const slideAnim = useRef(new Animated.Value(0)).current
+
+  useEffect(() => {
+    changeNavigationBarColor(backgroundColor)
+  }, [backgroundColor])
+
   useEffect(() => {
     const slideIn = () => {
       Animated.timing(slideAnim, {
