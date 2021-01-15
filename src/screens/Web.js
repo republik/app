@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback'
 import { Share, Platform, BackHandler } from 'react-native'
 import SplashScreen from 'react-native-splash-screen'
+import { v4 as uuidv4 } from 'uuid'
 
 import { APP_VERSION, FRONTEND_BASE_URL } from '../constants'
 import { useGlobalState } from '../GlobalState'
@@ -56,7 +57,13 @@ const Web = () => {
       // the date is added so that when a page is set via setWebUrl
       // and a user navigates away but then tries to return to the page
       // (e.g. via AudioPlayer Title-Link), the state change is registered
-      setWebUrl(`${globalState.pendingUrl}?t=${Date.now()}`)
+      if (webUrl === globalState.pendingUrl) {
+        setWebUrl(
+          `${globalState.pendingUrl.split('#')[0]}#app-load-${uuidv4()}}`,
+        )
+      } else {
+        setWebUrl(`${globalState.pendingUrl}`)
+      }
       setGlobalState({ pendingUrl: null })
     } else if (!webUrl) {
       // if nothing is pending navigate to saved url

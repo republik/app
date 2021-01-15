@@ -53,7 +53,10 @@ const CustomStatusBar = () => {
       style={{
         height: slideAnim.interpolate({
           inputRange: [0, 1],
-          outputRange: [statusBarHeight, animationStatusBarHeight],
+          outputRange: [
+            orientation === 'landscape' ? 0 : statusBarHeight,
+            animationStatusBarHeight,
+          ],
         }),
         backgroundColor,
       }}>
