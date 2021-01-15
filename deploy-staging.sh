@@ -17,6 +17,6 @@ yarn deploy-ios-staging || exit 1
 yarn deploy-android-staging || exit 1
 
 # commit
-git add package.json
-export VERSION=$(node -p "require('./package.json').version")
-git commit -m "Version bump to ${VERSION}" && git push && git push --tags
+# git add package.json
+# export VERSION=$(node -p "require('./package.json').version")
+# git commit -m "Version bump to ${VERSION}" && git push && git push --tags
