@@ -13,6 +13,7 @@ import java.util.List;
 import com.wix.reactnativenotifications.RNNotificationsPackage;
 
 import app.republik.BuildConfig;
+import android.webkit.WebView;
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -48,6 +49,7 @@ public class MainApplication extends Application implements ReactApplication {
     super.onCreate();
     SoLoader.init(this, /* native exopackage */ false);
     initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
+    WebView.setWebContentsDebuggingEnabled(true);
   }
 
   /**

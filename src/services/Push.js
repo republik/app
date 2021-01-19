@@ -46,16 +46,6 @@ const init = async ({ isSignedIn, setGlobalState, dispatch }) => {
   Notifications.events().registerRemoteNotificationsRegistered(
     async (event) => {
       const nativeUserAgent = await DeviceInfo.getUserAgent()
-      console.log('onPushRegistered', {
-        token: event.deviceToken,
-        os: Platform.OS,
-        osVersion: Platform.Version,
-        brand: getBrand(),
-        model: getModel(),
-        deviceId: getDeviceId(),
-        appVersion: APP_VERSION,
-        userAgent: `${nativeUserAgent} RepublikApp/${APP_VERSION}`,
-      })
       dispatch({
         type: 'postMessage',
         content: {

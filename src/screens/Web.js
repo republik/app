@@ -24,6 +24,7 @@ const Web = () => {
   const [webUrl, setWebUrl] = useState()
   const [isReady, setIsReady] = useState(false)
   const [showLoader, setShowLoader] = useState(false)
+  const [canGoBack, setCanGoBack] = useState(false)
   const { colors } = useColorContext()
 
   // Capture Android back button press
@@ -33,14 +34,20 @@ const Web = () => {
       return
     }
     const currentWebView = webviewRef.current
-    BackHandler.addEventListener('hardwareBackPress', currentWebView.goBack())
-    return () => {
-      BackHandler.removeEventListener(
-        'hardwareBackPress',
-        currentWebView.goBack(),
-      )
+    const backAction = () => {
+      if (canGoBack) {
+        currentWebView.goBack()
+        setCanGoBack(undefined)
+        return true
+      }
+      BackHandler.exitApp()
+      return false
     }
-  }, [hasWebUrl])
+    BackHandler.addEventListener('hardwareBackPress', backAction)
+    return () => {
+      BackHandler.removeEventListener('hardwareBackPress')
+    }
+  }, [hasWebUrl, canGoBack])
 
   useEffect(() => {
     // wait for all services
@@ -103,7 +110,12 @@ const Web = () => {
   const onMessage = (e) => {
     const message = JSON.parse(e.nativeEvent.data) || {}
     console.log('onMessage', message)
-    if (message.type === 'share') {
+    if (message.type === 'routeChange') {
+      onNavigationStateChange({
+        ...message.payload,
+        onMessage: true,
+      })
+    } else if (message.type === 'share') {
       share(message.payload)
     } else if (message.type === 'haptic') {
       ReactNativeHapticFeedback.trigger(message.payload.type)
@@ -149,6 +161,15 @@ const Web = () => {
     }
   }
 
+  const onNavigationStateChange = ({ url, canGoBack, onMessage }) => {
+    // ToDo: deduplicate iOS - on iOS this function is currently
+    //called twice, once onMessage, and once onNavigationStateChange
+    const consistentUrl = onMessage ? `${FRONTEND_BASE_URL}${url}` : url
+    console.log(onMessage, consistentUrl)
+    setPersistedState({ consistentUrl })
+    setCanGoBack(canGoBack)
+  }
+
   return (
     <>
       {webUrl && (
@@ -167,10 +188,7 @@ const Web = () => {
             startInLoadingState={true}
             renderLoading={() => <Loader loading={!isReady} />}
             applicationNameForUserAgent={`RepublikApp/${APP_VERSION}`}
-            onNavigationStateChange={({ url }) => {
-              console.log('onNavigationStateChange', url)
-              setPersistedState({ url })
-            }}
+            onNavigationStateChange={(e) => onNavigationStateChange(e)}
             onMessage={(e) => onMessage(e)}
             onLoadStart={(event) => {
               console.log('onLoadStart', 'ready', false, webUrl, event)
