@@ -25,6 +25,7 @@ const Controls = ({ seekTo, audio, togglePlayback, paused }) => {
     if (audio && audio.sourcePath) {
       setGlobalState({
         pendingUrl: `${FRONTEND_BASE_URL}${audio.sourcePath}`,
+        showLoader: true,
       })
     }
   }

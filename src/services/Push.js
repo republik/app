@@ -33,7 +33,7 @@ const init = async ({ isSignedIn, setGlobalState, dispatch }) => {
     originUrl.host = FRONTEND_HOST
     originUrl.protocol = FRONTEND_PROTOCOL
     const newUrl = format(originUrl)
-    setGlobalState({ pendingUrl: newUrl })
+    setGlobalState({ pendingUrl: newUrl, showLoader: true })
   }
 
   const initialNotification = await Notifications.getInitialNotification()

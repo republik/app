@@ -23,7 +23,6 @@ const Web = () => {
   const webviewRef = useRef()
   const [webUrl, setWebUrl] = useState()
   const [isReady, setIsReady] = useState(false)
-  const [showLoader, setShowLoader] = useState(false)
   const [canGoBack, setCanGoBack] = useState(false)
   const { colors } = useColorContext()
 
@@ -116,6 +115,7 @@ const Web = () => {
         ...message.payload,
         onMessage: true,
       })
+      setGlobalState({ showLoader: false })
     } else if (message.type === 'share') {
       share(message.payload)
     } else if (message.type === 'haptic') {
@@ -187,19 +187,20 @@ const Web = () => {
             source={{ uri: webUrl }}
             // Loader for first mount
             startInLoadingState={true}
-            renderLoading={() => <Loader loading={!isReady} />}
+            renderLoading={() => (
+              <Loader loading={globalState.showLoader !== false} />
+            )}
             applicationNameForUserAgent={`RepublikApp/${APP_VERSION}`}
             onNavigationStateChange={(e) => onNavigationStateChange(e)}
             onMessage={(e) => onMessage(e)}
             onLoadStart={(event) => {
               console.log('onLoadStart', 'ready', false, webUrl, event)
               setIsReady(false)
-              setShowLoader(true)
             }}
             onLoad={() => {
               console.log('onLoad', 'ready', true)
+              setGlobalState({ showLoader: false })
               setIsReady(true)
-              setShowLoader(false)
             }}
             originWhitelist={[`${FRONTEND_BASE_URL}*`]}
             pullToRefreshEnabled={false}
@@ -216,8 +217,7 @@ const Web = () => {
           />
         </SafeAreaView>
       )}
-      {/* used to indicate loading when navigation is initiated from the app */}
-      {showLoader && !isReady && <Loader loading={!isReady} />}
+      {globalState.showLoader !== false && <Loader loading={!isReady} />}
     </>
   )
 }
