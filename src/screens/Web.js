@@ -110,11 +110,14 @@ const Web = () => {
   const onMessage = (e) => {
     const message = JSON.parse(e.nativeEvent.data) || {}
     console.log('onMessage', message)
+
     if (message.type === 'routeChange') {
       onNavigationStateChange({
         ...message.payload,
         onMessage: true,
       })
+    } else if (message.type === 'debug') {
+      console.warn(message.payload.name, message.payload.value)
     } else if (message.type === 'share') {
       share(message.payload)
     } else if (message.type === 'haptic') {
