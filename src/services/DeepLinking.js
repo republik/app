@@ -8,6 +8,10 @@ const DeepLinkingService = () => {
 
   useEffect(() => {
     const handleOpenURL = ({ url }) => {
+      // Don't navigate if trackplayer url
+      if (url === 'trackplayer://notification.click') {
+        return
+      }
       setGlobalState({ pendingUrl: url })
     }
 
