@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 import { APP_VERSION, FRONTEND_BASE_URL } from '../constants'
 import { useGlobalState } from '../GlobalState'
+import Error from './Error'
 import Loader from '../components/Loader'
 import { useColorContext } from '../utils/colors'
 
@@ -109,7 +110,6 @@ const Web = () => {
   const onMessage = (e) => {
     const message = JSON.parse(e.nativeEvent.data) || {}
     console.log('onMessage', message)
-
     if (message.type === 'routeChange') {
       onNavigationStateChange({
         ...message.payload,
@@ -202,6 +202,9 @@ const Web = () => {
               setGlobalState({ showLoader: false })
               setIsReady(true)
             }}
+            renderError={() => (
+              <Error onReload={() => webviewRef.current.reload()} />
+            )}
             originWhitelist={[`${FRONTEND_BASE_URL}*`]}
             pullToRefreshEnabled={false}
             bounce={false}
