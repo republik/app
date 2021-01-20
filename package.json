@@ -15,7 +15,7 @@
     "test": "jest",
     "lint": "eslint .",
     "version": "react-native-version --skip-tag",
-    "postinstall": "patch --forward ./node_modules/react-native-notifications/lib/android/app/src/main/java/com/wix/reactnativenotifications/core/notification/PushNotification.java < patches/react-native-notifications/PushNotifications-java.patch"
+    "postinstall": "patch --forward ./node_modules/react-native-notifications/lib/android/app/src/main/java/com/wix/reactnativenotifications/core/notification/PushNotification.java < patches/react-native-notifications/PushNotifications-java.patch  || true"
   },
   "dependencies": {
     "@react-native-community/async-storage": "^1.12.1",
