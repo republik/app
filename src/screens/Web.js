@@ -121,9 +121,10 @@ const Web = () => {
     } else if (message.type === 'haptic') {
       ReactNativeHapticFeedback.trigger(message.payload.type)
     } else if (message.type === 'play-audio') {
+      const { currentTime, ...audio } = message.payload
       setPersistedState({
-        audio: message.payload.audio,
-        currentMediaTime: message.payload.currentTime,
+        audio,
+        currentMediaTime: currentTime,
       })
     } else if (message.type === 'isSignedIn') {
       setPersistedState({ isSignedIn: message.payload })
