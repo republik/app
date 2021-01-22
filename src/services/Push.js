@@ -73,8 +73,13 @@ const init = async ({ isSignedIn, setGlobalState, dispatch }) => {
     (notification, completion) => {
       const payload = notification.payload
       if (payload?.type === 'authorization') {
-        // authorization only triggers a notification if the app is in
-        // background.
+        dispatch({
+          type: 'postMessage',
+          content: {
+            type: 'authorization',
+            url: payload.url
+          },
+        })
         return
       }
       completion({ alert: true, sound: true, badge: true })
