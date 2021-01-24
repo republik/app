@@ -12,6 +12,22 @@ import NetworkError from './NetworkError'
 import Loader from '../components/Loader'
 import { useColorContext } from '../utils/colors'
 
+const generateMessageJS = (data) => {
+  return [
+    '(function(){',
+    'var event;',
+    `var data = ${JSON.stringify(data)};`,
+    'try{',
+    'event = new MessageEvent("message",{data});',
+    '}catch(e){',
+    'event = document.createEvent("MessageEvent");',
+    'event.initMessageEvent("message",true,true,data,"","",window);',
+    '}',
+    'document.dispatchEvent(event);',
+    '})();'
+  ].join('')
+}
+
 const Web = () => {
   const {
     globalState,
@@ -92,7 +108,7 @@ const Web = () => {
       return
     }
     console.log('postMessage', message)
-    webviewRef.current.postMessage(JSON.stringify(message))
+    webviewRef.current.injectJavaScript(generateMessageJS(message))
     dispatch({
       type: 'markMessage',
       id: message.id,
