@@ -2,7 +2,7 @@ import React from 'react'
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native'
 import { useColorContext } from '../utils/colors'
 
-const ErrorView = ({ onReload }) => {
+const NetworkError = ({ onReload }) => {
   const { colors } = useColorContext()
 
   return (
@@ -35,7 +35,7 @@ const ErrorView = ({ onReload }) => {
   )
 }
 
-export default ErrorView
+export default NetworkError
 
 const styles = StyleSheet.create({
   container: {

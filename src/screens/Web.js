@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 import { APP_VERSION, FRONTEND_BASE_URL } from '../constants'
 import { useGlobalState } from '../GlobalState'
-import Error from './Error'
+import NetworkError from './NetworkError'
 import Loader from '../components/Loader'
 import { useColorContext } from '../utils/colors'
 
@@ -204,7 +204,7 @@ const Web = () => {
               setIsReady(true)
             }}
             renderError={() => (
-              <Error onReload={() => webviewRef.current.reload()} />
+              <NetworkError onReload={() => webviewRef.current.reload()} />
             )}
             originWhitelist={[`${FRONTEND_BASE_URL}*`]}
             pullToRefreshEnabled={false}
