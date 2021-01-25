@@ -24,7 +24,7 @@ const generateMessageJS = (data) => {
     'event.initMessageEvent("message",true,true,data,"","",window);',
     '}',
     'document.dispatchEvent(event);',
-    '})();'
+    '})();',
   ].join('')
 }
 

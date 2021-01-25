@@ -77,7 +77,7 @@ const init = async ({ isSignedIn, setGlobalState, dispatch }) => {
           type: 'postMessage',
           content: {
             type: 'authorization',
-            url: payload.url
+            url: payload.url,
           },
         })
         return
