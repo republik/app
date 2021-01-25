@@ -184,7 +184,7 @@ const Web = () => {
     //called twice, once onMessage, and once onNavigationStateChange
     const consistentUrl = onMessage ? `${FRONTEND_BASE_URL}${url}` : url
     console.log(onMessage, consistentUrl)
-    setPersistedState({ consistentUrl })
+    setPersistedState({ url: consistentUrl })
     setCanGoBack(canGoBack)
   }
 
