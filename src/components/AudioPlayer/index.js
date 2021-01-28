@@ -3,8 +3,6 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { View, StyleSheet, Animated, Easing } from 'react-native'
 import TrackPlayer, {
   usePlaybackState,
-  TrackPlayerEvents,
-  useTrackPlayerEvents,
   useTrackPlayerProgress,
 } from 'react-native-track-player'
 
@@ -66,9 +64,9 @@ const AudioPlayer = () => {
         useNativeDriver: false,
       }).start()
     }
-    if (!!audio) {
+    if (audio) {
       slideIn()
-      togglePlayback()
+      togglePlayback({ init: true })
     } else {
       slideOut()
       togglePlayback()
@@ -76,15 +74,15 @@ const AudioPlayer = () => {
   }, [audio, slideAnim, togglePlayback, setPersistedState, dispatch])
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const togglePlayback = async () => {
-    if (audio == null) {
+  const togglePlayback = async ({ init } = {}) => {
+    if (!audio) {
       await TrackPlayer.pause()
       return
     }
     const currentTrack = await TrackPlayer.getCurrentTrack()
 
     // check if there's already a track loaded in the player
-    if (currentTrack == null) {
+    if (currentTrack === null) {
       // if not, add the audio object provided and
       await TrackPlayer.reset()
       await TrackPlayer.add({
@@ -94,12 +92,6 @@ const AudioPlayer = () => {
         artist: 'Republik',
         artwork: Logo,
       })
-      if (currentMediaTime) {
-        // if a current time is provided play from there
-        await TrackPlayer.seekTo(currentMediaTime)
-        await TrackPlayer.play()
-        return
-      }
       // if no current time, just play
       await TrackPlayer.play()
     } else {
@@ -114,11 +106,6 @@ const AudioPlayer = () => {
           artist: 'Republik',
           artwork: Logo,
         })
-        if (currentMediaTime) {
-          await TrackPlayer.seekTo(currentMediaTime)
-          await TrackPlayer.play()
-          return
-        }
         await TrackPlayer.play()
       } else {
         // if it's the same audio, check if the player is paused
@@ -130,6 +117,9 @@ const AudioPlayer = () => {
           await TrackPlayer.pause()
         }
       }
+    }
+    if (init && currentMediaTime) {
+      await TrackPlayer.seekTo(currentMediaTime)
     }
   }
 
@@ -153,7 +143,7 @@ const AudioPlayer = () => {
           <ProgressBar
             audio={audio}
             enableProgress={true}
-            isPlaying={playbackState == TrackPlayer.STATE_PLAYING}
+            isPlaying={playbackState === TrackPlayer.STATE_PLAYING}
             seekTo={(position) => seekTo(position)}
           />
           <Controls
