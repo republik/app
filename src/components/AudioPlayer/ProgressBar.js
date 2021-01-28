@@ -5,18 +5,21 @@ import {
   ANIMATION_DURATION,
   AUDIO_PLAYER_PROGRESS_HEIGHT,
 } from '../../constants'
-import { useTrackPlayerProgress } from 'react-native-track-player'
+import TrackPlayer, { useTrackPlayerProgress, usePlaybackState } from 'react-native-track-player'
 import { useColorContext } from '../../utils/colors'
 import { useGlobalState } from '../../GlobalState'
 
-const ProgressBar = ({ audio, isPlaying, enableProgress, seekTo }) => {
+const ProgressBar = ({ audio }) => {
   const [isPanning, setIsPanning] = useState(false)
   const [playerWidth, setPlayerWidth] = useState(0)
   const [panProgress, setPanProgress] = useState(0)
   const { colors } = useColorContext()
-  const { position, duration, bufferedPosition } = useTrackPlayerProgress()
+  const { position, duration, bufferedPosition } = useTrackPlayerProgress(100)
+  const playbackState = usePlaybackState()
   const { setPersistedState, dispatch } = useGlobalState()
   const scaleY = useRef(new Animated.Value(1)).current
+
+  const isPlaying = playbackState === TrackPlayer.STATE_PLAYING
 
   const upsertCurrentMediaProgress = useMemo(() => {
     return debounce((audio, position) => {
@@ -70,21 +73,21 @@ const ProgressBar = ({ audio, isPlaying, enableProgress, seekTo }) => {
       },
       onPanResponderRelease: (evt, gestureState) => {
         setIsPanning(false)
-        seekTo(panProgress * duration)
+        TrackPlayer.seekTo(panProgress * duration)
         collapseAnim()
       },
     })
-  }, [scaleY, playerWidth, duration, panProgress, seekTo])
+  }, [scaleY, playerWidth, duration, panProgress])
 
   useEffect(() => {
-    if (enableProgress && audio && isPlaying && position > 0) {
+    if (audio && isPlaying && position > 0) {
       if (audio.mediaId) {
         upsertCurrentMediaProgress(audio, position)
       } else {
         console.warn(`Audio element ${audio.id} has no mediaId`)
       }
     }
-  }, [upsertCurrentMediaProgress, audio, enableProgress, isPlaying, position])
+  }, [upsertCurrentMediaProgress, audio, isPlaying, position])
 
   const progress = isPanning ? panProgress * 100 : (position / duration) * 100
   const buffered = (bufferedPosition / duration) * 100

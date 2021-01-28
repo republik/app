@@ -1,10 +1,7 @@
 import React, { useEffect, useRef } from 'react'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
-import { View, StyleSheet, Animated, Easing } from 'react-native'
-import TrackPlayer, {
-  usePlaybackState,
-  useTrackPlayerProgress,
-} from 'react-native-track-player'
+import { View, StyleSheet, Animated, Easing, Platform } from 'react-native'
+import TrackPlayer from 'react-native-track-player'
 
 import Logo from '../../assets/images/playlist-logo.png'
 import { AUDIO_PLAYER_HEIGHT, ANIMATION_DURATION } from '../../constants'
@@ -13,34 +10,40 @@ import { useColorContext } from '../../utils/colors'
 import ProgressBar from './ProgressBar'
 import Controls from './Controls'
 
+async function setup() {
+  await TrackPlayer.setupPlayer({
+    backBuffer: 15,
+  })
+  await TrackPlayer.updateOptions({
+    stopWithApp: true,
+    jumpInterval: 15,
+    capabilities: [
+      TrackPlayer.CAPABILITY_PLAY,
+      TrackPlayer.CAPABILITY_PAUSE,
+      TrackPlayer.CAPABILITY_JUMP_FORWARD,
+      TrackPlayer.CAPABILITY_JUMP_BACKWARD,
+      TrackPlayer.CAPABILITY_SEEK_TO,
+    ],
+  })
+}
+
 const AudioPlayer = () => {
   const insets = useSafeAreaInsets()
-  const playbackState = usePlaybackState()
-  const { persistedState, setPersistedState, dispatch } = useGlobalState()
-  const { audio, currentMediaTime } = persistedState
+  const {
+    persistedState,
+    setPersistedState,
+    dispatch,
+    globalState,
+    setGlobalState,
+  } = useGlobalState()
+  const { audio } = persistedState
   const slideAnim = useRef(new Animated.Value(0)).current
   const { colors } = useColorContext()
-  const { position } = useTrackPlayerProgress()
 
   // Initializes the player
   useEffect(() => {
     setup()
   }, [])
-
-  async function setup() {
-    await TrackPlayer.setupPlayer({})
-    await TrackPlayer.updateOptions({
-      stopWithApp: true,
-      jumpInterval: 15,
-      capabilities: [
-        TrackPlayer.CAPABILITY_PLAY,
-        TrackPlayer.CAPABILITY_PAUSE,
-        TrackPlayer.CAPABILITY_JUMP_FORWARD,
-        TrackPlayer.CAPABILITY_JUMP_BACKWARD,
-        TrackPlayer.CAPABILITY_SEEK_TO,
-      ],
-    })
-  }
 
   // Handles changes in the audio persisted state, sliding the
   // player in when there is an audio object vs sliding it out
@@ -66,24 +69,20 @@ const AudioPlayer = () => {
     }
     if (audio) {
       slideIn()
-      togglePlayback({ init: true })
+      loadAudio()
     } else {
       slideOut()
-      togglePlayback()
+      loadAudio()
     }
-  }, [audio, slideAnim, togglePlayback, setPersistedState, dispatch])
+  }, [audio, slideAnim, loadAudio, setPersistedState, dispatch])
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const togglePlayback = async ({ init } = {}) => {
+  const loadAudio = async () => {
     if (!audio) {
-      await TrackPlayer.pause()
+      await TrackPlayer.reset()
       return
     }
     const currentTrack = await TrackPlayer.getCurrentTrack()
-
-    // check if there's already a track loaded in the player
-    if (currentTrack === null) {
-      // if not, add the audio object provided and
+    if (currentTrack === null || currentTrack !== audio.mediaId) {
       await TrackPlayer.reset()
       await TrackPlayer.add({
         id: audio.mediaId,
@@ -92,40 +91,35 @@ const AudioPlayer = () => {
         artist: 'Republik',
         artwork: Logo,
       })
-      // if no current time, just play
+    }
+    if (globalState.autoPlayAudio) {
+      if (audio.currentTime && Platform.OS === 'ios') {
+        TrackPlayer.setVolume(0)
+      }
       await TrackPlayer.play()
-    } else {
-      // if there's already a current track check if a the audio file provided is a new track
-      if (currentTrack !== audio.mediaId) {
-        // if so, reset the player, add new track and play
-        await TrackPlayer.reset()
-        await TrackPlayer.add({
-          id: audio.mediaId,
-          url: audio.url,
-          title: audio.title,
-          artist: 'Republik',
-          artwork: Logo,
-        })
-        await TrackPlayer.play()
-      } else {
-        // if it's the same audio, check if the player is paused
-        if (playbackState === TrackPlayer.STATE_PAUSED) {
-          // if so, start playback
-          await TrackPlayer.play()
+      setGlobalState({ autoPlayAudio: false })
+      if (audio.currentTime) {
+        if (Platform.OS === 'ios') {
+          // seekTo does not work on iOS until the player has started playing
+          // we workaround around this with a setTimeout:
+          // https://github.com/react-native-kit/react-native-track-player/issues/387#issuecomment-709433886
+          setTimeout(() => {
+            TrackPlayer.seekTo(audio.currentTime)
+          }, 1)
+          setTimeout(() => {
+            TrackPlayer.seekTo(audio.currentTime)
+          }, 500)
+          setTimeout(() => {
+            TrackPlayer.seekTo(audio.currentTime)
+            TrackPlayer.setVolume(1)
+          }, 1000)
         } else {
-          // else pause the player
-          await TrackPlayer.pause()
+          TrackPlayer.seekTo(audio.currentTime)
         }
       }
     }
-    if (init && currentMediaTime) {
-      await TrackPlayer.seekTo(currentMediaTime)
-    }
   }
 
-  const seekTo = async (sec) => {
-    await TrackPlayer.seekTo(sec)
-  }
   return (
     <Animated.View
       style={[
@@ -140,18 +134,8 @@ const AudioPlayer = () => {
       ]}>
       <SafeAreaView edges={['right', 'left']}>
         <View style={[styles.player]}>
-          <ProgressBar
-            audio={audio}
-            enableProgress={true}
-            isPlaying={playbackState === TrackPlayer.STATE_PLAYING}
-            seekTo={(position) => seekTo(position)}
-          />
-          <Controls
-            seekTo={(position) => seekTo(position)}
-            audio={audio}
-            togglePlayback={() => togglePlayback()}
-            paused={TrackPlayer.STATE_PAUSED}
-          />
+          <ProgressBar audio={audio} />
+          <Controls audio={audio} />
         </View>
       </SafeAreaView>
     </Animated.View>

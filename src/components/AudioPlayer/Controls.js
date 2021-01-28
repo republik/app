@@ -2,16 +2,17 @@ import React from 'react'
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
 import { useColorContext } from '../../utils/colors'
 import Icon from 'react-native-vector-icons/MaterialIcons'
-import {
+import TrackPlayer, {
   useTrackPlayerProgress,
   usePlaybackState,
 } from 'react-native-track-player'
 import { useGlobalState } from '../../GlobalState'
 import { FRONTEND_BASE_URL } from '../../constants'
-const Controls = ({ seekTo, audio, togglePlayback, paused }) => {
+
+const Controls = ({ audio }) => {
   const { setPersistedState, setGlobalState } = useGlobalState()
   const { colors } = useColorContext()
-  const { position, duration } = useTrackPlayerProgress()
+  const { position, duration } = useTrackPlayerProgress(100)
   const playbackState = usePlaybackState()
 
   const parseSeconds = (value) => {
@@ -30,25 +31,33 @@ const Controls = ({ seekTo, audio, togglePlayback, paused }) => {
     }
   }
 
+  const isPlaying = playbackState === TrackPlayer.STATE_PLAYING
+
   return (
     <View {...styles.controls}>
       <Icon
         name="replay-10"
         size={28}
         color={colors.text}
-        onPress={() => seekTo(position - 10)}
+        onPress={() => TrackPlayer.seekTo(position - 10)}
       />
       <Icon
-        name={playbackState == paused ? 'play-arrow' : 'pause'}
+        name={isPlaying ? 'pause' : 'play-arrow'}
         size={46}
         color={colors.text}
-        onPress={() => togglePlayback()}
+        onPress={() => {
+          if (isPlaying) {
+            TrackPlayer.pause()
+          } else {
+            TrackPlayer.play()
+          }
+        }}
       />
       <Icon
         name="forward-30"
         size={28}
         color={colors.text}
-        onPress={() => seekTo(position + 30)}
+        onPress={() => TrackPlayer.seekTo(position + 30)}
       />
       <View style={styles.content}>
         <TouchableOpacity onPress={onTitlePress}>
