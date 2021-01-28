@@ -36,7 +36,7 @@ const Controls = ({ audio }) => {
   return (
     <View {...styles.controls}>
       <Icon
-        name="replay-10"
+        name='replay-10'
         size={28}
         color={colors.text}
         onPress={() => TrackPlayer.seekTo(position - 10)}
@@ -54,7 +54,7 @@ const Controls = ({ audio }) => {
         }}
       />
       <Icon
-        name="forward-30"
+        name='forward-30'
         size={28}
         color={colors.text}
         onPress={() => TrackPlayer.seekTo(position + 30)}
@@ -67,12 +67,12 @@ const Controls = ({ audio }) => {
             {audio && audio.title}
           </Text>
         </TouchableOpacity>
-        <Text style={[styles.time, { color: colors.text }]}>
+        {duration > 0 && <Text style={[styles.time, { color: colors.text }]}>
           {parseSeconds(position)} / {parseSeconds(duration)}
-        </Text>
+        </Text>}
       </View>
       <Icon
-        name="close"
+        name='close'
         size={35}
         color={colors.text}
         onPress={() =>
