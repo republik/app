@@ -6,7 +6,7 @@ import { Share, Platform, BackHandler } from 'react-native'
 import SplashScreen from 'react-native-splash-screen'
 import { v4 as uuidv4 } from 'uuid'
 
-import { APP_VERSION, FRONTEND_BASE_URL } from '../constants'
+import { APP_VERSION, FRONTEND_BASE_URL, HOME_URL } from '../constants'
 import { useGlobalState } from '../GlobalState'
 import NetworkError from './NetworkError'
 import Loader from '../components/Loader'
@@ -30,6 +30,8 @@ const generateMessageJS = (data) => {
   ].join('')
 }
 
+const getLast = array => array[array.length - 1]
+
 const Web = () => {
   const {
     globalState,
@@ -42,8 +44,9 @@ const Web = () => {
   const webviewRef = useRef()
   const [webUrl, setWebUrl] = useState()
   const [isReady, setIsReady] = useState(false)
-  const [canGoBack, setCanGoBack] = useState(false)
   const { colors } = useColorContext()
+
+  const [history, setHistory] = useState([])
 
   // Capture Android back button press
   const hasWebUrl = !!webUrl
@@ -53,9 +56,15 @@ const Web = () => {
     }
     const currentWebView = webviewRef.current
     const backAction = () => {
-      if (canGoBack) {
+      if (history.length) {
+        setHistory(currentHistory => {
+          return currentHistory.slice(0, currentHistory - 1)
+        })
         currentWebView.goBack()
-        setCanGoBack(undefined)
+        return true
+      }
+      if (getLast(history) !== HOME_URL) {
+        setGlobalState({ pendingUrl: HOME_URL })
         return true
       }
       BackHandler.exitApp()
@@ -65,7 +74,7 @@ const Web = () => {
     return () => {
       BackHandler.removeEventListener('hardwareBackPress')
     }
-  }, [hasWebUrl, canGoBack])
+  }, [hasWebUrl])
 
   useEffect(() => {
     // wait for all services
@@ -131,7 +140,7 @@ const Web = () => {
     if (message.type === 'routeChange') {
       onNavigationStateChange({
         ...message.payload,
-        onMessage: true,
+        url: `${FRONTEND_BASE_URL}${message.payload.url}`
       })
       setGlobalState({ showLoader: false })
     } else if (message.type === 'share') {
@@ -181,13 +190,23 @@ const Web = () => {
     }
   }
 
-  const onNavigationStateChange = ({ url, canGoBack, onMessage }) => {
-    // ToDo: deduplicate iOS - on iOS this function is currently
-    //called twice, once onMessage, and once onNavigationStateChange
-    const consistentUrl = onMessage ? `${FRONTEND_BASE_URL}${url}` : url
-    console.log(onMessage, consistentUrl)
-    setPersistedState({ url: consistentUrl })
-    setCanGoBack(canGoBack)
+  const onNavigationStateChange = ({ url, onMessage }) => {
+    // deduplicate
+    // - called by onMessage routeChange and onNavigationStateChange
+    //   - iOS triggers onNavigationStateChange for pushState in the web view
+    //   - Android does not
+    // - onNavigationStateChange is still necessary
+    //   - for all route changes via pendingUrl
+    //   - e.g. notifications & link opening
+    if (url !== persistedState.url) {
+      setPersistedState({ url })
+      setHistory(currentHistory => {
+        if (getLast(currentHistory) === url) {
+          return currentHistory
+        }
+        return currentHistory.concat(url)
+      })
+    }
   }
 
   return (
@@ -210,8 +229,8 @@ const Web = () => {
               <Loader loading={globalState.showLoader !== false} />
             )}
             applicationNameForUserAgent={`RepublikApp/${APP_VERSION}`}
-            onNavigationStateChange={(e) => onNavigationStateChange(e)}
-            onMessage={(e) => onMessage(e)}
+            onNavigationStateChange={onNavigationStateChange}
+            onMessage={onMessage}
             onLoadStart={(event) => {
               console.log('onLoadStart', 'ready', false, webUrl, event)
               setIsReady(false)
@@ -235,7 +254,7 @@ const Web = () => {
             keyboardDisplayRequiresUserAction={false}
             mediaPlaybackRequiresUserAction={false}
             scalesPageToFit={false}
-            decelerationRate="normal"
+            decelerationRate='normal'
           />
         </SafeAreaView>
       )}
