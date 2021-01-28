@@ -3,10 +3,10 @@ import { Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import { getModel, getDeviceId, getBrand } from 'react-native-device-info'
 import { Notifications } from 'react-native-notifications'
-import { parse, format } from 'url'
 
 import { useGlobalState } from '../GlobalState'
-import { APP_VERSION, FRONTEND_HOST, FRONTEND_PROTOCOL } from '../constants'
+import { APP_VERSION, rewriteBaseUrl } from '../constants'
+
 const init = async ({ isSignedIn, setGlobalState, dispatch }) => {
   if (!isSignedIn) {
     setGlobalState({ pushReady: true })
@@ -20,20 +20,15 @@ const init = async ({ isSignedIn, setGlobalState, dispatch }) => {
   //   return
   // }
 
-  const onNotificationOpened = (notification) => {
-    const payload = notification.payload
-    if (payload?.type === 'authorization') {
+  const onNotificationOpened = ({ payload = {} }) => {
+    if (payload.type === 'authorization') {
       // authorization only doesn't trigger navigation
       // webview listens to appstate and triggers login overlay
       return
     }
-    // ToDo: remove when finished testing
-    // replaced production origin with staging origin for notification testing
-    const originUrl = parse(payload.url)
-    originUrl.host = FRONTEND_HOST
-    originUrl.protocol = FRONTEND_PROTOCOL
-    const newUrl = format(originUrl)
-    setGlobalState({ pendingUrl: newUrl, showLoader: true })
+    if (payload.url) {
+      setGlobalState({ pendingUrl: rewriteBaseUrl(payload.url), showLoader: true })
+    }
   }
 
   const initialNotification = await Notifications.getInitialNotification()

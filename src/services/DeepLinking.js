@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { Linking } from 'react-native'
 
 import { useGlobalState } from '../GlobalState'
+import { rewriteBaseUrl } from '../constants'
 
 const DeepLinkingService = () => {
   const { setGlobalState } = useGlobalState()
@@ -12,7 +13,7 @@ const DeepLinkingService = () => {
       if (url === 'trackplayer://notification.click') {
         return
       }
-      setGlobalState({ pendingUrl: url })
+      setGlobalState({ pendingUrl: rewriteBaseUrl(url), showLoader: true })
     }
 
     Linking.getInitialURL().then((url) => {

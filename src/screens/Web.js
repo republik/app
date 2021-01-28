@@ -250,6 +250,9 @@ const Web = () => {
             onError={({ nativeEvent }) => {
               setGlobalState({ showLoader: false })
             }}
+            renderLoading={() => (
+              <Loader loading />
+            )}
             renderError={() => (
               <NetworkError onReload={() => webviewRef.current.reload()} />
             )}
