@@ -4,21 +4,26 @@ import { AppState } from 'react-native'
 import { useGlobalState } from '../GlobalState'
 
 const AppStateService = () => {
-  const { dispatch } = useGlobalState()
-
-  const [appState, setAppState] = useState(AppState.currentState)
+  const { 
+    globalState: { appState },
+    setGlobalState,
+    dispatch
+  } = useGlobalState()
 
   useEffect(() => {
     const handleAppStateChange = (nextAppState) => {
-      setAppState(nextAppState)
+      setGlobalState({ appState: nextAppState })
     }
-
+    handleAppStateChange(AppState.currentState)
     AppState.addEventListener('change', handleAppStateChange)
     return () => {
       AppState.removeEventListener('change', handleAppStateChange)
     }
   }, [])
   useEffect(() => {
+    if (!appState) {
+      return
+    }
     dispatch({
       type: 'postMessage',
       content: {

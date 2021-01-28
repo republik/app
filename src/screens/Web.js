@@ -47,6 +47,18 @@ const Web = () => {
   const { colors } = useColorContext()
 
   const [history, setHistory] = useState([])
+  
+  const {
+    appState
+  } = globalState
+  const [didCrash, setDidCrash] = useState()
+  
+  useEffect(() => {
+    if (didCrash && appState === 'active') {
+      webviewRef.current.reload()
+      setDidCrash(false)
+    }
+  }, [appState, didCrash])
 
   // Capture Android back button press
   const hasWebUrl = !!webUrl
@@ -142,7 +154,6 @@ const Web = () => {
         ...message.payload,
         url: `${FRONTEND_BASE_URL}${message.payload.url}`
       })
-      setGlobalState({ showLoader: false })
     } else if (message.type === 'share') {
       share(message.payload)
     } else if (message.type === 'haptic') {
@@ -225,18 +236,14 @@ const Web = () => {
             source={{ uri: webUrl }}
             // Loader for first mount
             startInLoadingState={true}
-            renderLoading={() => (
-              <Loader loading={globalState.showLoader !== false} />
-            )}
             applicationNameForUserAgent={`RepublikApp/${APP_VERSION}`}
             onNavigationStateChange={onNavigationStateChange}
             onMessage={onMessage}
             onLoadStart={(event) => {
-              console.log('onLoadStart', 'ready', false, webUrl, event)
-              setIsReady(false)
+              // console.log('onLoadStart', 'ready', false, webUrl, event)
             }}
             onLoad={() => {
-              console.log('onLoad', 'ready', true)
+              // console.log('onLoad', 'ready', true)
               setGlobalState({ showLoader: false })
               setIsReady(true)
             }}
@@ -248,7 +255,6 @@ const Web = () => {
             )}
             originWhitelist={[`${FRONTEND_BASE_URL}*`]}
             pullToRefreshEnabled={false}
-            bounce={false}
             allowsFullscreenVideo={true}
             allowsInlineMediaPlayback={true}
             sharedCookiesEnabled={true}
@@ -258,10 +264,16 @@ const Web = () => {
             mediaPlaybackRequiresUserAction={false}
             scalesPageToFit={false}
             decelerationRate='normal'
+            onRenderProcessGone={() => {
+              setDidCrash(true)
+            }}
+            onContentProcessDidTerminate={() => {
+              setDidCrash(true)
+            }}
           />
         </SafeAreaView>
       )}
-      {globalState.showLoader !== false && <Loader loading={!isReady} />}
+      {globalState.showLoader !== false && <Loader loading />}
     </>
   )
 }
