@@ -47,6 +47,8 @@ const Web = () => {
   const { colors } = useColorContext()
 
   const [history, setHistory] = useState([])
+  const historyRef = useRef()
+  historyRef.current = history
   
   const {
     appState
@@ -61,32 +63,30 @@ const Web = () => {
   }, [appState, didCrash])
 
   // Capture Android back button press
-  const hasWebUrl = !!webUrl
   useEffect(() => {
-    if (!hasWebUrl || Platform.OS !== 'android') {
+    if (Platform.OS !== 'android') {
       return
     }
-    const currentWebView = webviewRef.current
     const backAction = () => {
-      if (history.length) {
+      if (historyRef.current.length === 1 && getLast(historyRef.current) === HOME_URL) {
+        BackHandler.exitApp()
+        return false
+      }
+      if (historyRef.current.length) {
         setHistory(currentHistory => {
-          return currentHistory.slice(0, currentHistory - 1)
+          return currentHistory.slice(0, currentHistory.length - 1)
         })
-        currentWebView.goBack()
+        setGlobalState({ pendingUrl: historyRef.current[historyRef.current.length - 2] || HOME_URL })
         return true
       }
-      if (getLast(history) !== HOME_URL) {
-        setGlobalState({ pendingUrl: HOME_URL })
-        return true
-      }
-      BackHandler.exitApp()
-      return false
+      setGlobalState({ pendingUrl: HOME_URL })
+      return true
     }
     BackHandler.addEventListener('hardwareBackPress', backAction)
     return () => {
       BackHandler.removeEventListener('hardwareBackPress')
     }
-  }, [hasWebUrl])
+  }, [])
 
   useEffect(() => {
     // wait for all services
