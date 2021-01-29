@@ -13,6 +13,6 @@ module.exports = async function () {
   })
   TrackPlayer.addEventListener('remote-jump-backward', async (e) => {
     const position = await TrackPlayer.getPosition()
-    TrackPlayer.seekTo(position + e.interval)
+    TrackPlayer.seekTo(position - e.interval)
   })
 }
