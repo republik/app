@@ -16,20 +16,14 @@ const ProgressBar = ({ audio }) => {
   const { colors } = useColorContext()
   const { position, duration, bufferedPosition } = useTrackPlayerProgress(100)
   const playbackState = usePlaybackState()
-  const { setPersistedState, dispatch } = useGlobalState()
+  const { dispatch } = useGlobalState()
   const scaleY = useRef(new Animated.Value(1)).current
 
   const isPlaying = playbackState === TrackPlayer.STATE_PLAYING
 
   const upsertCurrentMediaProgress = useMemo(() => {
     return debounce((audio, position) => {
-      if (!!audio) {
-        setPersistedState({
-          mediaProgress: {
-            mediaId: audio.mediaId,
-            secs: position,
-          },
-        })
+      if (audio) {
         dispatch({
           type: 'postMessage',
           content: {
@@ -40,7 +34,7 @@ const ProgressBar = ({ audio }) => {
         })
       }
     }, 1000)
-  }, [dispatch, setPersistedState])
+  }, [dispatch])
 
   const panResponder = useMemo(() => {
     const expandAnim = () => {
