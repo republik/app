@@ -810,7 +810,7 @@
 				CODE_SIGN_ENTITLEMENTS = republikapp/republikapp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 31;
+				CURRENT_PROJECT_VERSION = 33;
 				DEVELOPMENT_TEAM = 7MQXM58QM7;
 				ENABLE_BITCODE = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
@@ -886,7 +886,7 @@
 				CODE_SIGN_ENTITLEMENTS = republikapp/republikapp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 31;
+				CURRENT_PROJECT_VERSION = 33;
 				DEVELOPMENT_TEAM = 7MQXM58QM7;
 				INFOPLIST_FILE = republikapp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
