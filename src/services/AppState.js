@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { AppState } from 'react-native'
 
 import { useGlobalState } from '../GlobalState'
 
 const AppStateService = () => {
-  const { 
+  const {
     globalState: { appState },
     setGlobalState,
-    dispatch
+    dispatch,
   } = useGlobalState()
 
   useEffect(() => {
@@ -19,7 +19,7 @@ const AppStateService = () => {
     return () => {
       AppState.removeEventListener('change', handleAppStateChange)
     }
-  }, [])
+  }, [setGlobalState])
   useEffect(() => {
     if (!appState) {
       return

@@ -16,11 +16,10 @@ const rewriteHost = (value) => {
   return value
 }
 
-export const devLog = Config.ENV === 'development'
-  ? console.log.bind(console)
-  : () => {}
+export const devLog =
+  Config.ENV === 'development' ? console.log.bind(console) : () => {}
 
-  // Base urls
+// Base urls
 export const FRONTEND_BASE_URL = rewriteHost(Config.FRONTEND_BASE_URL)
 export const frontendBaseUrl = parse(FRONTEND_BASE_URL)
 export const rewriteBaseUrl = (url) => {
@@ -32,7 +31,7 @@ export const rewriteBaseUrl = (url) => {
 }
 
 // App paths
-export const HOME_PATH = `/`
+export const HOME_PATH = '/'
 export const CURTAIN_BACKDOOR_PATH = `${Config.CURTAIN_BACKDOOR_PATH}`
 
 // App urls

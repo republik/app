@@ -38,7 +38,7 @@ export const ColorContextProvider = ({ children }) => {
   const { persistedState } = useGlobalState()
   const { userSetColorScheme } = persistedState
   const colorSchemeKey =
-    !userSetColorScheme || userSetColorScheme == 'auto'
+    !userSetColorScheme || userSetColorScheme === 'auto'
       ? colorScheme
       : userSetColorScheme
   return (

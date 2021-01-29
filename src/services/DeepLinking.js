@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { Linking } from 'react-native'
 
 import { useGlobalState } from '../GlobalState'

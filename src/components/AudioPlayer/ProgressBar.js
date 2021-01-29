@@ -5,7 +5,10 @@ import {
   ANIMATION_DURATION,
   AUDIO_PLAYER_PROGRESS_HEIGHT,
 } from '../../constants'
-import TrackPlayer, { useTrackPlayerProgress, usePlaybackState } from 'react-native-track-player'
+import TrackPlayer, {
+  useTrackPlayerProgress,
+  usePlaybackState,
+} from 'react-native-track-player'
 import { useColorContext } from '../../utils/colors'
 import { useGlobalState } from '../../GlobalState'
 
@@ -22,14 +25,14 @@ const ProgressBar = ({ audio }) => {
   const isPlaying = playbackState === TrackPlayer.STATE_PLAYING
 
   const upsertCurrentMediaProgress = useMemo(() => {
-    return debounce((audio, position) => {
-      if (audio) {
+    return debounce((currentAudio, currentPosition) => {
+      if (currentAudio) {
         dispatch({
           type: 'postMessage',
           content: {
             type: 'onAppMediaProgressUpdate',
-            mediaId: audio.mediaId,
-            currentTime: position,
+            mediaId: currentAudio.mediaId,
+            currentTime: currentPosition,
           },
         })
       }

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import { getModel, getDeviceId, getBrand } from 'react-native-device-info'
@@ -27,7 +27,10 @@ const init = async ({ isSignedIn, setGlobalState, dispatch }) => {
       return
     }
     if (payload.url) {
-      setGlobalState({ pendingUrl: rewriteBaseUrl(payload.url), showLoader: true })
+      setGlobalState({
+        pendingUrl: rewriteBaseUrl(payload.url),
+        showLoader: true,
+      })
     }
   }
 

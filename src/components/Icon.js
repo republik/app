@@ -34,7 +34,7 @@ const buttons = {
 
 const Icon = ({ type, size, onPress, style, disabled }) => {
   const Wrapper = onPress ? TouchableOpacity : ({ children }) => children
-
+  const opacity = disabled ? 0.3 : 1
   return (
     <Wrapper onPress={disabled ? null : onPress}>
       <Image
@@ -43,7 +43,7 @@ const Icon = ({ type, size, onPress, style, disabled }) => {
           ...style,
           width: size,
           height: size,
-          opacity: disabled ? 0.3 : 1,
+          opacity,
         }}
       />
     </Wrapper>

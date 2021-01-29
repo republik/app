@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react'
-import { Platform } from 'react-native'
+import { useEffect } from 'react'
 import CookieManager from '@react-native-community/cookies'
 import { FRONTEND_BASE_URL, CURTAIN_BACKDOOR_PATH } from '../constants'
 import { useGlobalState } from '../GlobalState'

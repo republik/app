@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from 'react'
 import { WebView } from 'react-native-webview'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback'
-import { Share, Platform, BackHandler } from 'react-native'
+import { StyleSheet, Share, Platform, BackHandler } from 'react-native'
 import SplashScreen from 'react-native-splash-screen'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -30,7 +30,13 @@ const generateMessageJS = (data) => {
   ].join('')
 }
 
-const getLast = array => array[array.length - 1]
+const getLast = (array) => array[array.length - 1]
+
+const styles = StyleSheet.create({
+  webView: {
+    flex: 1,
+  },
+})
 
 const Web = () => {
   const {
@@ -49,12 +55,10 @@ const Web = () => {
   const [history, setHistory] = useState([])
   const historyRef = useRef()
   historyRef.current = history
-  
-  const {
-    appState
-  } = globalState
+
+  const { appState } = globalState
   const [didCrash, setDidCrash] = useState()
-  
+
   useEffect(() => {
     if (didCrash && appState === 'active') {
       webviewRef.current.reload()
@@ -68,15 +72,21 @@ const Web = () => {
       return
     }
     const backAction = () => {
-      if (historyRef.current.length === 1 && getLast(historyRef.current) === HOME_URL) {
+      if (
+        historyRef.current.length === 1 &&
+        getLast(historyRef.current) === HOME_URL
+      ) {
         BackHandler.exitApp()
         return false
       }
       if (historyRef.current.length) {
-        setHistory(currentHistory => {
+        setHistory((currentHistory) => {
           return currentHistory.slice(0, currentHistory.length - 1)
         })
-        setGlobalState({ pendingUrl: historyRef.current[historyRef.current.length - 2] || HOME_URL })
+        setGlobalState({
+          pendingUrl:
+            historyRef.current[historyRef.current.length - 2] || HOME_URL,
+        })
         return true
       }
       setGlobalState({ pendingUrl: HOME_URL })
@@ -86,7 +96,7 @@ const Web = () => {
     return () => {
       BackHandler.removeEventListener('hardwareBackPress')
     }
-  }, [])
+  }, [setGlobalState])
 
   useEffect(() => {
     // wait for all services
@@ -113,7 +123,11 @@ const Web = () => {
       setGlobalState({ pendingUrl: null })
     } else if (!webUrl) {
       // if nothing is pending navigate to saved url
-      setWebUrl(persistedState.url?.startsWith(FRONTEND_BASE_URL) ? persistedState.url : HOME_URL)
+      setWebUrl(
+        persistedState.url?.startsWith(FRONTEND_BASE_URL)
+          ? persistedState.url
+          : HOME_URL,
+      )
     }
 
     if (!webUrl) {
@@ -151,7 +165,7 @@ const Web = () => {
     if (message.type === 'routeChange') {
       onNavigationStateChange({
         ...message.payload,
-        url: `${FRONTEND_BASE_URL}${message.payload.url}`
+        url: `${FRONTEND_BASE_URL}${message.payload.url}`,
       })
     } else if (message.type === 'share') {
       share(message.payload)
@@ -160,7 +174,7 @@ const Web = () => {
     } else if (message.type === 'play-audio') {
       setGlobalState({ autoPlayAudio: true })
       setPersistedState({
-        audio: message.payload
+        audio: message.payload,
       })
     } else if (message.type === 'isSignedIn') {
       setPersistedState({ isSignedIn: message.payload })
@@ -195,11 +209,12 @@ const Web = () => {
             },
       )
     } catch (error) {
+      // eslint-disable-next-line no-alert
       alert(error.message)
     }
   }
 
-  const onNavigationStateChange = ({ url, onMessage }) => {
+  const onNavigationStateChange = ({ url }) => {
     // deduplicate
     // - called by onMessage routeChange and onNavigationStateChange
     //   - iOS triggers onNavigationStateChange for pushState in the web view
@@ -209,7 +224,7 @@ const Web = () => {
     //   - e.g. notifications & link opening
     if (url !== persistedState.url) {
       setPersistedState({ url })
-      setHistory(currentHistory => {
+      setHistory((currentHistory) => {
         if (getLast(currentHistory) === url) {
           return currentHistory
         }
@@ -222,7 +237,7 @@ const Web = () => {
     <>
       {webUrl && (
         <SafeAreaView
-          style={{ flex: 1 }}
+          style={styles.webView}
           edges={['right', 'left']}
           backgroundColor={
             persistedState.isFullscreen
@@ -244,9 +259,7 @@ const Web = () => {
             onError={({ nativeEvent }) => {
               setGlobalState({ showLoader: false })
             }}
-            renderLoading={() => (
-              <Loader loading />
-            )}
+            renderLoading={() => <Loader loading />}
             renderError={() => (
               <NetworkError onReload={() => webviewRef.current.reload()} />
             )}
@@ -260,7 +273,7 @@ const Web = () => {
             keyboardDisplayRequiresUserAction={false}
             mediaPlaybackRequiresUserAction={false}
             scalesPageToFit={false}
-            decelerationRate='normal'
+            decelerationRate="normal"
             onRenderProcessGone={() => {
               setDidCrash(true)
             }}

@@ -16,7 +16,9 @@ const Controls = ({ audio }) => {
   const playbackState = usePlaybackState()
 
   const parseSeconds = (value) => {
-    if (value === null || value === undefined) return ''
+    if (value === null || value === undefined) {
+      return ''
+    }
     const minutes = Math.floor(value / 60)
     const seconds = Math.floor(value - minutes * 60)
     return minutes + ':' + (seconds < 10 ? '0' : '') + seconds
@@ -34,9 +36,9 @@ const Controls = ({ audio }) => {
   const isPlaying = playbackState === TrackPlayer.STATE_PLAYING
 
   return (
-    <View {...styles.controls}>
+    <View style={styles.controls}>
       <Icon
-        name='replay-10'
+        name="replay-10"
         size={28}
         color={colors.text}
         onPress={() => TrackPlayer.seekTo(position - 10)}
@@ -54,7 +56,7 @@ const Controls = ({ audio }) => {
         }}
       />
       <Icon
-        name='forward-30'
+        name="forward-30"
         size={28}
         color={colors.text}
         onPress={() => TrackPlayer.seekTo(position + 30)}
@@ -67,12 +69,14 @@ const Controls = ({ audio }) => {
             {audio && audio.title}
           </Text>
         </TouchableOpacity>
-        {duration > 0 && <Text style={[styles.time, { color: colors.text }]}>
-          {parseSeconds(position)} / {parseSeconds(duration)}
-        </Text>}
+        {duration > 0 && (
+          <Text style={[styles.time, { color: colors.text }]}>
+            {parseSeconds(position)} / {parseSeconds(duration)}
+          </Text>
+        )}
       </View>
       <Icon
-        name='close'
+        name="close"
         size={35}
         color={colors.text}
         onPress={() =>

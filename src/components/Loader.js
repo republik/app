@@ -9,7 +9,7 @@ const Loader = ({ loading }) => {
       <ActivityIndicator
         animating={loading}
         color={colors.textSoft}
-        size='large'
+        size="large"
       />
     </View>
   )
