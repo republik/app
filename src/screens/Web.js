@@ -115,7 +115,7 @@ const Web = () => {
       // (e.g. via AudioPlayer Title-Link), the state change is registered
       if (webUrl === globalState.pendingUrl) {
         setWebUrl(
-          `${globalState.pendingUrl.split('#')[0]}#app-load-${uuidv4()}}`,
+          `${globalState.pendingUrl.split('#')[0]}#app-load-${uuidv4()}`,
         )
       } else {
         setWebUrl(`${globalState.pendingUrl}`)
