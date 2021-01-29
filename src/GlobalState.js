@@ -6,14 +6,9 @@ import React, {
   useReducer,
 } from 'react'
 import AsyncStorage from '@react-native-community/async-storage'
-import { SIGN_IN_URL } from './constants'
+import { HOME_URL } from './constants'
 import 'react-native-get-random-values'
 import { v4 as uuidv4 } from 'uuid'
-
-const defaultPersistedState = {
-  url: SIGN_IN_URL,
-  isSignedIn: false,
-}
 
 const GlobalState = React.createContext()
 
@@ -75,7 +70,7 @@ const messageReducer = (state, action) => {
 export const GlobalStateProvider = ({ children }) => {
   const [error, setError] = useState()
 
-  const [persistedState, setPersistedStateRaw] = useState(defaultPersistedState)
+  const [persistedState, setPersistedStateRaw] = useState({})
   const setPersistedState = useCallback(
     (newState) => setPersistedStateRaw((state) => ({ ...state, ...newState })),
     [],

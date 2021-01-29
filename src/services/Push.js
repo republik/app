@@ -5,7 +5,7 @@ import { getModel, getDeviceId, getBrand } from 'react-native-device-info'
 import { Notifications } from 'react-native-notifications'
 
 import { useGlobalState } from '../GlobalState'
-import { APP_VERSION, rewriteBaseUrl } from '../constants'
+import { APP_VERSION, rewriteBaseUrl, devLog } from '../constants'
 
 const init = async ({ isSignedIn, setGlobalState, dispatch }) => {
   if (!isSignedIn) {
@@ -88,7 +88,7 @@ const init = async ({ isSignedIn, setGlobalState, dispatch }) => {
   )
   Notifications.events().registerNotificationReceivedBackground(
     (notification, completion) => {
-      console.log('Notification Received - Background', notification.payload)
+      devLog('Notification Received - Background', notification.payload)
       completion({ alert: true, sound: true, badge: false })
     },
   )

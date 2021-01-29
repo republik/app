@@ -6,7 +6,7 @@ import { Share, Platform, BackHandler } from 'react-native'
 import SplashScreen from 'react-native-splash-screen'
 import { v4 as uuidv4 } from 'uuid'
 
-import { APP_VERSION, FRONTEND_BASE_URL, HOME_URL } from '../constants'
+import { APP_VERSION, FRONTEND_BASE_URL, HOME_URL, devLog } from '../constants'
 import { useGlobalState } from '../GlobalState'
 import NetworkError from './NetworkError'
 import Loader from '../components/Loader'
@@ -113,8 +113,7 @@ const Web = () => {
       setGlobalState({ pendingUrl: null })
     } else if (!webUrl) {
       // if nothing is pending navigate to saved url
-      // - which also has a default
-      setWebUrl(persistedState.url)
+      setWebUrl(persistedState.url?.startsWith(FRONTEND_BASE_URL) ? persistedState.url : HOME_URL)
     }
 
     if (!webUrl) {
@@ -130,7 +129,7 @@ const Web = () => {
     if (!message) {
       return
     }
-    console.log('postMessage', message)
+    devLog('postMessage', message)
     webviewRef.current.injectJavaScript(generateMessageJS(message))
     dispatch({
       type: 'markMessage',
@@ -148,7 +147,7 @@ const Web = () => {
 
   const onMessage = (e) => {
     const message = JSON.parse(e.nativeEvent.data) || {}
-    console.log('onMessage', message)
+    devLog('onMessage', message)
     if (message.type === 'routeChange') {
       onNavigationStateChange({
         ...message.payload,
@@ -238,11 +237,7 @@ const Web = () => {
             applicationNameForUserAgent={`RepublikApp/${APP_VERSION}`}
             onNavigationStateChange={onNavigationStateChange}
             onMessage={onMessage}
-            onLoadStart={(event) => {
-              // console.log('onLoadStart', 'ready', false, webUrl, event)
-            }}
             onLoad={() => {
-              // console.log('onLoad', 'ready', true)
               setGlobalState({ showLoader: false })
               setIsReady(true)
             }}
