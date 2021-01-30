@@ -2,9 +2,8 @@ import React, { useRef, useState, useEffect } from 'react'
 import { WebView } from 'react-native-webview'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback'
-import { StyleSheet, Share, Platform, BackHandler } from 'react-native'
+import { StyleSheet, Share, Platform, BackHandler, StatusBar } from 'react-native'
 import SplashScreen from 'react-native-splash-screen'
-import { v4 as uuidv4 } from 'uuid'
 
 import { APP_VERSION, FRONTEND_BASE_URL, HOME_URL, devLog } from '../constants'
 import { useGlobalState } from '../GlobalState'
@@ -109,21 +108,22 @@ const Web = () => {
       return
     }
     if (globalState.pendingUrl) {
-      // navigate to pendingUrl a service
-      // the date is added so that when a page is set via setWebUrl
-      // and a user navigates away but then tries to return to the page
-      // (e.g. via AudioPlayer Title-Link), the state change is registered
-      if (webUrl === globalState.pendingUrl) {
-        setWebUrl(
-          `${globalState.pendingUrl.split('#')[0]}#app-load-${uuidv4()}`,
-        )
+      if (webUrl) {
+        dispatch({
+          type: 'postMessage',
+          content: {
+            type: 'push-route',
+            url: globalState.pendingUrl
+          }
+        })
       } else {
-        setWebUrl(`${globalState.pendingUrl}`)
+        setWebUrl(globalState.pendingUrl)
       }
       setGlobalState({ pendingUrl: null })
     } else if (!webUrl) {
       // if nothing is pending navigate to saved url
       setWebUrl(
+        // handle env changes or illegal navigations
         persistedState.url?.startsWith(FRONTEND_BASE_URL)
           ? persistedState.url
           : HOME_URL,
@@ -247,18 +247,23 @@ const Web = () => {
           <WebView
             ref={webviewRef}
             source={{ uri: webUrl }}
-            // Loader for first mount
-            startInLoadingState={true}
             applicationNameForUserAgent={`RepublikApp/${APP_VERSION}`}
             onNavigationStateChange={onNavigationStateChange}
             onMessage={onMessage}
             onLoad={() => {
-              setGlobalState({ showLoader: false })
               setIsReady(true)
             }}
-            onError={({ nativeEvent }) => {
-              setGlobalState({ showLoader: false })
+            onLoadStart={({ nativeEvent }) => {
+              if (nativeEvent.loading && Platform.OS === 'ios') {
+                StatusBar.setNetworkActivityIndicatorVisible(true)
+              }
             }}
+            onLoadEnd={({ nativeEvent }) => {
+              if (Platform.OS === 'ios') {
+                StatusBar.setNetworkActivityIndicatorVisible(false)
+              }
+            }}
+            startInLoadingState
             renderLoading={() => <Loader loading />}
             renderError={() => (
               <NetworkError onReload={() => webviewRef.current.reload()} />
@@ -283,7 +288,6 @@ const Web = () => {
           />
         </SafeAreaView>
       )}
-      {globalState.showLoader !== false && <Loader loading />}
     </>
   )
 }

@@ -13,7 +13,7 @@ const DeepLinkingService = () => {
       if (url === 'trackplayer://notification.click') {
         return
       }
-      setGlobalState({ pendingUrl: rewriteBaseUrl(url), showLoader: true })
+      setGlobalState({ pendingUrl: rewriteBaseUrl(url) })
     }
 
     Linking.getInitialURL().then((url) => {

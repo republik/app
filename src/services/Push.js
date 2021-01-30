@@ -28,8 +28,7 @@ const init = async ({ isSignedIn, setGlobalState, dispatch }) => {
     }
     if (payload.url) {
       setGlobalState({
-        pendingUrl: rewriteBaseUrl(payload.url),
-        showLoader: true,
+        pendingUrl: rewriteBaseUrl(payload.url)
       })
     }
   }
