@@ -22,10 +22,6 @@ platform :android do
     increment_version_code(
       app_project_dir: "./app"
     )
-    increment_version_name(
-      bump_type: options[:type] || 'patch',
-      app_project_dir: "./app"
-    )
     gradle(
       task: "assemble",
       build_type: "Release"
@@ -37,23 +33,6 @@ platform :android do
       skip_upload_images: true,
       skip_upload_screenshots: true
     )
-    slack(
-     message: "New staging version successfully uploaded to the GooglePlay store.",
-     success: true,
-     slack_url: ENV["SLACK_URL"],
-     attachment_properties: {
-       fields: [
-         {
-           title: "Build version",
-           value: lane_context[SharedValues::VERSION_NAME],
-         },
-         {
-           title: "Build code",
-           value: lane_context[SharedValues::VERSION_CODE],
-         },
-       ]
-     }
-   )
   end
 
   lane :production do |options|
@@ -75,22 +54,5 @@ platform :android do
       skip_upload_images: true,
       skip_upload_screenshots: true
     )
-    slack(
-     message: "New production version successfully uploaded to the GooglePlay store.",
-     success: true,
-     slack_url: ENV["SLACK_URL"],
-     attachment_properties: {
-       fields: [
-         {
-           title: "Build version",
-           value: lane_context[SharedValues::VERSION_NAME],
-         },
-         {
-           title: "Build code",
-           value: lane_context[SharedValues::VERSION_CODE],
-         },
-       ]
-     }
-   )
   end
 end

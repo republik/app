@@ -29,17 +29,22 @@ const buttons = {
   chevronUp: ChevronUp,
   discussion: Discussion,
   chevronDown: ChevronDown,
-  searchActive: SearchActive
+  searchActive: SearchActive,
 }
 
 const Icon = ({ type, size, onPress, style, disabled }) => {
   const Wrapper = onPress ? TouchableOpacity : ({ children }) => children
-
+  const opacity = disabled ? 0.3 : 1
   return (
     <Wrapper onPress={disabled ? null : onPress}>
       <Image
         source={buttons[type]}
-        style={{...style, width: size, height: size, opacity: disabled ? 0.3 : 1 }}
+        style={{
+          ...style,
+          width: size,
+          height: size,
+          opacity,
+        }}
       />
     </Wrapper>
   )
@@ -47,7 +52,7 @@ const Icon = ({ type, size, onPress, style, disabled }) => {
 
 Icon.defaultProps = {
   size: 25,
-  disabled: false
+  disabled: false,
 }
 
 export default Icon

@@ -1,0 +1,14 @@
+{
+    "Simulator Target Bundle": "app.republik",
+    "aps": {
+        "alert": {
+            "body": "Jetzt prüfen",
+            "title": "Anmelden?"
+        },
+        "sound": "default",
+        "badge": 1
+    },
+    "type": "authorization",
+}
+
+

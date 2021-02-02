@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="textColor" format="color"/>
+    <attr name="colorAccent" format="color"/>
+    <attr name="backgroundColor" format="color"/>
+    <attr name="splashBackgroundColor" format="color" />
+    <attr name="splashLogo" format="reference" />
+</resources>

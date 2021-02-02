@@ -1,0 +1,18 @@
+{
+    "Simulator Target Bundle": "app.republik",
+    "aps": {
+        "alert": {
+            "body": "Das Nachrichtenbriefing: Europa in der zweiten Welle, Abtreibungsverbot in Polen, Abwehrschlacht in der Ägäis und Macron gegen Erdoğan",
+            "title": "«Was diese Woche wichtig war» jetzt online"
+        },
+        "sound": "default",
+        "badge": 1
+    },
+    "tag": "republik/wdwww-woche-43-20",
+    "url": "https://republik.ch/2020/10/30/europa-in-der-zweiten-welle-abtreibungs-verbot-in-polen-abwehr-schlacht-in-der-aegaeis-und-macron-gegen-erdogan",
+    "body": "Das Nachrichtenbriefing: Europa in der zweiten Welle, Abtreibungsverbot in Polen, Abwehrschlacht in der Ägäis und Macron gegen Erdoğan",
+    "type": "something",
+    "title": "«Was diese Woche wichtig war» jetzt online"
+}
+
+

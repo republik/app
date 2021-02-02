@@ -16,54 +16,24 @@
 default_platform(:ios)
 
 platform :ios do
-  desc "Submit a new Beta Build to Apple TestFlight"
-  desc "This will also make sure the profile is up to date"
+  desc "Push a new beta build to TestFlight"
   lane :staging do
     increment_build_number
     match(
       type: "appstore",
       git_url: "git@github.com:orbiting/app-certificates.git"
     ) # more information: https://codesigning.guide
-    gym(
-      scheme: "orbitingapp (staging)"
-    ) # Build your app - more options available
-    pilot(skip_waiting_for_build_processing: true)
-    slack(
-     message: "New staging version successfully uploaded to the Apple TestFlight.",
-     success: true,
-     slack_url: ENV["SLACK_URL"],
-     attachment_properties: {
-       fields: [
-         {
-           title: "Build code",
-           value: lane_context[SharedValues::BUILD_NUMBER],
-         },
-       ]
-     }
-   )
+    build_app(workspace: "republikapp.xcworkspace", scheme: "republikapp (staging)", export_xcargs: "-allowProvisioningUpdates")
+    upload_to_testflight(skip_waiting_for_build_processing: true)
   end
-  lane :production do
+    lane :production do
     increment_build_number
     match(
       type: "appstore",
       git_url: "git@github.com:orbiting/app-certificates.git"
     ) # more information: https://codesigning.guide
-    gym(
-      scheme: "orbitingapp (production)"
-    ) # Build your app - more options available
-    pilot(skip_waiting_for_build_processing: true)
-    slack(
-     message: "New production version successfully uploaded to Apple.",
-     success: true,
-     slack_url: ENV["SLACK_URL"],
-     attachment_properties: {
-       fields: [
-         {
-           title: "Build code",
-           value: lane_context[SharedValues::BUILD_NUMBER],
-         },
-       ]
-     }
-   )
+    build_app(workspace: "republikapp.xcworkspace", scheme: "republikapp (production)")
+    upload_to_testflight(skip_waiting_for_build_processing: true)
+    #upload_to_app_store 
   end
 end

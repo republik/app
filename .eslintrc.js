@@ -1,13 +1,14 @@
 module.exports = {
-  'parser': 'babel-eslint',
-  'extends': ['standard', 'standard-react'],
-  "globals": {
-    "window": true,
-    "navigator": true,
-    "fetch": true
+  root: true,
+  extends: '@react-native-community',
+  globals: {
+    window: true,
+    navigator: true,
+    fetch: true,
   },
-  'rules': {
+  rules: {
     'jsx-quotes': 0,
-    'react/prop-types': 0
-  }
+    'react/prop-types': 0,
+    semi: 0,
+  },
 }

@@ -1,200 +1,295 @@
-import React, { Component, Fragment } from 'react'
-import {
-  AppState, Animated, Keyboard, Platform
-} from 'react-native'
-import { graphql, compose } from 'react-apollo'
-import gql from 'graphql-tag'
-import WebView from '../components/WebView'
-import AudioPlayer, { AUDIO_PLAYER_HEIGHT, ANIMATION_DURATION } from '../components/AudioPlayer'
-import SafeAreaView from '../components/SafeAreaView'
-import navigator from '../services/navigation'
-import {
-  setUrl,
-  withAudio,
-  setAudio,
-  pendingAppSignIn
-} from '../apollo'
-import mkDebug from '../utils/debug'
+import React, { useRef, useState, useEffect } from 'react'
+import { WebView } from 'react-native-webview'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import ReactNativeHapticFeedback from 'react-native-haptic-feedback'
+import { StyleSheet, Share, Platform, BackHandler, StatusBar } from 'react-native'
+import SplashScreen from 'react-native-splash-screen'
 
-const debug = mkDebug('Web')
+import { APP_VERSION, FRONTEND_BASE_URL, HOME_URL, devLog } from '../constants'
+import { useGlobalState } from '../GlobalState'
+import NetworkError from './NetworkError'
+import Loader from '../components/Loader'
+import { useColorContext } from '../utils/colors'
 
-const getBottom = ({ fullscreen, keyboard }, { audio }) => {
-  return !fullscreen && !keyboard && audio
-    ? AUDIO_PLAYER_HEIGHT
-    : 0
+// Based on react-native-webview injection for Android
+// https://github.com/react-native-webview/react-native-webview/blob/194c6a2335b12cc05283413c44d0948eb5156e02/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManager.java#L651-L670
+const generateMessageJS = (data) => {
+  return [
+    '(function(){',
+    'var event;',
+    `var data = ${JSON.stringify(data)};`,
+    'try{',
+    'event = new MessageEvent("message",{data});',
+    '}catch(e){',
+    'event = document.createEvent("MessageEvent");',
+    'event.initMessageEvent("message",true,true,data,"","",window);',
+    '}',
+    'document.dispatchEvent(event);',
+    '})();',
+  ].join('')
 }
 
-class Web extends Component {
-  constructor (props) {
-    super(props)
+const getLast = (array) => array[array.length - 1]
 
-    this.state = {}
+const styles = StyleSheet.create({
+  webView: {
+    flex: 1,
+  },
+})
 
-    this.bottom = new Animated.Value(getBottom(this.state, props))
-  }
+const Web = () => {
+  const {
+    globalState,
+    setGlobalState,
+    persistedState,
+    setPersistedState,
+    pendingMessages,
+    dispatch,
+  } = useGlobalState()
+  const webviewRef = useRef()
+  const [webUrl, setWebUrl] = useState()
+  const [isReady, setIsReady] = useState(false)
+  const { colors } = useColorContext()
 
-  componentDidMount () {
-    AppState.addEventListener('change', this.handleAppStateChange)
+  const [history, setHistory] = useState([])
+  const historyRef = useRef()
+  historyRef.current = history
 
-    this.goToLoginIfPendingRequest()
+  const { appState } = globalState
+  const [didCrash, setDidCrash] = useState()
 
-    // on iOS the keyboard automatically goes over the audio player
-    // - no need to track / hide audio player manually
-    if (Platform.OS === 'android') {
-      this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-        this.setState({ keyboard: true })
-      })
-      this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-        this.setState({ keyboard: false })
-      })
+  useEffect(() => {
+    if (didCrash && appState === 'active') {
+      webviewRef.current.reload()
+      setDidCrash(false)
     }
-  }
+  }, [appState, didCrash])
 
-  componentWillUnmount () {
-    AppState.removeEventListener('change', this.handleAppStateChange)
-
-    if (Platform.OS === 'android') {
-      this.keyboardDidShowListener.remove()
-      this.keyboardDidHideListener.remove()
-    }
-  }
-
-  handleAppStateChange = nextAppState => {
-    if (!nextAppState.match(/inactive|background/)) {
-      this.goToLoginIfPendingRequest()
-      this.props.screenProps.checkForUpdates()
-    }
-  }
-
-  goToLoginIfPendingRequest = async () => {
-    const { refetchPendingSignInRequests } = this.props
-    if (!refetchPendingSignInRequests) {
+  // Capture Android back button press
+  useEffect(() => {
+    if (Platform.OS !== 'android') {
       return
     }
-    const { data } = await refetchPendingSignInRequests()
-    if (data.pendingAppSignIn) {
-      navigator.navigate('Login', { url: data.pendingAppSignIn.verificationUrl })
+    const backAction = () => {
+      if (
+        historyRef.current.length === 1 &&
+        getLast(historyRef.current) === HOME_URL
+      ) {
+        BackHandler.exitApp()
+        return false
+      }
+      if (historyRef.current.length) {
+        setHistory((currentHistory) => {
+          return currentHistory.slice(0, currentHistory.length - 1)
+        })
+        setGlobalState({
+          pendingUrl:
+            historyRef.current[historyRef.current.length - 2] || HOME_URL,
+        })
+        return true
+      }
+      setGlobalState({ pendingUrl: HOME_URL })
+      return true
     }
-  }
+    BackHandler.addEventListener('hardwareBackPress', backAction)
+    return () => {
+      BackHandler.removeEventListener('hardwareBackPress')
+    }
+  }, [setGlobalState])
 
-  onShouldLoad = ({ url }) => {
-    this.props.setUrl({ variables: { url } })
+  useEffect(() => {
+    // wait for all services
+    if (
+      !globalState.deepLinkingReady ||
+      !globalState.pushReady ||
+      !globalState.persistedStateReady ||
+      !globalState.cookiesReady
+    ) {
+      return
+    }
+    if (globalState.pendingUrl) {
+      if (webUrl) {
+        dispatch({
+          type: 'postMessage',
+          content: {
+            type: 'push-route',
+            url: globalState.pendingUrl
+          }
+        })
+      } else {
+        setWebUrl(globalState.pendingUrl)
+      }
+      setGlobalState({ pendingUrl: null })
+    } else if (!webUrl) {
+      // if nothing is pending navigate to saved url
+      setWebUrl(
+        // handle env changes or illegal navigations
+        persistedState.url?.startsWith(FRONTEND_BASE_URL)
+          ? persistedState.url
+          : HOME_URL,
+      )
+    }
 
-    return true
-  }
+    if (!webUrl) {
+      SplashScreen.hide()
+    }
+  }, [webUrl, globalState, persistedState, setGlobalState])
 
-  onLoadStart = () => {
-    debug('onLoadStart')
-    if (this.state.fullscreen) {
-      this.setState({
-        fullscreen: false
+  useEffect(() => {
+    if (!isReady) {
+      return
+    }
+    const message = pendingMessages.filter((msg) => !msg.mark)[0]
+    if (!message) {
+      return
+    }
+    devLog('postMessage', message)
+    webviewRef.current.injectJavaScript(generateMessageJS(message))
+    dispatch({
+      type: 'markMessage',
+      id: message.id,
+      mark: true,
+    })
+    setTimeout(() => {
+      dispatch({
+        type: 'markMessage',
+        id: message.id,
+        mark: false,
+      })
+    }, 5 * 1000)
+  }, [isReady, pendingMessages, dispatch])
+
+  const onMessage = (e) => {
+    const message = JSON.parse(e.nativeEvent.data) || {}
+    devLog('onMessage', message)
+    if (message.type === 'routeChange') {
+      onNavigationStateChange({
+        ...message.payload,
+        url: `${FRONTEND_BASE_URL}${message.payload.url}`,
+      })
+    } else if (message.type === 'share') {
+      share(message.payload)
+    } else if (message.type === 'haptic') {
+      ReactNativeHapticFeedback.trigger(message.payload.type)
+    } else if (message.type === 'play-audio') {
+      setPersistedState({
+        audio: message.payload,
+      })
+      setGlobalState({ autoPlayAudio: true })
+    } else if (message.type === 'isSignedIn') {
+      setPersistedState({ isSignedIn: message.payload })
+    } else if (message.type === 'fullscreen-enter') {
+      setGlobalState({ isFullscreen: true })
+    } else if (message.type === 'fullscreen-exit') {
+      setGlobalState({ isFullscreen: false })
+    } else if (message.type === 'setColorScheme') {
+      setPersistedState({ userSetColorScheme: message.colorSchemeKey })
+    } else if (message.type === 'ackMessage') {
+      dispatch({
+        type: 'clearMessage',
+        id: message.id,
       })
     }
-    if (this.props.screenProps.onLoadStart) {
-      this.props.screenProps.onLoadStart()
+  }
+
+  const share = async ({ url, title, message, subject, dialogTitle }) => {
+    try {
+      await Share.share(
+        Platform.OS === 'ios'
+          ? {
+              url,
+              title,
+              subject,
+              message,
+            }
+          : {
+              dialogTitle,
+              title,
+              message: [message, url].filter(Boolean).join('\n'),
+            },
+      )
+    } catch (error) {
+      // eslint-disable-next-line no-alert
+      alert(error.message)
     }
   }
 
-  onLoadEnd = () => {
-    debug('onLoadEnd')
-    if (this.props.screenProps.onLoadEnd) {
-      this.props.screenProps.onLoadEnd()
+  const onNavigationStateChange = ({ url }) => {
+    // deduplicate
+    // - called by onMessage routeChange and onNavigationStateChange
+    //   - iOS triggers onNavigationStateChange for pushState in the web view
+    //   - Android does not
+    // - onNavigationStateChange is still necessary
+    //   - for all route changes via pendingUrl
+    //   - e.g. notifications & link opening
+    if (url !== persistedState.url) {
+      setPersistedState({ url })
+      setHistory((currentHistory) => {
+        if (getLast(currentHistory) === url) {
+          return currentHistory
+        }
+        return currentHistory.concat(url)
+      })
     }
   }
 
-  onSignIn = () => {
-    // do nothing
-    // - web view handles reload
-  }
-
-  onMessage = message => {
-    switch (message.type) {
-      case 'play-audio':
-        return this.playAudio(message.payload)
-      case 'fullscreen-enter':
-        return this.setState({ fullscreen: true })
-      case 'fullscreen-exit':
-        return this.setState({ fullscreen: false })
-      default:
-        console.log(message)
-        console.warn(`Unhandled message of type: ${message.type}`)
-    }
-  }
-
-  playAudio = payload => {
-    this.props.setAudio({
-      variables: payload
-    })
-  }
-
-  componentWillUpdate (nextProps, nextState) {
-    const bottom = getBottom(this.state, this.props)
-    const nextBottom = getBottom(nextState, nextProps)
-    this.keyboardChange = nextState.keyboard !== this.state.keyboard
-    if (bottom !== nextBottom) {
-      Animated.timing(this.bottom, {
-        toValue: nextBottom,
-        duration: this.keyboardChange
-          ? 0
-          : ANIMATION_DURATION
-      }).start()
-    }
-  }
-
-  componentWillReceiveProps (nextProps) {
-    if (
-      nextProps.data.url !== this.props.data.url &&
-      this.state.fullscreen
-    ) {
-      this.setState({ fullscreen: false })
-    }
-  }
-
-  render () {
-    const {
-      data,
-      setUrl
-    } = this.props
-    const { loading, fullscreen, keyboard } = this.state
-
-    return (
-      <Fragment>
-        <SafeAreaView fullscreen={fullscreen}>
-          <Animated.View style={{
-            flex: 1,
-            marginBottom: this.bottom
-          }}>
-            <WebView
-              source={{ uri: data.url }}
-              onMessage={this.onMessage}
-              onLoadEnd={this.onLoadEnd}
-              onLoadStart={this.onLoadStart}
-              onShouldLoad={this.onShouldLoad}
-              onSignIn={this.onSignIn}
-              loading={{ status: loading, showSpinner: true }}
-            />
-          </Animated.View>
-          <AudioPlayer
-            hidden={fullscreen || keyboard}
-            animated={!this.keyboardChange}
-            setUrl={setUrl}
+  return (
+    <>
+      {webUrl && (
+        <SafeAreaView
+          style={styles.webView}
+          edges={['right', 'left']}
+          backgroundColor={
+            globalState.isFullscreen
+              ? colors.fullScreenStatusBar
+              : colors.default
+          }>
+          <WebView
+            ref={webviewRef}
+            source={{ uri: webUrl }}
+            applicationNameForUserAgent={`RepublikApp/${APP_VERSION}`}
+            onNavigationStateChange={onNavigationStateChange}
+            onMessage={onMessage}
+            onLoad={() => {
+              setIsReady(true)
+            }}
+            onLoadStart={({ nativeEvent }) => {
+              if (nativeEvent.loading && Platform.OS === 'ios') {
+                StatusBar.setNetworkActivityIndicatorVisible(true)
+              }
+            }}
+            onLoadEnd={({ nativeEvent }) => {
+              if (Platform.OS === 'ios') {
+                StatusBar.setNetworkActivityIndicatorVisible(false)
+              }
+            }}
+            startInLoadingState
+            renderLoading={() => <Loader loading />}
+            renderError={() => (
+              <NetworkError onReload={() => webviewRef.current.reload()} />
+            )}
+            originWhitelist={[`${FRONTEND_BASE_URL}*`]}
+            pullToRefreshEnabled={false}
+            allowsFullscreenVideo={true}
+            allowsInlineMediaPlayback={true}
+            sharedCookiesEnabled={true}
+            allowsBackForwardNavigationGestures={true}
+            automaticallyAdjustContentInsets={false}
+            keyboardDisplayRequiresUserAction={false}
+            mediaPlaybackRequiresUserAction={false}
+            scalesPageToFit={false}
+            decelerationRate="normal"
+            onRenderProcessGone={() => {
+              setDidCrash(true)
+            }}
+            onContentProcessDidTerminate={() => {
+              setDidCrash(true)
+            }}
           />
         </SafeAreaView>
-      </Fragment>
-    )
-  }
+      )}
+    </>
+  )
 }
 
-const getUrl = graphql(gql`
-  query GetUrl {
-    url @client
-  }
-`)
-
-export default compose(
-  getUrl,
-  setUrl,
-  withAudio,
-  setAudio,
-  pendingAppSignIn
-)(Web)
+export default Web

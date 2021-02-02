@@ -1,0 +1,19 @@
+# Fix that allows foreground notifications to work
+# From: https://github.com/wix/react-native-notifications/issues/525#issuecomment-656585578
+--- ./node_modules/react-native-notifications/lib/android/app/src/main/java/com/wix/reactnativenotifications/core/notification/PushNotification.java	2020-12-16 16:00:26.000000000 +0100
++++ patches/react-native-notifications/PushNotifications.java	2021-01-19 16:57:27.000000000 +0100
+@@ -60,12 +60,8 @@
+ 
+     @Override
+     public void onReceived() throws InvalidNotificationException {
+-        if (!mAppLifecycleFacade.isAppVisible()) {
+-            postNotification(null);
+-            notifyReceivedBackgroundToJS();
+-        } else {
+-            notifyReceivedToJS();
+-        }
++        postNotification(null);
++        notifyReceivedToJS();
+     }
+ 
+     @Override

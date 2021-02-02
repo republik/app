@@ -1,74 +1,42 @@
 package app.republik;
 
 import android.app.Application;
-
-import app.republik.OTA.OTA;
-import app.republik.OTA.OTAPackage;
-import app.republik.CustomWebView.CustomWebViewPackage;
 import android.content.Context;
+import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
-import com.rnziparchive.RNZipArchivePackage;
-import com.RNFetchBlob.RNFetchBlobPackage;
-import com.guichaguri.trackplayer.TrackPlayer;
-
-// react-native link: react-native-notifications is not used on Android
-
-import com.learnium.RNDeviceInfo.RNDeviceInfo;
-import com.psykar.cookiemanager.CookieManagerPackage;
-
-import app.republik.firebase.NoPlayRNFirebasePackage;
-import io.invertase.firebase.messaging.RNFirebaseMessagingPackage;
-import io.invertase.firebase.notifications.RNFirebaseNotificationsPackage;
-import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
-
-import org.devio.rn.splashscreen.SplashScreenReactPackage;
+import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
-import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
-
-import java.util.Arrays;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import com.wix.reactnativenotifications.RNNotificationsPackage;
+
+import app.republik.BuildConfig;
 
 public class MainApplication extends Application implements ReactApplication {
-  private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
 
-    @Override
-    protected String getJSBundleFile() {
-        Context context = getApplicationContext();
-        String bundleAssetName = this.getBundleAssetName();
-        return OTA.getJSBundleFile(context, bundleAssetName);
-    }
+  private final ReactNativeHost mReactNativeHost =
+      new ReactNativeHost(this) {
+        @Override
+        public boolean getUseDeveloperSupport() {
+          return BuildConfig.DEBUG;
+        }
 
-    @Override
-    public boolean getUseDeveloperSupport() {
-      return BuildConfig.DEBUG;
-    }
+        @Override
+        protected List<ReactPackage> getPackages() {
+          @SuppressWarnings("UnnecessaryLocalVariable")
+          List<ReactPackage> packages = new PackageList(this).getPackages();
+          // Packages that cannot be autolinked yet can be added manually here, for example:
+          // packages.add(new MyReactNativePackage());
+          return packages;
+        }
 
-    @Override
-    protected List<ReactPackage> getPackages() {
-      return Arrays.<ReactPackage>asList(
-          new MainReactPackage(),
-          new RNZipArchivePackage(),
-          new RNFetchBlobPackage(),
-          new TrackPlayer(),
-          new OTAPackage(),
-          new SplashScreenReactPackage(),
-          new NoPlayRNFirebasePackage(),
-          new RNDeviceInfo(),
-          new CookieManagerPackage(),
-          new ReactNativeConfigPackage(),
-          new RNFirebaseMessagingPackage(),
-          new RNFirebaseNotificationsPackage(),
-          new CustomWebViewPackage()
-      );
-    }
-
-    @Override
-    protected String getJSMainModuleName() {
-      return "index";
-    }
-  };
+        @Override
+        protected String getJSMainModuleName() {
+          return "index";
+        }
+      };
 
   @Override
   public ReactNativeHost getReactNativeHost() {
@@ -79,5 +47,37 @@ public class MainApplication extends Application implements ReactApplication {
   public void onCreate() {
     super.onCreate();
     SoLoader.init(this, /* native exopackage */ false);
+    initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
+  }
+
+  /**
+   * Loads Flipper in React Native templates. Call this in the onCreate method with something like
+   * initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
+   *
+   * @param context
+   * @param reactInstanceManager
+   */
+  private static void initializeFlipper(
+      Context context, ReactInstanceManager reactInstanceManager) {
+    if (BuildConfig.DEBUG) {
+      try {
+        /*
+         We use reflection here to pick up the class that initializes Flipper,
+        since Flipper library is not available in release mode
+        */
+        Class<?> aClass = Class.forName("app.republik.ReactNativeFlipper");
+        aClass
+            .getMethod("initializeFlipper", Context.class, ReactInstanceManager.class)
+            .invoke(null, context, reactInstanceManager);
+      } catch (ClassNotFoundException e) {
+        e.printStackTrace();
+      } catch (NoSuchMethodException e) {
+        e.printStackTrace();
+      } catch (IllegalAccessException e) {
+        e.printStackTrace();
+      } catch (InvocationTargetException e) {
+        e.printStackTrace();
+      }
+    }
   }
 }

@@ -4,39 +4,69 @@ A thin native app for persistent auth, app store presence and convenience.
 
 Most views are provided by [republik-frontend](https://github.com/orbiting/republik-frontend) and rendered in a web view.
 
-## Usage
+## General Setup
 
 [Setup React Native for projects with native code](https://facebook.github.io/react-native/docs/getting-started.html).
 
-Make sure to use the «Legacy Build System» in XCode 10 or newer:
-https://github.com/facebook/react-native/issues/21168#issuecomment-422710485
+### Env
 
-Bootstrap your .env file:
+Bootstrap your .env files:
 
-```bash
-cp .env.example .env.dev
+```sh
+cp .env.example .env.development
+cp .env.example .env.staging
+cp .env.example .env.production
 ```
 
-Install and run:
+If `FRONTEND_BASE_URL` is changed you have to clear the babel loader cache:
 
-```bash
+```sh
+rm -rf node_modules/.cache/babel-loader/*
+```
+
+### Install
+
+```sh
 yarn
-yarn run run-ios-dev # or run via Xcode to see logs
-# first start your Android virtual device from Android Studio then
-yarn run run-android-dev
-# adb logcat *:I # to see logs from the emulator
+cd ios
+pod install
 ```
 
-For testing on real iOS devices: Make sure that automatic signing in the general project settings is on and your device is registered and provisioned.
+### Additional Setup
 
-Follow the guides to get up to speed on messages api (between `republik-frontend` and the `app`), fonts, notifications and deployments.
+- [Publishing with Fastlane](docs/publishing.md)
+- [Private Fonts](docs/fonts.md)
 
-### Guides
+## Run Dev
 
-* [Messages API](docs/messages.md)
-* [Publishing](docs/publishing.md)
-* [Notifications](docs/notifications.md)
-* [Fonts](docs/fonts.md)
+### With Local Frontend and Production API
+
+Runs the app in a simulator and use localhost build of `republik-frontend` with [yaproxy](https://github.com/orbiting/proxy) for api. 
+
+in `republik-frontend`:
+
+```sh
+npm run dev
+npm run yaproxy
+```
+
+in `app`:
+
+```sh
+yarn run ios
+yarn run android
+```
+
+Optionally specify simulator: `yarn run ios --simulator iPhone 11`
+
+### Run with Staging Frontend
+
+Set a remote `FRONTEND_BASE_URL` in `.env.staging` and the run:
+
+```sh
+yarn run ios-staging
+yarn run android-staging
+```
 
 ### Universal Links
 
@@ -44,21 +74,18 @@ The app is configured to responde to `www.republik.ch` links.
 
 You can test this in the iOS simulator by running [following command](https://objectivetidbits.com/working-with-universal-links-on-ios-simulator-adffb7767801):
 
-```bash
+```sh
 xcrun simctl openurl booted "https://www.republik.ch/feed"
 ```
 
 [Testing](https://developer.android.com/training/app-links/verify-site-associations#testing) with Android virtual devices:
 
-```bash
+```sh
 adb shell am start -a android.intent.action.VIEW \
     -c android.intent.category.BROWSABLE \
     -d "https://www.republik.ch/feed"
 ```
 
-## Key Screens
+### Notifications
 
-![Login, Front and Article Screen](docs/keyscreens.svg)
-
-The login screen needs to be implemented specifically for the app, probably in the web front end. The existing front and article views can be used as is.
-
+On iOS you can drag the `notification.apns` and `notification-authorization.apns` file onto the simulator for testing.

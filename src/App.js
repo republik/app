@@ -1,65 +1,31 @@
-import React, { Component } from 'react'
-import SplashScreen from 'react-native-splash-screen'
-import { createStackNavigator } from 'react-navigation'
-import { compose } from 'react-apollo'
+import React from 'react'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
+import PushService from './services/Push'
+import DeepLinkingService from './services/DeepLinking'
+import AppStateService from './services/AppState'
+import CookieService from './services/Cookies'
+import { ColorContextProvider } from './utils/colors'
 import Web from './screens/Web'
-import Login from './screens/Login'
-import cookies from './services/cookies'
-import navigator from './services/navigation'
-import deepLinking from './services/deepLinking'
-import ota from './services/ota'
-import pushNotifications from './services/pushNotifications'
-import withApollo from './apollo'
+import AudioPlayer from './components/AudioPlayer'
+import StatusBar from './components/StatusBar'
+import { GlobalStateProvider } from './GlobalState'
 
-const Router = createStackNavigator({
-  Web: {
-    screen: Web
-  },
-  Login: {
-    screen: Login,
-    path: 'login/:url'
-  }
-}, {
-  mode: 'modal',
-  initialRouteName: 'Web',
-  headerMode: 'none'
-})
-
-class App extends Component {
-  state = { cacheLoaded: false }
-
-  componentDidMount () {
-    this.props.persistor.restore().then(() => {
-      this.setState({ cacheLoaded: true })
-    })
-  }
-
-  hideSplashScreen = () => {
-    SplashScreen.hide()
-  }
-
-  render () {
-    if (!this.state.cacheLoaded) return null
-
-    return (
-      <Router
-        ref={navigatorRef => navigator.setContainer(navigatorRef)}
-        screenProps={{
-          persistor: this.props.persistor,
-          onLoadEnd: this.hideSplashScreen,
-          checkForUpdates: this.props.checkForUpdates
-        }}
-      />
-    )
-  }
+const App = () => {
+  return (
+    <GlobalStateProvider>
+      <PushService />
+      <DeepLinkingService />
+      <AppStateService />
+      <CookieService />
+      <SafeAreaProvider>
+        <ColorContextProvider>
+          <StatusBar />
+          <Web />
+          <AudioPlayer />
+        </ColorContextProvider>
+      </SafeAreaProvider>
+    </GlobalStateProvider>
+  )
 }
 
-export default compose(
-  withApollo,
-  ota,
-  deepLinking,
-  pushNotifications,
-  cookies
-)(App)
-
-console.ignoredYellowBox = ['Warning: isMounted(...) is deprecated in plain JavaScript React classes.']
+export default App
