@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react'
-import { Animated, StatusBar, Easing } from 'react-native'
+import { Animated, StatusBar, Easing, Platform } from 'react-native'
 import {
   getStatusBarHeight,
   isIPhoneWithMonobrow,
@@ -24,6 +24,26 @@ const CustomStatusBar = () => {
   const barStyle = colorSchemeKey === 'dark' ? 'light-content' : 'dark-content'
   const slideAnim = useRef(new Animated.Value(0)).current
 
+  useEffect(() => {
+    if (Platform.OS === 'ios') {
+      // workaround odd issue where status bar style change does not stick after OS dark mode switch
+      // to reproduce:
+      // - open app in iOS simulator, set «Nachtmodus» to «Automatisch»
+      // - toggle dark mode via cmd + shift + a
+      // - when going dark: without this fix the bar style first changes to light as desiered but goes dark again after ~500ms
+      // - the 1500ms is necessary for hot reloading, where it also always goes dark when in auto dark node
+      const timeoutId = setTimeout(() => {
+        StatusBar.setBarStyle(barStyle)
+      }, 500)
+      const timeout2Id = setTimeout(() => {
+        StatusBar.setBarStyle(barStyle)
+      }, 1500)
+      return () => {
+        clearTimeout(timeoutId)
+        clearTimeout(timeout2Id)
+      }
+    }
+  }, [barStyle])
   useEffect(() => {
     changeNavigationBarColor(backgroundColor)
   }, [backgroundColor])
@@ -72,7 +92,7 @@ const CustomStatusBar = () => {
         translucent
         barStyle={barStyle}
         // workaround: needs to be transparent on Android, else it overlaps because it's too big
-        backgroundColor={'rgba(0,0,0,0)'}
+        backgroundColor='rgba(0,0,0,0)'
         hidden={isFullscreen}
       />
     </Animated.View>
