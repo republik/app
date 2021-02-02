@@ -179,9 +179,9 @@ const Web = () => {
     } else if (message.type === 'isSignedIn') {
       setPersistedState({ isSignedIn: message.payload })
     } else if (message.type === 'fullscreen-enter') {
-      setPersistedState({ isFullscreen: true })
+      setGlobalState({ isFullscreen: true })
     } else if (message.type === 'fullscreen-exit') {
-      setPersistedState({ isFullscreen: false })
+      setGlobalState({ isFullscreen: false })
     } else if (message.type === 'setColorScheme') {
       setPersistedState({ userSetColorScheme: message.colorSchemeKey })
     } else if (message.type === 'ackMessage') {
@@ -240,7 +240,7 @@ const Web = () => {
           style={styles.webView}
           edges={['right', 'left']}
           backgroundColor={
-            persistedState.isFullscreen
+            globalState.isFullscreen
               ? colors.fullScreenStatusBar
               : colors.default
           }>

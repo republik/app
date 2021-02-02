@@ -16,7 +16,7 @@ const CustomStatusBar = () => {
   const statusBarHeight = getStatusBarHeight()
   const orientation = useOrientation()
   const {
-    persistedState: { isFullscreen },
+    globalState: { isFullscreen },
   } = useGlobalState()
   const backgroundColor = isFullscreen
     ? colors.fullScreenStatusBar
