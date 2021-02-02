@@ -1,5 +1,4 @@
 app_identifier("app.republik") # The bundle identifier of your app
-apple_id("olivierbaumann@me.com") # Your Apple email address
 
 itc_team_id("119115396") # App Store Connect Team ID
 team_id("7MQXM58QM7") # Developer Portal Team ID

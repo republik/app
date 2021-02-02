@@ -26,13 +26,14 @@ platform :ios do
     build_app(workspace: "republikapp.xcworkspace", scheme: "republikapp (staging)", export_xcargs: "-allowProvisioningUpdates")
     upload_to_testflight(skip_waiting_for_build_processing: true)
   end
-    lane :release do
+    lane :production do
     increment_build_number
     match(
       type: "appstore",
       git_url: "git@github.com:orbiting/app-certificates.git"
     ) # more information: https://codesigning.guide
-    build_app(scheme: "republikapp", scheme: "republikapp (production)")
-    upload_to_app_store 
+    build_app(workspace: "republikapp.xcworkspace", scheme: "republikapp (production)")
+    upload_to_testflight(skip_waiting_for_build_processing: true)
+    #upload_to_app_store 
   end
 end
