@@ -40,7 +40,11 @@ const Controls = ({ audio }) => {
         name="replay-10"
         size={28}
         color={colors.text}
-        onPress={() => TrackPlayer.seekTo(position - 10)}
+        onPress={() => {
+          // seekTo does not work on iOS unless playing
+          TrackPlayer.play()
+          TrackPlayer.seekTo(position - 10)
+        }}
       />
       <Icon
         name={isPlaying ? 'pause' : 'play-arrow'}
@@ -58,7 +62,11 @@ const Controls = ({ audio }) => {
         name="forward-30"
         size={28}
         color={colors.text}
-        onPress={() => TrackPlayer.seekTo(position + 30)}
+        onPress={() => {
+          // seekTo does not work on iOS unless playing
+          TrackPlayer.play()
+          TrackPlayer.seekTo(position + 30)
+        }}
       />
       <View style={styles.content}>
         <TouchableOpacity onPress={onTitlePress}>

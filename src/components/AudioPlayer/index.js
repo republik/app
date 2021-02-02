@@ -84,15 +84,11 @@ const AudioPlayer = () => {
           artist: 'Republik',
           artwork: Logo,
         })
-      }
-      if (autoPlayAudio) {
-        if (audio.currentTime && Platform.OS === 'ios') {
-          TrackPlayer.setVolume(0)
-        }
-        await TrackPlayer.play()
-        setGlobalState({ autoPlayAudio: false })
         if (audio.currentTime) {
+          TrackPlayer.seekTo(audio.currentTime)
           if (Platform.OS === 'ios') {
+            TrackPlayer.setVolume(0)
+            await TrackPlayer.play()
             // seekTo does not work on iOS until the player has started playing
             // we workaround around this with a setTimeout:
             // https://github.com/react-native-kit/react-native-track-player/issues/387#issuecomment-709433886
@@ -104,12 +100,17 @@ const AudioPlayer = () => {
             }, 500)
             setTimeout(() => {
               TrackPlayer.seekTo(audio.currentTime)
+              if (!autoPlayAudio) {
+                TrackPlayer.pause()
+              }
               TrackPlayer.setVolume(1)
             }, 1000)
-          } else {
-            TrackPlayer.seekTo(audio.currentTime)
           }
         }
+      }
+      if (autoPlayAudio) {
+        await TrackPlayer.play()
+        setGlobalState({ autoPlayAudio: false })
       }
     }
 

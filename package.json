@@ -20,7 +20,7 @@
   "dependencies": {
     "@react-native-community/async-storage": "^1.12.1",
     "@react-native-community/cookies": "^5.0.1",
-    "lodash.debounce": "^4.0.8",
+    "lodash": "^4.17.20",
     "react": "16.11.0",
     "react-native": "0.62.2",
     "react-native-config": "^1.4.1",

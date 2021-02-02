@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState, useRef } from 'react'
 import { View, StyleSheet, Animated, PanResponder, Easing } from 'react-native'
-import debounce from 'lodash.debounce'
+import throttle from 'lodash/throttle'
 import {
   ANIMATION_DURATION,
   AUDIO_PLAYER_PROGRESS_HEIGHT,
@@ -19,25 +19,31 @@ const ProgressBar = ({ audio }) => {
   const { colors } = useColorContext()
   const { position, duration, bufferedPosition } = useTrackPlayerProgress(100)
   const playbackState = usePlaybackState()
-  const { dispatch } = useGlobalState()
+  const { dispatch, setPersistedState } = useGlobalState()
   const scaleY = useRef(new Animated.Value(1)).current
 
   const isPlaying = playbackState === TrackPlayer.STATE_PLAYING
 
   const upsertCurrentMediaProgress = useMemo(() => {
-    return debounce((currentAudio, currentPosition) => {
+    return throttle((currentAudio, currentTime) => {
       if (currentAudio) {
         dispatch({
           type: 'postMessage',
           content: {
             type: 'onAppMediaProgressUpdate',
             mediaId: currentAudio.mediaId,
-            currentTime: currentPosition,
+            currentTime,
+          },
+        })
+        setPersistedState({
+          audio: {
+            ...currentAudio,
+            currentTime
           },
         })
       }
-    }, 1000)
-  }, [dispatch])
+    }, 1000, { trailing: true })
+  }, [dispatch, setPersistedState])
 
   const panResponder = useMemo(() => {
     const expandAnim = () => {
@@ -70,6 +76,8 @@ const ProgressBar = ({ audio }) => {
       },
       onPanResponderRelease: (evt, gestureState) => {
         setIsPanning(false)
+        // seekTo does not work on iOS unless playing
+        TrackPlayer.play()
         TrackPlayer.seekTo(panProgress * duration)
         collapseAnim()
       },
@@ -83,6 +91,9 @@ const ProgressBar = ({ audio }) => {
       } else {
         console.warn(`Audio element ${audio.id} has no mediaId`)
       }
+    } else if (!audio) {
+      // prevent call to rewrite audio to persited state with current position
+      upsertCurrentMediaProgress.cancel()
     }
   }, [upsertCurrentMediaProgress, audio, isPlaying, position])
 
