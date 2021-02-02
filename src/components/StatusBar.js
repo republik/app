@@ -1,10 +1,11 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useMemo, useRef } from 'react'
 import { Animated, StatusBar, Easing, Platform } from 'react-native'
 import {
   getStatusBarHeight,
   isIPhoneWithMonobrow,
 } from 'react-native-status-bar-height'
 import changeNavigationBarColor from 'react-native-navigation-bar-color'
+import { getModel } from 'react-native-device-info'
 
 import { useColorContext } from '../utils/colors'
 import { useOrientation } from '../utils/useOrientation'
@@ -23,6 +24,8 @@ const CustomStatusBar = () => {
     : colors.default
   const barStyle = colorSchemeKey === 'dark' ? 'light-content' : 'dark-content'
   const slideAnim = useRef(new Animated.Value(0)).current
+  
+  const model = useMemo(() => getModel())
 
   useEffect(() => {
     if (Platform.OS === 'ios') {
@@ -72,8 +75,9 @@ const CustomStatusBar = () => {
     slideIn()
   }, [isFullscreen, slideAnim])
 
+  const isAlwaysHidden = orientation === 'landscape' && !model.match('iPad')
   const animationStatusBarHeight =
-    orientation === 'landscape' || !isIPhoneWithMonobrow() ? 0 : statusBarHeight
+    isAlwaysHidden || !isIPhoneWithMonobrow() ? 0 : statusBarHeight
 
   return (
     <Animated.View
@@ -81,7 +85,7 @@ const CustomStatusBar = () => {
         height: slideAnim.interpolate({
           inputRange: [0, 1],
           outputRange: [
-            orientation === 'landscape' ? 0 : statusBarHeight,
+            isAlwaysHidden ? 0 : statusBarHeight,
             animationStatusBarHeight,
           ],
         }),
@@ -93,7 +97,7 @@ const CustomStatusBar = () => {
         barStyle={barStyle}
         // workaround: needs to be transparent on Android, else it overlaps because it's too big
         backgroundColor='rgba(0,0,0,0)'
-        hidden={isFullscreen}
+        hidden={isFullscreen || isAlwaysHidden}
       />
     </Animated.View>
   )
