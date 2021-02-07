@@ -163,10 +163,7 @@ const Web = () => {
     const message = JSON.parse(e.nativeEvent.data) || {}
     devLog('onMessage', message)
     if (message.type === 'routeChange') {
-      onNavigationStateChange({
-        ...message.payload,
-        url: `${FRONTEND_BASE_URL}${message.payload.url}`,
-      })
+      onNavigationStateChange(message.payload)
     } else if (message.type === 'share') {
       share(message.payload)
     } else if (message.type === 'haptic') {
@@ -214,7 +211,10 @@ const Web = () => {
     }
   }
 
-  const onNavigationStateChange = ({ url }) => {
+  const onNavigationStateChange = ({ url: urlInput }) => {
+    const url = urlInput.startsWith(FRONTEND_BASE_URL)
+      ? urlInput
+      : `${FRONTEND_BASE_URL}${urlInput}`
     // deduplicate
     // - called by onMessage routeChange and onNavigationStateChange
     //   - iOS triggers onNavigationStateChange for pushState in the web view
@@ -224,6 +224,8 @@ const Web = () => {
     //   - e.g. notifications & link opening
     if (url !== persistedState.url) {
       setPersistedState({ url })
+    }
+    if (getLast(history) !== url) {
       setHistory((currentHistory) => {
         if (getLast(currentHistory) === url) {
           return currentHistory
