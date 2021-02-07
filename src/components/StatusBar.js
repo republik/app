@@ -24,8 +24,8 @@ const CustomStatusBar = () => {
     : colors.default
   const barStyle = colorSchemeKey === 'dark' ? 'light-content' : 'dark-content'
   const slideAnim = useRef(new Animated.Value(0)).current
-  
-  const model = useMemo(() => getModel())
+
+  const model = useMemo(() => getModel(), [])
 
   useEffect(() => {
     if (Platform.OS === 'ios') {
@@ -96,7 +96,7 @@ const CustomStatusBar = () => {
         translucent
         barStyle={barStyle}
         // workaround: needs to be transparent on Android, else it overlaps because it's too big
-        backgroundColor='rgba(0,0,0,0)'
+        backgroundColor="rgba(0,0,0,0)"
         hidden={isFullscreen || isAlwaysHidden}
       />
     </Animated.View>

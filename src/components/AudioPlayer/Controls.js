@@ -27,7 +27,7 @@ const Controls = ({ audio }) => {
   const onTitlePress = () => {
     if (audio && audio.sourcePath) {
       setGlobalState({
-        pendingUrl: `${FRONTEND_BASE_URL}${audio.sourcePath}`
+        pendingUrl: `${FRONTEND_BASE_URL}${audio.sourcePath}`,
       })
     }
   }

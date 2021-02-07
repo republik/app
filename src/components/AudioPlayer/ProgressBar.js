@@ -25,24 +25,28 @@ const ProgressBar = ({ audio }) => {
   const isPlaying = playbackState === TrackPlayer.STATE_PLAYING
 
   const upsertCurrentMediaProgress = useMemo(() => {
-    return throttle((currentAudio, currentTime) => {
-      if (currentAudio) {
-        dispatch({
-          type: 'postMessage',
-          content: {
-            type: 'onAppMediaProgressUpdate',
-            mediaId: currentAudio.mediaId,
-            currentTime,
-          },
-        })
-        setPersistedState({
-          audio: {
-            ...currentAudio,
-            currentTime
-          },
-        })
-      }
-    }, 1000, { trailing: true })
+    return throttle(
+      (currentAudio, currentTime) => {
+        if (currentAudio) {
+          dispatch({
+            type: 'postMessage',
+            content: {
+              type: 'onAppMediaProgressUpdate',
+              mediaId: currentAudio.mediaId,
+              currentTime,
+            },
+          })
+          setPersistedState({
+            audio: {
+              ...currentAudio,
+              currentTime,
+            },
+          })
+        }
+      },
+      1000,
+      { trailing: true },
+    )
   }, [dispatch, setPersistedState])
 
   const panResponder = useMemo(() => {

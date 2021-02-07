@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { useColorScheme, Appearance } from 'react-native'
+import { Appearance } from 'react-native'
 import { useGlobalState } from '../GlobalState'
 
 const colors = {
@@ -33,7 +33,9 @@ const ColorContext = React.createContext({
 })
 
 export const ColorContextProvider = ({ children }) => {
-  const [colorScheme, setColorScheme] = useState(() => Appearance.getColorScheme())
+  const [colorScheme, setColorScheme] = useState(() =>
+    Appearance.getColorScheme(),
+  )
 
   useEffect(() => {
     const onChange = (preferences) => {

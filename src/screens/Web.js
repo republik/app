@@ -2,7 +2,13 @@ import React, { useRef, useState, useEffect } from 'react'
 import { WebView } from 'react-native-webview'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback'
-import { StyleSheet, Share, Platform, BackHandler, StatusBar } from 'react-native'
+import {
+  StyleSheet,
+  Share,
+  Platform,
+  BackHandler,
+  StatusBar,
+} from 'react-native'
 import SplashScreen from 'react-native-splash-screen'
 
 import { APP_VERSION, FRONTEND_BASE_URL, HOME_URL, devLog } from '../constants'
@@ -75,10 +81,10 @@ const Web = () => {
       type: 'postMessage',
       content: {
         type: 'osColorScheme',
-        value: colorSchemeKey
-      }
+        value: colorSchemeKey,
+      },
     })
-  }, [colorSchemeKey])
+  }, [colorSchemeKey, dispatch])
 
   // Capture Android back button press
   useEffect(() => {
@@ -128,8 +134,8 @@ const Web = () => {
           type: 'postMessage',
           content: {
             type: 'push-route',
-            url: globalState.pendingUrl
-          }
+            url: globalState.pendingUrl,
+          },
         })
       } else {
         setWebUrl(globalState.pendingUrl)
@@ -148,7 +154,7 @@ const Web = () => {
     if (!webUrl) {
       SplashScreen.hide()
     }
-  }, [webUrl, globalState, persistedState, setGlobalState])
+  }, [webUrl, globalState, persistedState, setGlobalState, dispatch])
 
   useEffect(() => {
     if (!isReady) {
