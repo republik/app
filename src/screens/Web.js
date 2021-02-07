@@ -256,7 +256,7 @@ const Web = () => {
               setIsReady(true)
             }}
             onLoadStart={({ nativeEvent }) => {
-              if (nativeEvent.loading && Platform.OS === 'ios') {
+              if (isReady && nativeEvent.loading && Platform.OS === 'ios') {
                 StatusBar.setNetworkActivityIndicatorVisible(true)
               }
             }}
