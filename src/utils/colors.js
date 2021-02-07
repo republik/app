@@ -1,8 +1,7 @@
-import React, { useContext } from 'react'
-import { useColorScheme } from 'react-native'
+import React, { useContext, useEffect, useState } from 'react'
+import { useColorScheme, Appearance } from 'react-native'
 import { useGlobalState } from '../GlobalState'
 
-//TODO get colors from styleguide
 const colors = {
   light: {
     default: '#FFFFFF',
@@ -34,8 +33,26 @@ const ColorContext = React.createContext({
 })
 
 export const ColorContextProvider = ({ children }) => {
-  const colorScheme = useColorScheme()
-  const { persistedState } = useGlobalState()
+  const [colorScheme, setColorScheme] = useState(() => Appearance.getColorScheme())
+
+  useEffect(() => {
+    const onChange = (preferences) => {
+      setColorScheme(preferences.colorScheme)
+    }
+    Appearance.addChangeListener(onChange)
+    return () => {
+      Appearance.removeChangeListener(onChange)
+    }
+  }, [])
+
+  const { globalState, persistedState } = useGlobalState()
+  const { appState } = globalState
+  useEffect(() => {
+    if (appState === 'active') {
+      setColorScheme(Appearance.getColorScheme())
+    }
+  }, [appState])
+
   const { userSetColorScheme } = persistedState
   const colorSchemeKey =
     !userSetColorScheme || userSetColorScheme === 'auto'

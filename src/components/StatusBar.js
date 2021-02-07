@@ -48,7 +48,7 @@ const CustomStatusBar = () => {
     }
   }, [barStyle])
   useEffect(() => {
-    changeNavigationBarColor(backgroundColor)
+    changeNavigationBarColor(backgroundColor, backgroundColor === '#FFFFFF')
   }, [backgroundColor])
 
   useEffect(() => {

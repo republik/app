@@ -49,7 +49,7 @@ const Web = () => {
   const webviewRef = useRef()
   const [webUrl, setWebUrl] = useState()
   const [isReady, setIsReady] = useState(false)
-  const { colors } = useColorContext()
+  const { colors, colorSchemeKey } = useColorContext()
 
   const [history, setHistory] = useState([])
   const historyRef = useRef()
@@ -64,6 +64,21 @@ const Web = () => {
       setDidCrash(false)
     }
   }, [appState, didCrash])
+
+  // Android web view does not support media queries
+  useEffect(() => {
+    if (Platform.OS !== 'android') {
+      return
+    }
+    // there for we send the os/app color scheme to the web app
+    dispatch({
+      type: 'postMessage',
+      content: {
+        type: 'osColorScheme',
+        value: colorSchemeKey
+      }
+    })
+  }, [colorSchemeKey])
 
   // Capture Android back button press
   useEffect(() => {
