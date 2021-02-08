@@ -32,7 +32,7 @@ export const rewriteBaseUrl = (url) => {
 
 // App paths
 export const HOME_PATH = '/'
-export const CURTAIN_BACKDOOR_PATH = `${Config.CURTAIN_BACKDOOR_PATH}`
+export const CURTAIN_BACKDOOR_PATH = Config.CURTAIN_BACKDOOR_PATH
 
 // App urls
 export const HOME_URL = `${FRONTEND_BASE_URL}${HOME_PATH}`
