@@ -10,7 +10,7 @@ git diff --exit-code || (echo "Error: please commit changes in git first."; exit
 yarn lint
 
 # Bump version number, but do not commit
-yarn version --no-git-tag-version || exit 1
+# yarn version --no-git-tag-version || exit 1
 
 # build and push to stores (remember error traps do not work on chained &&)
 yarn deploy-ios-staging || exit 1
