@@ -2,13 +2,14 @@ import { useEffect } from 'react'
 import { Linking } from 'react-native'
 
 import { useGlobalState } from '../GlobalState'
-import { rewriteBaseUrl } from '../constants'
+import { rewriteBaseUrl, devLog } from '../constants'
 
 const DeepLinkingService = () => {
   const { setGlobalState } = useGlobalState()
 
   useEffect(() => {
     const handleOpenURL = ({ url }) => {
+      devLog('handleOpenURL', url)
       // Don't navigate if trackplayer url
       if (url === 'trackplayer://notification.click') {
         return
