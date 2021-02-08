@@ -92,21 +92,21 @@ const Web = () => {
       return
     }
     const backAction = () => {
+      const currentHistory = historyRef.current
       if (
-        historyRef.current.length === 1 &&
-        getLast(historyRef.current) === HOME_URL
+        currentHistory.length === 1 &&
+        getLast(currentHistory) === HOME_URL
       ) {
         BackHandler.exitApp()
         return false
       }
-      if (historyRef.current.length) {
-        setHistory((currentHistory) => {
-          return currentHistory.slice(0, currentHistory.length - 1)
-        })
+      if (currentHistory.length) {
         setGlobalState({
           pendingUrl:
-            historyRef.current[historyRef.current.length - 2] || HOME_URL,
+            currentHistory[currentHistory.length - 2] || HOME_URL,
         })
+        // needs to happen after setGlobalState because set happens instantaneously instant in react native
+        setHistory(currentHistory.slice(0, currentHistory.length - 1))
         return true
       }
       setGlobalState({ pendingUrl: HOME_URL })
@@ -134,7 +134,7 @@ const Web = () => {
           type: 'postMessage',
           content: {
             type: 'push-route',
-            url: globalState.pendingUrl,
+            url: globalState.pendingUrl.replace(FRONTEND_BASE_URL, ''),
           },
         })
       } else {
