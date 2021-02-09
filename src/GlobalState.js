@@ -22,7 +22,7 @@ const readStore = async ({ setPersistedState, setGlobalState, setError }) => {
     const storedState = JSON.parse(await AsyncStorage.getItem(KEY))
     setPersistedState(storedState)
   } catch (e) {
-    console.error(e)
+    console.error('readStore', e)
     setError(e)
   }
   setGlobalState({ persistedStateReady: true })
