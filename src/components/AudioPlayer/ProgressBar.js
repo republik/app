@@ -101,6 +101,13 @@ const ProgressBar = ({ audio }) => {
     }
   }, [upsertCurrentMediaProgress, audio, isPlaying, position])
 
+  useEffect(() => {
+    return () => {
+      // stop sending when app is quite
+      upsertCurrentMediaProgress.cancel()
+    }
+  }, [upsertCurrentMediaProgress])
+
   const progress = isPanning ? panProgress * 100 : (position / duration) * 100
   const buffered = (bufferedPosition / duration) * 100
 
