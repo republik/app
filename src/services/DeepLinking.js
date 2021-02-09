@@ -38,9 +38,17 @@ const DeepLinkingService = () => {
       Linking.getInitialURL().then(onInitialUrl).catch(onInitialError)
     }
 
+    // max wait on initial url
+    // - secondary workaround against React Native bug on Android
+    // - https://github.com/facebook/react-native/issues/25675
+    const timeout = setTimeout(() => {
+      setGlobalState({ deepLinkingReady: true })
+    }, 15000)
+
     Linking.addEventListener('url', handleOpenURL)
     return () => {
       Linking.removeEventListener('url', handleOpenURL)
+      clearTimeout(timeout)
     }
   }, [setGlobalState])
 
