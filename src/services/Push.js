@@ -13,13 +13,6 @@ const init = async ({ isSignedIn, setGlobalState, dispatch }) => {
     return
   }
 
-  // Todo: remove this commented section when releasing
-  // const isInEmulator = await isEmulator()
-  // if (isInEmulator) {
-  //   setGlobalState({ pushReady: true })
-  //   return
-  // }
-
   const onNotificationOpened = ({ payload = {} }) => {
     if (payload.type === 'authorization') {
       // authorization only doesn't trigger navigation
@@ -33,9 +26,13 @@ const init = async ({ isSignedIn, setGlobalState, dispatch }) => {
     }
   }
 
-  const initialNotification = await Notifications.getInitialNotification()
-  if (initialNotification) {
-    onNotificationOpened(initialNotification)
+  try {
+    const initialNotification = await Notifications.getInitialNotification()
+    if (initialNotification) {
+      onNotificationOpened(initialNotification)
+    }
+  } catch (e) {
+    console.error('getInitialNotification', e)
   }
   setGlobalState({ pushReady: true })
 

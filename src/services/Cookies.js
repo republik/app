@@ -8,23 +8,22 @@ const CookieService = () => {
   const { setGlobalState } = useGlobalState()
 
   useEffect(() => {
-    const setCookies = async () => {
-      if (CURTAIN_BACKDOOR_PATH) {
-        CookieManager.set(FRONTEND_BASE_URL, {
-          name: 'OpenSesame',
-          value: encodeURIComponent(CURTAIN_BACKDOOR_PATH),
-          path: '/',
-          version: '1',
-          expires: '2030-05-30T12:30:00.00-05:00',
-        }).then(() => {
-          setGlobalState({ cookiesReady: true })
-        })
-      } else {
+    if (CURTAIN_BACKDOOR_PATH) {
+      CookieManager.set(FRONTEND_BASE_URL, {
+        name: 'OpenSesame',
+        value: encodeURIComponent(CURTAIN_BACKDOOR_PATH),
+        path: '/',
+        version: '1',
+        expires: '2030-05-30T12:30:00.00-05:00',
+      }).then(() => {
         setGlobalState({ cookiesReady: true })
-      }
-      return
+      }).catch((error) => {
+        console.error('CookieManager.set', error)
+        setGlobalState({ cookiesReady: true })
+      })
+    } else {
+      setGlobalState({ cookiesReady: true })
     }
-    setCookies()
   }, [setGlobalState])
 
   return null
