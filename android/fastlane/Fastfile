@@ -39,10 +39,6 @@ platform :android do
     increment_version_code(
       app_project_dir: "./app"
     )
-    increment_version_name(
-      bump_type: options[:type] || 'patch',
-      app_project_dir: "./app"
-    )
     gradle(
       task: "assemble",
       build_type: "Release"
