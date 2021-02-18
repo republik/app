@@ -100,6 +100,15 @@ Will do the same as above but with `.env.production`. Can then be released via [
 yarn deploy-android-production type:[version-type]
 ```
 
+##### APK File
+
+Download «Distribution APK» file from Google Play Console and upload to our [S3 Bucket](https://s3.console.aws.amazon.com/s3/buckets/republik-assets?prefix=assets%2Fapp%2F&region=eu-central-1#).
+
+Make sure to update links on following pages:
+
+- republik.ch/gebrauchsanleitung 
+- republik.ch/app
+
 ## Tagging
 
 Make sure to tag versions that you release to production:
