@@ -4,6 +4,12 @@ A thin native app for persistent auth, app store presence and convenience.
 
 Most views are provided by [republik-frontend](https://github.com/orbiting/republik-frontend) and rendered in a web view.
 
+## License
+
+The logo (republik_logo.png) is property of its owner (Project R), and may not be reproduced without permission.
+
+The source code is «BSD 3-clause» licensed.
+
 ## General Setup
 
 [Setup React Native for projects with native code](https://facebook.github.io/react-native/docs/getting-started.html).
