@@ -17,7 +17,7 @@
     "test": "jest",
     "lint": "eslint .",
     "version": "react-native-version --skip-tag",
-    "postinstall": "patch --forward ./node_modules/react-native-notifications/lib/android/app/src/main/java/com/wix/reactnativenotifications/core/notification/PushNotification.java < patches/react-native-notifications/PushNotifications-java.patch  || true"
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@react-native-community/async-storage": "^1.12.1",
@@ -37,7 +37,7 @@
     "react-native-swift": "^1.2.3",
     "react-native-track-player": "^1.2.3",
     "react-native-vector-icons": "^7.1.0",
-    "react-native-webview": "11.0.3",
+    "react-native-webview": "11.3.2",
     "url": "^0.11.0",
     "uuid": "^8.3.1",
     "yarn": "^1.22.10"
@@ -51,7 +51,8 @@
     "jest": "^26.5.2",
     "metro-react-native-babel-preset": "^0.63.0",
     "react-native-version": "^4.0.0",
-    "react-test-renderer": "16.11.0"
+    "react-test-renderer": "16.11.0",
+    "patch-package": "^6.4.7"
   },
   "jest": {
     "preset": "react-native"
