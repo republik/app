@@ -2,4 +2,5 @@
 <resources>
     <color name="primary_dark">#000000</color>
     <color name="primary_bright">#FFFFFF</color>
+    <color name="scroll_bar_color">#808080</color>
 </resources>
