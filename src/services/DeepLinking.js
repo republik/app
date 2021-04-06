@@ -17,14 +17,13 @@ const DeepLinkingService = () => {
       setGlobalState({ pendingUrl: rewriteBaseUrl(url) })
     }
 
-
-    const onInitialUrl = (url) => {
+    const onInitialUrl = url => {
       if (url) {
         handleOpenURL({ url })
       }
       setGlobalState({ deepLinkingReady: true })
     }
-    const onInitialError = (error) => {
+    const onInitialError = error => {
       console.error('getInitialURL', error)
       setGlobalState({ deepLinkingReady: true })
     }
@@ -32,7 +31,8 @@ const DeepLinkingService = () => {
     if (Platform.OS === 'android') {
       // work around regular Linking.getInitialURL promise never returning after a force quite
       // https://github.com/facebook/react-native/issues/25675#issuecomment-612249911
-      const NativeLinking = require('react-native/Libraries/Linking/NativeLinking').default
+      const NativeLinking = require('react-native/Libraries/Linking/NativeIntentAndroid')
+        .default
       NativeLinking.getInitialURL().then(onInitialUrl).catch(onInitialError)
     } else {
       Linking.getInitialURL().then(onInitialUrl).catch(onInitialError)

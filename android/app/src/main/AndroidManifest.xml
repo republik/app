@@ -29,7 +29,6 @@
           <data android:scheme="https" android:host="republik.love" />
       </intent-filter>
       </activity>
-      <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
       <service
         android:name="com.wix.reactnativenotifications.fcm.FcmInstanceIdListenerService"
         android:exported="false">
