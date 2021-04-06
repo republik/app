@@ -35,7 +35,7 @@
     "react-native-splash-screen": "^3.2.0",
     "react-native-status-bar-height": "^2.6.0",
     "react-native-swift": "^1.2.3",
-    "react-native-track-player": "^1.2.3",
+    "react-native-track-player": "^1.2.7",
     "react-native-vector-icons": "^7.1.0",
     "react-native-webview": "11.3.2",
     "url": "^0.11.0",
