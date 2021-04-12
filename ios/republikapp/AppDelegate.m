@@ -38,11 +38,7 @@ static void InitializeFlipper(UIApplication *application) {
   RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge
                                                    moduleName:@"republikapp"
                                             initialProperties:nil];
-  if (@available(iOS 13.0, *)) {
-    rootView.backgroundColor = [UIColor blackColor];
-  } else {
-    rootView.backgroundColor = [UIColor blackColor];
-  }
+  rootView.backgroundColor = [UIColor blackColor];
 
   self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
   UIViewController *rootViewController = [UIViewController new];
