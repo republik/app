@@ -2,7 +2,8 @@
   package="app.republik">
 
     <uses-permission android:name="android.permission.INTERNET" />
-
+    <!-- Chromebook Compatibility see: https://developer.android.com/topic/arc#update_your_apps_manifest_file -->
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
     <application
       android:name="app.republik.MainApplication"
       android:label="@string/app_name"
@@ -28,7 +29,6 @@
           <data android:scheme="https" android:host="republik.love" />
       </intent-filter>
       </activity>
-      <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
       <service
         android:name="com.wix.reactnativenotifications.fcm.FcmInstanceIdListenerService"
         android:exported="false">
