@@ -24,7 +24,7 @@
     "@react-native-community/cookies": "^5.0.1",
     "lodash": "^4.17.20",
     "react": "17.0.1",
-    "react-native": "0.64.0",
+    "react-native": "0.64.2",
     "react-native-config": "^1.4.1",
     "react-native-device-info": "^6.2.0",
     "react-native-get-random-values": "^1.5.0",
