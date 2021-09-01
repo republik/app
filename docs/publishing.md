@@ -104,10 +104,25 @@ yarn deploy-android-production type:[version-type]
 
 Download «Distribution APK» file from Google Play Console and upload to our [S3 Bucket](https://s3.console.aws.amazon.com/s3/buckets/republik-assets?prefix=assets%2Fapp%2F&region=eu-central-1#).
 
-Make sure to update links on following pages:
+Make sure to update the [APK download-link](https://republik.ch/app/apk/latest), so that the link points to the newly uploaded APK-file.
+You can update the redirect-link by running the following GraphQL mutation on api.republik.ch:
 
-- republik.ch/gebrauchsanleitung 
-- republik.ch/app
+```graphql
+  mutation {
+    updateRedirection(
+      id:"7e9c49dc-7f1c-43f2-919f-eb92c17ccf2b"
+      source:"/app/apk/latest",
+      target: --> Paste your link for the uploaded APK-file here <---
+      status:302
+    ) {
+      target
+    }
+  }
+```
+The link is used on the following pages:
+ - [App](https://republik.ch/app)
+ - [Gebrauchsanleitung](https://republik.ch/gebrauchsanleitung)
+ - Inside a banner that's shown to users running a legacy-version of the app.
 
 ## Tagging
 
