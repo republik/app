@@ -15,12 +15,14 @@ const CookieService = () => {
         path: '/',
         version: '1',
         expires: '2030-05-30T12:30:00.00-05:00',
-      }).then(() => {
-        setGlobalState({ cookiesReady: true })
-      }).catch((error) => {
-        console.error('CookieManager.set', error)
-        setGlobalState({ cookiesReady: true })
       })
+        .then(() => {
+          setGlobalState({ cookiesReady: true })
+        })
+        .catch(error => {
+          console.error('CookieManager.set', error)
+          setGlobalState({ cookiesReady: true })
+        })
     } else {
       setGlobalState({ cookiesReady: true })
     }
