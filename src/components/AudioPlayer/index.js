@@ -39,6 +39,7 @@ const AudioPlayer = () => {
   const { audio } = persistedState
   const { autoPlayAudio } = globalState
   const slideAnimatedValue = useRef(new Animated.Value(0)).current
+  const opacityAnimatedValue = useRef(new Animated.Value(0)).current
   const { colors } = useColorContext()
 
   // Initializes the player
@@ -53,20 +54,34 @@ const AudioPlayer = () => {
   // which happens via message API.
   useEffect(() => {
     const slideIn = () => {
-      Animated.timing(slideAnimatedValue, {
-        toValue: 1,
-        duration: ANIMATION_DURATION,
-        easing: Easing.in(Easing.ease),
-        useNativeDriver: false,
-      }).start()
+      Animated.sequence([
+        Animated.timing(opacityAnimatedValue, {
+          toValue: 1,
+          duration: 10,
+          useNativeDriver: false,
+        }),
+        Animated.timing(slideAnimatedValue, {
+          toValue: 1,
+          duration: ANIMATION_DURATION,
+          easing: Easing.in(Easing.ease),
+          useNativeDriver: false,
+        }),
+      ]).start()
     }
     const slideOut = () => {
-      Animated.timing(slideAnimatedValue, {
-        toValue: 0,
-        duration: ANIMATION_DURATION,
-        easing: Easing.out(Easing.ease),
-        useNativeDriver: false,
-      }).start()
+      Animated.sequence([
+        Animated.timing(slideAnimatedValue, {
+          toValue: 0,
+          duration: ANIMATION_DURATION,
+          easing: Easing.in(Easing.ease),
+          useNativeDriver: false,
+        }),
+        Animated.timing(opacityAnimatedValue, {
+          toValue: 0,
+          duration: 10,
+          useNativeDriver: false,
+        }),
+      ]).start()
     }
 
     const loadAudio = async () => {
@@ -125,6 +140,7 @@ const AudioPlayer = () => {
     audio,
     autoPlayAudio,
     slideAnimatedValue,
+    opacityAnimatedValue,
     setGlobalState,
     setPersistedState,
     dispatch,
@@ -136,6 +152,7 @@ const AudioPlayer = () => {
         styles.container,
         {
           backgroundColor: colors.overlay,
+          opacity: opacityAnimatedValue,
           height: slideAnimatedValue.interpolate({
             inputRange: [0, 1],
             outputRange: [0, AUDIO_PLAYER_HEIGHT + insets.bottom],
