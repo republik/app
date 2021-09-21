@@ -19,7 +19,7 @@ import { useColorContext } from '../utils/colors'
 
 // Based on react-native-webview injection for Android
 // https://github.com/react-native-webview/react-native-webview/blob/194c6a2335b12cc05283413c44d0948eb5156e02/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManager.java#L651-L670
-const generateMessageJS = (data) => {
+const generateMessageJS = data => {
   return [
     '(function(){',
     'var event;',
@@ -35,7 +35,7 @@ const generateMessageJS = (data) => {
   ].join('')
 }
 
-const getLast = (array) => array[array.length - 1]
+const getLast = array => array[array.length - 1]
 
 const styles = StyleSheet.create({
   webView: {
@@ -93,17 +93,16 @@ const Web = () => {
     }
     const backAction = () => {
       const currentHistory = historyRef.current
-      if (
-        currentHistory.length === 1 &&
-        getLast(currentHistory) === HOME_URL
-      ) {
+      if (currentHistory.length === 1 && getLast(currentHistory) === HOME_URL) {
         BackHandler.exitApp()
         return false
       }
       if (currentHistory.length) {
-        setGlobalState({
-          pendingUrl:
-            currentHistory[currentHistory.length - 2] || HOME_URL,
+        dispatch({
+          type: 'postMessage',
+          content: {
+            type: 'back',
+          },
         })
         // needs to happen after setGlobalState because set happens instantaneously instant in react native
         setHistory(currentHistory.slice(0, currentHistory.length - 1))
@@ -116,7 +115,7 @@ const Web = () => {
     return () => {
       BackHandler.removeEventListener('hardwareBackPress')
     }
-  }, [setGlobalState])
+  }, [setGlobalState, dispatch])
 
   useEffect(() => {
     // wait for all services
@@ -160,7 +159,7 @@ const Web = () => {
     if (!isReady) {
       return
     }
-    const message = pendingMessages.filter((msg) => !msg.mark)[0]
+    const message = pendingMessages.filter(msg => !msg.mark)[0]
     if (!message) {
       return
     }
@@ -180,7 +179,7 @@ const Web = () => {
     }, 5 * 1000)
   }, [isReady, pendingMessages, dispatch])
 
-  const onMessage = (e) => {
+  const onMessage = e => {
     const message = JSON.parse(e.nativeEvent.data) || {}
     devLog('onMessage', message)
     if (message.type === 'routeChange') {
@@ -247,7 +246,7 @@ const Web = () => {
       setPersistedState({ url })
     }
     if (getLast(history) !== url) {
-      setHistory((currentHistory) => {
+      setHistory(currentHistory => {
         if (getLast(currentHistory) === url) {
           return currentHistory
         }
