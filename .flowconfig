@@ -23,9 +23,10 @@ node_modules/react-native/flow/
 [options]
 emoji=true
 
-exact_by_default=true
+esproposal.optional_chaining=enable
+esproposal.nullish_coalescing=enable
 
-format.bracket_spacing=false
+exact_by_default=true
 
 module.file_ext=.js
 module.file_ext=.json
@@ -62,4 +63,4 @@ untyped-import
 untyped-type-import
 
 [version]
-^0.158.0
+^0.137.0
