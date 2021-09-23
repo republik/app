@@ -23,25 +23,7 @@ platform :android do
       app_project_dir: "./app"
     )
     gradle(
-      task: "bundle",
-      build_type: "Release"
-    )
-    supply(
-      track: "alpha",
-      apk: "#{lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH]}",
-      skip_upload_metadata: true,
-      skip_upload_images: true,
-      skip_upload_screenshots: true,
-      skip_upload_apk: true
-    )
-  end
-
-  lane :production do |options|
-    increment_version_code(
-      app_project_dir: "./app"
-    )
-    gradle(
-      task: "bundle",
+      task: "assemble",
       build_type: "Release"
     )
     supply(
@@ -50,6 +32,23 @@ platform :android do
       skip_upload_metadata: true,
       skip_upload_images: true,
       skip_upload_screenshots: true
+    )
+  end
+
+  lane :production do |options|
+    increment_version_code(
+      app_project_dir: "./app"
+    )
+    gradle(
+      task: "assemble",
+      build_type: "Release"
+    )
+    supply(
+      track: "alpha",
+      apk: "#{lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH]}",
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
     )
   end
 end
