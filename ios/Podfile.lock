@@ -256,7 +256,7 @@ PODS:
     - react-native-config/App (= 1.4.2)
   - react-native-config/App (1.4.2):
     - React-Core
-  - react-native-cookies (5.0.1):
+  - react-native-cookies (6.0.10):
     - React-Core
   - react-native-get-random-values (1.6.0):
     - React-Core
@@ -384,7 +384,7 @@ DEPENDENCIES:
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - react-native-config (from `../node_modules/react-native-config`)
-  - "react-native-cookies (from `../node_modules/@react-native-community/cookies`)"
+  - "react-native-cookies (from `../node_modules/@react-native-cookies/cookies`)"
   - react-native-get-random-values (from `../node_modules/react-native-get-random-values`)
   - react-native-notifications (from `../node_modules/react-native-notifications`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
@@ -458,7 +458,7 @@ EXTERNAL SOURCES:
   react-native-config:
     :path: "../node_modules/react-native-config"
   react-native-cookies:
-    :path: "../node_modules/@react-native-community/cookies"
+    :path: "../node_modules/@react-native-cookies/cookies"
   react-native-get-random-values:
     :path: "../node_modules/react-native-get-random-values"
   react-native-notifications:
@@ -534,7 +534,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 06a9c77b56902ae7ffcdd7a4905f664adc5d237b
   React-jsinspector: 0ae35a37b20d5e031eb020a69cc5afdbd6406301
   react-native-config: c98128a72bc2c3a1ca72caec0b021f0fa944aa29
-  react-native-cookies: ce50e42ace7cf0dd47769260ca5bbe8eee607e4e
+  react-native-cookies: 47ef7ec7839e99f738f6ee64fbb2d4d224e36a65
   react-native-get-random-values: f0fc24a5887a3341589515a86282a574407b59e4
   react-native-notifications: 51ed8167f70f01c5000ba81a4465ea98b4612e23
   react-native-safe-area-context: f0906bf8bc9835ac9a9d3f97e8bde2a997d8da79

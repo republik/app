@@ -1,6 +1,6 @@
 {
   "name": "republikapp",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "license": "bsd-3-clause",
   "scripts": {
     "android": "ENVFILE=.env.development react-native run-android",
@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@react-native-community/async-storage": "^1.12.1",
-    "@react-native-community/cookies": "^5.0.1",
+    "@react-native-cookies/cookies": "^6.0.10",
     "lodash": "^4.17.20",
     "react": "17.0.1",
     "react-native": "0.64.0",

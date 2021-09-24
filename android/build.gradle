@@ -33,7 +33,8 @@ allprojects {
             // Android JSC is installed from npm
             url("$rootDir/../node_modules/jsc-android/dist")
         }
-
+        // jcenter is required for track-player on android
+        jcenter()
         google()
         jcenter()
         maven { url 'https://www.jitpack.io' }
