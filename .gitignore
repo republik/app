@@ -29,7 +29,7 @@ release/
 .gradle
 local.properties
 *.iml
-.hprof
+*.hprof
 
 # node.js
 #
