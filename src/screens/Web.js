@@ -290,7 +290,7 @@ const Web = () => {
             renderError={() => (
               <NetworkError onReload={() => webviewRef.current.reload()} />
             )}
-            originWhitelist={[`${FRONTEND_BASE_URL}*`]}
+            originWhitelist={[`${FRONTEND_BASE_URL}*`, `https://*.stripe.com`]}
             pullToRefreshEnabled={false}
             allowsFullscreenVideo={true}
             allowsInlineMediaPlayback={true}
