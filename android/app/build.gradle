@@ -151,8 +151,8 @@ android {
         applicationId "app.republik"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 158
-        versionName "2.0.2"
+        versionCode 161
+        versionName "2.0.3"
     }
     splits {
         abi {
@@ -210,7 +210,6 @@ dependencies {
     implementation project(':react-native-track-player')
     implementation project(':react-native-splash-screen')
     implementation project(':react-native-notifications')
-    implementation 'com.google.firebase:firebase-core:16.0.0'
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
       exclude group:'com.facebook.fbjni'
