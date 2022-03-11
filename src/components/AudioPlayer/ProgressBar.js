@@ -12,7 +12,7 @@ import TrackPlayer, {
 import { useColorContext } from '../../utils/colors'
 import { useGlobalState } from '../../GlobalState'
 
-const ProgressBar = ({ audio }) => {
+const ProgressBar = ({ audio, expanded }) => {
   const [isPanning, setIsPanning] = useState(false)
   const [playerWidth, setPlayerWidth] = useState(0)
   const [panProgress, setPanProgress] = useState(0)
@@ -113,9 +113,9 @@ const ProgressBar = ({ audio }) => {
 
   return (
     <View
-      style={styles.progressBarContainer}
+      style={([styles.progressBarContainer], { padding: expanded ? 16 : 0 })}
       {...panResponder.panHandlers}
-      onLayout={(e) => setPlayerWidth(e.nativeEvent.layout.width)}>
+      onLayout={e => setPlayerWidth(e.nativeEvent.layout.width)}>
       <Animated.View
         style={[
           styles.progressBar,
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
   progressBarContainer: {
     top: 0,
     width: '100%',
-    position: 'absolute',
+    position: 'relative',
   },
   progressBar: {
     width: '100%',

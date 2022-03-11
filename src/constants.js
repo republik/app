@@ -5,7 +5,7 @@ import { Platform } from 'react-native'
 
 // support Android Emulator
 // https://stackoverflow.com/questions/4336394/webview-and-localhost
-const rewriteHost = (value) => {
+const rewriteHost = value => {
   if (Config.ENV === 'development' && value) {
     return Platform.select({
       ios: value,
@@ -22,7 +22,7 @@ export const devLog =
 // Base urls
 export const FRONTEND_BASE_URL = rewriteHost(Config.FRONTEND_BASE_URL)
 export const frontendBaseUrl = parse(FRONTEND_BASE_URL)
-export const rewriteBaseUrl = (url) => {
+export const rewriteBaseUrl = url => {
   const originUrl = parse(url)
   originUrl.host = frontendBaseUrl.host
   originUrl.protocol = frontendBaseUrl.protocol
@@ -42,5 +42,5 @@ export const APP_VERSION = DeviceInfo.getVersion()
 
 // Audio
 export const AUDIO_PLAYER_HEIGHT = 68
-export const ANIMATION_DURATION = 250
+export const ANIMATION_DURATION = 150
 export const AUDIO_PLAYER_PROGRESS_HEIGHT = 5
