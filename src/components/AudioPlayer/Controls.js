@@ -60,7 +60,7 @@ const Controls = ({
   })
 
   return (
-    <SafeAreaView edges={['right', 'left']} style={[styles.controls]}>
+    <SafeAreaView edges={['right', 'left']} style={styles.controls}>
       <View style={[styles.column, { flex: 1 }]}>
         {!expanded && (
           <>
@@ -94,7 +94,7 @@ const Controls = ({
           </>
         )}
       </View>
-      <View style={styles.column}>
+      <View style={[styles.column, { paddingRight: 8 }]}>
         <AnimatedIcon
           name={'expand-less'}
           size={40}
@@ -121,7 +121,6 @@ const styles = StyleSheet.create({
   controls: {
     width: '100%',
     height: AUDIO_PLAYER_HEIGHT,
-    paddingHorizontal: 8,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',

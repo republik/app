@@ -82,9 +82,9 @@ const ExpandedControls = ({
 
 const styles = StyleSheet.create({
   container: {
-    shadowOffset: { width: 1, height: 1 },
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
+    shadowOffset: { width: 0, height: -8 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
     elevation: 5,
   },
   titleContainer: {

@@ -195,13 +195,18 @@ const AudioPlayer = () => {
           opacity: opacityAnimatedValue,
           height: slideAnimatedValue.interpolate({
             inputRange: [0, 1],
-            outputRange: [0, AUDIO_PLAYER_HEIGHT + insets.bottom], //base your animation on the calculated height: ;
+            outputRange: [0, AUDIO_PLAYER_HEIGHT + insets.bottom],
           }),
         },
       ]}>
       <View style={[styles.player]}>
         {/* Container for Expanded Controls and Progressbar */}
-        <View>
+        <View
+          style={{
+            backgroundColor: colors.overlay,
+            justifyContent: 'flex-end',
+          }}
+          edges={['right', 'left']}>
           {expanded && (
             <ExpandedControls
               audio={audio}
@@ -212,14 +217,8 @@ const AudioPlayer = () => {
               position={position}
             />
           )}
-          <View
-            style={{
-              backgroundColor: colors.overlay,
-            }}>
-            <SafeAreaView edges={['right', 'left']}>
-              <ProgressBar audio={audio} expanded={expanded} />
-            </SafeAreaView>
-
+          <SafeAreaView edges={['right', 'left']}>
+            <ProgressBar audio={audio} expanded={expanded} />
             {expanded && (
               <View style={styles.rateSelectContainer}>
                 {[0.5, 0.75, 1, 1.5, 2].map(rate => (
@@ -242,7 +241,7 @@ const AudioPlayer = () => {
                 ))}
               </View>
             )}
-          </View>
+          </SafeAreaView>
         </View>
         <View
           style={{
