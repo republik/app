@@ -3,6 +3,7 @@ import {
   StyleSheet,
   Text,
   View,
+  SafeAreaView,
   TouchableOpacity,
   Animated,
 } from 'react-native'
@@ -59,7 +60,7 @@ const Controls = ({
   })
 
   return (
-    <View style={[styles.controls]}>
+    <SafeAreaView edges={['right', 'left']} style={[styles.controls]}>
       <View style={[styles.column, { flex: 1 }]}>
         {!expanded && (
           <>
@@ -112,7 +113,7 @@ const Controls = ({
           }
         />
       </View>
-    </View>
+    </SafeAreaView>
   )
 }
 

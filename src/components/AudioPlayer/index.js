@@ -199,7 +199,7 @@ const AudioPlayer = () => {
           }),
         },
       ]}>
-      <SafeAreaView edges={['right', 'left']} style={[styles.player]}>
+      <View style={[styles.player]}>
         {/* Container for Expanded Controls and Progressbar */}
         <View>
           {expanded && (
@@ -216,7 +216,10 @@ const AudioPlayer = () => {
             style={{
               backgroundColor: colors.overlay,
             }}>
-            <ProgressBar audio={audio} expanded={expanded} />
+            <SafeAreaView edges={['right', 'left']}>
+              <ProgressBar audio={audio} expanded={expanded} />
+            </SafeAreaView>
+
             {expanded && (
               <View style={styles.rateSelectContainer}>
                 {[0.5, 0.75, 1, 1.5, 2].map(rate => (
@@ -259,7 +262,7 @@ const AudioPlayer = () => {
             }}
           />
         </View>
-      </SafeAreaView>
+      </View>
     </Animated.View>
   )
 }
