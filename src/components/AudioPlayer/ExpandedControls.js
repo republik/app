@@ -11,6 +11,7 @@ const ExpandedControls = ({
   onTitlePress,
   isPlaying,
   position,
+  playbackRate,
   duration,
 }) => {
   const { colors } = useColorContext()
@@ -27,7 +28,8 @@ const ExpandedControls = ({
         </TouchableOpacity>
         {duration > 0 && (
           <Text style={[styles.time, { color: colors.textSoft }]}>
-            {parseSeconds(position)} / {parseSeconds(duration)}
+            {parseSeconds(position / playbackRate)} /{' '}
+            {parseSeconds(duration / playbackRate)}
           </Text>
         )}
       </View>

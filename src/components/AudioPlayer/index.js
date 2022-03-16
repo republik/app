@@ -206,6 +206,7 @@ const AudioPlayer = () => {
             <ExpandedControls
               audio={audio}
               onTitlePress={onTitlePress}
+              playbackRate={playbackRate}
               isPlaying={isPlaying}
               duration={duration}
               position={position}
