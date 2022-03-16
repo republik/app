@@ -229,7 +229,10 @@ const AudioPlayer = () => {
                     }}>
                     <Text
                       style={[
-                        { fontWeight: rate === playbackRate ? '800' : '400' },
+                        {
+                          fontWeight: rate === playbackRate ? '800' : '400',
+                          color: colors.text,
+                        },
                         styles.rateSelector,
                       ]}>{`${rate}x`}</Text>
                   </TouchableOpacity>
