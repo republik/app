@@ -222,7 +222,7 @@ const AudioPlayer = () => {
                 {[0.5, 0.75, 1, 1.5, 2].map(rate => (
                   <TouchableOpacity
                     key={rate}
-                    style={{ marginHorizontal: 12 }}
+                    style={{ marginHorizontal: 16 }}
                     onPress={() => {
                       TrackPlayer.setRate(rate)
                       setPlaybackRate(rate)
