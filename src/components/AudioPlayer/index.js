@@ -68,9 +68,6 @@ const AudioPlayer = () => {
   const { colors } = useColorContext()
   const [expanded, setExpanded] = useState(false)
   const [playbackRate, setPlaybackRate] = useState(1)
-  const [playbackRateSelectExpanded, setPlaybackRateSelectExpanded] = useState(
-    false,
-  )
   const { position, duration } = useTrackPlayerProgress(100)
   const playbackState = usePlaybackState()
 
@@ -219,7 +216,7 @@ const AudioPlayer = () => {
               backgroundColor: colors.overlay,
             }}>
             <ProgressBar audio={audio} expanded={expanded} />
-            {expanded && playbackRateSelectExpanded && (
+            {expanded && (
               <View style={styles.rateSelectContainer}>
                 {[0.5, 0.75, 1, 1.5, 2].map(rate => (
                   <TouchableOpacity
@@ -228,7 +225,6 @@ const AudioPlayer = () => {
                     onPress={() => {
                       TrackPlayer.setRate(rate)
                       setPlaybackRate(rate)
-                      setPlaybackRateSelectExpanded(false)
                     }}>
                     <Text
                       style={[
@@ -256,9 +252,6 @@ const AudioPlayer = () => {
             onTitlePress={onTitlePress}
             onExpandToggle={() => {
               setExpanded(!expanded)
-            }}
-            onPlayBackRateSelectToggle={() => {
-              setPlaybackRateSelectExpanded(!playbackRateSelectExpanded)
             }}
           />
         </View>

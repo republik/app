@@ -22,7 +22,6 @@ const Controls = ({
   position,
   isPlaying,
   onExpandToggle,
-  onPlayBackRateSelectToggle,
   playbackRate,
   onTitlePress,
 }) => {
@@ -62,14 +61,7 @@ const Controls = ({
   return (
     <View style={[styles.controls]}>
       <View style={[styles.column, { flex: 1 }]}>
-        {expanded ? (
-          <TouchableOpacity
-            onPress={onPlayBackRateSelectToggle}
-            style={styles.playbackRateButton}>
-            <Text
-              style={styles.plabackRateButtonText}>{`${playbackRate}x`}</Text>
-          </TouchableOpacity>
-        ) : (
+        {!expanded && (
           <>
             <Icon
               name={isPlaying ? 'pause' : 'play-arrow'}

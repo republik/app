@@ -20,7 +20,7 @@ const ExpandedControls = ({
       <View style={styles.titleContainer}>
         <TouchableOpacity onPress={onTitlePress}>
           <Text
-            numberOfLines={1}
+            numberOfLines={2}
             style={[styles.title, { color: colors.text }]}>
             {audio && audio.title}
           </Text>
@@ -81,13 +81,13 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   title: {
-    fontSize: 18,
+    fontSize: 20,
     paddingBottom: 6,
     textAlign: 'center',
     fontFamily: 'GT America',
   },
   time: {
-    fontSize: 16,
+    fontSize: 18,
     textAlign: 'center',
     fontFamily: 'GT America',
     fontVariant: ['tabular-nums'],
