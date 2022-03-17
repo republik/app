@@ -109,7 +109,11 @@ const ExpandedControls = ({
               }}
             />
           </View>
-          <ProgressBar audio={audio} expanded={true} />
+          <ProgressBar
+            audio={audio}
+            expanded={true}
+            playbackRate={playbackRate}
+          />
           <View style={styles.rateSelectContainer}>
             {[
               { speed: 0.5, label: '0,5×' },

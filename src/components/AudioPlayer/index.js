@@ -202,7 +202,9 @@ const AudioPlayer = () => {
               insets.bottom,
             backgroundColor: colors.overlay,
           }}>
-          {!expanded && <ProgressBar audio={audio} />}
+          {!expanded && (
+            <ProgressBar audio={audio} playbackRate={playbackRate} />
+          )}
           <Controls
             audio={audio}
             expanded={expanded}

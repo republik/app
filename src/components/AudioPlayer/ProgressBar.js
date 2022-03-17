@@ -14,7 +14,7 @@ import TrackPlayer, {
 import { useColorContext } from '../../utils/colors'
 import { useGlobalState } from '../../GlobalState'
 
-const ProgressBar = ({ audio, expanded, inset }) => {
+const ProgressBar = ({ audio, expanded, playbackRate }) => {
   const insets = useSafeAreaInsets()
   const [isPanning, setIsPanning] = useState(false)
   const [playerWidth, setPlayerWidth] = useState(0)
@@ -101,10 +101,19 @@ const ProgressBar = ({ audio, expanded, inset }) => {
         // seekTo does not work on iOS unless playing
         TrackPlayer.play()
         TrackPlayer.seekTo(panProgress * duration)
+        TrackPlayer.setRate(playbackRate)
         collapseAnim()
       },
     })
-  }, [scaleY, playerWidth, duration, panProgress, insets, expanded])
+  }, [
+    scaleY,
+    playerWidth,
+    duration,
+    panProgress,
+    insets,
+    expanded,
+    playbackRate,
+  ])
 
   useEffect(() => {
     if (audio && isPlaying && position > 0) {
