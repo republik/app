@@ -63,7 +63,12 @@ const Controls = ({
   })
 
   return (
-    <SafeAreaView edges={['right', 'left']} style={styles.controls}>
+    <SafeAreaView
+      edges={['right', 'left']}
+      style={[
+        styles.controls,
+        { marginTop: expanded ? AUDIO_PLAYER_PROGRESS_HEIGHT : 0 },
+      ]}>
       <View style={[styles.column, { flex: 1 }]}>
         {!expanded && (
           <>
