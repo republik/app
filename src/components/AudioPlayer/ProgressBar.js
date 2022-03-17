@@ -1,9 +1,11 @@
 import React, { useEffect, useMemo, useState, useRef } from 'react'
 import { View, StyleSheet, Animated, PanResponder, Easing } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import throttle from 'lodash/throttle'
 import {
   ANIMATION_DURATION,
   AUDIO_PLAYER_PROGRESS_HEIGHT,
+  AUDIO_PLAYER_EXPANDED_PADDING_X,
 } from '../../constants'
 import TrackPlayer, {
   useTrackPlayerProgress,
@@ -12,7 +14,8 @@ import TrackPlayer, {
 import { useColorContext } from '../../utils/colors'
 import { useGlobalState } from '../../GlobalState'
 
-const ProgressBar = ({ audio, expanded }) => {
+const ProgressBar = ({ audio, expanded, inset }) => {
+  const insets = useSafeAreaInsets()
   const [isPanning, setIsPanning] = useState(false)
   const [playerWidth, setPlayerWidth] = useState(0)
   const [panProgress, setPanProgress] = useState(0)
@@ -72,11 +75,26 @@ const ProgressBar = ({ audio, expanded }) => {
       onMoveShouldSetPanResponder: () => true,
       onPanResponderGrant: (evt, gestureState) => {
         setIsPanning(true)
-        setPanProgress(gestureState.x0 / playerWidth)
+        // setPanProgress(gestureState.x0 / (expanded ? playerWidth : playerWidth))
+        setPanProgress(
+          expanded
+            ? (gestureState.x0 -
+                insets.left -
+                AUDIO_PLAYER_EXPANDED_PADDING_X) /
+                playerWidth
+            : gestureState.x0 / playerWidth,
+        )
         expandAnim()
       },
       onPanResponderMove: (evt, gestureState) => {
-        setPanProgress(gestureState.moveX / playerWidth)
+        setPanProgress(
+          expanded
+            ? (gestureState.moveX -
+                insets.left -
+                AUDIO_PLAYER_EXPANDED_PADDING_X) /
+                playerWidth
+            : gestureState.moveX / playerWidth,
+        )
       },
       onPanResponderRelease: (evt, gestureState) => {
         setIsPanning(false)
@@ -86,7 +104,7 @@ const ProgressBar = ({ audio, expanded }) => {
         collapseAnim()
       },
     })
-  }, [scaleY, playerWidth, duration, panProgress])
+  }, [scaleY, playerWidth, duration, panProgress, insets, expanded])
 
   useEffect(() => {
     if (audio && isPlaying && position > 0) {
@@ -114,11 +132,14 @@ const ProgressBar = ({ audio, expanded }) => {
   return (
     <View
       style={{
-        paddingHorizontal: expanded ? 16 : 0,
+        marginHorizontal: expanded ? AUDIO_PLAYER_EXPANDED_PADDING_X : 0,
         paddingVertical: expanded ? 24 : 0,
       }}
       {...panResponder.panHandlers}
-      onLayout={e => setPlayerWidth(e.nativeEvent.layout.width)}>
+      onLayout={e => {
+        console.log(e.nativeEvent.layout.width)
+        setPlayerWidth(e.nativeEvent.layout.width)
+      }}>
       <Animated.View
         style={[
           styles.progressBar,

@@ -25,9 +25,7 @@ const ExpandedControls = ({
 
   return (
     <View style={[styles.container, { backgroundColor: colors.overlay }]}>
-      <SafeAreaView
-        // style={{ justifyContent: 'flex-end' }}
-        edges={['right', 'left']}>
+      <SafeAreaView edges={['right', 'left']}>
         <View style={styles.titleContainer}>
           <TouchableOpacity onPress={onTitlePress}>
             <Text
