@@ -136,10 +136,7 @@ const ProgressBar = ({ audio, expanded, inset }) => {
         paddingVertical: expanded ? 24 : 0,
       }}
       {...panResponder.panHandlers}
-      onLayout={e => {
-        console.log(e.nativeEvent.layout.width)
-        setPlayerWidth(e.nativeEvent.layout.width)
-      }}>
+      onLayout={e => setPlayerWidth(e.nativeEvent.layout.width)}>
       <Animated.View
         style={[
           styles.progressBar,
