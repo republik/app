@@ -9,7 +9,7 @@ import {
 import { useColorContext } from '../../utils/colors'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import TrackPlayer from 'react-native-track-player'
-
+import ProgressBar from './ProgressBar'
 import { parseSeconds } from './index.js'
 
 const ExpandedControls = ({
@@ -18,18 +18,26 @@ const ExpandedControls = ({
   isPlaying,
   position,
   playbackRate,
+  setPlaybackRate,
   duration,
 }) => {
   const { colors } = useColorContext()
 
   return (
     <View style={[styles.container, { backgroundColor: colors.overlay }]}>
-      <SafeAreaView edges={['right', 'left']}>
+      <SafeAreaView
+        // style={{ justifyContent: 'flex-end' }}
+        edges={['right', 'left']}>
         <View style={styles.titleContainer}>
           <TouchableOpacity onPress={onTitlePress}>
             <Text
               numberOfLines={2}
-              style={[styles.title, { color: colors.text }]}>
+              style={[
+                styles.title,
+                {
+                  color: colors.text,
+                },
+              ]}>
               {audio && audio.title}
             </Text>
           </TouchableOpacity>
@@ -43,17 +51,17 @@ const ExpandedControls = ({
         <View style={styles.playbackContainer}>
           <Icon
             name="replay-10"
-            size={30}
+            size={36}
             color={colors.text}
             onPress={() => {
               // seekTo does not work on iOS unless playing
               TrackPlayer.play()
-              TrackPlayer.seekTo(position - 10)
+              TrackPlayer.seekTo(position - 10 * playbackRate)
             }}
           />
           <Icon
             name={isPlaying ? 'pause' : 'play-arrow'}
-            size={66}
+            size={72}
             color={colors.text}
             style={{ marginHorizontal: 12 }}
             onPress={() => {
@@ -71,9 +79,30 @@ const ExpandedControls = ({
             onPress={() => {
               // seekTo does not work on iOS unless playing
               TrackPlayer.play()
-              TrackPlayer.seekTo(position + 30)
+              TrackPlayer.seekTo(position + 30 * playbackRate)
             }}
           />
+        </View>
+        <ProgressBar audio={audio} expanded={true} />
+        <View style={styles.rateSelectContainer}>
+          {[0.5, 0.75, 1, 1.5, 2].map(rate => (
+            <TouchableOpacity
+              key={rate}
+              style={{ marginHorizontal: 16 }}
+              onPress={() => {
+                TrackPlayer.setRate(rate)
+                setPlaybackRate(rate)
+              }}>
+              <Text
+                style={[
+                  {
+                    fontWeight: rate === playbackRate ? 'bold' : 'normal',
+                    color: colors.text,
+                  },
+                  styles.rateSelector,
+                ]}>{`${rate}x`}</Text>
+            </TouchableOpacity>
+          ))}
         </View>
       </SafeAreaView>
     </View>
@@ -85,14 +114,15 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: -8 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
-    elevation: 5,
+    zIndex: 1,
   },
   titleContainer: {
     padding: 16,
+    justifyContent: 'flex-end',
   },
   title: {
     fontSize: 20,
-    paddingBottom: 6,
+    paddingBottom: 8,
     textAlign: 'center',
     fontFamily: 'GT America',
   },
@@ -107,6 +137,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  rateSelectContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  rateSelector: {
+    fontSize: 18,
+    textAlign: 'center',
+    fontFamily: 'GT America',
   },
 })
 

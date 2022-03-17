@@ -12,7 +12,10 @@ import Icon from 'react-native-vector-icons/MaterialIcons'
 import TrackPlayer from 'react-native-track-player'
 import { useGlobalState } from '../../GlobalState'
 import { parseSeconds } from './index.js'
-import { AUDIO_PLAYER_HEIGHT, ANIMATION_DURATION } from '../../constants'
+import {
+  ANIMATION_DURATION,
+  AUDIO_PLAYER_PROGRESS_HEIGHT,
+} from '../../constants'
 
 const AnimatedIcon = Animated.createAnimatedComponent(Icon)
 
@@ -76,7 +79,7 @@ const Controls = ({
                 }
               }}
             />
-            <View style={styles.content}>
+            <View style={styles.textContainer}>
               <TouchableOpacity onPress={onTitlePress}>
                 <Text
                   numberOfLines={1}
@@ -119,20 +122,19 @@ const Controls = ({
 
 const styles = StyleSheet.create({
   controls: {
-    width: '100%',
-    height: AUDIO_PLAYER_HEIGHT,
+    flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
   },
   column: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingBottom: AUDIO_PLAYER_PROGRESS_HEIGHT,
   },
-  content: {
+  textContainer: {
     flex: 1,
     marginLeft: 10,
-    alignItems: 'flex-start',
+    marginBottom: 2,
   },
   title: {
     fontSize: 18,

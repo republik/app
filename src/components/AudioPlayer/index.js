@@ -1,14 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
-import {
-  View,
-  StyleSheet,
-  Animated,
-  Easing,
-  Platform,
-  TouchableOpacity,
-  Text,
-} from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { View, StyleSheet, Animated, Easing, Platform } from 'react-native'
 import TrackPlayer, {
   useTrackPlayerProgress,
   usePlaybackState,
@@ -19,6 +11,7 @@ import {
   ANIMATION_DURATION,
   AUDIO_PLAYER_HEIGHT,
   FRONTEND_BASE_URL,
+  AUDIO_PLAYER_PROGRESS_HEIGHT,
 } from '../../constants'
 import { useGlobalState } from '../../GlobalState'
 import { useColorContext } from '../../utils/colors'
@@ -164,6 +157,7 @@ const AudioPlayer = () => {
       loadAudio()
     } else {
       slideOut()
+      setExpanded(false)
       loadAudio()
     }
   }, [
@@ -187,67 +181,28 @@ const AudioPlayer = () => {
   const isPlaying = playbackState === TrackPlayer.STATE_PLAYING
 
   return (
-    <Animated.View
-      style={[
-        styles.container,
-        {
-          backgroundColor: colors.overlay,
-          opacity: opacityAnimatedValue,
-          height: slideAnimatedValue.interpolate({
-            inputRange: [0, 1],
-            outputRange: [0, AUDIO_PLAYER_HEIGHT + insets.bottom],
-          }),
-        },
-      ]}>
-      <View style={[styles.player]}>
-        {/* Container for Expanded Controls and Progressbar */}
-        <View
-          style={{
+    <>
+      <Animated.View
+        style={[
+          styles.container,
+          {
             backgroundColor: colors.overlay,
-            justifyContent: 'flex-end',
-          }}
-          edges={['right', 'left']}>
-          {expanded && (
-            <ExpandedControls
-              audio={audio}
-              onTitlePress={onTitlePress}
-              playbackRate={playbackRate}
-              isPlaying={isPlaying}
-              duration={duration}
-              position={position}
-            />
-          )}
-          <SafeAreaView edges={['right', 'left']}>
-            <ProgressBar audio={audio} expanded={expanded} />
-            {expanded && (
-              <View style={styles.rateSelectContainer}>
-                {[0.5, 0.75, 1, 1.5, 2].map(rate => (
-                  <TouchableOpacity
-                    key={rate}
-                    style={{ marginHorizontal: 16 }}
-                    onPress={() => {
-                      TrackPlayer.setRate(rate)
-                      setPlaybackRate(rate)
-                    }}>
-                    <Text
-                      style={[
-                        {
-                          fontWeight: rate === playbackRate ? '800' : '400',
-                          color: colors.text,
-                        },
-                        styles.rateSelector,
-                      ]}>{`${rate}x`}</Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
-          </SafeAreaView>
-        </View>
+            opacity: opacityAnimatedValue,
+            height: slideAnimatedValue.interpolate({
+              inputRange: [0, 1],
+              outputRange: [0, AUDIO_PLAYER_HEIGHT + insets.bottom],
+            }),
+          },
+        ]}>
         <View
           style={{
-            height: AUDIO_PLAYER_HEIGHT + insets.bottom,
+            height:
+              AUDIO_PLAYER_HEIGHT +
+              2 * AUDIO_PLAYER_PROGRESS_HEIGHT +
+              insets.bottom,
             backgroundColor: colors.overlay,
           }}>
+          {!expanded && <ProgressBar audio={audio} />}
           <Controls
             audio={audio}
             expanded={expanded}
@@ -261,8 +216,28 @@ const AudioPlayer = () => {
             }}
           />
         </View>
-      </View>
-    </Animated.View>
+      </Animated.View>
+      {expanded && (
+        <View
+          style={[
+            styles.expandedControls,
+            {
+              bottom: AUDIO_PLAYER_HEIGHT + insets.bottom,
+              backgroundColor: colors.overlay,
+            },
+          ]}>
+          <ExpandedControls
+            audio={audio}
+            onTitlePress={onTitlePress}
+            playbackRate={playbackRate}
+            setPlaybackRate={setPlaybackRate}
+            isPlaying={isPlaying}
+            duration={duration}
+            position={position}
+          />
+        </View>
+      )}
+    </>
   )
 }
 
@@ -273,22 +248,12 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 1, height: 1 },
     shadowOpacity: 0.15,
     shadowRadius: 6,
-    elevation: 5,
   },
-  player: {
-    justifyContent: 'flex-end',
-    flexDirection: 'column',
-  },
-  rateSelectContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  rateSelector: {
-    fontSize: 18,
-    textAlign: 'center',
-    fontFamily: 'GT America',
+  expandedControls: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    zIndex: 1,
   },
 })
 

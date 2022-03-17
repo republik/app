@@ -113,7 +113,10 @@ const ProgressBar = ({ audio, expanded }) => {
 
   return (
     <View
-      style={([styles.progressBarContainer], { padding: expanded ? 16 : 0 })}
+      style={{
+        paddingHorizontal: expanded ? 16 : 0,
+        paddingVertical: expanded ? 24 : 0,
+      }}
       {...panResponder.panHandlers}
       onLayout={e => setPlayerWidth(e.nativeEvent.layout.width)}>
       <Animated.View
@@ -155,11 +158,6 @@ const ProgressBar = ({ audio, expanded }) => {
 export default ProgressBar
 
 const styles = StyleSheet.create({
-  progressBarContainer: {
-    top: 0,
-    width: '100%',
-    position: 'relative',
-  },
   progressBar: {
     width: '100%',
     height: AUDIO_PLAYER_PROGRESS_HEIGHT,
