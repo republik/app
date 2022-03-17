@@ -123,7 +123,10 @@ const AudioPlayer = () => {
           artwork: Logo,
         })
         if (audio.currentTime) {
-          TrackPlayer.seekTo(audio.currentTime)
+          // restart the track at beginning if it was finished in previous session and is initiated again.
+          const seekToTime =
+            audio.currentTime >= duration - 5 ? 0 : audio.currentTime
+          TrackPlayer.seekTo(seekToTime)
           if (Platform.OS === 'ios') {
             TrackPlayer.setVolume(0)
             await TrackPlayer.play()
@@ -131,13 +134,13 @@ const AudioPlayer = () => {
             // we workaround around this with a setTimeout:
             // https://github.com/react-native-kit/react-native-track-player/issues/387#issuecomment-709433886
             setTimeout(() => {
-              TrackPlayer.seekTo(audio.currentTime)
+              TrackPlayer.seekTo(seekToTime)
             }, 1)
             setTimeout(() => {
-              TrackPlayer.seekTo(audio.currentTime)
+              TrackPlayer.seekTo(seekToTime)
             }, 500)
             setTimeout(() => {
-              TrackPlayer.seekTo(audio.currentTime)
+              TrackPlayer.seekTo(seekToTime)
               if (!autoPlayAudio) {
                 TrackPlayer.pause()
               }
@@ -168,6 +171,7 @@ const AudioPlayer = () => {
     setGlobalState,
     setPersistedState,
     dispatch,
+    duration,
   ])
 
   const onTitlePress = () => {

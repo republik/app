@@ -84,6 +84,10 @@ const Controls = ({
                 if (isPlaying) {
                   TrackPlayer.pause()
                 } else {
+                  if (audio.currentTime >= duration - 5) {
+                    TrackPlayer.play()
+                    TrackPlayer.seekTo(0)
+                  }
                   TrackPlayer.play()
                 }
               }}

@@ -82,7 +82,11 @@ const ExpandedControls = ({
               onPress={() => {
                 // seekTo does not work on iOS unless playing
                 TrackPlayer.play()
-                TrackPlayer.seekTo(position - 10 * playbackRate)
+                if (position <= 10) {
+                  TrackPlayer.seekTo(0)
+                } else {
+                  TrackPlayer.seekTo(position - 10 * playbackRate)
+                }
               }}
             />
             <Icon
@@ -94,6 +98,11 @@ const ExpandedControls = ({
                 if (isPlaying) {
                   TrackPlayer.pause()
                 } else {
+                  if (audio.currentTime >= duration - 5) {
+                    // if less than 10s in, set to beginning
+                    TrackPlayer.play()
+                    TrackPlayer.seekTo(0)
+                  }
                   TrackPlayer.play()
                 }
               }}
@@ -105,7 +114,12 @@ const ExpandedControls = ({
               onPress={() => {
                 // seekTo does not work on iOS unless playing
                 TrackPlayer.play()
-                TrackPlayer.seekTo(position + 30 * playbackRate)
+                if (duration - position <= 30) {
+                  // if less than 30s remain, set to duration
+                  TrackPlayer.seekTo(duration)
+                } else {
+                  TrackPlayer.seekTo(position + 30 * playbackRate)
+                }
               }}
             />
           </View>
