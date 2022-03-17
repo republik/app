@@ -190,7 +190,12 @@ const AudioPlayer = () => {
             opacity: opacityAnimatedValue,
             height: slideAnimatedValue.interpolate({
               inputRange: [0, 1],
-              outputRange: [0, AUDIO_PLAYER_HEIGHT + insets.bottom],
+              outputRange: [
+                0,
+                AUDIO_PLAYER_HEIGHT +
+                  AUDIO_PLAYER_PROGRESS_HEIGHT +
+                  insets.bottom,
+              ],
             }),
           },
         ]}>
@@ -198,7 +203,7 @@ const AudioPlayer = () => {
           style={{
             height:
               AUDIO_PLAYER_HEIGHT +
-              2 * AUDIO_PLAYER_PROGRESS_HEIGHT +
+              AUDIO_PLAYER_PROGRESS_HEIGHT +
               insets.bottom,
             backgroundColor: colors.overlay,
           }}>

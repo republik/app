@@ -67,7 +67,11 @@ const Controls = ({
       edges={['right', 'left']}
       style={[
         styles.controls,
-        { marginTop: expanded ? AUDIO_PLAYER_PROGRESS_HEIGHT : 0 },
+        {
+          marginTop: expanded
+            ? 2 * AUDIO_PLAYER_PROGRESS_HEIGHT
+            : AUDIO_PLAYER_PROGRESS_HEIGHT,
+        },
       ]}>
       <View style={[styles.column, { flex: 1 }]}>
         {!expanded && (
