@@ -83,22 +83,28 @@ const ExpandedControls = ({
         </View>
         <ProgressBar audio={audio} expanded={true} />
         <View style={styles.rateSelectContainer}>
-          {[0.5, 0.75, 1, 1.5, 2].map(rate => (
+          {[
+            { speed: 0.5, label: '0,5×' },
+            { speed: 0.75, label: '0,75×' },
+            { speed: 1, label: '1×' },
+            { speed: 1.5, label: '1,5×' },
+            { speed: 2, label: '2×' },
+          ].map(rate => (
             <TouchableOpacity
-              key={rate}
+              key={rate.speed}
               style={{ marginHorizontal: 16 }}
               onPress={() => {
-                TrackPlayer.setRate(rate)
-                setPlaybackRate(rate)
+                TrackPlayer.setRate(rate.speed)
+                setPlaybackRate(rate.speed)
               }}>
               <Text
                 style={[
                   {
-                    fontWeight: rate === playbackRate ? 'bold' : 'normal',
+                    fontWeight: rate.speed === playbackRate ? 'bold' : 'normal',
                     color: colors.text,
                   },
                   styles.rateSelector,
-                ]}>{`${rate}x`}</Text>
+                ]}>{`${rate.label}`}</Text>
             </TouchableOpacity>
           ))}
         </View>
