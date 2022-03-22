@@ -42,6 +42,9 @@
       <meta-data android:name="com.google.firebase.messaging.default_notification_color"
         android:resource="@color/primary_dark" />
     </application>
+    <!-- Required for external links to open in webview
+    ref: https://reactnative.dev/docs/linking#canopenurl
+     -->
     <queries>
         <intent>
             <action android:name="android.intent.action.VIEW" />
