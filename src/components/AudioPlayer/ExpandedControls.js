@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import {
   StyleSheet,
   SafeAreaView,
@@ -24,7 +24,6 @@ const ExpandedControls = ({
   duration,
 }) => {
   const { colors } = useColorContext()
-  const [expandedControlsWidth, setExpandedControlsWidth] = useState(0)
   return (
     <>
       {Platform.OS === 'android' && (
@@ -34,9 +33,8 @@ const ExpandedControls = ({
             top: -12,
             zIndex: 1,
             width: '100%',
-          }}
-          onLayout={e => setExpandedControlsWidth(e.nativeEvent.layout.width)}>
-          <Svg height={12} width={expandedControlsWidth}>
+          }}>
+          <Svg height={12} width="100%">
             <Defs>
               <LinearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
                 <Stop offset={0} stopColor="#000000" stopOpacity={0} key="1" />
@@ -48,7 +46,7 @@ const ExpandedControls = ({
                 />
               </LinearGradient>
             </Defs>
-            <Rect height={12} width={expandedControlsWidth} fill="url(#grad)" />
+            <Rect height={12} width="100%" fill="url(#grad)" />
           </Svg>
         </View>
       )}
