@@ -78,6 +78,7 @@ const Controls = ({
           <>
             <Icon
               name={isPlaying ? 'pause' : 'play-arrow'}
+              style={{ width: 46, paddingLeft: isPlaying ? 4 : 0 }}
               size={46}
               color={colors.text}
               onPress={() => {
