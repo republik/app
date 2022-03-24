@@ -11,7 +11,6 @@ import {
   ANIMATION_DURATION,
   AUDIO_PLAYER_HEIGHT,
   FRONTEND_BASE_URL,
-  AUDIO_PLAYER_PROGRESS_HEIGHT,
   AUDIO_PLAYER_PROGRESS_HITZONE_HEIGHT,
 } from '../../constants'
 import { useGlobalState } from '../../GlobalState'

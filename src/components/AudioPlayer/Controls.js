@@ -69,9 +69,7 @@ const Controls = ({
       style={[
         styles.controls,
         {
-          marginTop: expanded
-            ? AUDIO_PLAYER_PROGRESS_HITZONE_HEIGHT
-            : 0,
+          marginTop: expanded ? AUDIO_PLAYER_PROGRESS_HITZONE_HEIGHT : 0,
         },
       ]}>
       <View style={[styles.column, { flex: 1 }]}>
