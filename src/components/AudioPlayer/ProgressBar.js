@@ -1,57 +1,23 @@
-import React, { useEffect, useMemo, useState, useRef } from 'react'
+import React, { useMemo, useState, useRef } from 'react'
 import { View, StyleSheet, Animated, PanResponder, Easing } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import throttle from 'lodash/throttle'
 import {
   ANIMATION_DURATION,
   AUDIO_PLAYER_PROGRESS_HEIGHT,
   AUDIO_PLAYER_EXPANDED_PADDING_X,
   AUDIO_PLAYER_PROGRESS_HITZONE_HEIGHT,
 } from '../../constants'
-import TrackPlayer, {
-  useTrackPlayerProgress,
-  usePlaybackState,
-} from 'react-native-track-player'
+import TrackPlayer, { useTrackPlayerProgress } from 'react-native-track-player'
 import { useColorContext } from '../../utils/colors'
-import { useGlobalState } from '../../GlobalState'
 
-const ProgressBar = ({ audio, expanded, playbackRate }) => {
+const ProgressBar = ({ expanded, playbackRate }) => {
   const insets = useSafeAreaInsets()
   const [isPanning, setIsPanning] = useState(false)
   const [playerWidth, setPlayerWidth] = useState(0)
   const [panProgress, setPanProgress] = useState(0)
   const { colors } = useColorContext()
   const { position, duration, bufferedPosition } = useTrackPlayerProgress(100)
-  const playbackState = usePlaybackState()
-  const { dispatch, setPersistedState } = useGlobalState()
   const scaleY = useRef(new Animated.Value(1)).current
-
-  const isPlaying = playbackState === TrackPlayer.STATE_PLAYING
-
-  const upsertCurrentMediaProgress = useMemo(() => {
-    return throttle(
-      (currentAudio, currentTime) => {
-        if (currentAudio) {
-          dispatch({
-            type: 'postMessage',
-            content: {
-              type: 'onAppMediaProgressUpdate',
-              mediaId: currentAudio.mediaId,
-              currentTime,
-            },
-          })
-          setPersistedState({
-            audio: {
-              ...currentAudio,
-              currentTime,
-            },
-          })
-        }
-      },
-      1000,
-      { trailing: true },
-    )
-  }, [dispatch, setPersistedState])
 
   const panResponder = useMemo(() => {
     const expandAnim = () => {
@@ -76,7 +42,6 @@ const ProgressBar = ({ audio, expanded, playbackRate }) => {
       onMoveShouldSetPanResponder: () => true,
       onPanResponderGrant: (evt, gestureState) => {
         setIsPanning(true)
-        // setPanProgress(gestureState.x0 / (expanded ? playerWidth : playerWidth))
         setPanProgress(
           expanded
             ? (gestureState.x0 -
@@ -115,26 +80,6 @@ const ProgressBar = ({ audio, expanded, playbackRate }) => {
     expanded,
     playbackRate,
   ])
-
-  useEffect(() => {
-    if (audio && isPlaying && position > 0) {
-      if (audio.mediaId) {
-        upsertCurrentMediaProgress(audio, position)
-      } else {
-        console.warn(`Audio element ${audio.id} has no mediaId`)
-      }
-    } else if (!audio) {
-      // prevent call to rewrite audio to persited state with current position
-      upsertCurrentMediaProgress.cancel()
-    }
-  }, [upsertCurrentMediaProgress, audio, isPlaying, position])
-
-  useEffect(() => {
-    return () => {
-      // stop sending when app is quite
-      upsertCurrentMediaProgress.cancel()
-    }
-  }, [upsertCurrentMediaProgress])
 
   const progress = isPanning ? panProgress * 100 : (position / duration) * 100
   const buffered = (bufferedPosition / duration) * 100

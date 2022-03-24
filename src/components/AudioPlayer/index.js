@@ -1,10 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useMemo } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { View, StyleSheet, Animated, Easing, Platform } from 'react-native'
 import TrackPlayer, {
   useTrackPlayerProgress,
   usePlaybackState,
 } from 'react-native-track-player'
+import throttle from 'lodash/throttle'
 
 import Logo from '../../assets/images/playlist-logo.png'
 import {
@@ -173,6 +174,51 @@ const AudioPlayer = () => {
     dispatch,
     duration,
   ])
+
+  const upsertCurrentMediaProgress = useMemo(() => {
+    return throttle(
+      (currentAudio, currentTime) => {
+        if (currentAudio) {
+          dispatch({
+            type: 'postMessage',
+            content: {
+              type: 'onAppMediaProgressUpdate',
+              mediaId: currentAudio.mediaId,
+              currentTime,
+            },
+          })
+          setPersistedState({
+            audio: {
+              ...currentAudio,
+              currentTime,
+            },
+          })
+        }
+      },
+      1000,
+      { trailing: true },
+    )
+  }, [dispatch, setPersistedState])
+
+  useEffect(() => {
+    if (audio && isPlaying && position > 0) {
+      if (audio.mediaId) {
+        upsertCurrentMediaProgress(audio, position)
+      } else {
+        console.warn(`Audio element ${audio.id} has no mediaId`)
+      }
+    } else if (!audio) {
+      // prevent call to rewrite audio to persited state with current position
+      upsertCurrentMediaProgress.cancel()
+    }
+  }, [upsertCurrentMediaProgress, audio, isPlaying, position])
+
+  useEffect(() => {
+    return () => {
+      // stop sending when app is quite
+      upsertCurrentMediaProgress.cancel()
+    }
+  }, [upsertCurrentMediaProgress])
 
   const onTitlePress = () => {
     if (audio && audio.sourcePath) {
