@@ -151,7 +151,7 @@ android {
         applicationId "app.republik"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 174
+        versionCode 178
         versionName "2.1.1"
     }
     splits {
