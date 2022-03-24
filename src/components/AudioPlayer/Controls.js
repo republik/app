@@ -15,6 +15,7 @@ import { parseSeconds } from './index.js'
 import {
   ANIMATION_DURATION,
   AUDIO_PLAYER_PROGRESS_HEIGHT,
+  AUDIO_PLAYER_PROGRESS_HITZONE_HEIGHT,
 } from '../../constants'
 
 const AnimatedIcon = Animated.createAnimatedComponent(Icon)
@@ -69,8 +70,8 @@ const Controls = ({
         styles.controls,
         {
           marginTop: expanded
-            ? 2 * AUDIO_PLAYER_PROGRESS_HEIGHT
-            : AUDIO_PLAYER_PROGRESS_HEIGHT,
+            ? AUDIO_PLAYER_PROGRESS_HITZONE_HEIGHT
+            : 0,
         },
       ]}>
       <View style={[styles.column, { flex: 1 }]}>

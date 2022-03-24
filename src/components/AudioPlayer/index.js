@@ -12,6 +12,7 @@ import {
   AUDIO_PLAYER_HEIGHT,
   FRONTEND_BASE_URL,
   AUDIO_PLAYER_PROGRESS_HEIGHT,
+  AUDIO_PLAYER_PROGRESS_HITZONE_HEIGHT,
 } from '../../constants'
 import { useGlobalState } from '../../GlobalState'
 import { useColorContext } from '../../utils/colors'
@@ -197,7 +198,7 @@ const AudioPlayer = () => {
               outputRange: [
                 0,
                 AUDIO_PLAYER_HEIGHT +
-                  AUDIO_PLAYER_PROGRESS_HEIGHT +
+                  AUDIO_PLAYER_PROGRESS_HITZONE_HEIGHT +
                   insets.bottom,
               ],
             }),
@@ -207,7 +208,7 @@ const AudioPlayer = () => {
           style={{
             height:
               AUDIO_PLAYER_HEIGHT +
-              AUDIO_PLAYER_PROGRESS_HEIGHT +
+              AUDIO_PLAYER_PROGRESS_HITZONE_HEIGHT +
               insets.bottom,
             backgroundColor: colors.overlay,
           }}>

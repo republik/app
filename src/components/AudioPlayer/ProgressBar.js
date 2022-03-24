@@ -6,6 +6,7 @@ import {
   ANIMATION_DURATION,
   AUDIO_PLAYER_PROGRESS_HEIGHT,
   AUDIO_PLAYER_EXPANDED_PADDING_X,
+  AUDIO_PLAYER_PROGRESS_HITZONE_HEIGHT,
 } from '../../constants'
 import TrackPlayer, {
   useTrackPlayerProgress,
@@ -142,7 +143,9 @@ const ProgressBar = ({ audio, expanded, playbackRate }) => {
     <View
       style={{
         marginHorizontal: expanded ? AUDIO_PLAYER_EXPANDED_PADDING_X : 0,
-        paddingVertical: expanded ? 24 : 0,
+        paddingTop: expanded ? 24 : 0,
+        paddingBottom: expanded ? 24 + AUDIO_PLAYER_PROGRESS_HEIGHT : 0,
+        height: AUDIO_PLAYER_PROGRESS_HITZONE_HEIGHT,
       }}
       {...panResponder.panHandlers}
       onLayout={e => setPlayerWidth(e.nativeEvent.layout.width)}>
