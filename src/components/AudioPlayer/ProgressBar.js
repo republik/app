@@ -10,17 +10,17 @@ import {
 import TrackPlayer from 'react-native-track-player'
 import { useColorContext } from '../../utils/colors'
 
-const ProgressBar = ({ expanded, playbackRate, position, duration, bufferedPosition }) => {
+const ProgressBar = ({ expanded, playbackRate, position, duration, bufferedPosition, thumb }) => {
   const insets = useSafeAreaInsets()
   const [isPanning, setIsPanning] = useState(false)
   const [playerWidth, setPlayerWidth] = useState(0)
   const [panProgress, setPanProgress] = useState(0)
   const { colors } = useColorContext()
-  const scaleY = useRef(new Animated.Value(1)).current
+  const panScaleValue = useRef(new Animated.Value(1)).current
 
   const panResponder = useMemo(() => {
     const expandAnim = () => {
-      Animated.timing(scaleY, {
+      Animated.timing(panScaleValue, {
         toValue: 2.5,
         easing: Easing.in(Easing.ease),
         duration: ANIMATION_DURATION,
@@ -29,7 +29,7 @@ const ProgressBar = ({ expanded, playbackRate, position, duration, bufferedPosit
     }
 
     const collapseAnim = () => {
-      Animated.timing(scaleY, {
+      Animated.timing(panScaleValue, {
         toValue: 1,
         duration: ANIMATION_DURATION,
         easing: Easing.in(Easing.ease),
@@ -71,7 +71,7 @@ const ProgressBar = ({ expanded, playbackRate, position, duration, bufferedPosit
       },
     })
   }, [
-    scaleY,
+    panScaleValue,
     playerWidth,
     duration,
     panProgress,
@@ -97,11 +97,11 @@ const ProgressBar = ({ expanded, playbackRate, position, duration, bufferedPosit
         style={[
           styles.progressBar,
           { backgroundColor: colors.progress },
-          {
+          !thumb && {
             transform: [
-              { scaleY },
+              { scaleY: panScaleValue },
               {
-                translateY: scaleY.interpolate({
+                translateY: panScaleValue.interpolate({
                   inputRange: [1, 2.5],
                   outputRange: [0, -AUDIO_PLAYER_PROGRESS_HEIGHT / 3],
                 }),
@@ -124,6 +124,22 @@ const ProgressBar = ({ expanded, playbackRate, position, duration, bufferedPosit
             { backgroundColor: colors.primary, width: `${progress}%` },
           ]}
         />
+        {thumb && <Animated.View
+          style={[
+            styles.progressThumb,
+            { backgroundColor: colors.primary, left: `${progress}%` },
+            {
+              transform: [
+                {
+                  scale: panScaleValue.interpolate({
+                    inputRange: [1, 2.5],
+                    outputRange: [1, 2],
+                  }),
+                },
+              ],
+            },
+          ]}
+        />}
       </Animated.View>
     </View>
   )
@@ -135,6 +151,14 @@ const styles = StyleSheet.create({
   progressBar: {
     width: '100%',
     height: AUDIO_PLAYER_PROGRESS_HEIGHT,
+  },
+  progressThumb: {
+    top: -4,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginLeft: -6,
+    position: 'absolute',
   },
   progressPosition: {
     top: 0,

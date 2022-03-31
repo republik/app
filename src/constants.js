@@ -43,6 +43,6 @@ export const APP_VERSION = DeviceInfo.getVersion()
 // Audio
 export const AUDIO_PLAYER_HEIGHT = 68
 export const ANIMATION_DURATION = 150
-export const AUDIO_PLAYER_PROGRESS_HEIGHT = 5
+export const AUDIO_PLAYER_PROGRESS_HEIGHT = 4
 export const AUDIO_PLAYER_PROGRESS_HITZONE_HEIGHT = 10
 export const AUDIO_PLAYER_EXPANDED_PADDING_X = 16

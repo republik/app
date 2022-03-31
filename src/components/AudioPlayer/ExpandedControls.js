@@ -135,6 +135,7 @@ const ExpandedControls = ({
             duration={duration}
             position={position}
             bufferedPosition={bufferedPosition}
+            thumb
           />
           <View style={styles.rateSelectContainer}>
             {[
