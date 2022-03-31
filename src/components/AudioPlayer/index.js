@@ -137,9 +137,11 @@ const AudioPlayer = () => {
             // https://github.com/react-native-kit/react-native-track-player/issues/387#issuecomment-709433886
             setTimeout(() => {
               TrackPlayer.seekTo(seekToTime)
+              TrackPlayer.setRate(playbackRate)
             }, 1)
             setTimeout(() => {
               TrackPlayer.seekTo(seekToTime)
+              TrackPlayer.setRate(playbackRate)
             }, 500)
             setTimeout(() => {
               TrackPlayer.seekTo(seekToTime)
@@ -196,7 +198,7 @@ const AudioPlayer = () => {
           })
         }
       },
-      5000,
+      1000,
       { trailing: true },
     )
   }, [dispatch, setPersistedState])

@@ -89,6 +89,7 @@ const ExpandedControls = ({
                 } else {
                   TrackPlayer.seekTo(position - 10 * playbackRate)
                 }
+                TrackPlayer.setRate(playbackRate)
               }}
             />
             <Icon
@@ -104,6 +105,7 @@ const ExpandedControls = ({
                     // if less than 10s in, set to beginning
                     TrackPlayer.play()
                     TrackPlayer.seekTo(0)
+                    TrackPlayer.setRate(playbackRate)
                   }
                   TrackPlayer.play()
                 }
@@ -122,6 +124,7 @@ const ExpandedControls = ({
                 } else {
                   TrackPlayer.seekTo(position + 30 * playbackRate)
                 }
+                TrackPlayer.setRate(playbackRate)
               }}
             />
           </View>

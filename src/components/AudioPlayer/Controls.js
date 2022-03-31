@@ -87,6 +87,7 @@ const Controls = ({
                   if (audio.currentTime >= duration - 5) {
                     TrackPlayer.play()
                     TrackPlayer.seekTo(0)
+                    TrackPlayer.setRate(playbackRate)
                   }
                   TrackPlayer.play()
                 }
