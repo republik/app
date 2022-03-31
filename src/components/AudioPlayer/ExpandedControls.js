@@ -201,6 +201,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   rateSelectContainer: {
+    marginTop: 8,
+    marginBottom: 8,
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'center',
