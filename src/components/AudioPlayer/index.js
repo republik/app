@@ -259,13 +259,19 @@ const AudioPlayer = () => {
             backgroundColor: colors.overlay,
           }}>
           {!expanded && (
-            <ProgressBar position={position} duration={duration} bufferedPosition={bufferedPosition} audio={audio} playbackRate={playbackRate} />
+            <ProgressBar
+              duration={duration}
+              position={position}
+              bufferedPosition={bufferedPosition}
+              audio={audio}
+              playbackRate={playbackRate} />
           )}
           <Controls
             audio={audio}
             expanded={expanded}
             duration={duration}
             position={position}
+            bufferedPosition={bufferedPosition}
             isPlaying={isPlaying}
             playbackRate={playbackRate}
             onTitlePress={onTitlePress}

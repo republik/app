@@ -19,9 +19,10 @@ const ExpandedControls = ({
   audio,
   onTitlePress,
   isPlaying,
-  position,
   playbackRate,
   duration,
+  position,
+  bufferedPosition,
 }) => {
   const { colors } = useColorContext()
   const {
@@ -128,6 +129,9 @@ const ExpandedControls = ({
             audio={audio}
             expanded={true}
             playbackRate={playbackRate}
+            duration={duration}
+            position={position}
+            bufferedPosition={bufferedPosition}
           />
           <View style={styles.rateSelectContainer}>
             {[
