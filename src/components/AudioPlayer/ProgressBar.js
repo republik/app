@@ -7,16 +7,15 @@ import {
   AUDIO_PLAYER_EXPANDED_PADDING_X,
   AUDIO_PLAYER_PROGRESS_HITZONE_HEIGHT,
 } from '../../constants'
-import TrackPlayer, { useTrackPlayerProgress } from 'react-native-track-player'
+import TrackPlayer from 'react-native-track-player'
 import { useColorContext } from '../../utils/colors'
 
-const ProgressBar = ({ expanded, playbackRate }) => {
+const ProgressBar = ({ expanded, playbackRate, position, duration, bufferedPosition }) => {
   const insets = useSafeAreaInsets()
   const [isPanning, setIsPanning] = useState(false)
   const [playerWidth, setPlayerWidth] = useState(0)
   const [panProgress, setPanProgress] = useState(0)
   const { colors } = useColorContext()
-  const { position, duration, bufferedPosition } = useTrackPlayerProgress(100)
   const scaleY = useRef(new Animated.Value(1)).current
 
   const panResponder = useMemo(() => {

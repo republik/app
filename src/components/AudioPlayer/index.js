@@ -61,7 +61,7 @@ const AudioPlayer = () => {
   const opacityAnimatedValue = useRef(new Animated.Value(0)).current
   const { colors } = useColorContext()
   const [expanded, setExpanded] = useState(false)
-  const { position, duration } = useTrackPlayerProgress(100)
+  const { position, duration, bufferedPosition } = useTrackPlayerProgress(500)
   const playbackState = usePlaybackState()
 
   // Initializes the player
@@ -176,7 +176,6 @@ const AudioPlayer = () => {
     dispatch,
     duration,
   ])
-
   const upsertCurrentMediaProgress = useMemo(() => {
     return throttle(
       (currentAudio, currentTime) => {
@@ -197,7 +196,7 @@ const AudioPlayer = () => {
           })
         }
       },
-      1000,
+      5000,
       { trailing: true },
     )
   }, [dispatch, setPersistedState])
@@ -260,7 +259,7 @@ const AudioPlayer = () => {
             backgroundColor: colors.overlay,
           }}>
           {!expanded && (
-            <ProgressBar audio={audio} playbackRate={playbackRate} />
+            <ProgressBar position={position} duration={duration} bufferedPosition={bufferedPosition} audio={audio} playbackRate={playbackRate} />
           )}
           <Controls
             audio={audio}
