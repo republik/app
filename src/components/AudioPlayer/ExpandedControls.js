@@ -13,6 +13,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons'
 import TrackPlayer from 'react-native-track-player'
 import ProgressBar from './ProgressBar'
 import { parseSeconds } from './index.js'
+import { useGlobalState } from '../../GlobalState'
 
 const ExpandedControls = ({
   audio,
@@ -20,10 +21,12 @@ const ExpandedControls = ({
   isPlaying,
   position,
   playbackRate,
-  setPlaybackRate,
   duration,
 }) => {
   const { colors } = useColorContext()
+  const {
+    setPersistedState,
+  } = useGlobalState()
   return (
     <>
       {Platform.OS === 'android' && (
@@ -139,7 +142,9 @@ const ExpandedControls = ({
                 style={{ marginHorizontal: 16 }}
                 onPress={() => {
                   TrackPlayer.setRate(rate.speed)
-                  setPlaybackRate(rate.speed)
+                  setPersistedState({
+                    playbackRate: rate.speed
+                  })
                 }}>
                 <Text
                   style={[

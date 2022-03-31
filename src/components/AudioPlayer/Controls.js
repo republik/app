@@ -158,14 +158,6 @@ const styles = StyleSheet.create({
     fontFamily: 'GT America',
     fontVariant: ['tabular-nums'],
   },
-  playbackRateButton: {
-    paddingHorizontal: 8,
-  },
-  plabackRateButtonText: {
-    fontSize: 22,
-    fontFamily: 'GT America',
-    fontWeight: '600',
-  },
 })
 
 export default Controls

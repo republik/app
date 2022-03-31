@@ -55,13 +55,12 @@ const AudioPlayer = () => {
     globalState,
     setGlobalState,
   } = useGlobalState()
-  const { audio } = persistedState
+  const { audio, playbackRate = 1 } = persistedState
   const { autoPlayAudio } = globalState
   const slideAnimatedValue = useRef(new Animated.Value(0)).current
   const opacityAnimatedValue = useRef(new Animated.Value(0)).current
   const { colors } = useColorContext()
   const [expanded, setExpanded] = useState(false)
-  const [playbackRate, setPlaybackRate] = useState(1)
   const { position, duration } = useTrackPlayerProgress(100)
   const playbackState = usePlaybackState()
 
@@ -123,11 +122,13 @@ const AudioPlayer = () => {
           artist: 'Republik',
           artwork: Logo,
         })
+        TrackPlayer.setRate(playbackRate)
         if (audio.currentTime) {
           // restart the track at beginning if it was finished in previous session and is initiated again.
           const seekToTime =
             audio.currentTime >= duration - 5 ? 0 : audio.currentTime
           TrackPlayer.seekTo(seekToTime)
+          TrackPlayer.setRate(playbackRate)
           if (Platform.OS === 'ios') {
             TrackPlayer.setVolume(0)
             await TrackPlayer.play()
@@ -142,6 +143,7 @@ const AudioPlayer = () => {
             }, 500)
             setTimeout(() => {
               TrackPlayer.seekTo(seekToTime)
+              TrackPlayer.setRate(playbackRate)
               if (!autoPlayAudio) {
                 TrackPlayer.pause()
               }
@@ -287,7 +289,6 @@ const AudioPlayer = () => {
             audio={audio}
             onTitlePress={onTitlePress}
             playbackRate={playbackRate}
-            setPlaybackRate={setPlaybackRate}
             isPlaying={isPlaying}
             duration={duration}
             position={position}
