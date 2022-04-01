@@ -29,7 +29,7 @@ release/
 .gradle
 local.properties
 *.iml
-.hprof
+*.hprof
 
 # node.js
 #
@@ -58,7 +58,7 @@ buck-out/
 # Bundle artifact
 *.jsbundle
 
-# CocoaPods
+# Ruby / CocoaPods
 /ios/Pods/
 
 # Env
@@ -81,3 +81,4 @@ GoogleService-Info.plist
 
 # iOS
 *.dSYM.zip
+/vendor/bundle/
