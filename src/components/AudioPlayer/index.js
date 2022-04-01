@@ -2,8 +2,11 @@ import React, { useEffect, useRef, useState, useMemo } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { View, StyleSheet, Animated, Easing, Platform } from 'react-native'
 import TrackPlayer, {
-  useTrackPlayerProgress,
+  useProgress,
   usePlaybackState,
+  Capability,
+  State,
+  RepeatMode,
 } from 'react-native-track-player'
 import throttle from 'lodash/throttle'
 
@@ -20,21 +23,28 @@ import ProgressBar from './ProgressBar'
 import Controls from './Controls'
 import ExpandedControls from './ExpandedControls'
 
-async function setup() {
+async function setupIfNecessary() {
+  // if app was relaunched and music was already playing, we don't setup again.
+  const currentTrack = await TrackPlayer.getCurrentTrack()
+  if (currentTrack !== null) {
+    return
+  }
   await TrackPlayer.setupPlayer({
-    backBuffer: 15,
+    backBuffer: 30,
   })
   await TrackPlayer.updateOptions({
     stopWithApp: true,
     jumpInterval: 15,
     capabilities: [
-      TrackPlayer.CAPABILITY_PLAY,
-      TrackPlayer.CAPABILITY_PAUSE,
-      TrackPlayer.CAPABILITY_JUMP_FORWARD,
-      TrackPlayer.CAPABILITY_JUMP_BACKWARD,
-      TrackPlayer.CAPABILITY_SEEK_TO,
+      Capability.Play,
+      Capability.Pause,
+      Capability.JumpForward,
+      Capability.JumpBackward,
+      Capability.SeekTo,
     ],
+    compactCapabilities: [Capability.Play, Capability.Pause],
   })
+  TrackPlayer.setRepeatMode(RepeatMode.Off)
 }
 
 export const parseSeconds = value => {
@@ -61,12 +71,12 @@ const AudioPlayer = () => {
   const opacityAnimatedValue = useRef(new Animated.Value(0)).current
   const { colors } = useColorContext()
   const [expanded, setExpanded] = useState(false)
-  const { position, duration, bufferedPosition } = useTrackPlayerProgress(500)
+  const { position, duration, bufferedPosition } = useProgress(500)
   const playbackState = usePlaybackState()
 
   // Initializes the player
   useEffect(() => {
-    setup()
+    setupIfNecessary()
   }, [])
 
   // Handles changes in the audio persisted state, sliding the
@@ -129,29 +139,6 @@ const AudioPlayer = () => {
             audio.currentTime >= duration - 5 ? 0 : audio.currentTime
           TrackPlayer.seekTo(seekToTime)
           TrackPlayer.setRate(playbackRate)
-          if (Platform.OS === 'ios') {
-            TrackPlayer.setVolume(0)
-            await TrackPlayer.play()
-            // seekTo does not work on iOS until the player has started playing
-            // we workaround around this with a setTimeout:
-            // https://github.com/react-native-kit/react-native-track-player/issues/387#issuecomment-709433886
-            setTimeout(() => {
-              TrackPlayer.seekTo(seekToTime)
-              TrackPlayer.setRate(playbackRate)
-            }, 1)
-            setTimeout(() => {
-              TrackPlayer.seekTo(seekToTime)
-              TrackPlayer.setRate(playbackRate)
-            }, 500)
-            setTimeout(() => {
-              TrackPlayer.seekTo(seekToTime)
-              TrackPlayer.setRate(playbackRate)
-              if (!autoPlayAudio) {
-                TrackPlayer.pause()
-              }
-              TrackPlayer.setVolume(1)
-            }, 1000)
-          }
         }
       }
       if (autoPlayAudio) {
@@ -177,6 +164,7 @@ const AudioPlayer = () => {
     setPersistedState,
     dispatch,
     duration,
+    playbackRate,
   ])
   const upsertCurrentMediaProgress = useMemo(() => {
     return throttle(
@@ -231,7 +219,7 @@ const AudioPlayer = () => {
     }
   }
 
-  const isPlaying = playbackState === TrackPlayer.STATE_PLAYING
+  const isPlaying = playbackState === State.Playing
 
   return (
     <>
@@ -266,7 +254,8 @@ const AudioPlayer = () => {
               position={position}
               bufferedPosition={bufferedPosition}
               audio={audio}
-              playbackRate={playbackRate} />
+              playbackRate={playbackRate}
+            />
           )}
           <Controls
             audio={audio}
