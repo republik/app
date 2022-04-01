@@ -1,57 +1,26 @@
-import React, { useEffect, useMemo, useState, useRef } from 'react'
+import React, { useMemo, useState, useRef } from 'react'
 import { View, StyleSheet, Animated, PanResponder, Easing } from 'react-native'
-import throttle from 'lodash/throttle'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import {
   ANIMATION_DURATION,
   AUDIO_PLAYER_PROGRESS_HEIGHT,
+  AUDIO_PLAYER_EXPANDED_PADDING_X,
+  AUDIO_PLAYER_PROGRESS_HITZONE_HEIGHT,
 } from '../../constants'
-import TrackPlayer, {
-  useTrackPlayerProgress,
-  usePlaybackState,
-} from 'react-native-track-player'
+import TrackPlayer from 'react-native-track-player'
 import { useColorContext } from '../../utils/colors'
-import { useGlobalState } from '../../GlobalState'
 
-const ProgressBar = ({ audio }) => {
+const ProgressBar = ({ expanded, playbackRate, position, duration, bufferedPosition, thumb }) => {
+  const insets = useSafeAreaInsets()
   const [isPanning, setIsPanning] = useState(false)
   const [playerWidth, setPlayerWidth] = useState(0)
   const [panProgress, setPanProgress] = useState(0)
   const { colors } = useColorContext()
-  const { position, duration, bufferedPosition } = useTrackPlayerProgress(100)
-  const playbackState = usePlaybackState()
-  const { dispatch, setPersistedState } = useGlobalState()
-  const scaleY = useRef(new Animated.Value(1)).current
-
-  const isPlaying = playbackState === TrackPlayer.STATE_PLAYING
-
-  const upsertCurrentMediaProgress = useMemo(() => {
-    return throttle(
-      (currentAudio, currentTime) => {
-        if (currentAudio) {
-          dispatch({
-            type: 'postMessage',
-            content: {
-              type: 'onAppMediaProgressUpdate',
-              mediaId: currentAudio.mediaId,
-              currentTime,
-            },
-          })
-          setPersistedState({
-            audio: {
-              ...currentAudio,
-              currentTime,
-            },
-          })
-        }
-      },
-      1000,
-      { trailing: true },
-    )
-  }, [dispatch, setPersistedState])
+  const panScaleValue = useRef(new Animated.Value(1)).current
 
   const panResponder = useMemo(() => {
     const expandAnim = () => {
-      Animated.timing(scaleY, {
+      Animated.timing(panScaleValue, {
         toValue: 2.5,
         easing: Easing.in(Easing.ease),
         duration: ANIMATION_DURATION,
@@ -60,7 +29,7 @@ const ProgressBar = ({ audio }) => {
     }
 
     const collapseAnim = () => {
-      Animated.timing(scaleY, {
+      Animated.timing(panScaleValue, {
         toValue: 1,
         duration: ANIMATION_DURATION,
         easing: Easing.in(Easing.ease),
@@ -72,59 +41,67 @@ const ProgressBar = ({ audio }) => {
       onMoveShouldSetPanResponder: () => true,
       onPanResponderGrant: (evt, gestureState) => {
         setIsPanning(true)
-        setPanProgress(gestureState.x0 / playerWidth)
+        setPanProgress(
+          expanded
+            ? (gestureState.x0 -
+                insets.left -
+                AUDIO_PLAYER_EXPANDED_PADDING_X) /
+                playerWidth
+            : gestureState.x0 / playerWidth,
+        )
         expandAnim()
       },
       onPanResponderMove: (evt, gestureState) => {
-        setPanProgress(gestureState.moveX / playerWidth)
+        setPanProgress(
+          expanded
+            ? (gestureState.moveX -
+                insets.left -
+                AUDIO_PLAYER_EXPANDED_PADDING_X) /
+                playerWidth
+            : gestureState.moveX / playerWidth,
+        )
       },
       onPanResponderRelease: (evt, gestureState) => {
         setIsPanning(false)
         // seekTo does not work on iOS unless playing
         TrackPlayer.play()
         TrackPlayer.seekTo(panProgress * duration)
+        TrackPlayer.setRate(playbackRate)
         collapseAnim()
       },
     })
-  }, [scaleY, playerWidth, duration, panProgress])
-
-  useEffect(() => {
-    if (audio && isPlaying && position > 0) {
-      if (audio.mediaId) {
-        upsertCurrentMediaProgress(audio, position)
-      } else {
-        console.warn(`Audio element ${audio.id} has no mediaId`)
-      }
-    } else if (!audio) {
-      // prevent call to rewrite audio to persited state with current position
-      upsertCurrentMediaProgress.cancel()
-    }
-  }, [upsertCurrentMediaProgress, audio, isPlaying, position])
-
-  useEffect(() => {
-    return () => {
-      // stop sending when app is quite
-      upsertCurrentMediaProgress.cancel()
-    }
-  }, [upsertCurrentMediaProgress])
+  }, [
+    panScaleValue,
+    playerWidth,
+    duration,
+    panProgress,
+    insets,
+    expanded,
+    playbackRate,
+  ])
 
   const progress = isPanning ? panProgress * 100 : (position / duration) * 100
   const buffered = (bufferedPosition / duration) * 100
 
   return (
     <View
-      style={styles.progressBarContainer}
+      style={{
+        marginHorizontal: expanded ? AUDIO_PLAYER_EXPANDED_PADDING_X : 0,
+        paddingTop: expanded ? 24 : 0,
+        paddingBottom: expanded ? 24 + AUDIO_PLAYER_PROGRESS_HEIGHT : 0,
+        height: AUDIO_PLAYER_PROGRESS_HITZONE_HEIGHT,
+      }}
       {...panResponder.panHandlers}
-      onLayout={(e) => setPlayerWidth(e.nativeEvent.layout.width)}>
+      onLayout={e => setPlayerWidth(e.nativeEvent.layout.width)}>
       <Animated.View
         style={[
           styles.progressBar,
           { backgroundColor: colors.progress },
-          {
+          !thumb && {
             transform: [
-              { scaleY },
+              { scaleY: panScaleValue },
               {
-                translateY: scaleY.interpolate({
+                translateY: panScaleValue.interpolate({
                   inputRange: [1, 2.5],
                   outputRange: [0, -AUDIO_PLAYER_PROGRESS_HEIGHT / 3],
                 }),
@@ -147,6 +124,22 @@ const ProgressBar = ({ audio }) => {
             { backgroundColor: colors.primary, width: `${progress}%` },
           ]}
         />
+        {thumb && <Animated.View
+          style={[
+            styles.progressThumb,
+            { backgroundColor: colors.primary, left: `${progress}%` },
+            {
+              transform: [
+                {
+                  scale: panScaleValue.interpolate({
+                    inputRange: [1, 2.5],
+                    outputRange: [1, 2],
+                  }),
+                },
+              ],
+            },
+          ]}
+        />}
       </Animated.View>
     </View>
   )
@@ -155,14 +148,17 @@ const ProgressBar = ({ audio }) => {
 export default ProgressBar
 
 const styles = StyleSheet.create({
-  progressBarContainer: {
-    top: 0,
-    width: '100%',
-    position: 'absolute',
-  },
   progressBar: {
     width: '100%',
     height: AUDIO_PLAYER_PROGRESS_HEIGHT,
+  },
+  progressThumb: {
+    top: -4,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginLeft: -6,
+    position: 'absolute',
   },
   progressPosition: {
     top: 0,

@@ -1,118 +1,161 @@
-import React from 'react'
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
+import React, { useRef, useEffect } from 'react'
+import {
+  StyleSheet,
+  Text,
+  View,
+  SafeAreaView,
+  TouchableOpacity,
+  Animated,
+} from 'react-native'
 import { useColorContext } from '../../utils/colors'
 import Icon from 'react-native-vector-icons/MaterialIcons'
-import TrackPlayer, {
-  useTrackPlayerProgress,
-  usePlaybackState,
-} from 'react-native-track-player'
+import TrackPlayer from 'react-native-track-player'
 import { useGlobalState } from '../../GlobalState'
-import { FRONTEND_BASE_URL } from '../../constants'
+import { parseSeconds } from './index.js'
+import {
+  ANIMATION_DURATION,
+  AUDIO_PLAYER_PROGRESS_HEIGHT,
+  AUDIO_PLAYER_PROGRESS_HITZONE_HEIGHT,
+} from '../../constants'
 
-const Controls = ({ audio }) => {
-  const { setPersistedState, setGlobalState } = useGlobalState()
+const AnimatedIcon = Animated.createAnimatedComponent(Icon)
+
+const Controls = ({
+  audio,
+  expanded,
+  duration,
+  position,
+  isPlaying,
+  onExpandToggle,
+  playbackRate,
+  onTitlePress,
+}) => {
+  const { setPersistedState } = useGlobalState()
   const { colors } = useColorContext()
-  const { position, duration } = useTrackPlayerProgress(100)
-  const playbackState = usePlaybackState()
+  const rotateAnimation = useRef(new Animated.Value(0)).current
 
-  const parseSeconds = (value) => {
-    if (value === null || value === undefined) {
-      return ''
+  useEffect(() => {
+    const rotateOpen = () => {
+      Animated.timing(rotateAnimation, {
+        toValue: 1,
+        duration: ANIMATION_DURATION,
+        useNativeDriver: true,
+      }).start()
     }
-    const minutes = Math.floor(value / 60)
-    const seconds = Math.floor(value - minutes * 60)
-    return minutes + ':' + (seconds < 10 ? '0' : '') + seconds
-  }
 
-  const onTitlePress = () => {
-    if (audio && audio.sourcePath) {
-      setGlobalState({
-        pendingUrl: `${FRONTEND_BASE_URL}${audio.sourcePath}`,
-      })
+    const rotateClosed = () => {
+      Animated.timing(rotateAnimation, {
+        toValue: 0,
+        duration: ANIMATION_DURATION,
+        useNativeDriver: true,
+      }).start()
     }
-  }
+    if (expanded) {
+      rotateOpen()
+    } else {
+      rotateClosed()
+    }
+    return () => {}
+  }, [expanded, rotateAnimation])
 
-  const isPlaying = playbackState === TrackPlayer.STATE_PLAYING
+  const rotate = rotateAnimation.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '180deg'],
+  })
 
   return (
-    <View style={styles.controls}>
-      <Icon
-        name="replay-10"
-        size={28}
-        color={colors.text}
-        onPress={() => {
-          // seekTo does not work on iOS unless playing
-          TrackPlayer.play()
-          TrackPlayer.seekTo(position - 10)
-        }}
-      />
-      <Icon
-        name={isPlaying ? 'pause' : 'play-arrow'}
-        size={46}
-        color={colors.text}
-        onPress={() => {
-          if (isPlaying) {
-            TrackPlayer.pause()
-          } else {
-            TrackPlayer.play()
-          }
-        }}
-      />
-      <Icon
-        name="forward-30"
-        size={28}
-        color={colors.text}
-        onPress={() => {
-          // seekTo does not work on iOS unless playing
-          TrackPlayer.play()
-          TrackPlayer.seekTo(position + 30)
-        }}
-      />
-      <View style={styles.content}>
-        <TouchableOpacity onPress={onTitlePress}>
-          <Text
-            numberOfLines={1}
-            style={[styles.title, { color: colors.text }]}>
-            {audio && audio.title}
-          </Text>
-        </TouchableOpacity>
-        {duration > 0 && (
-          <Text style={[styles.time, { color: colors.text }]}>
-            {parseSeconds(position)} / {parseSeconds(duration)}
-          </Text>
+    <SafeAreaView
+      edges={['right', 'left']}
+      style={[
+        styles.controls,
+        {
+          marginTop: expanded ? AUDIO_PLAYER_PROGRESS_HITZONE_HEIGHT : 0,
+        },
+      ]}>
+      <View style={[styles.column, { flex: 1 }]}>
+        {!expanded && (
+          <>
+            <Icon
+              name={isPlaying ? 'pause' : 'play-arrow'}
+              style={{ width: 46, paddingLeft: isPlaying ? 4 : 0 }}
+              size={46}
+              color={colors.text}
+              onPress={() => {
+                if (isPlaying) {
+                  TrackPlayer.pause()
+                } else {
+                  if (audio.currentTime >= duration - 5) {
+                    TrackPlayer.play()
+                    TrackPlayer.seekTo(0)
+                    TrackPlayer.setRate(playbackRate)
+                  }
+                  TrackPlayer.play()
+                }
+              }}
+            />
+            <View style={styles.textContainer}>
+              <TouchableOpacity onPress={onTitlePress}>
+                <Text
+                  numberOfLines={1}
+                  style={[styles.title, { color: colors.text }]}>
+                  {audio && audio.title}
+                </Text>
+              </TouchableOpacity>
+              {duration > 0 && (
+                <Text style={[styles.time, { color: colors.textSoft }]}>
+                  {parseSeconds(position / playbackRate)} /{' '}
+                  {parseSeconds(duration / playbackRate)}
+                </Text>
+              )}
+            </View>
+          </>
         )}
       </View>
-      <Icon
-        name="close"
-        size={35}
-        color={colors.text}
-        onPress={() =>
-          setPersistedState({
-            audio: null,
-          })
-        }
-      />
-    </View>
+      <View style={[styles.column, { paddingRight: 8 }]}>
+        <AnimatedIcon
+          name={'expand-less'}
+          size={40}
+          color={colors.text}
+          onPress={onExpandToggle}
+          style={{ marginHorizontal: 12, transform: [{ rotate: rotate }] }}
+        />
+        <Icon
+          name="close"
+          size={35}
+          color={colors.text}
+          onPress={() =>
+            setPersistedState({
+              audio: null,
+            })
+          }
+        />
+      </View>
+    </SafeAreaView>
   )
 }
+
 const styles = StyleSheet.create({
   controls: {
-    width: '100%',
-    paddingHorizontal: 8,
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  column: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingBottom: AUDIO_PLAYER_PROGRESS_HEIGHT,
   },
-  content: {
+  textContainer: {
     flex: 1,
     marginLeft: 10,
-    alignItems: 'flex-start',
+    marginBottom: 2,
   },
   title: {
     fontSize: 18,
     fontFamily: 'GT America',
   },
   time: {
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: 'GT America',
     fontVariant: ['tabular-nums'],
   },

@@ -307,6 +307,7 @@ const Web = () => {
             onContentProcessDidTerminate={() => {
               setDidCrash(true)
             }}
+            style={{backgroundColor:colors.default}}
           />
         </SafeAreaView>
       )}
