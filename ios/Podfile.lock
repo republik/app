@@ -286,11 +286,11 @@ PODS:
     - react-native-config/App (= 1.4.2)
   - react-native-config/App (1.4.2):
     - React-Core
-  - react-native-cookies (6.0.10):
+  - react-native-cookies (6.1.0):
     - React-Core
   - react-native-get-random-values (1.6.0):
     - React-Core
-  - react-native-notifications (3.4.2):
+  - react-native-notifications (4.2.4):
     - React-Core
   - react-native-safe-area-context (3.2.0):
     - React-Core
@@ -589,9 +589,9 @@ SPEC CHECKSUMS:
   React-jsinspector: 90f0bfd5d04e0b066c29216a110ffb9a6c34f23f
   React-logger: 8474fefa09d05f573a13c044cb0dfd751d4e52e3
   react-native-config: c98128a72bc2c3a1ca72caec0b021f0fa944aa29
-  react-native-cookies: 47ef7ec7839e99f738f6ee64fbb2d4d224e36a65
+  react-native-cookies: 7e14e823f32bd7c868134c7e207c89a46fa28f98
   react-native-get-random-values: f0fc24a5887a3341589515a86282a574407b59e4
-  react-native-notifications: 51ed8167f70f01c5000ba81a4465ea98b4612e23
+  react-native-notifications: 3de8ef9cd800e5db0225d9aa46b228d2b94ce51e
   react-native-safe-area-context: f0906bf8bc9835ac9a9d3f97e8bde2a997d8da79
   react-native-splash-screen: 200d11d188e2e78cea3ad319964f6142b6384865
   react-native-track-player: c4a4c5ec8090aec5b97a3f634dab8bdb657491a0
