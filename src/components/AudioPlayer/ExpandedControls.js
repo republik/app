@@ -25,9 +25,7 @@ const ExpandedControls = ({
   bufferedPosition,
 }) => {
   const { colors } = useColorContext()
-  const {
-    setPersistedState,
-  } = useGlobalState()
+  const { setPersistedState } = useGlobalState()
   return (
     <>
       {Platform.OS === 'android' && (
@@ -139,9 +137,9 @@ const ExpandedControls = ({
           />
           <View style={styles.rateSelectContainer}>
             {[
-              { speed: 0.5, label: '0,5×' },
               { speed: 0.75, label: '0,75×' },
               { speed: 1, label: '1×' },
+              { speed: 1.25, label: '1,25×' },
               { speed: 1.5, label: '1,5×' },
               { speed: 2, label: '2×' },
             ].map(rate => (
@@ -151,7 +149,7 @@ const ExpandedControls = ({
                 onPress={() => {
                   TrackPlayer.setRate(rate.speed)
                   setPersistedState({
-                    playbackRate: rate.speed
+                    playbackRate: rate.speed,
                   })
                 }}>
                 <Text

@@ -10,7 +10,14 @@ import {
 import TrackPlayer from 'react-native-track-player'
 import { useColorContext } from '../../utils/colors'
 
-const ProgressBar = ({ expanded, playbackRate, position, duration, bufferedPosition, thumb }) => {
+const ProgressBar = ({
+  expanded,
+  playbackRate,
+  position,
+  duration,
+  bufferedPosition,
+  thumb,
+}) => {
   const insets = useSafeAreaInsets()
   const [isPanning, setIsPanning] = useState(false)
   const [playerWidth, setPlayerWidth] = useState(0)
@@ -121,25 +128,27 @@ const ProgressBar = ({ expanded, playbackRate, position, duration, bufferedPosit
         <View
           style={[
             styles.progressPosition,
-            { backgroundColor: colors.primary, width: `${progress}%` },
+            { backgroundColor: colors.text, width: `${progress}%` },
           ]}
         />
-        {thumb && <Animated.View
-          style={[
-            styles.progressThumb,
-            { backgroundColor: colors.primary, left: `${progress}%` },
-            {
-              transform: [
-                {
-                  scale: panScaleValue.interpolate({
-                    inputRange: [1, 2.5],
-                    outputRange: [1, 2],
-                  }),
-                },
-              ],
-            },
-          ]}
-        />}
+        {thumb && (
+          <Animated.View
+            style={[
+              styles.progressThumb,
+              { backgroundColor: colors.text, left: `${progress}%` },
+              {
+                transform: [
+                  {
+                    scale: panScaleValue.interpolate({
+                      inputRange: [1, 2.5],
+                      outputRange: [1, 2],
+                    }),
+                  },
+                ],
+              },
+            ]}
+          />
+        )}
       </Animated.View>
     </View>
   )
