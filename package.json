@@ -1,6 +1,6 @@
 {
   "name": "republikapp",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "license": "bsd-3-clause",
   "scripts": {
     "android": "ENVFILE=.env.development react-native run-android",
