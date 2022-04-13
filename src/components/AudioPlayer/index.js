@@ -46,6 +46,13 @@ export const parseSeconds = value => {
   return minutes + ':' + (seconds < 10 ? '0' : '') + seconds
 }
 
+const getAudioId = (audio) => {
+  if (!audio) {
+    return null
+  }
+  return audio.mediaId || audio.url
+}
+
 const AudioPlayer = () => {
   const insets = useSafeAreaInsets()
   const {
@@ -74,6 +81,7 @@ const AudioPlayer = () => {
   // once the audio object is wiped from persistedState
   // also triggers playback when a new audio object is set to persistedState,
   // which happens via message API.
+  const audioId = getAudioId(audio)
   useEffect(() => {
     const slideIn = () => {
       Animated.sequence([
@@ -112,11 +120,12 @@ const AudioPlayer = () => {
         await TrackPlayer.reset()
         return
       }
+      const shouldAutoPlay = getAudioId(autoPlayAudio) === audioId
       const currentTrack = await TrackPlayer.getCurrentTrack()
-      if (currentTrack === null || currentTrack !== audio.mediaId) {
+      if (currentTrack === null || currentTrack !== audioId) {
         await TrackPlayer.reset()
         await TrackPlayer.add({
-          id: audio.mediaId,
+          id: audioId,
           url: audio.url,
           title: audio.title,
           artist: 'Republik',
@@ -146,7 +155,7 @@ const AudioPlayer = () => {
             setTimeout(() => {
               TrackPlayer.seekTo(seekToTime)
               TrackPlayer.setRate(playbackRate)
-              if (!autoPlayAudio) {
+              if (!shouldAutoPlay) {
                 TrackPlayer.pause()
               }
               TrackPlayer.setVolume(1)
@@ -154,12 +163,11 @@ const AudioPlayer = () => {
           }
         }
       }
-      if (autoPlayAudio) {
+      if (shouldAutoPlay) {
         await TrackPlayer.play()
-        setGlobalState({ autoPlayAudio: false })
+        setGlobalState({ autoPlayAudio: null })
       }
     }
-
     if (audio) {
       slideIn()
       loadAudio()
@@ -169,7 +177,7 @@ const AudioPlayer = () => {
       loadAudio()
     }
   }, [
-    audio,
+    audioId,
     autoPlayAudio,
     slideAnimatedValue,
     opacityAnimatedValue,

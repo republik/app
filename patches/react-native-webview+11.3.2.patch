@@ -13,3 +13,22 @@ index e3e878d..cb9964e 100644
      setupWebChromeClient((ReactContext)view.getContext(), view);
    }
  
+diff --git a/node_modules/react-native-webview/lib/WebViewShared.js b/node_modules/react-native-webview/lib/WebViewShared.js
+index 893d48e..612678d 100644
+--- a/node_modules/react-native-webview/lib/WebViewShared.js
++++ b/node_modules/react-native-webview/lib/WebViewShared.js
+@@ -30,13 +30,7 @@ var createOnShouldStartLoadWithRequest = function (loadRequest, originWhitelist,
+         var shouldStart = true;
+         var url = nativeEvent.url, lockIdentifier = nativeEvent.lockIdentifier;
+         if (!passesWhitelist(compileWhitelist(originWhitelist), url)) {
+-            Linking.canOpenURL(url).then(function (supported) {
+-                if (supported) {
+-                    return Linking.openURL(url);
+-                }
+-                console.warn("Can't open url: " + url);
+-                return undefined;
+-            })["catch"](function (e) {
++            Linking.openURL(url)["catch"](function (e) {
+                 console.warn('Error opening URL: ', e);
+             });
+             shouldStart = false;
