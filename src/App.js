@@ -14,15 +14,13 @@ import SetupAudioPlayerSerivce from './components/AudioPlayer/SetupAudioPlayerSe
 const App = () => {
   const [isAudioPlayerReady, setIsAudioPlayerReady] = useState(false)
 
-  // Initializes the player
+  // Initialize the AudioPlayer
   useEffect(() => {
     const run = async () => {
       const nextReadyState = await SetupAudioPlayerSerivce()
-      console.log('nextReadyState', nextReadyState)
       setIsAudioPlayerReady(nextReadyState)
     }
     if (!isAudioPlayerReady) {
-      console.log('Running setup')
       run()
     }
   }, [isAudioPlayerReady, setIsAudioPlayerReady])

@@ -1,5 +1,9 @@
 import TrackPlayer, { Capability, RepeatMode } from 'react-native-track-player'
 
+/**
+ * Setup the AudioPlayer with all the necessary configuration.
+ * @returns boolean saying if the AudioPlayer is ready to be used
+ */
 const SetupAudioPlayerService = async () => {
   let isSetup = false
   try {
