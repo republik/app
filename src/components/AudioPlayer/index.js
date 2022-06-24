@@ -1,12 +1,10 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { View, StyleSheet, Animated, Easing, Platform } from 'react-native'
+import { View, StyleSheet, Animated, Easing } from 'react-native'
 import TrackPlayer, {
   useProgress,
   usePlaybackState,
-  Capability,
   State,
-  RepeatMode,
 } from 'react-native-track-player'
 import throttle from 'lodash/throttle'
 
@@ -23,30 +21,6 @@ import ProgressBar from './ProgressBar'
 import Controls from './Controls'
 import ExpandedControls from './ExpandedControls'
 
-async function setupIfNecessary() {
-  // if app was relaunched and music was already playing, we don't setup again.
-  const currentTrack = await TrackPlayer.getCurrentTrack()
-  if (currentTrack !== null) {
-    return
-  }
-  await TrackPlayer.setupPlayer({
-    backBuffer: 30,
-  })
-  await TrackPlayer.updateOptions({
-    stopWithApp: true,
-    jumpInterval: 15,
-    capabilities: [
-      Capability.Play,
-      Capability.Pause,
-      Capability.JumpForward,
-      Capability.JumpBackward,
-      Capability.SeekTo,
-    ],
-    compactCapabilities: [Capability.Play, Capability.Pause],
-  })
-  TrackPlayer.setRepeatMode(RepeatMode.Off)
-}
-
 export const parseSeconds = value => {
   if (value === null || value === undefined) {
     return ''
@@ -56,7 +30,7 @@ export const parseSeconds = value => {
   return minutes + ':' + (seconds < 10 ? '0' : '') + seconds
 }
 
-const AudioPlayer = () => {
+const AudioPlayer = ({ isPlayerReady }) => {
   const insets = useSafeAreaInsets()
   const {
     persistedState,
@@ -74,17 +48,16 @@ const AudioPlayer = () => {
   const { position, duration, bufferedPosition } = useProgress(500)
   const playbackState = usePlaybackState()
 
-  // Initializes the player
-  useEffect(() => {
-    setupIfNecessary()
-  }, [])
-
   // Handles changes in the audio persisted state, sliding the
   // player in when there is an audio object vs sliding it out
   // once the audio object is wiped from persistedState
   // also triggers playback when a new audio object is set to persistedState,
   // which happens via message API.
   useEffect(() => {
+    if (!isPlayerReady) {
+      return
+    }
+
     const slideIn = () => {
       Animated.sequence([
         Animated.timing(opacityAnimatedValue, {
@@ -165,6 +138,7 @@ const AudioPlayer = () => {
     dispatch,
     duration,
     playbackRate,
+    isPlayerReady,
   ])
   const upsertCurrentMediaProgress = useMemo(() => {
     return throttle(
@@ -191,7 +165,12 @@ const AudioPlayer = () => {
     )
   }, [dispatch, setPersistedState])
 
+  const isPlaying = playbackState === State.Playing
+
   useEffect(() => {
+    if (!isPlayerReady) {
+      return
+    }
     if (audio && isPlaying && position > 0) {
       if (audio.mediaId) {
         upsertCurrentMediaProgress(audio, position)
@@ -202,7 +181,7 @@ const AudioPlayer = () => {
       // prevent call to rewrite audio to persited state with current position
       upsertCurrentMediaProgress.cancel()
     }
-  }, [upsertCurrentMediaProgress, audio, isPlaying, position])
+  }, [isPlayerReady, upsertCurrentMediaProgress, audio, isPlaying, position])
 
   useEffect(() => {
     return () => {
@@ -219,7 +198,9 @@ const AudioPlayer = () => {
     }
   }
 
-  const isPlaying = playbackState === State.Playing
+  if (!isPlayerReady) {
+    return null
+  }
 
   return (
     <>
