@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react'
+import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { View, StyleSheet, Animated, Easing } from 'react-native'
 import TrackPlayer, {
@@ -30,7 +30,7 @@ export const parseSeconds = value => {
   return minutes + ':' + (seconds < 10 ? '0' : '') + seconds
 }
 
-const AudioPlayer = ({ isPlayerReady }) => {
+const AudioPlayer = () => {
   const insets = useSafeAreaInsets()
   const {
     persistedState,
@@ -48,48 +48,45 @@ const AudioPlayer = ({ isPlayerReady }) => {
   const { position, duration, bufferedPosition } = useProgress(500)
   const playbackState = usePlaybackState()
 
+  const slideIn = useCallback(() => {
+    Animated.sequence([
+      Animated.timing(opacityAnimatedValue, {
+        toValue: 1,
+        duration: 5,
+        delay: 20,
+        useNativeDriver: false,
+      }),
+      Animated.timing(slideAnimatedValue, {
+        toValue: 1,
+        duration: ANIMATION_DURATION,
+        easing: Easing.in(Easing.ease),
+        useNativeDriver: false,
+      }),
+    ]).start()
+  }, [opacityAnimatedValue, slideAnimatedValue])
+
+  const slideOut = useCallback(() => {
+    Animated.sequence([
+      Animated.timing(slideAnimatedValue, {
+        toValue: 0,
+        duration: ANIMATION_DURATION,
+        easing: Easing.in(Easing.ease),
+        useNativeDriver: false,
+      }),
+      Animated.timing(opacityAnimatedValue, {
+        toValue: 0,
+        duration: 5,
+        useNativeDriver: false,
+      }),
+    ]).start()
+  }, [opacityAnimatedValue, slideAnimatedValue])
+
   // Handles changes in the audio persisted state, sliding the
   // player in when there is an audio object vs sliding it out
   // once the audio object is wiped from persistedState
   // also triggers playback when a new audio object is set to persistedState,
   // which happens via message API.
   useEffect(() => {
-    if (!isPlayerReady) {
-      return
-    }
-
-    const slideIn = () => {
-      Animated.sequence([
-        Animated.timing(opacityAnimatedValue, {
-          toValue: 1,
-          duration: 5,
-          delay: 20,
-          useNativeDriver: false,
-        }),
-        Animated.timing(slideAnimatedValue, {
-          toValue: 1,
-          duration: ANIMATION_DURATION,
-          easing: Easing.in(Easing.ease),
-          useNativeDriver: false,
-        }),
-      ]).start()
-    }
-    const slideOut = () => {
-      Animated.sequence([
-        Animated.timing(slideAnimatedValue, {
-          toValue: 0,
-          duration: ANIMATION_DURATION,
-          easing: Easing.in(Easing.ease),
-          useNativeDriver: false,
-        }),
-        Animated.timing(opacityAnimatedValue, {
-          toValue: 0,
-          duration: 5,
-          useNativeDriver: false,
-        }),
-      ]).start()
-    }
-
     const loadAudio = async () => {
       if (!audio) {
         await TrackPlayer.reset()
@@ -138,8 +135,10 @@ const AudioPlayer = ({ isPlayerReady }) => {
     dispatch,
     duration,
     playbackRate,
-    isPlayerReady,
+    slideIn,
+    slideOut,
   ])
+
   const upsertCurrentMediaProgress = useMemo(() => {
     return throttle(
       (currentAudio, currentTime) => {
@@ -168,9 +167,6 @@ const AudioPlayer = ({ isPlayerReady }) => {
   const isPlaying = playbackState === State.Playing
 
   useEffect(() => {
-    if (!isPlayerReady) {
-      return
-    }
     if (audio && isPlaying && position > 0) {
       if (audio.mediaId) {
         upsertCurrentMediaProgress(audio, position)
@@ -181,7 +177,7 @@ const AudioPlayer = ({ isPlayerReady }) => {
       // prevent call to rewrite audio to persited state with current position
       upsertCurrentMediaProgress.cancel()
     }
-  }, [isPlayerReady, upsertCurrentMediaProgress, audio, isPlaying, position])
+  }, [upsertCurrentMediaProgress, audio, isPlaying, position])
 
   useEffect(() => {
     return () => {
@@ -196,10 +192,6 @@ const AudioPlayer = ({ isPlayerReady }) => {
         pendingUrl: `${FRONTEND_BASE_URL}${audio.sourcePath}`,
       })
     }
-  }
-
-  if (!isPlayerReady) {
-    return null
   }
 
   return (

@@ -37,7 +37,7 @@ const App = () => {
         <ColorContextProvider>
           <StatusBar />
           <Web />
-          <AudioPlayer isPlayerReady={isAudioPlayerReady} />
+          {isAudioPlayerReady && <AudioPlayer />}
         </ColorContextProvider>
       </SafeAreaProvider>
     </GlobalStateProvider>
