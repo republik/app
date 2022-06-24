@@ -98,12 +98,6 @@ export const GlobalStateProvider = ({ children }) => {
     })
   }, [persistedState])
 
-  console.log(
-    'GlobalStateProvider',
-    JSON.stringify(globalState, null, 2),
-    JSON.stringify(persistedState, null, 2),
-  )
-
   const context = {
     error,
     persistedState,

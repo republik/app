@@ -30,11 +30,19 @@ export const parseSeconds = value => {
   return minutes + ':' + (seconds < 10 ? '0' : '') + seconds
 }
 
-const getAudioId = (audio) => {
+const getAudioId = audio => {
   if (!audio) {
     return null
   }
   return audio.mediaId || audio.url
+}
+
+async function getCurrentPlayingTrack() {
+  const currentTrackIndex = await TrackPlayer.getCurrentTrack()
+  if (currentTrackIndex == null) {
+    return null
+  }
+  return await TrackPlayer.getTrack(currentTrackIndex)
 }
 
 const AudioPlayer = () => {
@@ -55,6 +63,7 @@ const AudioPlayer = () => {
   const { position, duration, bufferedPosition } = useProgress(500)
   const playbackState = usePlaybackState()
   const isPlaying = playbackState === State.Playing
+  const audioId = getAudioId(audio)
 
   const slideIn = useCallback(() => {
     Animated.sequence([
@@ -97,23 +106,16 @@ const AudioPlayer = () => {
   useEffect(() => {
     const loadAudio = async () => {
       // Stop the player
-      if (!audio) {
+      if (!audioId) {
+        console.log('Stopping player')
         await TrackPlayer.reset()
         return
       }
       const shouldAutoPlay = getAudioId(autoPlayAudio) === audioId
-      const currentTrack = await TrackPlayer.getCurrentTrack()
-      if (currentTrack === null || currentTrack !== audioId) {
+      const currentTrack = await getCurrentPlayingTrack()
 
       // Load audio if not yet playing or if plying a different track
-      if (currentTrack === null || currentTrack !== audio.mediaId) {
-        console.log(
-          'Loading audio',
-          currentTrack === null,
-          currentTrack !== audio?.mediaId,
-          currentTrack,
-          audio?.mediaId,
-        )
+      if (currentTrack === null || currentTrack?.id !== audioId) {
         await TrackPlayer.reset()
         await TrackPlayer.add({
           id: audioId,
@@ -122,24 +124,22 @@ const AudioPlayer = () => {
           artist: 'Republik',
           artwork: Logo,
         })
-        TrackPlayer.setRate(playbackRate)
+        await TrackPlayer.setRate(playbackRate)
 
         // restart the track at beginning if it was finished in previous session and is initiated again.
         if (audio.currentTime) {
           const seekToTime =
             audio.currentTime >= duration - 5 ? 0 : audio.currentTime
-          TrackPlayer.seekTo(seekToTime)
-          TrackPlayer.setRate(playbackRate)
+          await TrackPlayer.seekTo(seekToTime)
+          await TrackPlayer.setRate(playbackRate)
         }
       }
-
-      if (autoPlayAudio) {
-        console.log('Auto playing audio')
       if (shouldAutoPlay) {
         await TrackPlayer.play()
         setGlobalState({ autoPlayAudio: null })
       }
     }
+
     loadAudio()
   }, [
     audioId,
@@ -152,14 +152,15 @@ const AudioPlayer = () => {
     duration,
     playbackRate,
     isPlaying,
+    audio?.url,
+    audio?.title,
+    audio?.currentTime,
   ])
 
   useEffect(() => {
     if (audio) {
-      console.log('Audio player mounted')
       slideIn()
     } else {
-      console.log('Audio player unmounted')
       slideOut()
       setExpanded(false)
     }
