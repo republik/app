@@ -30,6 +30,13 @@ export const parseSeconds = value => {
   return minutes + ':' + (seconds < 10 ? '0' : '') + seconds
 }
 
+const getAudioId = (audio) => {
+  if (!audio) {
+    return null
+  }
+  return audio.mediaId || audio.url
+}
+
 const AudioPlayer = () => {
   const insets = useSafeAreaInsets()
   const {
@@ -89,16 +96,14 @@ const AudioPlayer = () => {
   // which happens via message API.
   useEffect(() => {
     const loadAudio = async () => {
-      const currentTrack = await TrackPlayer.getCurrentTrack()
-      if (currentTrack === audio?.mediaId && isPlaying) {
-        return
-      }
-
       // Stop the player
       if (!audio) {
         await TrackPlayer.reset()
         return
       }
+      const shouldAutoPlay = getAudioId(autoPlayAudio) === audioId
+      const currentTrack = await TrackPlayer.getCurrentTrack()
+      if (currentTrack === null || currentTrack !== audioId) {
 
       // Load audio if not yet playing or if plying a different track
       if (currentTrack === null || currentTrack !== audio.mediaId) {
@@ -111,7 +116,7 @@ const AudioPlayer = () => {
         )
         await TrackPlayer.reset()
         await TrackPlayer.add({
-          id: audio.mediaId,
+          id: audioId,
           url: audio.url,
           title: audio.title,
           artist: 'Republik',
@@ -130,13 +135,14 @@ const AudioPlayer = () => {
 
       if (autoPlayAudio) {
         console.log('Auto playing audio')
+      if (shouldAutoPlay) {
         await TrackPlayer.play()
-        setGlobalState({ autoPlayAudio: false })
+        setGlobalState({ autoPlayAudio: null })
       }
     }
     loadAudio()
   }, [
-    audio,
+    audioId,
     autoPlayAudio,
     slideAnimatedValue,
     opacityAnimatedValue,

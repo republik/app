@@ -189,10 +189,10 @@ const Web = () => {
     } else if (message.type === 'haptic') {
       ReactNativeHapticFeedback.trigger(message.payload.type)
     } else if (message.type === 'play-audio') {
+      setGlobalState({ autoPlayAudio: message.payload })
       setPersistedState({
         audio: message.payload,
       })
-      setGlobalState({ autoPlayAudio: true })
     } else if (message.type === 'isSignedIn') {
       setPersistedState({ isSignedIn: message.payload })
     } else if (message.type === 'fullscreen-enter') {

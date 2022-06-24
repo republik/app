@@ -50,6 +50,9 @@
         <intent>
             <action android:name="android.intent.action.VIEW" />
             <data android:scheme="https"/>
+            <category android:name="android.intent.category.DEFAULT" />
+            <!-- The BROWSABLE category is required to get links from web pages. -->
+            <category android:name="android.intent.category.BROWSABLE" />
         </intent>
         <intent>
             <action android:name="android.intent.action.SENDTO" />
