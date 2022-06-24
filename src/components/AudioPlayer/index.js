@@ -47,6 +47,7 @@ const AudioPlayer = () => {
   const [expanded, setExpanded] = useState(false)
   const { position, duration, bufferedPosition } = useProgress(500)
   const playbackState = usePlaybackState()
+  const isPlaying = playbackState === State.Playing
 
   const slideIn = useCallback(() => {
     Animated.sequence([
@@ -88,12 +89,26 @@ const AudioPlayer = () => {
   // which happens via message API.
   useEffect(() => {
     const loadAudio = async () => {
+      const currentTrack = await TrackPlayer.getCurrentTrack()
+      if (currentTrack === audio?.mediaId && isPlaying) {
+        return
+      }
+
+      // Stop the player
       if (!audio) {
         await TrackPlayer.reset()
         return
       }
-      const currentTrack = await TrackPlayer.getCurrentTrack()
+
+      // Load audio if not yet playing or if plying a different track
       if (currentTrack === null || currentTrack !== audio.mediaId) {
+        console.log(
+          'Loading audio',
+          currentTrack === null,
+          currentTrack !== audio?.mediaId,
+          currentTrack,
+          audio?.mediaId,
+        )
         await TrackPlayer.reset()
         await TrackPlayer.add({
           id: audio.mediaId,
@@ -103,28 +118,23 @@ const AudioPlayer = () => {
           artwork: Logo,
         })
         TrackPlayer.setRate(playbackRate)
+
+        // restart the track at beginning if it was finished in previous session and is initiated again.
         if (audio.currentTime) {
-          // restart the track at beginning if it was finished in previous session and is initiated again.
           const seekToTime =
             audio.currentTime >= duration - 5 ? 0 : audio.currentTime
           TrackPlayer.seekTo(seekToTime)
           TrackPlayer.setRate(playbackRate)
         }
       }
+
       if (autoPlayAudio) {
+        console.log('Auto playing audio')
         await TrackPlayer.play()
         setGlobalState({ autoPlayAudio: false })
       }
     }
-
-    if (audio) {
-      slideIn()
-      loadAudio()
-    } else {
-      slideOut()
-      setExpanded(false)
-      loadAudio()
-    }
+    loadAudio()
   }, [
     audio,
     autoPlayAudio,
@@ -135,9 +145,19 @@ const AudioPlayer = () => {
     dispatch,
     duration,
     playbackRate,
-    slideIn,
-    slideOut,
+    isPlaying,
   ])
+
+  useEffect(() => {
+    if (audio) {
+      console.log('Audio player mounted')
+      slideIn()
+    } else {
+      console.log('Audio player unmounted')
+      slideOut()
+      setExpanded(false)
+    }
+  }, [audio, slideIn, slideOut, setExpanded])
 
   const upsertCurrentMediaProgress = useMemo(() => {
     return throttle(
@@ -163,8 +183,6 @@ const AudioPlayer = () => {
       { trailing: true },
     )
   }, [dispatch, setPersistedState])
-
-  const isPlaying = playbackState === State.Playing
 
   useEffect(() => {
     if (audio && isPlaying && position > 0) {
