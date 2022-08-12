@@ -182,30 +182,43 @@ const Web = () => {
   const onMessage = e => {
     const message = JSON.parse(e.nativeEvent.data) || {}
     devLog('onMessage', message)
-    if (message.type === 'routeChange') {
-      onNavigationStateChange(message.payload)
-    } else if (message.type === 'share') {
-      share(message.payload)
-    } else if (message.type === 'haptic') {
-      ReactNativeHapticFeedback.trigger(message.payload.type)
-    } else if (message.type === 'play-audio') {
-      setGlobalState({ autoPlayAudio: message.payload })
-      setPersistedState({
-        audio: message.payload,
-      })
-    } else if (message.type === 'isSignedIn') {
-      setPersistedState({ isSignedIn: message.payload })
-    } else if (message.type === 'fullscreen-enter') {
-      setGlobalState({ isFullscreen: true })
-    } else if (message.type === 'fullscreen-exit') {
-      setGlobalState({ isFullscreen: false })
-    } else if (message.type === 'setColorScheme') {
-      setPersistedState({ userSetColorScheme: message.colorSchemeKey })
-    } else if (message.type === 'ackMessage') {
-      dispatch({
-        type: 'clearMessage',
-        id: message.id,
-      })
+    switch (message.type) {
+      case 'routeChange':
+        onNavigationStateChange(message.payload)
+        break
+      case 'share':
+        share(message.payload)
+        break
+      case 'haptic':
+        ReactNativeHapticFeedback.trigger(message.payload.type)
+        break
+      case 'play-audio':
+        setGlobalState({ autoPlayAudio: message.payload })
+        setPersistedState({
+          audio: message.payload,
+        })
+        break
+      case 'isSignedIn':
+        setPersistedState({ isSignedIn: message.payload })
+        break
+      case 'fullscreen-enter':
+        setGlobalState({ isFullscreen: true })
+        break
+      case 'fullscreen-exit':
+        setGlobalState({ isFullscreen: false })
+        break
+      case 'setColorScheme':
+        setPersistedState({ userSetColorScheme: message.colorSchemeKey })
+        break
+      case 'ackMessage':
+        dispatch({
+          type: 'clearMessage',
+          id: message.id,
+        })
+        break
+      default:
+        // TODO: forward to global react-native event-emitter
+        devLog('unhandled onMessage type')
     }
   }
 
@@ -290,7 +303,7 @@ const Web = () => {
             renderError={() => (
               <NetworkError onReload={() => webviewRef.current.reload()} />
             )}
-            originWhitelist={[`${FRONTEND_BASE_URL}*`, `https://*.stripe.com`]}
+            originWhitelist={[`${FRONTEND_BASE_URL}*`, 'https://*.stripe.com']}
             pullToRefreshEnabled={false}
             allowsFullscreenVideo={true}
             allowsInlineMediaPlayback={true}
@@ -307,7 +320,7 @@ const Web = () => {
             onContentProcessDidTerminate={() => {
               setDidCrash(true)
             }}
-            style={{backgroundColor:colors.default}}
+            style={{ backgroundColor: colors.default }}
           />
         </SafeAreaView>
       )}
