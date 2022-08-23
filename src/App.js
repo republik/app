@@ -6,10 +6,10 @@ import AppStateService from './services/AppState'
 import CookieService from './services/Cookies'
 import { ColorContextProvider } from './utils/colors'
 import Web from './screens/Web'
-import AudioPlayer from './components/AudioPlayer'
 import StatusBar from './components/StatusBar'
 import { GlobalStateProvider } from './GlobalState'
 import SetupAudioPlayerSerivce from './components/AudioPlayer/SetupAudioPlayerService'
+import PrimitiveAudioPlayer from './components/AudioPlayer/PirmitiveAudioPlayer'
 
 const App = () => {
   const [isAudioPlayerReady, setIsAudioPlayerReady] = useState(false)
@@ -35,7 +35,7 @@ const App = () => {
         <ColorContextProvider>
           <StatusBar />
           <Web />
-          {isAudioPlayerReady && <AudioPlayer />}
+          {isAudioPlayerReady && <PrimitiveAudioPlayer />}
         </ColorContextProvider>
       </SafeAreaProvider>
     </GlobalStateProvider>

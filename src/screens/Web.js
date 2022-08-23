@@ -16,6 +16,7 @@ import { useGlobalState } from '../GlobalState'
 import NetworkError from './NetworkError'
 import Loader from '../components/Loader'
 import { useColorContext } from '../utils/colors'
+import WebViewEventEmitter from '../lib/WebViewEventEmitter'
 
 // Based on react-native-webview injection for Android
 // https://github.com/react-native-webview/react-native-webview/blob/194c6a2335b12cc05283413c44d0948eb5156e02/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManager.java#L651-L670
@@ -217,8 +218,9 @@ const Web = () => {
         })
         break
       default:
-        // TODO: forward to global react-native event-emitter
-        devLog('unhandled onMessage type')
+        // Forward to an EventEmitter to directly handle the event
+        // in the respective component
+        WebViewEventEmitter.emit(message.type, message.payload)
     }
   }
 
