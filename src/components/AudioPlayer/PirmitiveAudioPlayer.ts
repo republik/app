@@ -1,8 +1,16 @@
-import { useEffect, useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
 import TrackPlayer, { Event, State, usePlaybackState, useTrackPlayerEvents } from "react-native-track-player"
 import { useGlobalState } from "../../GlobalState"
 import Logo from '../../assets/images/playlist-logo.png'
 import WebViewEventEmitter from "../../lib/WebViewEventEmitter"
+
+async function getCurrentPlayingTrack() {
+    const currentTrackIndex = await TrackPlayer.getCurrentTrack()
+    if (currentTrackIndex == null) {
+      return null
+    }
+    return await TrackPlayer.getTrack(currentTrackIndex)
+  }
 
 // Interval in ms to sync track-player state with web-ui.
 const SYNC_AUDIO_STATE_INTERVAL = 500
@@ -20,6 +28,7 @@ const SUBSCRIBED_EVENTS = [
 const PrimitiveAudioPlayer = ({}) => {
     const { dispatch } = useGlobalState()
     const playerState = usePlaybackState()
+    const [isLoading, setIsLoading] = useState(false)
     /**
      * Send all relevant state of the track-player to the web-ui.
      */
@@ -42,7 +51,7 @@ const PrimitiveAudioPlayer = ({}) => {
                 type: "audio:sync",
                 payload: {
                     isPlaying: state === State.Playing,
-                    isLoading: state === State.Buffering,
+                    isLoading: state === State.Buffering || state === State.Connecting,
                     duration,
                     currentTime: position,
                     playRate,
@@ -61,33 +70,55 @@ const PrimitiveAudioPlayer = ({}) => {
     }, [playerState, syncState])
 
     const handlePlay = useMemo(() => async (payload) => {
-        console.log('payload', payload)
-        const { audioSource } = payload;
-        await TrackPlayer.add({
-            id: audioSource.mediaId,
-            url: audioSource.mp3,
-            title: audioSource.title,
-            artist: 'Republik',
-            artwork: Logo,
-          })
-          await TrackPlayer.play()
-          await syncState()
+        try {
+            console.log('payload', payload)
+            const { audioSource } = payload;
+            const currentTrack = await getCurrentPlayingTrack();
+
+            // Load audio if not yet playing or if plying a different track
+            if (currentTrack === null || currentTrack?.id !== audioSource.mediaId) {
+                await TrackPlayer.reset()
+                await TrackPlayer.add({
+                    id: audioSource.mediaId,
+                    url: audioSource.mp3,
+                    title: audioSource.title,
+                    artist: 'Republik',
+                    artwork: Logo,
+                })
+            }
+            await TrackPlayer.play()
+            await syncState()
+        } catch (error) {
+            console.error(error)
+        }
     }, [syncState])
 
     const handlePause = useMemo(() => async () => {
-        await TrackPlayer.pause()
-        await syncState()
+        try {
+            await TrackPlayer.pause()
+            await syncState()
+        } catch (error) {
+            console.error(error)
+        }
     } , [syncState])
 
     const handleStop = useMemo(() => async () => {
-        await TrackPlayer.stop()
-        await syncState()
+        try {
+            await TrackPlayer.reset()
+            await syncState()
+        } catch (error) {
+            console.error(error)
+        }
     }, [syncState])
 
     const handleSeek = useMemo(() => async (payload) => {
-        console.log('seek to', payload)
-        await TrackPlayer.seekTo(payload)
-        await syncState()
+        try {
+            console.log('seek to', payload)
+            await TrackPlayer.seekTo(payload)
+            await syncState()
+        } catch (error) {
+            console.error(error)
+        }
     }, [syncState])
 
     // Handle events from track-player
