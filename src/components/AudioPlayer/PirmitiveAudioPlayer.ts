@@ -1,3 +1,4 @@
+import { AudioEvent } from './AudioEvent';
 import { useEffect, useMemo, useState } from "react"
 import TrackPlayer, { Event, State, usePlaybackState, useTrackPlayerEvents } from "react-native-track-player"
 import { useGlobalState } from "../../GlobalState"
@@ -121,6 +122,35 @@ const PrimitiveAudioPlayer = ({}) => {
         }
     }, [syncState])
 
+    const handleForward = useMemo(() => async () => {
+        try {
+            const position = await TrackPlayer.getPosition()
+            // TODO: adapt to playback rate
+            await handleSeek(position + 30)
+        } catch (error) {
+            console.error(error)
+        }
+    }, [handleSeek])
+
+    const handleBackward = useMemo(() => async () => {
+        try {
+            const position = await TrackPlayer.getPosition()
+            // TODO: adapt to playback rate
+            await handleSeek(position + 30)
+        } catch (error) {
+            console.error(error)
+        }
+    } , [handleSeek])
+
+    const handlePlaybackRate = useMemo(() => async (payload) => {
+        try {
+            await TrackPlayer.setRate(payload)
+            await syncState()
+        } catch (error) {
+            console.error(error)
+        }
+    } , [syncState])
+
     // Handle events from track-player
     useTrackPlayerEvents(SUBSCRIBED_EVENTS, (event) => {
         console.log('events', event)
@@ -128,17 +158,31 @@ const PrimitiveAudioPlayer = ({}) => {
 
     // Handle events from the web-ui.
     useEffect(() => {
-        WebViewEventEmitter.addListener("audio:play", handlePlay)
-        WebViewEventEmitter.addListener("audio:pause", handlePause)
-        WebViewEventEmitter.addListener("audio:stop", handleStop)
-        WebViewEventEmitter.addListener("audio:seek", handleSeek)
+        WebViewEventEmitter.addListener(AudioEvent.PLAY, handlePlay)
+        WebViewEventEmitter.addListener(AudioEvent.PAUSE, handlePause)
+        WebViewEventEmitter.addListener(AudioEvent.STOP, handleStop)
+        WebViewEventEmitter.addListener(AudioEvent.SEEK, handleSeek)
+        WebViewEventEmitter.addListener(AudioEvent.FORWARD, handleForward)
+        WebViewEventEmitter.addListener(AudioEvent.BACKWARD, handleBackward)
+        WebViewEventEmitter.addListener(AudioEvent.PLAYBACK_RATE, handlePlaybackRate)
         return () => {
-            WebViewEventEmitter.removeListener("audio:play", handlePlay)
-            WebViewEventEmitter.removeListener("audio:pause", handlePause)
-            WebViewEventEmitter.removeListener("audio:stop", handleStop)
-            WebViewEventEmitter.removeListener("audio:seek", handleSeek)
+            WebViewEventEmitter.removeListener(AudioEvent.PLAY, handlePlay)
+            WebViewEventEmitter.removeListener(AudioEvent.PAUSE, handlePause)
+            WebViewEventEmitter.removeListener(AudioEvent.STOP, handleStop)
+            WebViewEventEmitter.removeListener(AudioEvent.SEEK, handleSeek)
+            WebViewEventEmitter.removeListener(AudioEvent.FORWARD, handleForward)
+            WebViewEventEmitter.removeListener(AudioEvent.BACKWARD, handleBackward)
+            WebViewEventEmitter.removeListener(AudioEvent.PLAYBACK_RATE, handlePlaybackRate)
         }
-    }, [handlePlay, handlePause, handleStop])
+    }, [
+        handlePlay,
+        handlePause,
+        handleStop,
+        handleSeek,
+        handleForward,
+        handleBackward,
+        handlePlaybackRate
+    ])
 
     return null;
 }
