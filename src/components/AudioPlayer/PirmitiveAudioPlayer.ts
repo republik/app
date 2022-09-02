@@ -69,53 +69,34 @@ const PrimitiveAudioPlayer = ({}) => {
         })
     }, [dispatch])
 
+    /**
+     * Inform web-view to advance audio-queue.
+     */
     const handleQueueAdvance = useMemo(() => async () => {
-        console.log('!!!!!! handleQueueAdvance !!!!!!!!')
         dispatch({ 
             type: "postMessage", 
             content: {
                 type: AudioEvent.QUEUE_ADVANCE,
             } 
         })
-    }, [dispatch])
+        await syncStateWithWebUI()
+    }, [dispatch, syncStateWithWebUI])
 
-    const handlePrepare = useMemo(() => async (payload) => {
-        const { audioSource } = payload;
-        const currentTrack = await getCurrentPlayingTrack();
-        if (currentTrack === null || currentTrack?.id !== audioSource.mediaId) {
-            console.log('resetting track player')
-            await TrackPlayer.reset()
-            await TrackPlayer.add({
-                id: audioSource.mediaId,
-                url: audioSource.mp3,
-                title: audioSource.title,
-                artist: 'Republik',
-                artwork: Logo,
-                duration: audioSource.durationMs / 1000,
-            })
-            TrackPlayer.updateMetadataForTrack
-            await syncStateWithWebUI()
-        }
-    }, [syncStateWithWebUI])
-
-    const handlePlay = useMemo(() => async (payload) => {
+    /**
+     * Play the track that is 
+     */
+    const handlePlay = useMemo(() => async () => {
         try {
-            const { audioSource } = payload;
-            const currentTrack = await getCurrentPlayingTrack();
 
-            // Load audio if not yet playing or if plying a different track
-            if (currentTrack === null || currentTrack?.id !== audioSource.mediaId) {
-                console.log('resetting track player')
-                await TrackPlayer.reset()
-                await TrackPlayer.add({
-                    id: audioSource.mediaId,
-                    url: audioSource.mp3,
-                    title: audioSource.title,
-                    artist: 'Republik',
-                    artwork: Logo,
-                })
-            }
+            const queue = await TrackPlayer.getQueue()
+            console.log('queue', queue)
 
+            await TrackPlayer.play()
+            await syncStateWithWebUI()
+            return
+            
+            // TODO: find a solution to implement the below code-block with queued items
+            /*
             const position = await TrackPlayer.getPosition()
             const duration = await TrackPlayer.getDuration()
             // If audio is has ended and play is executed again, seek to start.
@@ -126,6 +107,7 @@ const PrimitiveAudioPlayer = ({}) => {
 
             await TrackPlayer.play()
             await syncStateWithWebUI()
+            */
         } catch (error) {
             console.error(error)
         }
@@ -140,16 +122,9 @@ const PrimitiveAudioPlayer = ({}) => {
         }
     } , [syncStateWithWebUI])
 
-    const handleResume = useMemo(() => async () => {
-        console.log('!!!!!!!!!! resuming !!!!!!!!!')
-        try {
-            await TrackPlayer.play()
-            await syncStateWithWebUI()
-        } catch (error) {
-            console.error(error)
-        }
-    } , [syncStateWithWebUI])
-
+    /**
+     * Called before the audio-player is visually hidden.
+     */
     const handleStop = useMemo(() => async () => {
         try {
             console.log('resetting track player')
@@ -160,6 +135,9 @@ const PrimitiveAudioPlayer = ({}) => {
         }
     }, [syncStateWithWebUI])
 
+    /**
+     * Seek to a specific position in the audio-player.
+     */
     const handleSeek = useMemo(() => async (payload) => {
         try {
             await TrackPlayer.seekTo(payload)
@@ -169,6 +147,9 @@ const PrimitiveAudioPlayer = ({}) => {
         }
     }, [syncStateWithWebUI])
 
+    /**
+     * Forward the given amount of seconds.
+     */
     const handleForward = useMemo(() => async (payload: number) => {
         try {
             const position = await TrackPlayer.getPosition()
@@ -179,6 +160,9 @@ const PrimitiveAudioPlayer = ({}) => {
         }
     }, [handleSeek])
 
+    /**
+     * Rewind the given amount of seconds.
+     */
     const handleBackward = useMemo(() => async (payload: number) => {
         try {
             const position = await TrackPlayer.getPosition()
@@ -189,6 +173,9 @@ const PrimitiveAudioPlayer = ({}) => {
         }
     } , [handleSeek])
 
+    /**
+     * Set the playback rate.
+     */
     const handlePlaybackRate = useMemo(() => async (payload: number) => {
         try {
             await TrackPlayer.setRate(payload)
@@ -199,33 +186,44 @@ const PrimitiveAudioPlayer = ({}) => {
     } , [syncStateWithWebUI])
 
     /**
-     * Handle the queue being updated.
+     * Handle the received audio-queue items.
      */
     const handleQueueUpdate = useMemo(() => async (payload: AudioQueueItem[]) => {
         try {
             const [inputItem, ...inputQueuedTracks] = payload
-
-            if (inputItem === null) {
+            
+            // If an empty queue was provided, reset the audio-player.
+            if (!inputItem) {
                 await TrackPlayer.reset()
                 return
             }
 
             const inputCurrentTrack = getTrackFromAudioQueueItem(inputItem)
             const currentTrack = await getCurrentPlayingTrack()
+            const playerState = await TrackPlayer.getState()
+            const mustUpdateCurrentTrack = currentTrack?.id !== inputCurrentTrack?.id
 
+            // In case the queue was emtpy before (meaning currentTrack would be null)
+            // or if the first element in the received queue is different from the current track
+            // reset the audio-player and add the first element to the queue
             if (
                 !!inputCurrentTrack &&
                 (
                     currentTrack === null ||
-                    currentTrack?.id !== inputCurrentTrack.id
+                    mustUpdateCurrentTrack
                 )
             ) {
                 console.log('resetting track player')
+                
                 await TrackPlayer.reset()
                 await TrackPlayer.add(inputCurrentTrack)
             }
 
-            if (true) {
+            /**
+             * Remove the everything but the current track from the queue,
+             * and replace it with the new received items.
+             */
+            if (true) { // TODO: check if queue is any different
                 await TrackPlayer.removeUpcomingTracks()
                 inputQueuedTracks.forEach(async (item) => {
                     const track = getTrackFromAudioQueueItem(item)
@@ -235,11 +233,17 @@ const PrimitiveAudioPlayer = ({}) => {
                     }
                 })
             }
+            
             await syncStateWithWebUI()
-            console.log("queue", JSON.stringify({
-                current: await TrackPlayer.getCurrentTrack(),
-                queue: await TrackPlayer.getQueue(),
-            }, null, 2))
+
+            /**
+             * In case the audio-player was playing while receiving this update,
+             * and the current track was changed, call handlePlay.
+             */
+            // in case the first track was changed and the state was playing,
+            if (mustUpdateCurrentTrack && playerState === State.Playing) {
+                await handlePlay()
+            }
         } catch (error) {
             console.error(error)
         }
@@ -250,11 +254,18 @@ const PrimitiveAudioPlayer = ({}) => {
         Event.PlaybackState,
         Event.PlaybackQueueEnded
     ], async (event) => {
-        console.log('trackplayer event', event.type)
         switch (event.type) {
+            /**
+             * Call advance queue when the current track has ended.
+             * To remove it from the queue
+             */
             case Event.PlaybackQueueEnded:
                 await handleQueueAdvance()
                 break
+            /**
+             * If the current track has changed, and a nextTrack is given
+             * remove the track from the queue.
+             */
             case Event.PlaybackTrackChanged:
                 const queue = await TrackPlayer.getQueue()
                 if (event.nextTrack) {
@@ -268,12 +279,13 @@ const PrimitiveAudioPlayer = ({}) => {
                 if (State.Ready === event.state) {
                     await syncStateWithWebUI()
                 }
-
-                    
+                if (State.Stopped === event.state) {
+                    await syncStateWithWebUI()
+                }
                 break;
-                default:
-                    alert('unknown event')
-                    break;
+            default:
+                alert('unknown event')
+                break;
         }
     });
 
@@ -293,15 +305,13 @@ const PrimitiveAudioPlayer = ({}) => {
     }, [playerState, syncStateWithWebUI])
 
     // Handle events from web-ui
-    useWebViewEvent(AudioEvent.PLAY, handlePlay)
-    useWebViewEvent(AudioEvent.PAUSE, handlePause)
-    useWebViewEvent(AudioEvent.RESUME, handleResume)
-    useWebViewEvent(AudioEvent.STOP, handleStop)
-    useWebViewEvent(AudioEvent.SEEK, handleSeek)
+    useWebViewEvent<void>(AudioEvent.PLAY, handlePlay)
+    useWebViewEvent<void>(AudioEvent.PAUSE, handlePause)
+    useWebViewEvent<void>(AudioEvent.STOP, handleStop)
+    useWebViewEvent<void>(AudioEvent.SEEK, handleSeek)
     useWebViewEvent<number>(AudioEvent.FORWARD, handleForward)
     useWebViewEvent<number>(AudioEvent.BACKWARD, handleBackward)
     useWebViewEvent<number>(AudioEvent.PLAYBACK_RATE, handlePlaybackRate)
-    useWebViewEvent(AudioEvent.PREPARE, handlePrepare)
     useWebViewEvent<AudioQueueItem[]>(AudioEvent.QUEUE_UPDATE, handleQueueUpdate)
 
     return null;
