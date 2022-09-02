@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import WebViewEventEmitter from './WebViewEventEmitter';
 
-type EventHandler<E> = (eventData: E) => void;
+type EventHandler<E> = (eventData: E) => Promise<void>;
 
 /**
  * useWebViewEvent allows to subscribe to events emitted by the web-ui.
