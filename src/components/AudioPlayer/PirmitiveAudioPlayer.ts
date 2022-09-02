@@ -4,6 +4,7 @@ import TrackPlayer, { Event, State, usePlaybackState, useTrackPlayerEvents } fro
 import { useGlobalState } from "../../GlobalState"
 import Logo from '../../assets/images/playlist-logo.png'
 import WebViewEventEmitter from "../../lib/WebViewEventEmitter"
+import useWebViewEvent from '../../lib/useWebViewEvent';
 
 async function getCurrentPlayingTrack() {
     const currentTrackIndex = await TrackPlayer.getCurrentTrack()
@@ -33,7 +34,7 @@ const PrimitiveAudioPlayer = ({}) => {
     /**
      * Send all relevant state of the track-player to the web-ui.
      */
-    const syncState = useMemo(() => async () => {
+    const syncStateWithWebUI = useMemo(() => async () => {
         const [
             state,
             duration,
@@ -45,7 +46,6 @@ const PrimitiveAudioPlayer = ({}) => {
             TrackPlayer.getPosition(),
             TrackPlayer.getRate(),
         ])
-
         dispatch({ 
             type: "postMessage", 
             content: {
@@ -65,10 +65,28 @@ const PrimitiveAudioPlayer = ({}) => {
         console.log("PrimitiveAudioPlayer: useEffect", playerState)
         const interval = setInterval(() => {
             console.log('syncing track-player state')
-            syncState()
-        }, SYNC_AUDIO_STATE_INTERVAL);
+            syncStateWithWebUI()
+        }, playerState === State.Playing ? SYNC_AUDIO_STATE_INTERVAL : 2 * SYNC_AUDIO_STATE_INTERVAL);
         return () => clearInterval(interval);
-    }, [playerState, syncState])
+    }, [playerState, syncStateWithWebUI])
+
+    const handlePrepare = useMemo(() => async (payload) => {
+        const { audioSource } = payload;
+        const currentTrack = await getCurrentPlayingTrack();
+        if (currentTrack === null || currentTrack?.id !== audioSource.mediaId) {
+            await TrackPlayer.reset()
+            await TrackPlayer.add({
+                id: audioSource.mediaId,
+                url: audioSource.mp3,
+                title: audioSource.title,
+                artist: 'Republik',
+                artwork: Logo,
+                duration: audioSource.durationMs / 1000,
+            })
+            TrackPlayer.updateMetadataForTrack
+            await syncStateWithWebUI()
+        }
+    }, [syncStateWithWebUI])
 
     const handlePlay = useMemo(() => async (payload) => {
         try {
@@ -88,39 +106,39 @@ const PrimitiveAudioPlayer = ({}) => {
                 })
             }
             await TrackPlayer.play()
-            await syncState()
+            await syncStateWithWebUI()
         } catch (error) {
             console.error(error)
         }
-    }, [syncState])
+    }, [syncStateWithWebUI])
 
     const handlePause = useMemo(() => async () => {
         try {
             await TrackPlayer.pause()
-            await syncState()
+            await syncStateWithWebUI()
         } catch (error) {
             console.error(error)
         }
-    } , [syncState])
+    } , [syncStateWithWebUI])
 
     const handleStop = useMemo(() => async () => {
         try {
             await TrackPlayer.reset()
-            await syncState()
+            await syncStateWithWebUI()
         } catch (error) {
             console.error(error)
         }
-    }, [syncState])
+    }, [syncStateWithWebUI])
 
     const handleSeek = useMemo(() => async (payload) => {
         try {
             console.log('seek to', payload)
             await TrackPlayer.seekTo(payload)
-            await syncState()
+            await syncStateWithWebUI()
         } catch (error) {
             console.error(error)
         }
-    }, [syncState])
+    }, [syncStateWithWebUI])
 
     const handleForward = useMemo(() => async () => {
         try {
@@ -145,44 +163,26 @@ const PrimitiveAudioPlayer = ({}) => {
     const handlePlaybackRate = useMemo(() => async (payload) => {
         try {
             await TrackPlayer.setRate(payload)
-            await syncState()
+            await syncStateWithWebUI()
         } catch (error) {
             console.error(error)
         }
-    } , [syncState])
+    } , [syncStateWithWebUI])
 
     // Handle events from track-player
     useTrackPlayerEvents(SUBSCRIBED_EVENTS, (event) => {
         console.log('events', event)
     })
-
-    // Handle events from the web-ui.
-    useEffect(() => {
-        WebViewEventEmitter.addListener(AudioEvent.PLAY, handlePlay)
-        WebViewEventEmitter.addListener(AudioEvent.PAUSE, handlePause)
-        WebViewEventEmitter.addListener(AudioEvent.STOP, handleStop)
-        WebViewEventEmitter.addListener(AudioEvent.SEEK, handleSeek)
-        WebViewEventEmitter.addListener(AudioEvent.FORWARD, handleForward)
-        WebViewEventEmitter.addListener(AudioEvent.BACKWARD, handleBackward)
-        WebViewEventEmitter.addListener(AudioEvent.PLAYBACK_RATE, handlePlaybackRate)
-        return () => {
-            WebViewEventEmitter.removeListener(AudioEvent.PLAY, handlePlay)
-            WebViewEventEmitter.removeListener(AudioEvent.PAUSE, handlePause)
-            WebViewEventEmitter.removeListener(AudioEvent.STOP, handleStop)
-            WebViewEventEmitter.removeListener(AudioEvent.SEEK, handleSeek)
-            WebViewEventEmitter.removeListener(AudioEvent.FORWARD, handleForward)
-            WebViewEventEmitter.removeListener(AudioEvent.BACKWARD, handleBackward)
-            WebViewEventEmitter.removeListener(AudioEvent.PLAYBACK_RATE, handlePlaybackRate)
-        }
-    }, [
-        handlePlay,
-        handlePause,
-        handleStop,
-        handleSeek,
-        handleForward,
-        handleBackward,
-        handlePlaybackRate
-    ])
+    
+    // Handle events from web-ui
+    useWebViewEvent(AudioEvent.PLAY, handlePlay)
+    useWebViewEvent(AudioEvent.PAUSE, handlePause)
+    useWebViewEvent(AudioEvent.STOP, handleStop)
+    useWebViewEvent(AudioEvent.SEEK, handleSeek)
+    useWebViewEvent(AudioEvent.FORWARD, handleForward)
+    useWebViewEvent(AudioEvent.BACKWARD, handleBackward)
+    useWebViewEvent(AudioEvent.PLAYBACK_RATE, handlePlaybackRate)
+    useWebViewEvent(AudioEvent.PREPARE, handlePrepare)
 
     return null;
 }
