@@ -9,7 +9,7 @@ import Web from './screens/Web'
 import StatusBar from './components/StatusBar'
 import { GlobalStateProvider } from './GlobalState'
 import SetupAudioPlayerSerivce from './components/AudioPlayer/SetupAudioPlayerService'
-import PrimitiveAudioPlayer from './components/AudioPlayer/PirmitiveAudioPlayer'
+import HeadlessAudioPlayer from './components/AudioPlayer/HeadlessAudioPlayer'
 
 const App = () => {
   const [isAudioPlayerReady, setIsAudioPlayerReady] = useState(false)
@@ -35,7 +35,7 @@ const App = () => {
         <ColorContextProvider>
           <StatusBar />
           <Web />
-          {isAudioPlayerReady && <PrimitiveAudioPlayer />}
+          {isAudioPlayerReady && <HeadlessAudioPlayer />}
         </ColorContextProvider>
       </SafeAreaProvider>
     </GlobalStateProvider>

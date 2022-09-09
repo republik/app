@@ -1,7 +1,7 @@
 import { AudioQueueItem } from './types/AudioQueueItem';
 import { AudioEvent } from './AudioEvent';
 import { useEffect, useMemo } from "react"
-import TrackPlayer, { Event, State, Track, usePlaybackState, useTrackPlayerEvents } from "react-native-track-player"
+import TrackPlayer, { Event, PlaybackStateEvent, PlaybackTrackChangedEvent, State, Track, usePlaybackState, useTrackPlayerEvents } from "react-native-track-player"
 import { useGlobalState } from "../../GlobalState"
 import Logo from '../../assets/images/playlist-logo.png'
 import useWebViewEvent from '../../lib/useWebViewEvent';
@@ -54,7 +54,8 @@ const PrimitiveAudioPlayer = ({}) => {
             TrackPlayer.getPosition(),
             TrackPlayer.getRate(),
         ])
-        dispatch({ 
+
+        dispatch({
             type: "postMessage", 
             content: {
                 type: AudioEvent.SYNC,
@@ -82,15 +83,11 @@ const PrimitiveAudioPlayer = ({}) => {
         await syncStateWithWebUI()
     }, [dispatch, syncStateWithWebUI])
 
-    /**
-     * Play the track that is 
-     */
-    const handlePlay = useMemo(() => async () => {
+    const handlePlay = useMemo(() => async (startTime?: number) => {
         try {
-
-            const queue = await TrackPlayer.getQueue()
-            console.log('queue', queue)
-
+            if (startTime) {
+                await TrackPlayer.seekTo(startTime)
+            }
             await TrackPlayer.play()
             await syncStateWithWebUI()
             return
@@ -213,10 +210,15 @@ const PrimitiveAudioPlayer = ({}) => {
                     mustUpdateCurrentTrack
                 )
             ) {
-                console.log('resetting track player')
-                
                 await TrackPlayer.reset()
                 await TrackPlayer.add(inputCurrentTrack)
+                const { userProgress, durationMs } = inputItem.document.meta?.audioSource ?? {}
+                const duration = inputCurrentTrack.duration || (durationMs ? durationMs / 1000 : undefined)
+
+                // Only load the userProgress if given and smaller within 2 seconds of the duration
+                if (userProgress && (!duration || userProgress.secs + 2 < duration)) {
+                    await TrackPlayer.seekTo(userProgress.secs)
+                }
             }
 
             /**
@@ -264,22 +266,23 @@ const PrimitiveAudioPlayer = ({}) => {
                 break
             /**
              * If the current track has changed, and a nextTrack is given
-             * remove the track from the queue.
+             * communicate the queue advance to the webview
              */
             case Event.PlaybackTrackChanged:
-                const queue = await TrackPlayer.getQueue()
-                if (event.nextTrack) {
+                const { nextTrack } = (event as PlaybackTrackChangedEvent)
+                if (nextTrack) {
                     await handleQueueAdvance()
                 }
                 break;
             case Event.PlaybackState:
-                if (State.Paused === event.state) {
+                const state = (event as PlaybackStateEvent).state
+                if (State.Paused === state) {
                     await handlePause()
                 }
-                if (State.Ready === event.state) {
+                if (State.Ready === state) {
                     await syncStateWithWebUI()
                 }
-                if (State.Stopped === event.state) {
+                if (State.Stopped === state) {
                     await syncStateWithWebUI()
                 }
                 break;
@@ -305,7 +308,7 @@ const PrimitiveAudioPlayer = ({}) => {
     }, [playerState, syncStateWithWebUI])
 
     // Handle events from web-ui
-    useWebViewEvent<void>(AudioEvent.PLAY, handlePlay)
+    useWebViewEvent<number|undefined>(AudioEvent.PLAY, handlePlay)
     useWebViewEvent<void>(AudioEvent.PAUSE, handlePause)
     useWebViewEvent<void>(AudioEvent.STOP, handleStop)
     useWebViewEvent<void>(AudioEvent.SEEK, handleSeek)
