@@ -1,4 +1,4 @@
-git_url("git@github.com:orbiting/app-certificates.git")
+git_url("https://github.com/orbiting/app-certificates")
 
 storage_mode("git")
 
