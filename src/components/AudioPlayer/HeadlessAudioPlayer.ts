@@ -254,7 +254,7 @@ const PrimitiveAudioPlayer = ({}) => {
     useTrackPlayerEvents([
         Event.PlaybackTrackChanged,
         Event.PlaybackState,
-        Event.PlaybackQueueEnded
+        Event.PlaybackQueueEnded,
     ], async (event) => {
         switch (event.type) {
             /**
