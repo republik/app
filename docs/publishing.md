@@ -17,6 +17,10 @@ fastlane match development
 
 #### Staging version
 
+Be sure to pass an app-specific password for your Apple ID to the `FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD` environment variable.
+When running the command below.
+To generate a new app-specific password, head over to [appleid.apple.com](appleid.apple.com)
+
 This will use `.env.staging`.
 
 ```sh
