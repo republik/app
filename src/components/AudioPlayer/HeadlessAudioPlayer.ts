@@ -38,6 +38,16 @@ function getTrackFromAudioQueueItem(item: AudioQueueItem): Track | null {
 const PrimitiveAudioPlayer = ({}) => {
     const { dispatch } = useGlobalState()
     const playerState = usePlaybackState()
+
+    const handleError = (error: Error) => {
+        dispatch({
+            type: "postMessage", 
+            content: {
+                type: AudioEvent.ERROR,
+                payload: JSON.stringify(error, Object.getOwnPropertyNames(error), 2),
+            } 
+        })
+    }
     
     /**
      * Send all relevant state of the track-player to the web-ui.
@@ -106,7 +116,7 @@ const PrimitiveAudioPlayer = ({}) => {
             await syncStateWithWebUI()
             */
         } catch (error) {
-            console.error(error)
+            handleError(error)
         }
     }, [syncStateWithWebUI])
 
@@ -115,7 +125,7 @@ const PrimitiveAudioPlayer = ({}) => {
             await TrackPlayer.pause()
             await syncStateWithWebUI()
         } catch (error) {
-            console.error(error)
+            handleError(error)
         }
     } , [syncStateWithWebUI])
 
@@ -128,7 +138,7 @@ const PrimitiveAudioPlayer = ({}) => {
             await TrackPlayer.reset()
             await syncStateWithWebUI()
         } catch (error) {
-            console.error(error)
+            handleError(error)
         }
     }, [syncStateWithWebUI])
 
@@ -140,7 +150,7 @@ const PrimitiveAudioPlayer = ({}) => {
             await TrackPlayer.seekTo(payload)
             await syncStateWithWebUI()
         } catch (error) {
-            console.error(error)
+            handleError(error)
         }
     }, [syncStateWithWebUI])
 
@@ -153,7 +163,7 @@ const PrimitiveAudioPlayer = ({}) => {
             // TODO: adapt to playback rate?
             await handleSeek(position + payload)
         } catch (error) {
-            console.error(error)
+            handleError(error)
         }
     }, [handleSeek])
 
@@ -166,7 +176,7 @@ const PrimitiveAudioPlayer = ({}) => {
             // TODO: adapt to playback rate?
             await handleSeek(position - payload)
         } catch (error) {
-            console.error(error)
+            handleError(error)
         }
     } , [handleSeek])
 
@@ -178,7 +188,7 @@ const PrimitiveAudioPlayer = ({}) => {
             await TrackPlayer.setRate(payload)
             await syncStateWithWebUI()
         } catch (error) {
-            console.error(error)
+            handleError(error)
         }
     } , [syncStateWithWebUI])
 
@@ -247,7 +257,7 @@ const PrimitiveAudioPlayer = ({}) => {
                 await handlePlay()
             }
         } catch (error) {
-            console.error(error)
+            handleError(error)
         }
     } , [syncStateWithWebUI])
 
