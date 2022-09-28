@@ -39,7 +39,7 @@
     "react-native-swift": "^1.2.3",
     "react-native-track-player": "^3.2.0",
     "react-native-vector-icons": "^7.1.0",
-    "react-native-webview": "^11.18.1",
+    "react-native-webview": "^11.23.1",
     "url": "^0.11.0",
     "uuid": "^8.3.1",
     "yarn": "^1.22.10"
