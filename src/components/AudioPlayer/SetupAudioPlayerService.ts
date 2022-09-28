@@ -14,8 +14,8 @@ const SetupAudioPlayerService = async () => {
       backBuffer: 30,
     })
     await TrackPlayer.updateOptions({
-      stopWithApp: true,
-      jumpInterval: 15,
+      forwardJumpInterval: 30,
+      backwardJumpInterval: 10,
       capabilities: [
         Capability.Play,
         Capability.Pause,
