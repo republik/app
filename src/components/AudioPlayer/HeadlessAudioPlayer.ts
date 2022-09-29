@@ -64,15 +64,13 @@ const PrimitiveAudioPlayer = ({}) => {
             TrackPlayer.getPosition(),
             TrackPlayer.getRate(),
         ])
-
+        
         dispatch({
             type: "postMessage", 
             content: {
                 type: AudioEvent.SYNC,
                 payload: {
                     playerState: state,
-                    isPlaying: state === State.Playing,
-                    isLoading: state === State.Buffering || state === State.Connecting,
                     duration,
                     currentTime: position,
                     playRate: Math.round(playRate * 100) / 100,
@@ -236,19 +234,17 @@ const PrimitiveAudioPlayer = ({}) => {
             }
 
             /**
-             * Remove the everything but the current track from the queue,
+             * Remove everything but the current track from the queue,
              * and replace it with the new received items.
              */
-            if (true) { // TODO: check if queue is any different
-                await TrackPlayer.removeUpcomingTracks()
-                inputQueuedTracks.forEach(async (item) => {
-                    const track = getTrackFromAudioQueueItem(item)
-                    // TODO: handle null track
-                    if (track) {
-                        await TrackPlayer.add(track) 
-                    }
-                })
-            }
+            await TrackPlayer.removeUpcomingTracks()
+            inputQueuedTracks.forEach(async (item) => {
+                const track = getTrackFromAudioQueueItem(item)
+                // TODO: handle null track
+                if (track) {
+                    await TrackPlayer.add(track) 
+                }
+            })
             
             await syncStateWithWebUI()
 
