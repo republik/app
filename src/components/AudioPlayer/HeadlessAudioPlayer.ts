@@ -70,6 +70,7 @@ const PrimitiveAudioPlayer = ({}) => {
             content: {
                 type: AudioEvent.SYNC,
                 payload: {
+                    playerState: state,
                     isPlaying: state === State.Playing,
                     isLoading: state === State.Buffering || state === State.Connecting,
                     duration,
@@ -224,9 +225,12 @@ const PrimitiveAudioPlayer = ({}) => {
                 await TrackPlayer.add(inputCurrentTrack)
                 const { userProgress, durationMs } = inputItem.document.meta?.audioSource ?? {}
                 const duration = inputCurrentTrack.duration || (durationMs ? durationMs / 1000 : undefined)
-
+                
+                // TODO: find out why sometimes seekTo is set, but current-time returns in first sync is 0 anyways.
+                
                 // Only load the userProgress if given and smaller within 2 seconds of the duration
                 if (userProgress && (!duration || userProgress.secs + 2 < duration)) {
+                    console.log("Attempt to seek intial userProgress", userProgress.secs)
                     await TrackPlayer.seekTo(userProgress.secs)
                 }
             }
@@ -303,11 +307,12 @@ const PrimitiveAudioPlayer = ({}) => {
     });
 
     useEffect(() => {
+        // Only sync in an interval if the underlying player state is playing
         if (
-            playerState === State.None || 
-            playerState === State.Stopped ||
-            playerState === State.Paused ||
-            playerState === State.Ready
+            ![
+                State.Buffering,
+                State.Playing,
+            ].includes(playerState)
         ) {
             return
         }

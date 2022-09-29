@@ -1,4 +1,4 @@
-import TrackPlayer, { Capability, RepeatMode } from 'react-native-track-player'
+import TrackPlayer, { AppKilledPlaybackBehavior, Capability, RepeatMode } from 'react-native-track-player'
 
 /**
  * Setup the AudioPlayer with all the necessary configuration.
@@ -23,7 +23,13 @@ const SetupAudioPlayerService = async () => {
         Capability.JumpBackward,
         Capability.SeekTo,
       ],
-      compactCapabilities: [Capability.Play, Capability.Pause],
+      compactCapabilities: [
+        Capability.Play,
+        Capability.Pause
+      ],
+      android: {
+         appKilledPlaybackBehavior: AppKilledPlaybackBehavior.ContinuePlayback
+        },
     })
     await TrackPlayer.setRepeatMode(RepeatMode.Off)
     isSetup = true
