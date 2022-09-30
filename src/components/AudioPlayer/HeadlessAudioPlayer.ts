@@ -264,6 +264,7 @@ const PrimitiveAudioPlayer = ({}) => {
     useTrackPlayerEvents([
         Event.PlaybackTrackChanged,
         Event.PlaybackState,
+        Event.RemoteNext,
         Event.PlaybackQueueEnded,
     ], async (event) => {
         switch (event.type) {
@@ -296,8 +297,11 @@ const PrimitiveAudioPlayer = ({}) => {
                     await syncStateWithWebUI()
                 }
                 break;
+            case Event.RemoteNext:
+                await handleQueueAdvance()
+                break
             default:
-                alert('unknown event')
+                console.error('unhandled track-player event')
                 break;
         }
     });
