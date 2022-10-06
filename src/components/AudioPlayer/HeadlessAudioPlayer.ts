@@ -1,6 +1,6 @@
 import { AudioQueueItem } from './types/AudioQueueItem';
 import { AudioEvent } from './AudioEvent';
-import { useEffect, useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
 import TrackPlayer, { Event, PlaybackStateEvent, PlaybackTrackChangedEvent, State, Track, usePlaybackState, useTrackPlayerEvents } from "react-native-track-player"
 import { useGlobalState } from "../../GlobalState"
 import Logo from '../../assets/images/playlist-logo.png'
@@ -38,6 +38,11 @@ function getTrackFromAudioQueueItem(item: AudioQueueItem): Track | null {
 const PrimitiveAudioPlayer = ({}) => {
     const { dispatch } = useGlobalState()
     const playerState = usePlaybackState()
+    const [trackedQueue, setTrackedQueue] = useState<AudioQueueItem[]>([])
+    /**
+     * The active state decides wheter the player has initialized the queue or not.
+     */
+    const [isQueueInitialized, setIsQueueInitialized] = useState(false)
 
     const handleError = (error: Error) => {
         dispatch({
@@ -94,6 +99,13 @@ const PrimitiveAudioPlayer = ({}) => {
 
     const handlePlay = useMemo(() => async (startTime?: number) => {
         try {
+            if (!isQueueInitialized) {
+                if (trackedQueue && trackedQueue.length > 0) {
+                    await handleQueueUpdate(trackedQueue)
+                }
+                setIsQueueInitialized(true)
+            }
+
             if (startTime) {
                 await TrackPlayer.seekTo(startTime)
             }
@@ -134,8 +146,10 @@ const PrimitiveAudioPlayer = ({}) => {
     const handleStop = useMemo(() => async () => {
         try {
             console.log('resetting track player')
+            setIsQueueInitialized(false)
             await TrackPlayer.reset()
             await syncStateWithWebUI()
+            
         } catch (error) {
             handleError(error)
         }
@@ -256,8 +270,10 @@ const PrimitiveAudioPlayer = ({}) => {
             if (mustUpdateCurrentTrack && playerState === State.Playing) {
                 await handlePlay()
             }
+            return Promise.resolve()
         } catch (error) {
             handleError(error)
+            return Promise.reject(error)
         }
     } , [syncStateWithWebUI])
 
@@ -330,7 +346,16 @@ const PrimitiveAudioPlayer = ({}) => {
     useWebViewEvent<number>(AudioEvent.FORWARD, handleForward)
     useWebViewEvent<number>(AudioEvent.BACKWARD, handleBackward)
     useWebViewEvent<number>(AudioEvent.PLAYBACK_RATE, handlePlaybackRate)
-    useWebViewEvent<AudioQueueItem[]>(AudioEvent.QUEUE_UPDATE, handleQueueUpdate)
+    useWebViewEvent<AudioQueueItem[]>(
+        AudioEvent.QUEUE_UPDATE, 
+        async (queue: AudioQueueItem[]) => {
+            setTrackedQueue(queue)
+            if (isQueueInitialized) {
+                return handleQueueUpdate(queue)
+            }
+            return Promise.resolve()
+        }
+    )
 
     return null;
 }
