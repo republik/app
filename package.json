@@ -23,7 +23,6 @@
     "@react-native-async-storage/async-storage": "^1.17.10",
     "@react-native-cookies/cookies": "^6.1.0",
     "events": "^3.3.0",
-    "lodash": "^4.17.20",
     "react": "17.0.2",
     "react-native": "0.68.3",
     "react-native-config": "^1.4.6",
@@ -35,14 +34,10 @@
     "react-native-safe-area-context": "4.1.4",
     "react-native-splash-screen": "^3.2.0",
     "react-native-status-bar-height": "^2.6.0",
-    "react-native-svg": "^12.3.0",
-    "react-native-swift": "^1.2.3",
     "react-native-track-player": "^3.2.0",
-    "react-native-vector-icons": "^7.1.0",
     "react-native-webview": "^11.23.1",
     "url": "^0.11.0",
-    "uuid": "^8.3.1",
-    "yarn": "^1.22.10"
+    "uuid": "^8.3.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
