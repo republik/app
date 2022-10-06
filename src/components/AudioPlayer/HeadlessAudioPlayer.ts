@@ -1,6 +1,6 @@
 import { AudioQueueItem } from './types/AudioQueueItem';
 import { AudioEvent } from './AudioEvent';
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import TrackPlayer, { Event, PlaybackStateEvent, PlaybackTrackChangedEvent, State, Track, usePlaybackState, useTrackPlayerEvents } from "react-native-track-player"
 import { useGlobalState } from "../../GlobalState"
 import Logo from '../../assets/images/playlist-logo.png'
@@ -57,7 +57,7 @@ const PrimitiveAudioPlayer = ({}) => {
     /**
      * Send all relevant state of the track-player to the web-ui.
      */
-    const syncStateWithWebUI = useMemo(() => async () => {
+    const syncStateWithWebUI = useCallback(async () => {
         const [
             state,
             duration,
@@ -87,7 +87,7 @@ const PrimitiveAudioPlayer = ({}) => {
     /**
      * Inform web-view to advance audio-queue.
      */
-    const handleQueueAdvance = useMemo(() => async () => {
+    const handleQueueAdvance = useCallback(() => async () => {
         dispatch({ 
             type: "postMessage", 
             content: {
@@ -97,7 +97,7 @@ const PrimitiveAudioPlayer = ({}) => {
         await syncStateWithWebUI()
     }, [dispatch, syncStateWithWebUI])
 
-    const handlePlay = useMemo(() => async (startTime?: number) => {
+    const handlePlay = useCallback(async (startTime?: number) => {
         try {
             if (!isQueueInitialized) {
                 if (trackedQueue && trackedQueue.length > 0) {
@@ -129,21 +129,21 @@ const PrimitiveAudioPlayer = ({}) => {
         } catch (error) {
             handleError(error)
         }
-    }, [syncStateWithWebUI])
+    }, [syncStateWithWebUI, isQueueInitialized, trackedQueue])
 
-    const handlePause = useMemo(() => async () => {
+    const handlePause = useCallback(async () => {
         try {
             await TrackPlayer.pause()
             await syncStateWithWebUI()
         } catch (error) {
             handleError(error)
         }
-    } , [syncStateWithWebUI])
+    } , [syncStateWithWebUI, handleError])
 
     /**
      * Called before the audio-player is visually hidden.
      */
-    const handleStop = useMemo(() => async () => {
+    const handleStop = useCallback(async () => {
         try {
             console.log('resetting track player')
             setIsQueueInitialized(false)
@@ -158,7 +158,7 @@ const PrimitiveAudioPlayer = ({}) => {
     /**
      * Seek to a specific position in the audio-player.
      */
-    const handleSeek = useMemo(() => async (payload) => {
+    const handleSeek = useCallback(async (payload) => {
         try {
             await TrackPlayer.seekTo(payload)
             await syncStateWithWebUI()
@@ -170,7 +170,7 @@ const PrimitiveAudioPlayer = ({}) => {
     /**
      * Forward the given amount of seconds.
      */
-    const handleForward = useMemo(() => async (payload: number) => {
+    const handleForward = useCallback(async (payload: number) => {
         try {
             const position = await TrackPlayer.getPosition()
             // TODO: adapt to playback rate?
@@ -183,7 +183,7 @@ const PrimitiveAudioPlayer = ({}) => {
     /**
      * Rewind the given amount of seconds.
      */
-    const handleBackward = useMemo(() => async (payload: number) => {
+    const handleBackward = useCallback(async (payload: number) => {
         try {
             const position = await TrackPlayer.getPosition()
             // TODO: adapt to playback rate?
@@ -196,7 +196,7 @@ const PrimitiveAudioPlayer = ({}) => {
     /**
      * Set the playback rate.
      */
-    const handlePlaybackRate = useMemo(() => async (payload: number) => {
+    const handlePlaybackRate = useCallback(async (payload: number) => {
         try {
             await TrackPlayer.setRate(payload)
             await syncStateWithWebUI()
@@ -208,7 +208,7 @@ const PrimitiveAudioPlayer = ({}) => {
     /**
      * Handle the received audio-queue items.
      */
-    const handleQueueUpdate = useMemo(() => async (payload: AudioQueueItem[]) => {
+    const handleQueueUpdate = useCallback(async (payload: AudioQueueItem[]) => {
         try {
             const [inputItem, ...inputQueuedTracks] = payload
             
