@@ -1,20 +1,36 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import WebViewEventEmitter from './WebViewEventEmitter';
 
-type EventHandler<E> = (eventData: E) => Promise<void>;
+type EventHandler<E> = (eventData: E) => Promise<void> | void;
 
 /**
  * useWebViewEvent allows to subscribe to events emitted by the web-ui.
  * @param eventName The name of the event to subscribe to.
- * @param handler The handler to call when the event is emitted.
+ * @param callback The handler to call when the event is emitted.
  */
-function useWebViewEvent<E = Event>(eventName: string, handler: EventHandler<E>) {
+function useWebViewEvent<E = Event>(
+  eventName: string, 
+  callback: EventHandler<E>
+) {
+  const savedCallback = useRef<EventHandler<E>>(() => Promise.resolve());
+
   useEffect(() => {
-    WebViewEventEmitter.addListener(eventName, handler)
-    return () => {
-        WebViewEventEmitter.removeListener(eventName, handler)
+    savedCallback.current = callback;
+  })
+
+  useEffect(() => {
+    const wrappedHandler = (eventData: E) => {
+      console.log('useWebViewEvent: received', eventName, eventData);
+      return savedCallback?.current(eventData);
     }
-  }, [eventName, handler])
+
+    console.log('useWebViewEvent: registering handler for', eventName);
+    WebViewEventEmitter.addListener(eventName, wrappedHandler)
+    return () => {
+      console.log('useWebViewEvent: Removing event handler for', eventName);
+      WebViewEventEmitter.removeListener(eventName, wrappedHandler)
+    }
+  }, [eventName])
 }
 
 export default useWebViewEvent
