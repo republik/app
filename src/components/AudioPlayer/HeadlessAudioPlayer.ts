@@ -87,7 +87,7 @@ const PrimitiveAudioPlayer = ({}) => {
     /**
      * Inform web-view to advance audio-queue.
      */
-    const handleQueueAdvance = useCallback(() => async () => {
+    const handleQueueAdvance = useCallback(async () => {
         dispatch({ 
             type: "postMessage", 
             content: {
