@@ -29,7 +29,7 @@ const SetupAudioPlayerService = async () => {
         Capability.Pause
       ],
       android: {
-         appKilledPlaybackBehavior: AppKilledPlaybackBehavior.ContinuePlayback
+         appKilledPlaybackBehavior: AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification
         },
     })
     await TrackPlayer.setRepeatMode(RepeatMode.Off)
