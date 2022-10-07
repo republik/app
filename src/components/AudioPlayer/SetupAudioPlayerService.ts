@@ -1,4 +1,4 @@
-import TrackPlayer, { AppKilledPlaybackBehavior, Capability, RepeatMode } from 'react-native-track-player'
+import TrackPlayer, { AppKilledPlaybackBehavior, Capability, IOSCategory, IOSCategoryMode, IOSCategoryOptions, RepeatMode } from 'react-native-track-player'
 
 /**
  * Setup the AudioPlayer with all the necessary configuration.
@@ -12,6 +12,8 @@ const SetupAudioPlayerService = async () => {
   } catch (err) {
     await TrackPlayer.setupPlayer({
       backBuffer: 30,
+      iosCategory: IOSCategory.Playback,
+      iosCategoryMode: IOSCategoryMode.SpokenAudio,
     })
     await TrackPlayer.updateOptions({
       forwardJumpInterval: 30,
@@ -29,8 +31,8 @@ const SetupAudioPlayerService = async () => {
         Capability.Pause
       ],
       android: {
-         appKilledPlaybackBehavior: AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification
-        },
+        appKilledPlaybackBehavior: AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification
+      },
     })
     await TrackPlayer.setRepeatMode(RepeatMode.Off)
     isSetup = true
