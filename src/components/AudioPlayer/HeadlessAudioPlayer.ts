@@ -189,7 +189,6 @@ const PrimitiveAudioPlayer = ({}) => {
     const handleBackward = useCallback(async (payload: number) => {
         try {
             const position = await TrackPlayer.getPosition()
-            // TODO: adapt to playback rate?
             await handleSeek(position - payload)
         } catch (error) {
             handleError(error)
