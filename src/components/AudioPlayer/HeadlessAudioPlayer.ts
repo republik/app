@@ -116,19 +116,6 @@ const PrimitiveAudioPlayer = ({}) => {
             await syncStateWithWebUI()
             return
             
-            // TODO: find a solution to implement the below code-block with queued items
-            /*
-            const position = await TrackPlayer.getPosition()
-            const duration = await TrackPlayer.getDuration()
-            // If audio is has ended and play is executed again, seek to start.
-            // restart from the beginning
-            if (Math.floor(position) === Math.floor(duration)) {
-                await TrackPlayer.seekTo(0)
-            }
-
-            await TrackPlayer.play()
-            await syncStateWithWebUI()
-            */
         } catch (error) {
             handleError(error)
         }
