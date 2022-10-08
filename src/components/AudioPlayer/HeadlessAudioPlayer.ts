@@ -62,7 +62,7 @@ const PrimitiveAudioPlayer = ({}) => {
             state,
             duration,
             position,
-            playRate,
+            playbackRate,
         ] = await Promise.all([
             TrackPlayer.getState(),
             TrackPlayer.getDuration(),
@@ -78,7 +78,7 @@ const PrimitiveAudioPlayer = ({}) => {
                     playerState: state,
                     duration,
                     currentTime: position,
-                    playRate: Math.round(playRate * 100) / 100,
+                    playbackRate: Math.round(playbackRate * 100) / 100,
                 }
             } 
         })
@@ -233,6 +233,7 @@ const PrimitiveAudioPlayer = ({}) => {
                     mustUpdateCurrentTrack
                 )
             ) {
+                console.log("QueueUpdate", "teardown head")
                 await TrackPlayer.reset()
                 await TrackPlayer.add(inputCurrentTrack)
                 const { userProgress, durationMs } = inputItem.document.meta?.audioSource ?? {}
@@ -242,7 +243,7 @@ const PrimitiveAudioPlayer = ({}) => {
                 
                 // Only load the userProgress if given and smaller within 2 seconds of the duration
                 if (userProgress && (!duration || userProgress.secs + 2 < duration)) {
-                    console.log("Attempt to seek intial userProgress", userProgress.secs)
+                    console.log("QueueUpdate", "seek to", userProgress.secs)
                     await TrackPlayer.seekTo(userProgress.secs)
                 }
             }
@@ -251,6 +252,7 @@ const PrimitiveAudioPlayer = ({}) => {
              * Remove everything but the current track from the queue,
              * and replace it with the new received items.
              */
+            console.log("QueueUpdate", "teardown tail")
             await TrackPlayer.removeUpcomingTracks()
             inputQueuedTracks.forEach(async (item) => {
                 const track = getTrackFromAudioQueueItem(item)
@@ -289,6 +291,7 @@ const PrimitiveAudioPlayer = ({}) => {
              * To remove it from the queue
              */
             case Event.PlaybackQueueEnded:
+                alert('PlaybackQueueEnded')
                 await handleQueueAdvance()
                 break
             /**
@@ -296,9 +299,13 @@ const PrimitiveAudioPlayer = ({}) => {
              * communicate the queue advance to the webview
              */
             case Event.PlaybackTrackChanged:
-                const { nextTrack } = (event as PlaybackTrackChangedEvent)
-                if (nextTrack) {
+                const { nextTrack, ...rest } = (event as PlaybackTrackChangedEvent)
+                console.log('PlaybackTrackChanged', nextTrack, rest)
+                if (nextTrack && nextTrack !== 0) {
+                    console.log('PlaybackTrackChanged: nextTrack', nextTrack)
                     await handleQueueAdvance()
+                } else {
+                    console.log('PlaybackTrackChanged: nextTrack is 0')
                 }
                 break;
             case Event.PlaybackState:
