@@ -25,7 +25,7 @@ function getTrackFromAudioQueueItem(item: AudioQueueItem): Track | null {
     }
     const track: Track = {
         id: audioSource.mediaId,
-        audiQueueId: item.id,
+        itemId: item.id,
         url: audioSource.mp3,
         title,
         artist: 'Republik',
@@ -59,11 +59,13 @@ const PrimitiveAudioPlayer = ({}) => {
      */
     const syncStateWithWebUI = useCallback(async () => {
         const [
+            track,
             state,
             duration,
             position,
             playbackRate,
         ] = await Promise.all([
+            getCurrentPlayingTrack(),
             TrackPlayer.getState(),
             TrackPlayer.getDuration(),
             TrackPlayer.getPosition(),
@@ -75,6 +77,7 @@ const PrimitiveAudioPlayer = ({}) => {
             content: {
                 type: AudioEvent.SYNC,
                 payload: {
+                    itemId: track?.itemId,
                     playerState: state,
                     duration,
                     currentTime: position,
