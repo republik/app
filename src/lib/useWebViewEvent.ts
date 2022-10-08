@@ -12,7 +12,7 @@ function useWebViewEvent<E = Event>(
   eventName: string, 
   callback: EventHandler<E>
 ) {
-  const savedCallback = useRef<EventHandler<E>>(() => Promise.resolve());
+  const savedCallback = useRef<EventHandler<E>>(callback);
 
   useEffect(() => {
     savedCallback.current = callback;
