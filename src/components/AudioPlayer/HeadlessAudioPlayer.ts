@@ -291,7 +291,6 @@ const PrimitiveAudioPlayer = ({}) => {
              * To remove it from the queue
              */
             case Event.PlaybackQueueEnded:
-                alert('PlaybackQueueEnded')
                 await handleQueueAdvance()
                 break
             /**
