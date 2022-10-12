@@ -31,6 +31,7 @@ function getTrackFromAudioQueueItem(item: AudioQueueItem): Track | null {
         artist: 'Republik',
         artwork: image ?? Logo,
         duration: audioSource.durationMs / 1000,
+        initialTime: audioSource?.userProgress?.secs || 0
     }
     return track
 }
@@ -100,22 +101,35 @@ const PrimitiveAudioPlayer = ({}) => {
         await syncStateWithWebUI()
     }, [dispatch, syncStateWithWebUI])
 
-    const handlePlay = useCallback(async (startTime?: number) => {
+    /**
+     * Handle play event. If the queue was not initialized yet, initialize it.
+     * After the initialization, the track will seek its initialTime if given.
+     * @param initialTime to seek to when playing
+     */
+    const handlePlay = useCallback(async (initialTime?: number) => {
         try {
+            // Initialize the queue lazily once the first time the player is started.
             if (!isQueueInitialized) {
                 if (trackedQueue && trackedQueue.length > 0) {
                     await handleQueueUpdate(trackedQueue)
                 }
                 setIsQueueInitialized(true)
+
+                // Seek the intialTime for the first item in the queue.
+                // For all subsequent items, the initialTime is seeked in the PlaybackTrackChangedEvent handler.
+                const firstTrack = await getCurrentPlayingTrack()
+                if (firstTrack?.initialTime) {
+                    initialTime = firstTrack.initialTime
+                }
             }
 
-            if (startTime) {
-                await TrackPlayer.seekTo(startTime)
+            if (initialTime) {
+                await TrackPlayer.skip(0, initialTime)
             }
+
             await TrackPlayer.play()
             await syncStateWithWebUI()
             return
-            
         } catch (error) {
             handleError(error)
         }
@@ -290,10 +304,7 @@ const PrimitiveAudioPlayer = ({}) => {
                 const { nextTrack, ...rest } = (event as PlaybackTrackChangedEvent)
                 console.log('PlaybackTrackChanged', nextTrack, rest)
                 if (nextTrack && nextTrack !== 0) {
-                    console.log('PlaybackTrackChanged: nextTrack', nextTrack)
                     await handleQueueAdvance()
-                } else {
-                    console.log('PlaybackTrackChanged: nextTrack is 0')
                 }
                 break;
             case Event.PlaybackState:
