@@ -229,19 +229,8 @@ const HeadlessAudioPlayer = ({}) => {
                     mustUpdateCurrentTrack
                 )
             ) {
-                console.log("QueueUpdate", "teardown head")
                 await TrackPlayer.reset()
                 await TrackPlayer.add(inputCurrentTrack)
-                const { userProgress, durationMs } = inputItem.document.meta?.audioSource ?? {}
-                const duration = inputCurrentTrack.duration || (durationMs ? durationMs / 1000 : undefined)
-                
-                // TODO: find out why sometimes seekTo is set, but current-time returns in first sync is 0 anyways.
-                
-                // Only load the userProgress if given and smaller within 2 seconds of the duration
-                if (userProgress && (!duration || userProgress.secs + 2 < duration)) {
-                    console.log("QueueUpdate", "seek to", userProgress.secs)
-                    await TrackPlayer.seekTo(userProgress.secs)
-                }
             }
 
             /**
@@ -277,7 +266,6 @@ const HeadlessAudioPlayer = ({}) => {
 
     useTrackPlayerEvents([
         Event.PlaybackTrackChanged,
-        Event.PlaybackState,
         Event.RemoteNext,
         Event.PlaybackQueueEnded,
     ], async (event) => {
@@ -295,16 +283,9 @@ const HeadlessAudioPlayer = ({}) => {
              */
             case Event.PlaybackTrackChanged:
                 const { nextTrack, ...rest } = (event as PlaybackTrackChangedEvent)
-                console.log('PlaybackTrackChanged', nextTrack, rest)
                 if (nextTrack && nextTrack !== 0) {
                     await handleQueueAdvance()
                     syncStateWithWebUI()
-                }
-                break;
-            case Event.PlaybackState:
-                const state = (event as PlaybackStateEvent).state
-                if (State.Paused === state) {
-                    await handlePause()
                 }
                 break;
             case Event.RemoteNext:
