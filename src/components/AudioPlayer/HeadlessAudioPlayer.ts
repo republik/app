@@ -7,6 +7,7 @@ import Logo from '../../assets/images/playlist-logo.png'
 import useWebViewEvent from '../../lib/useWebViewEvent';
 import useInterval from '../../lib/useInterval';
 import useWebViewHandlers from './hooks/useWebViewHandlers';
+import useCurrentTrack from './hooks/useCurrentTrack';
 
 async function getCurrentPlayingTrack() {
     const currentTrackIndex = await TrackPlayer.getCurrentTrack()
@@ -17,7 +18,8 @@ async function getCurrentPlayingTrack() {
   }
 
 // Interval in ms to sync track-player state with web-ui.
-const SYNC_AUDIO_STATE_INTERVAL = 500
+const SYNC_INTERVAL_WHILE_PLAYING = 500
+const SYNC_INTERVAL_WHILE_CONNECTING = 1000
 
 function getTrackFromAudioQueueItem(item: AudioQueueItem): Track | null {
     const { meta } = item.document
@@ -45,11 +47,13 @@ function getTrackFromAudioQueueItem(item: AudioQueueItem): Track | null {
 const HeadlessAudioPlayer = ({}) => {
     const playerState = usePlaybackState()
     const [trackedQueue, setTrackedQueue] = useState<AudioQueueItem[]>([])
+    const currentTrackIndex = useCurrentTrack()
+    const currentTrackRef = useRef<number | null>(null);
+
     /**
      * The active state decides wheter the player has initialized the queue or not.
      */
     const [isQueueInitialized, setIsQueueInitialized] = useState(false)
-    const currentTrackRef = useRef<number>();
 
     const { notifyStateSync, notifyQueueAdvance, notifyError } = useWebViewHandlers()
 
@@ -205,7 +209,8 @@ const HeadlessAudioPlayer = ({}) => {
     const handleSkipToNext = useCallback(async () => {
         try {
             await TrackPlayer.skipToNext()
-            handleQueueAdvance()
+            // After skipToNext, the web-ui will receive a handleQueueAdvance event.
+            // Sent by the useEffect that handles the currentTrack changes.
             syncStateWithWebUI()
         } catch (error) {
             handleError(error)
@@ -251,7 +256,7 @@ const HeadlessAudioPlayer = ({}) => {
                     .map(getTrackFromAudioQueueItem)
                     .filter(Boolean) as Track[]
                 await TrackPlayer.add(nextItem)
-                currentTrackRef.current = 0
+                currentTrackRef.current = null
             } else {
                 console.log('index update tail')
                 await TrackPlayer.removeUpcomingTracks()
@@ -282,7 +287,6 @@ const HeadlessAudioPlayer = ({}) => {
     } , [syncStateWithWebUI])
 
     useTrackPlayerEvents([
-        Event.PlaybackTrackChanged,
         Event.RemoteNext,
         Event.PlaybackQueueEnded,
     ], async (event) => {
@@ -294,59 +298,11 @@ const HeadlessAudioPlayer = ({}) => {
             case Event.PlaybackQueueEnded:
                 await handleQueueAdvance()
                 break
-            /**
-             * If the current track has changed, and a nextTrack is given
-             * communicate the queue advance to the webview
-             */
-            case Event.PlaybackTrackChanged:
-                const { nextTrack, track } = (event as PlaybackTrackChangedEvent)
-                const currentTrack = await TrackPlayer.getCurrentTrack()
-                
-                const queue = await TrackPlayer.getQueue()
-                console.log("PlaybackTrackChanged")
-                console.table(queue.map(item => item.title))
-                console.log('index ', {
-                    currentTrack,
-                    currentTrackRef: currentTrackRef?.current,
-                    previousTrack: track,
-                    nextTrack,
-                })
-
-                /**
-                 * If the current track has changed and differs from the currentTrackRef
-                 * update the currentTrackRef and advance the queue
-                 */
-                if (
-                    currentTrack != null
-                    && currentTrackRef.current !== undefined
-                    && currentTrackRef?.current !== currentTrack
-                    ) {
-                    currentTrackRef.current = currentTrack
-                    console.log('index - UPDATING REF AND ADVANCE')
-
-                    await handleQueueAdvance()
-                    syncStateWithWebUI()
-                    return 
-                }
-
-                /**
-                 * If the currentTrack is defined and the ref has not yet been set
-                 * set the currentTrackRef to the currentTrack
-                 */
-                if (
-                    currentTrack != null
-                    && currentTrackRef.current === undefined
-                ) {
-                    currentTrackRef.current = currentTrack
-                    console.log('index - UPDATING REF')
-                }
-
-                break;
             case Event.RemoteNext:
                 await handleQueueAdvance()
                 break
             default:
-                break;
+                break
         }
         syncStateWithWebUI()
     });
@@ -358,7 +314,9 @@ const HeadlessAudioPlayer = ({}) => {
             State.Buffering,
             State.Playing,
         ].includes(playerState) 
-        ? SYNC_AUDIO_STATE_INTERVAL 
+        ? SYNC_INTERVAL_WHILE_PLAYING
+        : [State.Connecting].includes(playerState)
+        ? SYNC_INTERVAL_WHILE_CONNECTING
         : null
     )
 
@@ -381,6 +339,31 @@ const HeadlessAudioPlayer = ({}) => {
             return Promise.resolve()
         }
     )
+
+    // TODO: add useEffect which syncs currenTrackIndex with the currentTrackRef.
+    // When ever the currentTrackIndex is larger than the currentTrackRef we want to call onQueueAdvance
+    // If the new index is not null and smaller than the last current index
+    // onQueueAdvance should not be called. 
+    // The index being lower is an indicator, that the queue has been reset and the new queue-head is now playing (should have index 0).
+    // After all of that, the currentTrackRef should be updated.
+    useEffect(() => {
+        console.log('currentTrackIndex changed', {
+            shouldAdvance: currentTrackIndex !== null && currentTrackRef?.current !== null && currentTrackIndex > currentTrackRef.current,
+            currentTrackIndex,
+            currentTrackRef: currentTrackRef?.current,
+            queueHasReset: 
+            currentTrackIndex === null ||
+            (currentTrackRef?.current !== null && currentTrackIndex < currentTrackRef.current),
+        })
+        if (
+            currentTrackRef?.current !== null 
+            && currentTrackIndex !== null 
+            && currentTrackIndex > currentTrackRef.current
+        ) {
+            handleQueueAdvance()
+        }
+        currentTrackRef.current = currentTrackIndex
+    }, [handleQueueAdvance, currentTrackIndex])
 
     return null;
 }
