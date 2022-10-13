@@ -5,6 +5,7 @@ import TrackPlayer, { Event, PlaybackStateEvent, PlaybackTrackChangedEvent, Stat
 import { useGlobalState } from "../../GlobalState"
 import Logo from '../../assets/images/playlist-logo.png'
 import useWebViewEvent from '../../lib/useWebViewEvent';
+import useInterval from '../../lib/useInterval';
 
 async function getCurrentPlayingTrack() {
     const currentTrackIndex = await TrackPlayer.getCurrentTrack()
@@ -58,35 +59,36 @@ const PrimitiveAudioPlayer = ({}) => {
     /**
      * Send all relevant state of the track-player to the web-ui.
      */
-    const syncStateWithWebUI = useCallback(async () => {
-        const [
-            track,
-            state,
-            duration,
-            position,
-            playbackRate,
-        ] = await Promise.all([
-            getCurrentPlayingTrack(),
-            TrackPlayer.getState(),
-            TrackPlayer.getDuration(),
-            TrackPlayer.getPosition(),
-            TrackPlayer.getRate(),
-        ])
-        
-        dispatch({
-            type: "postMessage", 
-            content: {
-                type: AudioEvent.SYNC,
-                payload: {
-                    itemId: track?.itemId,
-                    playerState: state,
-                    duration,
-                    currentTime: position,
-                    playbackRate: Math.round(playbackRate * 100) / 100,
-                }
-            } 
-        })
-    }, [dispatch])
+    const syncStateWithWebUI = useCallback(
+            async () => {
+            const [
+                track,
+                state,
+                duration,
+                position,
+                playbackRate,
+            ] = await Promise.all([
+                getCurrentPlayingTrack(),
+                TrackPlayer.getState(),
+                TrackPlayer.getDuration(),
+                TrackPlayer.getPosition(),
+                TrackPlayer.getRate(),
+            ])
+            
+            dispatch({
+                type: "postMessage", 
+                content: {
+                    type: AudioEvent.SYNC,
+                    payload: {
+                        itemId: track?.itemId,
+                        playerState: state,
+                        duration,
+                        currentTime: position,
+                        playbackRate: Math.round(playbackRate * 100) / 100,
+                    }
+                } 
+            })
+        }, [dispatch])
 
     /**
      * Inform web-view to advance audio-queue.
@@ -98,7 +100,7 @@ const PrimitiveAudioPlayer = ({}) => {
                 type: AudioEvent.QUEUE_ADVANCE,
             } 
         })
-        await syncStateWithWebUI()
+        syncStateWithWebUI()
     }, [dispatch, syncStateWithWebUI])
 
     /**
@@ -128,7 +130,7 @@ const PrimitiveAudioPlayer = ({}) => {
             }
 
             await TrackPlayer.play()
-            await syncStateWithWebUI()
+            syncStateWithWebUI()
             return
         } catch (error) {
             handleError(error)
@@ -138,7 +140,7 @@ const PrimitiveAudioPlayer = ({}) => {
     const handlePause = useCallback(async () => {
         try {
             await TrackPlayer.pause()
-            await syncStateWithWebUI()
+            syncStateWithWebUI()
         } catch (error) {
             handleError(error)
         }
@@ -152,7 +154,7 @@ const PrimitiveAudioPlayer = ({}) => {
             console.log('resetting track player')
             setIsQueueInitialized(false)
             await TrackPlayer.reset()
-            await syncStateWithWebUI()
+            syncStateWithWebUI()
             
         } catch (error) {
             handleError(error)
@@ -165,7 +167,7 @@ const PrimitiveAudioPlayer = ({}) => {
     const handleSeek = useCallback(async (payload) => {
         try {
             await TrackPlayer.seekTo(payload)
-            await syncStateWithWebUI()
+            syncStateWithWebUI()
         } catch (error) {
             handleError(error)
         }
@@ -202,7 +204,7 @@ const PrimitiveAudioPlayer = ({}) => {
     const handlePlaybackRate = useCallback(async (payload: number) => {
         try {
             await TrackPlayer.setRate(payload)
-            await syncStateWithWebUI()
+            syncStateWithWebUI()
         } catch (error) {
             handleError(error)
         }
@@ -265,7 +267,7 @@ const PrimitiveAudioPlayer = ({}) => {
                 }
             })
             
-            await syncStateWithWebUI()
+            syncStateWithWebUI()
 
             /**
              * In case the audio-player was playing while receiving this update,
@@ -305,18 +307,13 @@ const PrimitiveAudioPlayer = ({}) => {
                 console.log('PlaybackTrackChanged', nextTrack, rest)
                 if (nextTrack && nextTrack !== 0) {
                     await handleQueueAdvance()
+                    syncStateWithWebUI()
                 }
                 break;
             case Event.PlaybackState:
                 const state = (event as PlaybackStateEvent).state
                 if (State.Paused === state) {
                     await handlePause()
-                }
-                if (State.Ready === state) {
-                    await syncStateWithWebUI()
-                }
-                if (State.Stopped === state) {
-                    await syncStateWithWebUI()
                 }
                 break;
             case Event.RemoteNext:
@@ -326,23 +323,19 @@ const PrimitiveAudioPlayer = ({}) => {
                 console.error('unhandled track-player event')
                 break;
         }
+        syncStateWithWebUI()
     });
 
-    useEffect(() => {
-        // Only sync in an interval if the underlying player state is playing
-        if (
-            ![
-                State.Buffering,
-                State.Playing,
-            ].includes(playerState)
-        ) {
-            return
-        }
-        const interval = setInterval(() => {
-            syncStateWithWebUI()
-        }, SYNC_AUDIO_STATE_INTERVAL)
-        return () => clearInterval(interval);
-    }, [playerState, syncStateWithWebUI])
+    // Sync the state with the webview if in a playing state
+    useInterval(
+        () => syncStateWithWebUI(),
+        [
+            State.Buffering,
+            State.Playing,
+        ].includes(playerState) 
+        ? SYNC_AUDIO_STATE_INTERVAL 
+        : null
+    )
 
     // Handle events from web-ui
     useWebViewEvent<number|undefined>(AudioEvent.PLAY, handlePlay)
