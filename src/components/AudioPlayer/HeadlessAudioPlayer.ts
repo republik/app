@@ -1,6 +1,6 @@
 import { AudioQueueItem } from './types/AudioQueueItem';
 import { AudioEvent } from './AudioEvent';
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import TrackPlayer, { Event, PlaybackStateEvent, PlaybackTrackChangedEvent, State, Track, usePlaybackState, useTrackPlayerEvents } from "react-native-track-player"
 import { useGlobalState } from "../../GlobalState"
 import Logo from '../../assets/images/playlist-logo.png'
@@ -49,6 +49,7 @@ const HeadlessAudioPlayer = ({}) => {
      * The active state decides wheter the player has initialized the queue or not.
      */
     const [isQueueInitialized, setIsQueueInitialized] = useState(false)
+    const currentTrackRef = useRef<number>();
 
     const { notifyStateSync, notifyQueueAdvance, notifyError } = useWebViewHandlers()
 
@@ -201,6 +202,16 @@ const HeadlessAudioPlayer = ({}) => {
         }
     } , [syncStateWithWebUI])
 
+    const handleSkipToNext = useCallback(async () => {
+        try {
+            await TrackPlayer.skipToNext()
+            handleQueueAdvance()
+            syncStateWithWebUI()
+        } catch (error) {
+            handleError(error)
+        }
+    }, [syncStateWithWebUI])
+
     /**
      * Handle the received audio-queue items.
      */
@@ -218,10 +229,15 @@ const HeadlessAudioPlayer = ({}) => {
             const currentTrack = await getCurrentPlayingTrack()
             const playerState = await TrackPlayer.getState()
             const mustUpdateCurrentTrack = currentTrack?.id !== inputCurrentTrack?.id
+            /**
+             * Remove everything but the current track from the queue,
+             * and replace it with the new received items.
+             */
 
-            // In case the queue was emtpy before (meaning currentTrack would be null)
-            // or if the first element in the received queue is different from the current track
-            // reset the audio-player and add the first element to the queue
+            /**
+             * If the current track has to be updated, teardown the queue and add the entire queue again.
+             * The currentTrackRef must also be reset to 'undefined'.
+             */
             if (
                 !!inputCurrentTrack &&
                 (
@@ -229,24 +245,25 @@ const HeadlessAudioPlayer = ({}) => {
                     mustUpdateCurrentTrack
                 )
             ) {
+                console.log('index update all')
                 await TrackPlayer.reset()
-                await TrackPlayer.add(inputCurrentTrack)
-            }
+                const nextItem: Track[] = payload
+                    .map(getTrackFromAudioQueueItem)
+                    .filter(Boolean) as Track[]
+                await TrackPlayer.add(nextItem)
+                currentTrackRef.current = 0
+            } else {
+                console.log('index update tail')
+                await TrackPlayer.removeUpcomingTracks()
+                const nextItem: Track[] = inputQueuedTracks
+                    .map(getTrackFromAudioQueueItem)
+                    .filter(Boolean) as Track[]
 
-            /**
-             * Remove everything but the current track from the queue,
-             * and replace it with the new received items.
-             */
-            console.log("QueueUpdate", "teardown tail")
-            await TrackPlayer.removeUpcomingTracks()
-            inputQueuedTracks.forEach(async (item) => {
-                const track = getTrackFromAudioQueueItem(item)
-                // TODO: handle null track
-                if (track) {
-                    await TrackPlayer.add(track) 
-                }
-            })
-            
+                await TrackPlayer.add(
+                    nextItem
+                )
+             }
+
             syncStateWithWebUI()
 
             /**
@@ -282,17 +299,53 @@ const HeadlessAudioPlayer = ({}) => {
              * communicate the queue advance to the webview
              */
             case Event.PlaybackTrackChanged:
-                const { nextTrack, ...rest } = (event as PlaybackTrackChangedEvent)
-                if (nextTrack && nextTrack !== 0) {
+                const { nextTrack, track } = (event as PlaybackTrackChangedEvent)
+                const currentTrack = await TrackPlayer.getCurrentTrack()
+                
+                const queue = await TrackPlayer.getQueue()
+                console.log("PlaybackTrackChanged")
+                console.table(queue.map(item => item.title))
+                console.log('index ', {
+                    currentTrack,
+                    currentTrackRef: currentTrackRef?.current,
+                    previousTrack: track,
+                    nextTrack,
+                })
+
+                /**
+                 * If the current track has changed and differs from the currentTrackRef
+                 * update the currentTrackRef and advance the queue
+                 */
+                if (
+                    currentTrack != null
+                    && currentTrackRef.current !== undefined
+                    && currentTrackRef?.current !== currentTrack
+                    ) {
+                    currentTrackRef.current = currentTrack
+                    console.log('index - UPDATING REF AND ADVANCE')
+
                     await handleQueueAdvance()
                     syncStateWithWebUI()
+                    return 
                 }
+
+                /**
+                 * If the currentTrack is defined and the ref has not yet been set
+                 * set the currentTrackRef to the currentTrack
+                 */
+                if (
+                    currentTrack != null
+                    && currentTrackRef.current === undefined
+                ) {
+                    currentTrackRef.current = currentTrack
+                    console.log('index - UPDATING REF')
+                }
+
                 break;
             case Event.RemoteNext:
                 await handleQueueAdvance()
                 break
             default:
-                console.error('unhandled track-player event')
                 break;
         }
         syncStateWithWebUI()
@@ -317,6 +370,7 @@ const HeadlessAudioPlayer = ({}) => {
     useWebViewEvent<number>(AudioEvent.FORWARD, handleForward)
     useWebViewEvent<number>(AudioEvent.BACKWARD, handleBackward)
     useWebViewEvent<number>(AudioEvent.PLAYBACK_RATE, handlePlaybackRate)
+    useWebViewEvent<number>(AudioEvent.SKIP_TO_NEXT, handleSkipToNext)
     useWebViewEvent<AudioQueueItem[]>(
         AudioEvent.QUEUE_UPDATE, 
         async (queue: AudioQueueItem[]) => {
