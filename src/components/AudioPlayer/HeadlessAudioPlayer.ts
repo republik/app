@@ -9,6 +9,11 @@ import useInterval from '../../lib/useInterval';
 import useWebViewHandlers from './hooks/useWebViewHandlers';
 import useCurrentTrack from './hooks/useCurrentTrack';
 
+type Test = {
+    item: AudioQueueItem
+    track: Track | null
+}
+
 async function getCurrentPlayingTrack() {
     const currentTrackIndex = await TrackPlayer.getCurrentTrack()
     if (currentTrackIndex == null) {
@@ -49,6 +54,10 @@ const HeadlessAudioPlayer = ({}) => {
     const [trackedQueue, setTrackedQueue] = useState<AudioQueueItem[]>([])
     const currentTrackIndex = useCurrentTrack()
     const currentTrackRef = useRef<number | null>(null);
+
+    const [activeTrack, setActiveTrack] = useState<Test | null>(null)
+    const delayTrack = useRef<Test | null>(null)
+    const [isInitialized, setIsInitialized] = useState(false)
 
     /**
      * The active state decides wheter the player has initialized the queue or not.
@@ -106,20 +115,30 @@ const HeadlessAudioPlayer = ({}) => {
      */
     const handlePlay = useCallback(async (initialTime?: number) => {
         try {
+            /*
             // Initialize the queue lazily once the first time the player is started.
             if (!isQueueInitialized) {
-                if (trackedQueue && trackedQueue.length > 0) {
+                if (trackedQueue && trackedQueue) {
                     await handleQueueUpdate(trackedQueue)
                 }
                 setIsQueueInitialized(true)
-
-                // Seek the intialTime for the first item in the queue.
-                // For all subsequent items, the initialTime is seeked in the PlaybackTrackChangedEvent handler.
-                const firstTrack = await getCurrentPlayingTrack()
-                if (firstTrack?.initialTime) {
-                    initialTime = firstTrack.initialTime
+                */
+            if (!isInitialized) {
+                setIsInitialized(true)
+                if (delayTrack?.current && delayTrack.current.track !== null) {
+                    await TrackPlayer.reset()
+                    await TrackPlayer.add(delayTrack.current.track)
+                    console.log('test -- initialize on first play')
+                    // Seek the intialTime for the first item in the queue.
+                    // For all subsequent items, the initialTime is seeked in the PlaybackTrackChangedEvent handler.
+                    const firstTrack = delayTrack.current?.track
+                    if (firstTrack?.initialTime) {
+                        initialTime = firstTrack.initialTime
+                    }
                 }
             }
+            const queue = await TrackPlayer.getQueue()
+            console.log('test -- play', queue)
 
             if (initialTime) {
                 await TrackPlayer.skip(0, initialTime)
@@ -298,6 +317,8 @@ const HeadlessAudioPlayer = ({}) => {
              */
             case Event.PlaybackQueueEnded:
                 await handleQueueAdvance()
+                await TrackPlayer.reset()
+                //await handleQueueAdvance()
                 break
             case Event.RemoteNext:
                 await handleQueueAdvance()
@@ -329,6 +350,40 @@ const HeadlessAudioPlayer = ({}) => {
     useWebViewEvent<number>(AudioEvent.FORWARD, handleForward)
     useWebViewEvent<number>(AudioEvent.BACKWARD, handleBackward)
     useWebViewEvent<number>(AudioEvent.PLAYBACK_RATE, handlePlaybackRate)
+
+    useWebViewEvent<{item: AudioQueueItem, autoPlay?: boolean }>('audio:setup', async ({item, autoPlay}: {item: AudioQueueItem, autoPlay?: boolean}) => {
+        try {
+            console.log('test setup for item', item)
+            const nextItem = {
+                item,
+                track: getTrackFromAudioQueueItem(item),
+            }
+            if (!nextItem.track) {
+                console.log('test - no track found')
+                return
+            }
+
+            if (!isInitialized) {
+                console.log('test - not initialized, add to delay')
+                delayTrack.current = nextItem
+                return syncStateWithWebUI()
+            }
+            console.log('test - initialized, add as first item')
+            setActiveTrack(nextItem)
+            await TrackPlayer.reset()
+            await TrackPlayer.add(nextItem.track)
+            syncStateWithWebUI()
+            if (autoPlay) {
+                console.log('test - auto play')
+                await handlePlay()
+            }
+            return Promise.resolve()
+        } catch (error) {
+            handleError(error)
+        }
+        
+    })
+    /**
     useWebViewEvent<number>(AudioEvent.SKIP_TO_NEXT, handleSkipToNext)
     useWebViewEvent<AudioQueueItem[]>(
         AudioEvent.QUEUE_UPDATE, 
@@ -340,6 +395,7 @@ const HeadlessAudioPlayer = ({}) => {
             return Promise.resolve()
         }
     )
+    
 
     // TODO: add useEffect which syncs currenTrackIndex with the currentTrackRef.
     // When ever the currentTrackIndex is larger than the currentTrackRef we want to call onQueueAdvance
@@ -366,7 +422,7 @@ const HeadlessAudioPlayer = ({}) => {
         currentTrackRef.current = currentTrackIndex
         syncStateWithWebUI()
     }, [handleQueueAdvance, currentTrackIndex])
-
+    */
     return null;
 }
 
