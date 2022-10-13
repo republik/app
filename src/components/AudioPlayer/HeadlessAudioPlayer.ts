@@ -279,6 +279,7 @@ const HeadlessAudioPlayer = ({}) => {
             if (mustUpdateCurrentTrack && playerState === State.Playing) {
                 await handlePlay()
             }
+            syncStateWithWebUI()
             return Promise.resolve()
         } catch (error) {
             handleError(error)
@@ -363,6 +364,7 @@ const HeadlessAudioPlayer = ({}) => {
             handleQueueAdvance()
         }
         currentTrackRef.current = currentTrackIndex
+        syncStateWithWebUI()
     }, [handleQueueAdvance, currentTrackIndex])
 
     return null;
