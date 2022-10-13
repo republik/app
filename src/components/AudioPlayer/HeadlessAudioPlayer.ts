@@ -6,6 +6,7 @@ import { useGlobalState } from "../../GlobalState"
 import Logo from '../../assets/images/playlist-logo.png'
 import useWebViewEvent from '../../lib/useWebViewEvent';
 import useInterval from '../../lib/useInterval';
+import useWebViewHandlers from './hooks/useWebViewHandlers';
 
 async function getCurrentPlayingTrack() {
     const currentTrackIndex = await TrackPlayer.getCurrentTrack()
@@ -42,7 +43,6 @@ function getTrackFromAudioQueueItem(item: AudioQueueItem): Track | null {
  * The player is controlled through events received from the webview.
  */
 const HeadlessAudioPlayer = ({}) => {
-    const { dispatch } = useGlobalState()
     const playerState = usePlaybackState()
     const [trackedQueue, setTrackedQueue] = useState<AudioQueueItem[]>([])
     /**
@@ -50,14 +50,11 @@ const HeadlessAudioPlayer = ({}) => {
      */
     const [isQueueInitialized, setIsQueueInitialized] = useState(false)
 
+    const { notifyStateSync, notifyQueueAdvance, notifyError } = useWebViewHandlers()
+
     const handleError = (error: Error) => {
-        dispatch({
-            type: "postMessage", 
-            content: {
-                type: AudioEvent.ERROR,
-                payload: JSON.stringify(error, Object.getOwnPropertyNames(error), 2),
-            } 
-        })
+        console.error(error)
+        notifyError(error)
     }
     
     /**
@@ -78,34 +75,24 @@ const HeadlessAudioPlayer = ({}) => {
                 TrackPlayer.getPosition(),
                 TrackPlayer.getRate(),
             ])
-            
-            dispatch({
-                type: "postMessage", 
-                content: {
-                    type: AudioEvent.SYNC,
-                    payload: {
-                        itemId: track?.itemId,
-                        playerState: state,
-                        duration,
-                        currentTime: position,
-                        playbackRate: Math.round(playbackRate * 100) / 100,
-                    }
-                } 
+
+            notifyStateSync({
+                itemId: track?.itemId,
+                playerState: state,
+                duration,
+                position,
+                playbackRate: Math.round(playbackRate * 100) / 100,
             })
-        }, [dispatch])
+            
+        }, [notifyStateSync])
 
     /**
      * Inform web-view to advance audio-queue.
      */
     const handleQueueAdvance = useCallback(async () => {
-        dispatch({ 
-            type: "postMessage", 
-            content: {
-                type: AudioEvent.QUEUE_ADVANCE,
-            } 
-        })
+        notifyQueueAdvance()
         syncStateWithWebUI()
-    }, [dispatch, syncStateWithWebUI])
+    }, [syncStateWithWebUI, notifyQueueAdvance])
 
     /**
      * Handle play event. If the queue was not initialized yet, initialize it.
