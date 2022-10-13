@@ -37,7 +37,11 @@ function getTrackFromAudioQueueItem(item: AudioQueueItem): Track | null {
     return track
 }
 
-const PrimitiveAudioPlayer = ({}) => {
+/**
+ * HeadlessAudioPlayer is a wrapper around react-native-track-player without any react-native UI.
+ * The player is controlled through events received from the webview.
+ */
+const HeadlessAudioPlayer = ({}) => {
     const { dispatch } = useGlobalState()
     const playerState = usePlaybackState()
     const [trackedQueue, setTrackedQueue] = useState<AudioQueueItem[]>([])
@@ -359,4 +363,4 @@ const PrimitiveAudioPlayer = ({}) => {
     return null;
 }
 
-export default PrimitiveAudioPlayer;
+export default HeadlessAudioPlayer;
