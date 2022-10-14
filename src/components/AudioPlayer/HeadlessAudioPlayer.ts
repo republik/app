@@ -8,9 +8,10 @@ import useInterval from '../../lib/useInterval';
 import useWebViewHandlers from './hooks/useWebViewHandlers';
 import { AppState, AppStateStatus, Platform } from 'react-native';
 
-type Test = {
+type AudioObject = {
     item: AudioQueueItem
     track: Track | null
+    initialTime?: number
 }
 
 async function getCurrentPlayingTrack() {
@@ -25,6 +26,13 @@ async function getCurrentPlayingTrack() {
 const SYNC_INTERVAL_WHILE_PLAYING = 500
 const SYNC_INTERVAL_WHILE_CONNECTING = 1000
 
+/** 
+ * Generate a track object from an AudioQueueItem.
+ * In addition the track object, we also set the following custom properties:
+ * - itemId: id of the audioqueueitem
+ * - mediaId: audioSoruce.mediaId
+ * - initialTime: initialTime at which we should start playing the track
+*/
 function getTrackFromAudioQueueItem(item: AudioQueueItem): Track | null {
     const { meta } = item.document
     const { title, audioSource, image } = meta ?? {}
@@ -32,7 +40,7 @@ function getTrackFromAudioQueueItem(item: AudioQueueItem): Track | null {
         return null
     }
     const track: Track = {
-        id: audioSource.mediaId,
+        mediaId: audioSource.mediaId,
         itemId: item.id,
         url: audioSource.mp3,
         title,
@@ -52,9 +60,10 @@ const HeadlessAudioPlayer = ({}) => {
     const appState = useRef<AppStateStatus>(AppState.currentState)
     const playerState = usePlaybackState()
 
-    const [activeTrack, setActiveTrack] = useState<Test | null>(null)
-    const delayTrack = useRef<Test | null>(null)
+    const [activeTrack, setActiveTrack] = useState<AudioObject | null>(null)
+    const delayTrack = useRef<AudioObject | null>(null)
     const [isInitialized, setIsInitialized] = useState(false)
+    const [playbackRate, setPlaybackRate] = useState(1)
 
     const { notifyStateSync, notifyQueueAdvance, notifyError } = useWebViewHandlers()
 
@@ -154,6 +163,7 @@ const HeadlessAudioPlayer = ({}) => {
             if (Platform.OS == 'android' && initialTime) {
                 console.log('xxx -- play skipTo', initialTime)
                 await TrackPlayer.skip(0, initialTime)
+                await TrackPlayer.setRate(playbackRate)
                 await TrackPlayer.play()
                 return syncStateWithWebUI()
             } else if (
@@ -163,6 +173,7 @@ const HeadlessAudioPlayer = ({}) => {
             ) {
                 const seekTo = initialTime
                 await TrackPlayer.setVolume(0)
+                await TrackPlayer.setRate(playbackRate)
                 await TrackPlayer.play()
                 syncStateWithWebUI()
 
@@ -253,6 +264,7 @@ const HeadlessAudioPlayer = ({}) => {
      */
     const handlePlaybackRate = useCallback(async (payload: number) => {
         try {
+            setPlaybackRate(payload)
             await TrackPlayer.setRate(payload)
             syncStateWithWebUI()
         } catch (error) {
@@ -336,9 +348,10 @@ const HeadlessAudioPlayer = ({}) => {
         item : AudioQueueItem
         autoPlay?: boolean
         initialTime?: number
+        playbackRate?: number
     }
 
-    useWebViewEvent<AudioSetupData>(AudioEvent.SETUP_TRACK, async ({item, autoPlay, initialTime}: AudioSetupData) => {
+    useWebViewEvent<AudioSetupData>(AudioEvent.SETUP_TRACK, async ({item, autoPlay, initialTime, playbackRate }: AudioSetupData) => {
         try {
             console.log('test setup for item', item)
             const nextItem = {
@@ -350,9 +363,14 @@ const HeadlessAudioPlayer = ({}) => {
                 return
             }
 
+            // During the initial setup, the player safes the track into a ref.
+            // In addtion, the initial playbackrate can also be set.
             if (!isInitialized) {
                 console.log('test - not initialized, add to delay')
                 delayTrack.current = nextItem
+                if (playbackRate) {
+                    setPlaybackRate(playbackRate)
+                }
                 return
             }
             console.log('test - initialized, add as first item')
