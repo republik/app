@@ -24,7 +24,6 @@ const SetupAudioPlayerService = async () => {
         Capability.JumpForward,
         Capability.JumpBackward,
         Capability.SeekTo,
-        Capability.SkipToNext,
       ],
       compactCapabilities: [
         Capability.Play,
