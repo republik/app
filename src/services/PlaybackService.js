@@ -15,5 +15,4 @@ module.exports = async function () {
     const position = await TrackPlayer.getPosition()
     TrackPlayer.seekTo(position - e.interval)
   })
-  TrackPlayer.addEventListener(Event.RemoteNext, () => TrackPlayer.skipToNext())
 }
