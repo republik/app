@@ -113,6 +113,15 @@ const HeadlessAudioPlayer = ({}) => {
         syncStateWithWebUI()
     }, [syncStateWithWebUI, notifyQueueAdvance])
 
+    const getInitialTime = (track: Track, initialTime?: number) => {
+        const out =  initialTime ?? track?.initialTime ?? 0
+        console.log('xxx - resolved initialTime', out, {
+            initialTime,
+            track: track?.initialTime
+        })
+        return out
+    }
+
     /**
      * Handle play event. If the queue was not initialized yet, initialize it.
      * After the initialization, the track will seek its initialTime if given.
@@ -142,19 +151,24 @@ const HeadlessAudioPlayer = ({}) => {
                     // Seek the intialTime for the first item in the queue.
                     // For all subsequent items, the initialTime is seeked in the PlaybackTrackChangedEvent handler.
                     const firstTrack = delayTrack.current?.track
-                    if (firstTrack?.initialTime) {
-                        initialTime = firstTrack.initialTime
-                    }
+                    initialTime = getInitialTime(firstTrack, initialTime)
                 }
             }
             const queue = await TrackPlayer.getQueue()
             console.log('test -- play', queue)
 
             if (initialTime) {
+                console.log('xxx -- play skipTo', initialTime)
+                // 
                 await TrackPlayer.skip(0, initialTime)
             }
 
             await TrackPlayer.play()
+            if (initialTime !== undefined && initialTime > 0) {
+                setTimeout(() => {
+                    TrackPlayer.seekTo(initialTime)
+                }, 500)
+            }
             syncStateWithWebUI()
             return
         } catch (error) {
@@ -373,8 +387,14 @@ const HeadlessAudioPlayer = ({}) => {
     useWebViewEvent<number>(AudioEvent.FORWARD, handleForward)
     useWebViewEvent<number>(AudioEvent.BACKWARD, handleBackward)
     useWebViewEvent<number>(AudioEvent.PLAYBACK_RATE, handlePlaybackRate)
+    
+    type AudioSetupData = {
+        item : AudioQueueItem
+        autoPlay?: boolean
+        initialTime?: number
+    }
 
-    useWebViewEvent<{item: AudioQueueItem, autoPlay?: boolean }>('audio:setup', async ({item, autoPlay}: {item: AudioQueueItem, autoPlay?: boolean}) => {
+    useWebViewEvent<AudioSetupData>('audio:setup', async ({item, autoPlay, initialTime}: AudioSetupData) => {
         try {
             console.log('test setup for item', item)
             const nextItem = {
@@ -396,10 +416,15 @@ const HeadlessAudioPlayer = ({}) => {
             console.log('xxx - setup', nextItem)
             await TrackPlayer.reset()
             await TrackPlayer.add(nextItem.track)
+
+            const computedInitialTime = getInitialTime(nextItem.track, initialTime)
+
             syncStateWithWebUI()
             if (autoPlay) {
-                console.log('test - auto play')
-                await handlePlay()
+                console.log('test - auto play with start time', computedInitialTime)
+                await handlePlay(computedInitialTime)
+            } else {
+                await TrackPlayer.skip(0, computedInitialTime)
             }
             return Promise.resolve()
         } catch (error) {
