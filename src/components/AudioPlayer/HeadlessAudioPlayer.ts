@@ -56,18 +56,14 @@ const HeadlessAudioPlayer = ({}) => {
     const delayTrack = useRef<Test | null>(null)
     const [isInitialized, setIsInitialized] = useState(false)
 
+    const { notifyStateSync, notifyQueueAdvance, notifyError } = useWebViewHandlers()
+
     const resetCurrentTrack = async () => {
         delayTrack.current = null
         setActiveTrack(null)
         await TrackPlayer.reset()
     }
 
-    /**
-     * The active state decides wheter the player has initialized the queue or not.
-     */
-    const [isQueueInitialized, setIsQueueInitialized] = useState(false)
-
-    const { notifyStateSync, notifyQueueAdvance, notifyError } = useWebViewHandlers()
 
     const handleError = (error: Error) => {
         console.error(error)
@@ -155,26 +151,36 @@ const HeadlessAudioPlayer = ({}) => {
             const queue = await TrackPlayer.getQueue()
             console.log('test -- play', queue)
 
-            // Handle seeking initial time on android
             if (Platform.OS == 'android' && initialTime) {
                 console.log('xxx -- play skipTo', initialTime)
-                // 
                 await TrackPlayer.skip(0, initialTime)
+                await TrackPlayer.play()
+                return syncStateWithWebUI()
+            } else if (
+                Platform.OS == 'ios' 
+                && initialTime !== undefined 
+                && initialTime > 0
+            ) {
+                const seekTo = initialTime
+                await TrackPlayer.setVolume(0)
+                await TrackPlayer.play()
+                syncStateWithWebUI()
+
+                // This coe has been reused from v2.1.3
+                // seekTo does not work on iOS until the player has started playing
+                // we workaround around this with a setTimeout:
+                // https://github.com/react-native-kit/react-native-track-player/issues/387#issuecomment-709433886
+                setTimeout(() => {
+                  TrackPlayer.seekTo(seekTo)
+                }, 1)
+                setTimeout(() => {
+                  TrackPlayer.seekTo(seekTo)
+                }, 500)
+                TrackPlayer.setVolume(1)
+                return syncStateWithWebUI()
             }
 
             await TrackPlayer.play()
-
-            // Handle seek on android
-            if (
-                Platform.OS === 'ios' 
-                && initialTime !== undefined
-                && initialTime > 0
-            ) {
-                const scopedInitialTime = initialTime
-                setTimeout(() => {
-                    TrackPlayer.seekTo(scopedInitialTime)
-                }, 500)
-            }
             syncStateWithWebUI()
             return
         } catch (error) {
