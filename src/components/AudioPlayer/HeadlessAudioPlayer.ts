@@ -7,6 +7,7 @@ import useWebViewEvent from '../../lib/useWebViewEvent';
 import useInterval from '../../lib/useInterval';
 import useWebViewHandlers from './hooks/useWebViewHandlers';
 import useCurrentTrack from './hooks/useCurrentTrack';
+import { Platform } from 'react-native';
 
 type Test = {
     item: AudioQueueItem
@@ -157,16 +158,24 @@ const HeadlessAudioPlayer = ({}) => {
             const queue = await TrackPlayer.getQueue()
             console.log('test -- play', queue)
 
-            if (initialTime) {
+            // Handle seeking initial time on android
+            if (Platform.OS == 'android' && initialTime) {
                 console.log('xxx -- play skipTo', initialTime)
                 // 
                 await TrackPlayer.skip(0, initialTime)
             }
 
             await TrackPlayer.play()
-            if (initialTime !== undefined && initialTime > 0) {
+
+            // Handle seek on android
+            if (
+                Platform.OS === 'ios' 
+                && initialTime !== undefined
+                && initialTime > 0
+            ) {
+                const scopedInitialTime = initialTime
                 setTimeout(() => {
-                    TrackPlayer.seekTo(initialTime)
+                    TrackPlayer.seekTo(scopedInitialTime)
                 }, 500)
             }
             syncStateWithWebUI()
@@ -219,7 +228,6 @@ const HeadlessAudioPlayer = ({}) => {
     const handleForward = useCallback(async (payload: number) => {
         try {
             const position = await TrackPlayer.getPosition()
-            // TODO: adapt to playback rate?
             await handleSeek(position + payload)
         } catch (error) {
             handleError(error)
@@ -332,8 +340,8 @@ const HeadlessAudioPlayer = ({}) => {
     } , [syncStateWithWebUI])
 
     useTrackPlayerEvents([
-        Event.RemoteNext,
         Event.PlaybackQueueEnded,
+        Event.RemoteNext,
     ], async (event) => {
         switch (event.type) {
             /**
@@ -341,14 +349,35 @@ const HeadlessAudioPlayer = ({}) => {
              * To remove it from the queue
              */
             case Event.PlaybackQueueEnded:
-                console.log('xxx -ended')
+                const [
+                    queue,
+                    position,
+                    duration,
+                ] = await Promise.all([
+                    TrackPlayer.getQueue(),
+                    TrackPlayer.getPosition(),
+                    TrackPlayer.getDuration(),
+                ])
+
+                // On iOS the queueEnded event is fired when the track just started playing on iOS.
+                // If the ended event is fired but the first item is the activeItem and
+                // positon and current are 0, ignore the ended event.
+                if (
+                    queue.length > 0 
+                    && queue[0].itemId === activeTrack?.item.id
+                    && (duration <= 0|| position < duration)
+                ) {
+                    return
+                }
+
+                // Handle faulty event emission when nothing is tracked
                 if (activeTrack === null || activeTrack.item?.id === undefined) {
-                    alert('no active track queue ended')
-                    console.log('active track', {
+                    console.log('faulty playback-ended update', {
                         activeTrack, delyTrack: delayTrack.current
                     })
                     return
                 }
+
                 await handleQueueAdvance(activeTrack?.item.id)
                 await resetCurrentTrack()
                 //await handleQueueAdvance()
@@ -432,46 +461,7 @@ const HeadlessAudioPlayer = ({}) => {
         }
         
     })
-    /**
-    useWebViewEvent<number>(AudioEvent.SKIP_TO_NEXT, handleSkipToNext)
-    useWebViewEvent<AudioQueueItem[]>(
-        AudioEvent.QUEUE_UPDATE, 
-        async (queue: AudioQueueItem[]) => {
-            setTrackedQueue(queue)
-            if (isQueueInitialized) {
-                return handleQueueUpdate(queue)
-            }
-            return Promise.resolve()
-        }
-    )
-    
 
-    // TODO: add useEffect which syncs currenTrackIndex with the currentTrackRef.
-    // When ever the currentTrackIndex is larger than the currentTrackRef we want to call onQueueAdvance
-    // If the new index is not null and smaller than the last current index
-    // onQueueAdvance should not be called. 
-    // The index being lower is an indicator, that the queue has been reset and the new queue-head is now playing (should have index 0).
-    // After all of that, the currentTrackRef should be updated.
-    useEffect(() => {
-        console.log('currentTrackIndex changed', {
-            shouldAdvance: currentTrackIndex !== null && currentTrackRef?.current !== null && currentTrackIndex > currentTrackRef.current,
-            currentTrackIndex,
-            currentTrackRef: currentTrackRef?.current,
-            queueHasReset: 
-            currentTrackIndex === null ||
-            (currentTrackRef?.current !== null && currentTrackIndex < currentTrackRef.current),
-        })
-        if (
-            currentTrackRef?.current !== null 
-            && currentTrackIndex !== null 
-            && currentTrackIndex > currentTrackRef.current
-        ) {
-            handleQueueAdvance()
-        }
-        currentTrackRef.current = currentTrackIndex
-        syncStateWithWebUI()
-    }, [handleQueueAdvance, currentTrackIndex])
-    */
     return null;
 }
 
