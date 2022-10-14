@@ -7,6 +7,7 @@ export enum AudioEvent {
   FORWARD = 'audio:forward',
   BACKWARD = 'audio:backward',
   PLAYBACK_RATE = 'audio:playbackRate',
+  SETUP_TRACK = 'audio:setupTrack',
   // Sent to web
   SYNC = 'audio:sync',
   QUEUE_ADVANCE = 'audio:queueAdvance',

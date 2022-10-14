@@ -6,7 +6,7 @@ import Logo from '../../assets/images/playlist-logo.png'
 import useWebViewEvent from '../../lib/useWebViewEvent';
 import useInterval from '../../lib/useInterval';
 import useWebViewHandlers from './hooks/useWebViewHandlers';
-import { AppState, Platform } from 'react-native';
+import { AppState, AppStateStatus, Platform } from 'react-native';
 
 type Test = {
     item: AudioQueueItem
@@ -49,6 +49,7 @@ function getTrackFromAudioQueueItem(item: AudioQueueItem): Track | null {
  * The player is controlled through events received from the webview.
  */
 const HeadlessAudioPlayer = ({}) => {
+    const appState = useRef<AppStateStatus>(AppState.currentState)
     const playerState = usePlaybackState()
 
     const [activeTrack, setActiveTrack] = useState<Test | null>(null)
@@ -331,7 +332,7 @@ const HeadlessAudioPlayer = ({}) => {
         initialTime?: number
     }
 
-    useWebViewEvent<AudioSetupData>('audio:setup', async ({item, autoPlay, initialTime}: AudioSetupData) => {
+    useWebViewEvent<AudioSetupData>(AudioEvent.SETUP_TRACK, async ({item, autoPlay, initialTime}: AudioSetupData) => {
         try {
             console.log('test setup for item', item)
             const nextItem = {
@@ -369,6 +370,24 @@ const HeadlessAudioPlayer = ({}) => {
         }
         
     })
+
+    // Sync the player state with the webview when the app comes to the foreground
+    useEffect(() => {
+        const subscription = AppState.addEventListener("change", nextAppState => {
+          if (
+            appState.current.match(/inactive|background/) &&
+            nextAppState === "active"
+          ) {
+            syncStateWithWebUI()
+          }
+    
+          appState.current = nextAppState;
+        });
+    
+        return () => {
+          subscription.remove();
+        };
+      }, []);
 
     return null;
 }
