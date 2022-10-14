@@ -1,8 +1,7 @@
 import { AudioQueueItem } from './types/AudioQueueItem';
 import { AudioEvent } from './AudioEvent';
-import { useCallback, useEffect, useRef, useState } from "react"
-import TrackPlayer, { Event, PlaybackStateEvent, PlaybackTrackChangedEvent, State, Track, usePlaybackState, useTrackPlayerEvents } from "react-native-track-player"
-import { useGlobalState } from "../../GlobalState"
+import { useCallback, useRef, useState } from "react"
+import TrackPlayer, { Event, State, Track, usePlaybackState, useTrackPlayerEvents } from "react-native-track-player"
 import Logo from '../../assets/images/playlist-logo.png'
 import useWebViewEvent from '../../lib/useWebViewEvent';
 import useInterval from '../../lib/useInterval';
@@ -59,11 +58,11 @@ const HeadlessAudioPlayer = ({}) => {
     const delayTrack = useRef<Test | null>(null)
     const [isInitialized, setIsInitialized] = useState(false)
 
-    const resetCurrentTrack = useCallback(async () => {
+    const resetCurrentTrack = async () => {
         delayTrack.current = null
         setActiveTrack(null)
         await TrackPlayer.reset()
-    }, [null])
+    }
 
     /**
      * The active state decides wheter the player has initialized the queue or not.
@@ -136,7 +135,7 @@ const HeadlessAudioPlayer = ({}) => {
                     && delayTrack.current !== null 
                     && delayTrack.current.track !== null
                 ) {
-                    console.log('delayTrack', delayTrack.current)
+                    console.log('xxx delayTrack', delayTrack.current)
                     setActiveTrack(delayTrack.current)
                     await TrackPlayer.add(delayTrack.current.track)
                     console.log('test -- initialize on first play')
@@ -161,7 +160,7 @@ const HeadlessAudioPlayer = ({}) => {
         } catch (error) {
             handleError(error)
         }
-    }, [syncStateWithWebUI, isQueueInitialized, trackedQueue])
+    }, [syncStateWithWebUI, isInitialized])
 
     const handlePause = useCallback(async () => {
         try {
@@ -177,7 +176,7 @@ const HeadlessAudioPlayer = ({}) => {
      */
     const handleStop = useCallback(async () => {
         try {
-            console.log('resetting track player')
+            console.log('xxx - resetting track player')
             setIsQueueInitialized(false)
             setIsInitialized(false)
             await TrackPlayer.reset()
@@ -328,6 +327,7 @@ const HeadlessAudioPlayer = ({}) => {
              * To remove it from the queue
              */
             case Event.PlaybackQueueEnded:
+                console.log('xxx -ended')
                 if (activeTrack === null || activeTrack.item?.id === undefined) {
                     alert('no active track queue ended')
                     console.log('active track', {
@@ -389,10 +389,11 @@ const HeadlessAudioPlayer = ({}) => {
             if (!isInitialized) {
                 console.log('test - not initialized, add to delay')
                 delayTrack.current = nextItem
-                return syncStateWithWebUI()
+                return
             }
             console.log('test - initialized, add as first item')
             setActiveTrack(nextItem)
+            console.log('xxx - setup', nextItem)
             await TrackPlayer.reset()
             await TrackPlayer.add(nextItem.track)
             syncStateWithWebUI()
