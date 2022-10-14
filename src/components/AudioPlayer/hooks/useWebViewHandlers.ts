@@ -13,7 +13,7 @@ type AudioPlayerState = {
 
 type WebViewHandlers = {
     notifyStateSync: (state: AudioPlayerState) => void
-    notifyQueueAdvance: () => void
+    notifyQueueAdvance: (itemId: string) => void
     notifyError: (error: Error) => void
 }
 
@@ -36,10 +36,11 @@ const useWebViewHandlers = (): WebViewHandlers => {
         }), [dispatch]
     )
 
-    const advanceQueue = useCallback(() => dispatch({
+    const advanceQueue = useCallback((itemId: string) => dispatch({
             type: "postMessage",
             content: {
                 type: AudioEvent.QUEUE_ADVANCE,
+                payload: itemId
             }
         }), [dispatch]
     )

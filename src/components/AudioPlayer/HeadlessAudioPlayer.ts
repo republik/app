@@ -59,6 +59,12 @@ const HeadlessAudioPlayer = ({}) => {
     const delayTrack = useRef<Test | null>(null)
     const [isInitialized, setIsInitialized] = useState(false)
 
+    const resetCurrentTrack = useCallback(async () => {
+        delayTrack.current = null
+        setActiveTrack(null)
+        await TrackPlayer.reset()
+    }, [null])
+
     /**
      * The active state decides wheter the player has initialized the queue or not.
      */
@@ -103,8 +109,8 @@ const HeadlessAudioPlayer = ({}) => {
     /**
      * Inform web-view to advance audio-queue.
      */
-    const handleQueueAdvance = useCallback(async () => {
-        notifyQueueAdvance()
+    const handleQueueAdvance = useCallback(async (itemId: string) => {
+        notifyQueueAdvance(itemId)
         syncStateWithWebUI()
     }, [syncStateWithWebUI, notifyQueueAdvance])
 
@@ -125,8 +131,13 @@ const HeadlessAudioPlayer = ({}) => {
                 */
             if (!isInitialized) {
                 setIsInitialized(true)
-                if (delayTrack?.current && delayTrack.current.track !== null) {
-                    await TrackPlayer.reset()
+                if (
+                    delayTrack?.current 
+                    && delayTrack.current !== null 
+                    && delayTrack.current.track !== null
+                ) {
+                    console.log('delayTrack', delayTrack.current)
+                    setActiveTrack(delayTrack.current)
                     await TrackPlayer.add(delayTrack.current.track)
                     console.log('test -- initialize on first play')
                     // Seek the intialTime for the first item in the queue.
@@ -168,6 +179,7 @@ const HeadlessAudioPlayer = ({}) => {
         try {
             console.log('resetting track player')
             setIsQueueInitialized(false)
+            setIsInitialized(false)
             await TrackPlayer.reset()
             syncStateWithWebUI()
             
@@ -316,12 +328,23 @@ const HeadlessAudioPlayer = ({}) => {
              * To remove it from the queue
              */
             case Event.PlaybackQueueEnded:
-                await handleQueueAdvance()
-                await TrackPlayer.reset()
+                if (activeTrack === null || activeTrack.item?.id === undefined) {
+                    alert('no active track queue ended')
+                    console.log('active track', {
+                        activeTrack, delyTrack: delayTrack.current
+                    })
+                    return
+                }
+                await handleQueueAdvance(activeTrack?.item.id)
+                await resetCurrentTrack()
                 //await handleQueueAdvance()
                 break
             case Event.RemoteNext:
-                await handleQueueAdvance()
+                if (activeTrack === null || activeTrack.item.id !== undefined) {
+                    alert('no active track remote next')
+                    return
+                }
+                await handleQueueAdvance(activeTrack?.item.id)
                 break
             default:
                 break
