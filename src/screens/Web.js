@@ -11,7 +11,13 @@ import {
 } from 'react-native'
 import SplashScreen from 'react-native-splash-screen'
 
-import { APP_VERSION, FRONTEND_BASE_URL, HOME_URL, devLog } from '../constants'
+import {
+  APP_VERSION,
+  FRONTEND_BASE_URL,
+  HOME_URL,
+  devLog,
+  BUILD_NUMBER,
+} from '../constants'
 import { useGlobalState } from '../GlobalState'
 import NetworkError from './NetworkError'
 import Loader from '../components/Loader'
@@ -284,7 +290,7 @@ const Web = () => {
           <WebView
             ref={webviewRef}
             source={{ uri: webUrl }}
-            applicationNameForUserAgent={`RepublikApp/${APP_VERSION}`}
+            applicationNameForUserAgent={`RepublikApp/${APP_VERSION}/${BUILD_NUMBER}`}
             onNavigationStateChange={onNavigationStateChange}
             onMessage={onMessage}
             onLoad={() => {
