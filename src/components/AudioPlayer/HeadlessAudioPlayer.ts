@@ -132,14 +132,6 @@ const HeadlessAudioPlayer = ({}) => {
      */
     const handlePlay = useCallback(async (initialTime?: number) => {
         try {
-            /*
-            // Initialize the queue lazily once the first time the player is started.
-            if (!isQueueInitialized) {
-                if (trackedQueue && trackedQueue) {
-                    await handleQueueUpdate(trackedQueue)
-                }
-                setIsQueueInitialized(true)
-                */
             if (!isInitialized) {
                 setIsInitialized(true)
                 if (
@@ -160,44 +152,31 @@ const HeadlessAudioPlayer = ({}) => {
             const queue = await TrackPlayer.getQueue()
             console.log('test -- play', queue)
 
-            if (Platform.OS == 'android' && initialTime) {
+            if (initialTime) {
                 console.log('xxx -- play skipTo', initialTime)
                 await TrackPlayer.skip(0, initialTime)
-                await TrackPlayer.setRate(playbackRate)
-                await TrackPlayer.play()
-                return syncStateWithWebUI()
-            } else if (
-                Platform.OS == 'ios' 
-                && initialTime !== undefined 
-                && initialTime > 0
-            ) {
-                const seekTo = initialTime
-                await TrackPlayer.setVolume(0)
-                await TrackPlayer.setRate(playbackRate)
-                await TrackPlayer.play()
                 syncStateWithWebUI()
-
-                // This coe has been reused from v2.1.3
-                // seekTo does not work on iOS until the player has started playing
-                // we workaround around this with a setTimeout:
-                // https://github.com/react-native-kit/react-native-track-player/issues/387#issuecomment-709433886
-                setTimeout(() => {
-                  TrackPlayer.seekTo(seekTo)
+            }
+            await TrackPlayer.setRate(playbackRate)
+            await TrackPlayer.play()
+            // iOS has issues with the playback rate on the inital play.
+            if (Platform.OS == 'ios') {
+               setTimeout(() => {
+                    TrackPlayer.setRate(playbackRate)
                 }, 1)
                 setTimeout(() => {
-                  TrackPlayer.seekTo(seekTo)
+                    TrackPlayer.setRate(playbackRate)
                 }, 500)
-                TrackPlayer.setVolume(1)
-                return syncStateWithWebUI()
+                setTimeout(() => {
+                    TrackPlayer.setRate(playbackRate)
+                }, 1000)
             }
-
-            await TrackPlayer.play()
             syncStateWithWebUI()
             return
         } catch (error) {
             handleError(error)
         }
-    }, [syncStateWithWebUI, isInitialized])
+    }, [syncStateWithWebUI, isInitialized, playbackRate])
 
     const handlePause = useCallback(async () => {
         try {
@@ -265,6 +244,7 @@ const HeadlessAudioPlayer = ({}) => {
     const handlePlaybackRate = useCallback(async (payload: number) => {
         try {
             setPlaybackRate(payload)
+            console.log('xxx - set playback rate', payload)
             await TrackPlayer.setRate(payload)
             syncStateWithWebUI()
         } catch (error) {
@@ -363,14 +343,15 @@ const HeadlessAudioPlayer = ({}) => {
                 return
             }
 
+            if (playbackRate) {
+                setPlaybackRate(playbackRate)
+            }
+
             // During the initial setup, the player safes the track into a ref.
             // In addtion, the initial playbackrate can also be set.
             if (!isInitialized) {
                 console.log('test - not initialized, add to delay')
                 delayTrack.current = nextItem
-                if (playbackRate) {
-                    setPlaybackRate(playbackRate)
-                }
                 return
             }
             console.log('test - initialized, add as first item')
