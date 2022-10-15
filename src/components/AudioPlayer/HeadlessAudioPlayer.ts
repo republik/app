@@ -47,7 +47,6 @@ function getTrackFromAudioQueueItem(item: AudioQueueItem): Track | null {
         artist: 'Republik',
         artwork: image ?? Logo,
         duration: audioSource.durationMs / 1000,
-        initialTime: audioSource?.userProgress?.secs || 0
     }
     return track
 }
@@ -61,14 +60,14 @@ const HeadlessAudioPlayer = ({}) => {
     const playerState = usePlaybackState()
 
     const [activeTrack, setActiveTrack] = useState<AudioObject | null>(null)
-    const delayTrack = useRef<AudioObject | null>(null)
+    const lazyInitializedTrack = useRef<AudioObject | null>(null)
     const [isInitialized, setIsInitialized] = useState(false)
     const [playbackRate, setPlaybackRate] = useState(1)
 
     const { notifyStateSync, notifyQueueAdvance, notifyError } = useWebViewHandlers()
 
     const resetCurrentTrack = async () => {
-        delayTrack.current = null
+        lazyInitializedTrack.current = null
         setActiveTrack(null)
         await TrackPlayer.reset()
     }
@@ -81,23 +80,25 @@ const HeadlessAudioPlayer = ({}) => {
     
     /**
      * Send all relevant state of the track-player to the web-ui.
+     * If the player hasn't been initialized yet we send an update based on changes to the
+     * lazy initialized track.
      */
-    const syncStateWithWebUI = useCallback(
-            async () => {
-            const [
-                track,
-                state,
-                duration,
-                position,
-                playbackRate,
-            ] = await Promise.all([
-                getCurrentPlayingTrack(),
-                TrackPlayer.getState(),
-                TrackPlayer.getDuration(),
-                TrackPlayer.getPosition(),
-                TrackPlayer.getRate(),
-            ])
+    const syncStateWithWebUI = useCallback(async () => {
+        const [
+            track,
+            state,
+            duration,
+            position,
+            playbackRate,
+        ] = await Promise.all([
+            getCurrentPlayingTrack(),
+            TrackPlayer.getState(),
+            TrackPlayer.getDuration(),
+            TrackPlayer.getPosition(),
+            TrackPlayer.getRate(),
+        ])
 
+        if (isInitialized) {
             notifyStateSync({
                 itemId: track?.itemId,
                 playerState: state,
@@ -105,8 +106,17 @@ const HeadlessAudioPlayer = ({}) => {
                 position,
                 playbackRate: Math.round(playbackRate * 100) / 100,
             })
-            
-        }, [notifyStateSync])
+        } else if (lazyInitializedTrack?.current) {
+            notifyStateSync({
+                itemId: lazyInitializedTrack.current.item.id,
+                playerState: State.None,
+                duration: 0,
+                position: lazyInitializedTrack.current.initialTime ?? 0,
+                playbackRate,
+                forceUpdate: true
+            })
+        }
+    }, [notifyStateSync, isInitialized])
 
     /**
      * Inform web-view to advance audio-queue.
@@ -115,15 +125,6 @@ const HeadlessAudioPlayer = ({}) => {
         notifyQueueAdvance(itemId)
         syncStateWithWebUI()
     }, [syncStateWithWebUI, notifyQueueAdvance])
-
-    const getInitialTime = (track: Track, initialTime?: number) => {
-        const out =  initialTime ?? track?.initialTime ?? 0
-        console.log('xxx - resolved initialTime', out, {
-            initialTime,
-            track: track?.initialTime
-        })
-        return out
-    }
 
     /**
      * Handle play event. If the queue was not initialized yet, initialize it.
@@ -135,42 +136,33 @@ const HeadlessAudioPlayer = ({}) => {
             if (!isInitialized) {
                 setIsInitialized(true)
                 if (
-                    delayTrack?.current 
-                    && delayTrack.current !== null 
-                    && delayTrack.current.track !== null
+                    lazyInitializedTrack?.current 
+                    && lazyInitializedTrack.current !== null 
+                    && lazyInitializedTrack.current.track !== null
                 ) {
-                    console.log('xxx delayTrack', delayTrack.current)
-                    setActiveTrack(delayTrack.current)
-                    await TrackPlayer.add(delayTrack.current.track)
-                    console.log('test -- initialize on first play')
-                    // Seek the intialTime for the first item in the queue.
-                    // For all subsequent items, the initialTime is seeked in the PlaybackTrackChangedEvent handler.
-                    const firstTrack = delayTrack.current?.track
-                    initialTime = getInitialTime(firstTrack, initialTime)
+                    setActiveTrack(lazyInitializedTrack.current)
+                    await TrackPlayer.add(lazyInitializedTrack.current.track)
+                    initialTime = lazyInitializedTrack.current.initialTime
                 }
             }
-            const queue = await TrackPlayer.getQueue()
-            console.log('test -- play', queue)
 
             if (initialTime) {
-                console.log('xxx -- play skipTo', initialTime)
                 await TrackPlayer.skip(0, initialTime)
                 syncStateWithWebUI()
             }
             await TrackPlayer.setRate(playbackRate)
             await TrackPlayer.play()
+
             // iOS has issues with the playback rate on the inital play.
             if (Platform.OS == 'ios') {
-               setTimeout(() => {
+                setTimeout(() => {
                     TrackPlayer.setRate(playbackRate)
                 }, 1)
                 setTimeout(() => {
                     TrackPlayer.setRate(playbackRate)
                 }, 500)
-                setTimeout(() => {
-                    TrackPlayer.setRate(playbackRate)
-                }, 1000)
             }
+            
             syncStateWithWebUI()
             return
         } catch (error) {
@@ -192,7 +184,6 @@ const HeadlessAudioPlayer = ({}) => {
      */
     const handleStop = useCallback(async () => {
         try {
-            console.log('xxx - resetting track player')
             setIsInitialized(false)
             await TrackPlayer.reset()
             syncStateWithWebUI()
@@ -207,36 +198,59 @@ const HeadlessAudioPlayer = ({}) => {
      */
     const handleSeek = useCallback(async (payload) => {
         try {
-            await TrackPlayer.seekTo(payload)
+            if (isInitialized) {
+                await TrackPlayer.seekTo(payload)
+            } else if (lazyInitializedTrack?.current) {
+                lazyInitializedTrack.current = {
+                    ...lazyInitializedTrack.current,
+                    initialTime: payload
+                }
+            }
             syncStateWithWebUI()
         } catch (error) {
             handleError(error)
         }
-    }, [syncStateWithWebUI])
+    }, [syncStateWithWebUI, isInitialized])
 
     /**
      * Forward the given amount of seconds.
      */
     const handleForward = useCallback(async (payload: number) => {
         try {
-            const position = await TrackPlayer.getPosition()
-            await handleSeek(position + payload)
+            if (isInitialized) {
+                const position = await TrackPlayer.getPosition()
+                await TrackPlayer.seekTo(position + payload)
+            } else if (lazyInitializedTrack?.current) {
+                lazyInitializedTrack.current = {
+                    ...lazyInitializedTrack.current,
+                    initialTime: Math.max((lazyInitializedTrack?.current.initialTime || 0) + payload, 0)
+                }
+            }
+            syncStateWithWebUI()
         } catch (error) {
             handleError(error)
         }
-    }, [handleSeek])
+    }, [syncStateWithWebUI, isInitialized])
 
     /**
      * Rewind the given amount of seconds.
      */
     const handleBackward = useCallback(async (payload: number) => {
         try {
-            const position = await TrackPlayer.getPosition()
-            await handleSeek(position - payload)
+            if (isInitialized) {
+                const position = await TrackPlayer.getPosition()
+                await TrackPlayer.seekTo(position - payload)
+            } else if (lazyInitializedTrack?.current) {
+                lazyInitializedTrack.current = {
+                    ...lazyInitializedTrack.current,
+                    initialTime: Math.max((lazyInitializedTrack?.current.initialTime || 0) - payload, 0)
+                }
+            }
+            syncStateWithWebUI()
         } catch (error) {
             handleError(error)
         }
-    } , [handleSeek])
+    } , [syncStateWithWebUI, isInitialized])
 
     /**
      * Set the playback rate.
@@ -244,7 +258,6 @@ const HeadlessAudioPlayer = ({}) => {
     const handlePlaybackRate = useCallback(async (payload: number) => {
         try {
             setPlaybackRate(payload)
-            console.log('xxx - set playback rate', payload)
             await TrackPlayer.setRate(payload)
             syncStateWithWebUI()
         } catch (error) {
@@ -286,7 +299,7 @@ const HeadlessAudioPlayer = ({}) => {
                 // Handle faulty event emission when nothing is tracked
                 if (activeTrack === null || activeTrack.item?.id === undefined) {
                     console.log('faulty playback-ended update', {
-                        activeTrack, delyTrack: delayTrack.current
+                        activeTrack
                     })
                     return
                 }
@@ -333,13 +346,13 @@ const HeadlessAudioPlayer = ({}) => {
 
     useWebViewEvent<AudioSetupData>(AudioEvent.SETUP_TRACK, async ({item, autoPlay, initialTime, playbackRate }: AudioSetupData) => {
         try {
-            console.log('test setup for item', item)
             const nextItem = {
                 item,
                 track: getTrackFromAudioQueueItem(item),
+                initialTime: initialTime || 0,
             }
             if (!nextItem.track) {
-                console.log('test - no track found')
+                console.warn('no track found for item', item)
                 return
             }
 
@@ -350,24 +363,18 @@ const HeadlessAudioPlayer = ({}) => {
             // During the initial setup, the player safes the track into a ref.
             // In addtion, the initial playbackrate can also be set.
             if (!isInitialized) {
-                console.log('test - not initialized, add to delay')
-                delayTrack.current = nextItem
+                lazyInitializedTrack.current = nextItem
                 return
             }
-            console.log('test - initialized, add as first item')
             setActiveTrack(nextItem)
-            console.log('xxx - setup', nextItem)
             await TrackPlayer.reset()
             await TrackPlayer.add(nextItem.track)
 
-            const computedInitialTime = getInitialTime(nextItem.track, initialTime)
-
             syncStateWithWebUI()
             if (autoPlay) {
-                console.log('test - auto play with start time', computedInitialTime)
-                await handlePlay(computedInitialTime)
-            } else {
-                await TrackPlayer.skip(0, computedInitialTime)
+                await handlePlay(initialTime)
+            } else if (initialTime) {
+                await TrackPlayer.skip(0, initialTime)
             }
             return Promise.resolve()
         } catch (error) {

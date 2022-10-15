@@ -9,6 +9,7 @@ type AudioPlayerState = {
     duration: number
     position: number
     playbackRate: number
+    forceUpdate?: boolean
 }
 
 type WebViewHandlers = {
@@ -31,6 +32,7 @@ const useWebViewHandlers = (): WebViewHandlers => {
                     duration: state.duration,
                     currentTime: state.position,
                     playbackRate: state.playbackRate,
+                    forceUpdate: state.forceUpdate
                 }
             }
         }), [dispatch]
