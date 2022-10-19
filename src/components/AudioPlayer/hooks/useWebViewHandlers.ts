@@ -16,6 +16,7 @@ type WebViewHandlers = {
     notifyStateSync: (state: AudioPlayerState) => void
     notifyQueueAdvance: (itemId: string) => void
     notifyError: (error: Error) => void
+    notifyMinimize: () => void
 }
 
 const useWebViewHandlers = (): WebViewHandlers => {
@@ -57,10 +58,21 @@ const useWebViewHandlers = (): WebViewHandlers => {
         })
     }, [dispatch])
 
+    const handleMinimizePlayer = useCallback(() => {
+        dispatch({
+            type: "postMessage",
+            content: {
+                type: AudioEvent.MINIMIZE_PLAYER,
+                payload: null
+            }
+        })
+    }, [dispatch])
+
     return {
         notifyStateSync: syncState,
         notifyQueueAdvance: advanceQueue,
         notifyError: handleError,
+        notifyMinimize: handleMinimizePlayer,
     }
 }
 

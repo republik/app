@@ -6,7 +6,7 @@ import Logo from '../../assets/images/playlist-logo.png'
 import useWebViewEvent from '../../lib/useWebViewEvent';
 import useInterval from '../../lib/useInterval';
 import useWebViewHandlers from './hooks/useWebViewHandlers';
-import { AppState, AppStateStatus, Platform } from 'react-native';
+import { AppState, AppStateStatus, BackHandler, Platform } from 'react-native';
 
 type AudioObject = {
     item: AudioQueueItem
@@ -51,6 +51,11 @@ function getTrackFromAudioQueueItem(item: AudioQueueItem): Track | null {
     return track
 }
 
+type UIState = {
+    isVisible: boolean
+    isExpanded: boolean
+}
+
 /**
  * HeadlessAudioPlayer is a wrapper around react-native-track-player without any react-native UI.
  * The player is controlled through events received from the webview.
@@ -58,13 +63,14 @@ function getTrackFromAudioQueueItem(item: AudioQueueItem): Track | null {
 const HeadlessAudioPlayer = ({}) => {
     const appState = useRef<AppStateStatus>(AppState.currentState)
     const playerState = usePlaybackState()
+    const [uiState, setUIState] = useState<UIState>({ isVisible: false, isExpanded: false })
 
     const [activeTrack, setActiveTrack] = useState<AudioObject | null>(null)
     const lazyInitializedTrack = useRef<AudioObject | null>(null)
     const [isInitialized, setIsInitialized] = useState(false)
     const [playbackRate, setPlaybackRate] = useState(1)
 
-    const { notifyStateSync, notifyQueueAdvance, notifyError } = useWebViewHandlers()
+    const { notifyStateSync, notifyQueueAdvance, notifyError, notifyMinimize } = useWebViewHandlers()
 
     const resetCurrentTrack = async () => {
         lazyInitializedTrack.current = null
@@ -382,6 +388,25 @@ const HeadlessAudioPlayer = ({}) => {
         }
         
     })
+
+    // Sync teh UI-state of the web-player to allow for special handling of back button in android
+    useWebViewEvent<UIState>(AudioEvent.UPDATE_UI_STATE, (newUIState: UIState) => setUIState(newUIState))
+
+    // On android the back button should cause the expanded player to minimize on back button press
+    useEffect(() => {
+        if (Platform.OS === 'android') {
+            const handleBackPress = () => {
+                if  (uiState.isExpanded) {
+                    notifyMinimize()
+                    return true // The event is considered as handled, the OS won't bubble up the back-press
+                }
+                return false // Event is bubbled up for the OS to handle
+            }
+
+            const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackPress)
+            return () => backHandler.remove()
+        }
+    }, [uiState, notifyMinimize])
 
     // Sync the player state with the webview when the app comes to the foreground
     useEffect(() => {
