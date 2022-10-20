@@ -16,6 +16,15 @@ export type AudioPlayerItem = {
     path: string
     publishDate?: string
     image?: string
+    audioCoverCrop?: {
+      x: number
+      y: number
+      width: number
+      height: number
+    }
+    coverLg?: string
+    coverMd?: string
+    coverSm?: string
     audioSource?: {
       mediaId: string
       kind: string

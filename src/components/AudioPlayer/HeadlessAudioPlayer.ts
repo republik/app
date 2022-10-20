@@ -33,7 +33,7 @@ const SYNC_INTERVAL_WHILE_CONNECTING = 1000
  * - mediaId: audioSoruce.mediaId
  * - initialTime: initialTime at which we should start playing the track
 */
-function getTrackFromAudioQueueItem(item: AudioQueueItem): Track | null {
+function getTrackFromAudioQueueItem(item: AudioQueueItem, coverImage?: string): Track | null {
     const { meta } = item.document
     const { title, audioSource, image } = meta ?? {}
     if (!audioSource) {
@@ -45,7 +45,7 @@ function getTrackFromAudioQueueItem(item: AudioQueueItem): Track | null {
         url: audioSource.mp3,
         title,
         artist: 'Republik',
-        artwork: image ?? Logo,
+        artwork: coverImage || image || Logo,
         duration: audioSource.durationMs / 1000,
     }
     return track
@@ -348,13 +348,14 @@ const HeadlessAudioPlayer = ({}) => {
         autoPlay?: boolean
         initialTime?: number
         playbackRate?: number
+        coverImage?: string
     }
 
-    useWebViewEvent<AudioSetupData>(AudioEvent.SETUP_TRACK, async ({item, autoPlay, initialTime, playbackRate }: AudioSetupData) => {
+    useWebViewEvent<AudioSetupData>(AudioEvent.SETUP_TRACK, async ({item, autoPlay, initialTime, playbackRate, coverImage }: AudioSetupData) => {
         try {
             const nextItem = {
                 item,
-                track: getTrackFromAudioQueueItem(item),
+                track: getTrackFromAudioQueueItem(item, coverImage),
                 initialTime: initialTime || 0,
             }
             if (!nextItem.track) {
