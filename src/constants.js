@@ -39,6 +39,7 @@ export const HOME_URL = `${FRONTEND_BASE_URL}${HOME_PATH}`
 
 // Misc
 export const APP_VERSION = DeviceInfo.getVersion()
+export const BUILD_NUMBER = DeviceInfo.getBuildNumber()
 
 // Audio
 export const AUDIO_PLAYER_HEIGHT = 68

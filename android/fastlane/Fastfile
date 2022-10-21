@@ -23,15 +23,16 @@ platform :android do
       app_project_dir: "./app"
     )
     gradle(
-      task: "assemble",
+      task: "bundle",
       build_type: "Release"
     )
     supply(
       track: "alpha",
-      apk: "#{lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH]}",
+      aab: "#{lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH]}",
       skip_upload_metadata: true,
       skip_upload_images: true,
-      skip_upload_screenshots: true
+      skip_upload_screenshots: true,
+      skip_upload_apk: true,
     )
   end
 

@@ -21,7 +21,7 @@ platform :ios do
     increment_build_number
     match(
       type: "appstore",
-      git_url: "git@github.com:orbiting/app-certificates.git"
+      git_url: "https://github.com/orbiting/app-certificates"
     ) # more information: https://codesigning.guide
     build_app(workspace: "republikapp.xcworkspace", scheme: "republikapp (staging)", export_xcargs: "-allowProvisioningUpdates")
     upload_to_testflight(skip_waiting_for_build_processing: true)
@@ -30,7 +30,7 @@ platform :ios do
     increment_build_number
     match(
       type: "appstore",
-      git_url: "git@github.com:orbiting/app-certificates.git"
+      git_url: "https://github.com/orbiting/app-certificates"
     ) # more information: https://codesigning.guide
     build_app(workspace: "republikapp.xcworkspace", scheme: "republikapp (production)")
     upload_to_testflight(skip_waiting_for_build_processing: true)

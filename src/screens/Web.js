@@ -11,11 +11,18 @@ import {
 } from 'react-native'
 import SplashScreen from 'react-native-splash-screen'
 
-import { APP_VERSION, FRONTEND_BASE_URL, HOME_URL, devLog } from '../constants'
+import {
+  APP_VERSION,
+  FRONTEND_BASE_URL,
+  HOME_URL,
+  devLog,
+  BUILD_NUMBER,
+} from '../constants'
 import { useGlobalState } from '../GlobalState'
 import NetworkError from './NetworkError'
 import Loader from '../components/Loader'
 import { useColorContext } from '../utils/colors'
+import WebViewEventEmitter from '../lib/WebViewEventEmitter'
 
 // Based on react-native-webview injection for Android
 // https://github.com/react-native-webview/react-native-webview/blob/194c6a2335b12cc05283413c44d0948eb5156e02/android/src/main/java/com/reactnativecommunity/webview/RNCWebViewManager.java#L651-L670
@@ -182,30 +189,44 @@ const Web = () => {
   const onMessage = e => {
     const message = JSON.parse(e.nativeEvent.data) || {}
     devLog('onMessage', message)
-    if (message.type === 'routeChange') {
-      onNavigationStateChange(message.payload)
-    } else if (message.type === 'share') {
-      share(message.payload)
-    } else if (message.type === 'haptic') {
-      ReactNativeHapticFeedback.trigger(message.payload.type)
-    } else if (message.type === 'play-audio') {
-      setGlobalState({ autoPlayAudio: message.payload })
-      setPersistedState({
-        audio: message.payload,
-      })
-    } else if (message.type === 'isSignedIn') {
-      setPersistedState({ isSignedIn: message.payload })
-    } else if (message.type === 'fullscreen-enter') {
-      setGlobalState({ isFullscreen: true })
-    } else if (message.type === 'fullscreen-exit') {
-      setGlobalState({ isFullscreen: false })
-    } else if (message.type === 'setColorScheme') {
-      setPersistedState({ userSetColorScheme: message.colorSchemeKey })
-    } else if (message.type === 'ackMessage') {
-      dispatch({
-        type: 'clearMessage',
-        id: message.id,
-      })
+    switch (message.type) {
+      case 'routeChange':
+        onNavigationStateChange(message.payload)
+        break
+      case 'share':
+        share(message.payload)
+        break
+      case 'haptic':
+        ReactNativeHapticFeedback.trigger(message.payload.type)
+        break
+      case 'play-audio':
+        setGlobalState({ autoPlayAudio: message.payload })
+        setPersistedState({
+          audio: message.payload,
+        })
+        break
+      case 'isSignedIn':
+        setPersistedState({ isSignedIn: message.payload })
+        break
+      case 'fullscreen-enter':
+        setGlobalState({ isFullscreen: true })
+        break
+      case 'fullscreen-exit':
+        setGlobalState({ isFullscreen: false })
+        break
+      case 'setColorScheme':
+        setPersistedState({ userSetColorScheme: message.colorSchemeKey })
+        break
+      case 'ackMessage':
+        dispatch({
+          type: 'clearMessage',
+          id: message.id,
+        })
+        break
+      default:
+        // Forward to an EventEmitter to directly handle the event
+        // in the respective component
+        WebViewEventEmitter.emit(message.type, message.payload)
     }
   }
 
@@ -269,7 +290,7 @@ const Web = () => {
           <WebView
             ref={webviewRef}
             source={{ uri: webUrl }}
-            applicationNameForUserAgent={`RepublikApp/${APP_VERSION}`}
+            applicationNameForUserAgent={`RepublikApp/${APP_VERSION}/${BUILD_NUMBER}`}
             onNavigationStateChange={onNavigationStateChange}
             onMessage={onMessage}
             onLoad={() => {
@@ -290,7 +311,7 @@ const Web = () => {
             renderError={() => (
               <NetworkError onReload={() => webviewRef.current.reload()} />
             )}
-            originWhitelist={[`${FRONTEND_BASE_URL}*`, `https://*.stripe.com`]}
+            originWhitelist={[`${FRONTEND_BASE_URL}*`, 'https://*.stripe.com']}
             pullToRefreshEnabled={false}
             allowsFullscreenVideo={true}
             allowsInlineMediaPlayback={true}
@@ -307,7 +328,7 @@ const Web = () => {
             onContentProcessDidTerminate={() => {
               setDidCrash(true)
             }}
-            style={{backgroundColor:colors.default}}
+            style={{ backgroundColor: colors.default }}
           />
         </SafeAreaView>
       )}
