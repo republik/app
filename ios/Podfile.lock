@@ -290,7 +290,7 @@ PODS:
     - React-Core
   - react-native-get-random-values (1.8.0):
     - React-Core
-  - react-native-notifications (4.2.4):
+  - react-native-notifications (4.3.2):
     - React-Core
   - react-native-safe-area-context (4.1.4):
     - RCT-Folly
@@ -590,7 +590,7 @@ SPEC CHECKSUMS:
   react-native-config: 7cd105e71d903104e8919261480858940a6b9c0e
   react-native-cookies: 7e14e823f32bd7c868134c7e207c89a46fa28f98
   react-native-get-random-values: a6ea6a8a65dc93e96e24a11105b1a9c8cfe1d72a
-  react-native-notifications: 3de8ef9cd800e5db0225d9aa46b228d2b94ce51e
+  react-native-notifications: f3215821dfd74234f8f3910e2fe37e19fa8673b0
   react-native-safe-area-context: 989fa91e705bc7f2bc2a0d76d72104111f825c2a
   react-native-splash-screen: 200d11d188e2e78cea3ad319964f6142b6384865
   react-native-track-player: 0c26d981b5097910486cbbeb6d8f5352d41be069
