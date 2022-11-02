@@ -29,3 +29,19 @@ How to: Always state your device & OS and go through the list.
 **Other**
 * Check if video playback works as expected (inline & fullscreen or external (filmingo))
 * Open a gallery image and check that the status bar disappears and changes color
+
+# Send test-notification
+
+If you are testing the notification functionality in a production build of the app, the following graphql query can be executed to send a notification to the devices of the currently logged in user.
+
+```gql
+mutation {
+  sendTestPushNotification(
+    title: "[Test] title"
+    body: "body"
+    url: "https://www.republik.ch/2022/11/02/journal"
+    type: "discussion"
+    tag: "" // Enter a new unique value each time you execute this query
+  )
+}
+```
