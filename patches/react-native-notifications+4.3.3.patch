@@ -1,0 +1,34 @@
+diff --git a/node_modules/react-native-notifications/lib/android/app/src/main/java/com/wix/reactnativenotifications/RNNotificationsPackage.java b/node_modules/react-native-notifications/lib/android/app/src/main/java/com/wix/reactnativenotifications/RNNotificationsPackage.java
+index a249c6a..5903e02 100644
+--- a/node_modules/react-native-notifications/lib/android/app/src/main/java/com/wix/reactnativenotifications/RNNotificationsPackage.java
++++ b/node_modules/react-native-notifications/lib/android/app/src/main/java/com/wix/reactnativenotifications/RNNotificationsPackage.java
+@@ -95,9 +95,7 @@ public class RNNotificationsPackage implements ReactPackage, AppLifecycleFacade.
+         Intent intent = activity.getIntent();
+         if (NotificationIntentAdapter.canHandleIntent(intent)) {
+             Context appContext = mApplication.getApplicationContext();
+-            Bundle notificationData = NotificationIntentAdapter.canHandleTrampolineActivity(appContext) ?
+-                    intent.getExtras() : NotificationIntentAdapter.extractPendingNotificationDataFromIntent(intent);
+-            final IPushNotification pushNotification = PushNotification.get(appContext, notificationData);
++            final IPushNotification pushNotification = PushNotification.get(appContext, intent.getExtras());
+             if (pushNotification != null) {
+                 pushNotification.onOpened();
+             }
+diff --git a/node_modules/react-native-notifications/lib/android/app/src/main/java/com/wix/reactnativenotifications/core/notification/PushNotification.java b/node_modules/react-native-notifications/lib/android/app/src/main/java/com/wix/reactnativenotifications/core/notification/PushNotification.java
+index eade08d..f20fe23 100644
+--- a/node_modules/react-native-notifications/lib/android/app/src/main/java/com/wix/reactnativenotifications/core/notification/PushNotification.java
++++ b/node_modules/react-native-notifications/lib/android/app/src/main/java/com/wix/reactnativenotifications/core/notification/PushNotification.java
+@@ -62,12 +62,8 @@ public class PushNotification implements IPushNotification {
+ 
+     @Override
+     public void onReceived() throws InvalidNotificationException {
+-        if (!mAppLifecycleFacade.isAppVisible()) {
+-            postNotification(null);
+-            notifyReceivedBackgroundToJS();
+-        } else {
+-            notifyReceivedToJS();
+-        }
++        postNotification(null);
++        notifyReceivedToJS();
+     }
+ 
+     @Override
