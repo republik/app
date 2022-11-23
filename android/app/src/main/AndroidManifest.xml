@@ -2,7 +2,6 @@
   package="app.republik">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
     <!-- Chromebook Compatibility see: https://developer.android.com/topic/arc#update_your_apps_manifest_file -->
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
     <application
@@ -59,6 +58,53 @@
             <action android:name="android.intent.action.SENDTO" />
             <data android:scheme="mailto"/>
         </intent>
+    </queries>
+      <!-- Specifying the app packages below is necessary for links in our
+      articles to open, if a user has an app installed that captures the 
+      deep link. This became necessary because Google didn't allow our 
+      app to query_all_packages via uses-permission -->
+    <queries>
+      <package android:name="com.google.android.youtube" />
+      <package android:name="com.phonegap.tagesanzeiger" />
+      <package android:name="ch.nzz.mobile" />
+      <package android:name="com.nytimes.android" />
+      <package android:name="com.twitter.android" />
+      <package android:name="ch.srf.mobile" />
+      <package android:name="ch.iAgentur.i20Min" />
+      <package android:name="ch.fixxpunkt.watson" />
+      <package android:name="de.zeit.online" />
+      <package android:name="com.guardian" />
+      <package android:name="com.github.android" />
+      <package android:name="de.spiegel.android.app.spon" />
+      <package android:name="org.wikipedia" />
+      <package android:name="ch.blick.news" />
+      <package android:name="de.tagesschau" />
+      <package android:name="de.sueddeutsche" />
+      <package android:name="de.sde.mobile" />
+      <package android:name="bbc.mobile.news.ww" />
+      <package android:name="com.thomsonreuters.reuters" />
+      <package android:name="ch.azmedien.az_live_aargau" />
+      <package android:name="com.idmedia.android.newsportal" />
+      <package android:name="com.washingtonpost.android" />
+      <package android:name="ch.swissinfo.android" />
+      <package android:name="com.cnn.mobile.android.phone" />
+      <package android:name="net.faz.FAZ" />
+      <package android:name="com.ft.news" />
+      <package android:name="ch.woz.app" />
+      <package android:name="com.bloomberg.android.plus" />
+      <package android:name="com.theatlantic.newsstand" />
+      <package android:name="com.google.android.googlequicksearchbox" />
+      <package android:name="com.instagram.android" />
+      <package android:name="de.fcms.webapp.luzernerzeitung" />
+      <package android:name="de.fcms.webapp.tagblatt" />
+      <package android:name="de.cellular.n24hybrid" />
+      <package android:name="de.taz.android.app" />
+      <package android:name="ch.nau.app" />
+      <package android:name="de.tagesspiegel.epaper.android.uni" />
+      <package android:name="ch.derbund.app" />
+      <package android:name="ch.letemps" />
+      <package android:name="com.medium.reader" />
+      <package android:name="com.economist.lamarr" />
     </queries>
 
 </manifest>
