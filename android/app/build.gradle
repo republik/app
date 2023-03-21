@@ -155,8 +155,8 @@ android {
         applicationId "app.republik"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 256
-        versionName "2.2.2"
+        versionCode 267
+        versionName "2.2.3"
         buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
 
         if (isNewArchitectureEnabled()) {

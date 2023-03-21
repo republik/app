@@ -1,6 +1,6 @@
 {
   "name": "republikapp",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "license": "bsd-3-clause",
   "scripts": {
     "android": "ENVFILE=.env.development react-native run-android",
@@ -30,7 +30,7 @@
     "react-native-get-random-values": "^1.8.0",
     "react-native-haptic-feedback": "^1.14.0",
     "react-native-navigation-bar-color": "^2.0.1",
-    "react-native-notifications": "4.3.3",
+    "react-native-notifications": "^4.3.3",
     "react-native-safe-area-context": "4.1.4",
     "react-native-splash-screen": "^3.2.0",
     "react-native-status-bar-height": "^2.6.0",
