@@ -1,20 +1,175 @@
+diff --git a/node_modules/react-native-notifications/android/app/src/reactNative59/java/com/wix/reactnativenotifications/NotificationManagerCompatFacade.java b/node_modules/react-native-notifications/android/app/src/reactNative59/java/com/wix/reactnativenotifications/NotificationManagerCompatFacade.java
+index f9c858b..94ea188 100644
+--- a/node_modules/react-native-notifications/android/app/src/reactNative59/java/com/wix/reactnativenotifications/NotificationManagerCompatFacade.java
++++ b/node_modules/react-native-notifications/android/app/src/reactNative59/java/com/wix/reactnativenotifications/NotificationManagerCompatFacade.java
+@@ -2,8 +2,8 @@
+ package com.wix.reactnativenotifications;
+ 
+ import android.content.Context;
+-import android.support.annotation.NonNull;
+-import android.support.v4.app.NotificationManagerCompat;
++import androidx.annotation.NonNull;
++import androidx.core.app.NotificationManagerCompat;
+ 
+ public abstract class NotificationManagerCompatFacade {
+     public static NotificationManagerCompat from(@NonNull Context context) {
+diff --git a/node_modules/react-native-notifications/lib/android/app/src/main/AndroidManifest.xml b/node_modules/react-native-notifications/lib/android/app/src/main/AndroidManifest.xml
+index 24cd226..0304a9a 100644
+--- a/node_modules/react-native-notifications/lib/android/app/src/main/AndroidManifest.xml
++++ b/node_modules/react-native-notifications/lib/android/app/src/main/AndroidManifest.xml
+@@ -5,11 +5,6 @@
+ 
+     <application>
+ 
+-        <!--
+-         A proxy-service that gives the library an opportunity to do some work before launching/resuming the actual application task.
+-         -->
+-        <service android:name=".core.ProxyService"/>
+-
+         <service
+             android:name=".fcm.FcmInstanceIdListenerService"
+             android:exported="true">
 diff --git a/node_modules/react-native-notifications/lib/android/app/src/main/java/com/wix/reactnativenotifications/RNNotificationsPackage.java b/node_modules/react-native-notifications/lib/android/app/src/main/java/com/wix/reactnativenotifications/RNNotificationsPackage.java
-index a249c6a..5903e02 100644
+index a249c6a..be4c59a 100644
 --- a/node_modules/react-native-notifications/lib/android/app/src/main/java/com/wix/reactnativenotifications/RNNotificationsPackage.java
 +++ b/node_modules/react-native-notifications/lib/android/app/src/main/java/com/wix/reactnativenotifications/RNNotificationsPackage.java
-@@ -95,9 +95,7 @@ public class RNNotificationsPackage implements ReactPackage, AppLifecycleFacade.
-         Intent intent = activity.getIntent();
-         if (NotificationIntentAdapter.canHandleIntent(intent)) {
-             Context appContext = mApplication.getApplicationContext();
+@@ -17,6 +17,7 @@ import com.wix.reactnativenotifications.core.InitialNotificationHolder;
+ import com.wix.reactnativenotifications.core.NotificationIntentAdapter;
+ import com.wix.reactnativenotifications.core.notification.IPushNotification;
+ import com.wix.reactnativenotifications.core.notification.PushNotification;
++import com.wix.reactnativenotifications.core.notification.PushNotificationProps;
+ import com.wix.reactnativenotifications.core.notificationdrawer.IPushNotificationsDrawer;
+ import com.wix.reactnativenotifications.core.notificationdrawer.PushNotificationsDrawer;
+ 
+@@ -61,14 +62,18 @@ public class RNNotificationsPackage implements ReactPackage, AppLifecycleFacade.
+         final IPushNotificationsDrawer notificationsDrawer = PushNotificationsDrawer.get(mApplication.getApplicationContext());
+         notificationsDrawer.onNewActivity(activity);
+ 
+-        callOnOpenedIfNeed(activity);
++        Intent intent = activity.getIntent();
++        if (NotificationIntentAdapter.canHandleIntent(intent)) {
++            Bundle notificationData = intent.getExtras();
++            final IPushNotification pushNotification = PushNotification.get(mApplication.getApplicationContext(), notificationData);
++            if (pushNotification != null) {
++                pushNotification.onOpened();
++            }
++        }
+     }
+ 
+     @Override
+     public void onActivityStarted(Activity activity) {
+-        if (InitialNotificationHolder.getInstance().get() == null) {
+-            callOnOpenedIfNeed(activity);
+-        }
+     }
+ 
+     @Override
+@@ -90,17 +95,4 @@ public class RNNotificationsPackage implements ReactPackage, AppLifecycleFacade.
+     @Override
+     public void onActivityDestroyed(Activity activity) {
+     }
+-
+-    private void callOnOpenedIfNeed(Activity activity) {
+-        Intent intent = activity.getIntent();
+-        if (NotificationIntentAdapter.canHandleIntent(intent)) {
+-            Context appContext = mApplication.getApplicationContext();
 -            Bundle notificationData = NotificationIntentAdapter.canHandleTrampolineActivity(appContext) ?
 -                    intent.getExtras() : NotificationIntentAdapter.extractPendingNotificationDataFromIntent(intent);
 -            final IPushNotification pushNotification = PushNotification.get(appContext, notificationData);
-+            final IPushNotification pushNotification = PushNotification.get(appContext, intent.getExtras());
-             if (pushNotification != null) {
-                 pushNotification.onOpened();
-             }
+-            if (pushNotification != null) {
+-                pushNotification.onOpened();
+-            }
+-        }
+-    }
+ }
+diff --git a/node_modules/react-native-notifications/lib/android/app/src/main/java/com/wix/reactnativenotifications/core/NotificationIntentAdapter.java b/node_modules/react-native-notifications/lib/android/app/src/main/java/com/wix/reactnativenotifications/core/NotificationIntentAdapter.java
+index 70f609a..6773cf7 100644
+--- a/node_modules/react-native-notifications/lib/android/app/src/main/java/com/wix/reactnativenotifications/core/NotificationIntentAdapter.java
++++ b/node_modules/react-native-notifications/lib/android/app/src/main/java/com/wix/reactnativenotifications/core/NotificationIntentAdapter.java
+@@ -1,10 +1,9 @@
+ package com.wix.reactnativenotifications.core;
+ 
+-import android.annotation.SuppressLint;
+ import android.app.PendingIntent;
+-import android.app.TaskStackBuilder;
+ import android.content.Context;
+ import android.content.Intent;
++import android.os.Build;
+ import android.os.Bundle;
+ 
+ import com.wix.reactnativenotifications.core.notification.PushNotificationProps;
+@@ -12,29 +11,16 @@ import com.wix.reactnativenotifications.core.notification.PushNotificationProps;
+ public class NotificationIntentAdapter {
+     private static final String PUSH_NOTIFICATION_EXTRA_NAME = "pushNotification";
+ 
+-    @SuppressLint("UnspecifiedImmutableFlag")
+     public static PendingIntent createPendingNotificationIntent(Context appContext, PushNotificationProps notification) {
+-        if (canHandleTrampolineActivity(appContext)) {
+-            Intent intent = new Intent(appContext, ProxyService.class);
+-            intent.putExtra(PUSH_NOTIFICATION_EXTRA_NAME, notification.asBundle());
+-            return PendingIntent.getService(appContext, (int) System.currentTimeMillis(), intent, PendingIntent.FLAG_ONE_SHOT);
++        Intent intent = new AppLaunchHelper().getLaunchIntent(appContext);
++        intent.putExtra(PUSH_NOTIFICATION_EXTRA_NAME, notification.asBundle());
++        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
++            return PendingIntent.getActivity(appContext, (int) System.currentTimeMillis(), intent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
+         } else {
+-            Intent mainActivityIntent = appContext.getPackageManager().getLaunchIntentForPackage(appContext.getPackageName());
+-            mainActivityIntent.putExtra(PUSH_NOTIFICATION_EXTRA_NAME, notification.asBundle());
+-            TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(appContext);
+-            taskStackBuilder.addNextIntentWithParentStack(mainActivityIntent);
+-            return taskStackBuilder.getPendingIntent((int) System.currentTimeMillis(), PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
++            return PendingIntent.getActivity(appContext, (int) System.currentTimeMillis(), intent, PendingIntent.FLAG_ONE_SHOT);   
+         }
+     }
+ 
+-    public static boolean canHandleTrampolineActivity(Context appContext) {
+-        return android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.R || appContext.getApplicationInfo().targetSdkVersion < 31;
+-    }
+-
+-    public static Bundle extractPendingNotificationDataFromIntent(Intent intent) {
+-        return intent.getBundleExtra(PUSH_NOTIFICATION_EXTRA_NAME);
+-    }
+-
+     public static boolean canHandleIntent(Intent intent) {
+         if (intent != null) {
+             Bundle notificationData = intent.getExtras();
+diff --git a/node_modules/react-native-notifications/lib/android/app/src/main/java/com/wix/reactnativenotifications/core/ProxyService.java b/node_modules/react-native-notifications/lib/android/app/src/main/java/com/wix/reactnativenotifications/core/ProxyService.java
+deleted file mode 100644
+index be52912..0000000
+--- a/node_modules/react-native-notifications/lib/android/app/src/main/java/com/wix/reactnativenotifications/core/ProxyService.java
++++ /dev/null
+@@ -1,29 +0,0 @@
+-package com.wix.reactnativenotifications.core;
+-
+-import android.app.IntentService;
+-import android.content.Intent;
+-import android.os.Bundle;
+-import android.util.Log;
+-
+-import com.wix.reactnativenotifications.BuildConfig;
+-import com.wix.reactnativenotifications.core.notification.IPushNotification;
+-import com.wix.reactnativenotifications.core.notification.PushNotification;
+-
+-public class ProxyService extends IntentService {
+-
+-    private static final String TAG = ProxyService.class.getSimpleName();
+-
+-    public ProxyService() {
+-        super("notificationsProxyService");
+-    }
+-
+-    @Override
+-    protected void onHandleIntent(Intent intent) {
+-        if (BuildConfig.DEBUG) Log.d(TAG, "New intent: "+intent);
+-        final Bundle notificationData = NotificationIntentAdapter.extractPendingNotificationDataFromIntent(intent);
+-        final IPushNotification pushNotification = PushNotification.get(this, notificationData);
+-        if (pushNotification != null) {
+-            pushNotification.onOpened();
+-        }
+-    }
+-}
 diff --git a/node_modules/react-native-notifications/lib/android/app/src/main/java/com/wix/reactnativenotifications/core/notification/PushNotification.java b/node_modules/react-native-notifications/lib/android/app/src/main/java/com/wix/reactnativenotifications/core/notification/PushNotification.java
-index eade08d..f20fe23 100644
+index eade08d..1e6102b 100644
 --- a/node_modules/react-native-notifications/lib/android/app/src/main/java/com/wix/reactnativenotifications/core/notification/PushNotification.java
 +++ b/node_modules/react-native-notifications/lib/android/app/src/main/java/com/wix/reactnativenotifications/core/notification/PushNotification.java
 @@ -62,12 +62,8 @@ public class PushNotification implements IPushNotification {
@@ -32,3 +187,76 @@ index eade08d..f20fe23 100644
      }
  
      @Override
+@@ -97,22 +93,15 @@ public class PushNotification implements IPushNotification {
+     protected void digestNotification() {
+         if (!mAppLifecycleFacade.isReactInitialized()) {
+             setAsInitialNotification();
+-            launchOrResumeApp();
+             return;
+         }
+ 
+         final ReactContext reactContext = mAppLifecycleFacade.getRunningReactContext();
+         if (reactContext.getCurrentActivity() == null) {
+             setAsInitialNotification();
++            return;
+         }
+-
+-        if (mAppLifecycleFacade.isAppVisible()) {
+-            dispatchImmediately();
+-        } else if (mAppLifecycleFacade.isAppDestroyed()) {
+-            launchOrResumeApp();
+-        } else {
+-            dispatchUponVisibility();
+-        }
++        dispatchImmediately();
+     }
+ 
+     protected PushNotificationProps createProps(Bundle bundle) {
+@@ -127,18 +116,6 @@ public class PushNotification implements IPushNotification {
+         notifyOpenedToJS();
+     }
+ 
+-    protected void dispatchUponVisibility() {
+-        mAppLifecycleFacade.addVisibilityListener(getIntermediateAppVisibilityListener());
+-
+-        // Make the app visible so that we'll dispatch the notification opening when visibility changes to 'true' (see
+-        // above listener registration).
+-        launchOrResumeApp();
+-    }
+-
+-    protected AppVisibilityListener getIntermediateAppVisibilityListener() {
+-        return mAppVisibilityListener;
+-    }
+-
+     protected Notification buildNotification(PendingIntent intent) {
+         return getNotificationBuilder(intent).build();
+     }
+@@ -212,13 +189,6 @@ public class PushNotification implements IPushNotification {
+         mJsIOHelper.sendEventToJS(NOTIFICATION_OPENED_EVENT_NAME, response, mAppLifecycleFacade.getRunningReactContext());
+     }
+ 
+-    protected void launchOrResumeApp() {
+-        if (NotificationIntentAdapter.canHandleTrampolineActivity(mContext)) {
+-            final Intent intent = mAppLaunchHelper.getLaunchIntent(mContext);
+-            mContext.startActivity(intent);
+-        }
+-    }
+-
+     private int getAppResourceId(String resName, String resType) {
+         return mContext.getResources().getIdentifier(resName, resType, mContext.getPackageName());
+     }
+diff --git a/node_modules/react-native-notifications/lib/android/app/src/reactNative59/java/com/wix/reactnativenotifications/NotificationManagerCompatFacade.java b/node_modules/react-native-notifications/lib/android/app/src/reactNative59/java/com/wix/reactnativenotifications/NotificationManagerCompatFacade.java
+index f9c858b..94ea188 100644
+--- a/node_modules/react-native-notifications/lib/android/app/src/reactNative59/java/com/wix/reactnativenotifications/NotificationManagerCompatFacade.java
++++ b/node_modules/react-native-notifications/lib/android/app/src/reactNative59/java/com/wix/reactnativenotifications/NotificationManagerCompatFacade.java
+@@ -2,8 +2,8 @@
+ package com.wix.reactnativenotifications;
+ 
+ import android.content.Context;
+-import android.support.annotation.NonNull;
+-import android.support.v4.app.NotificationManagerCompat;
++import androidx.annotation.NonNull;
++import androidx.core.app.NotificationManagerCompat;
+ 
+ public abstract class NotificationManagerCompatFacade {
+     public static NotificationManagerCompat from(@NonNull Context context) {
