@@ -37,29 +37,27 @@ const init = async ({ isSignedIn, setGlobalState, dispatch }) => {
   setGlobalState({ pushReady: true })
 
   Notifications.registerRemoteNotifications()
-  Notifications.events().registerRemoteNotificationsRegistered(
-    async (event) => {
-      const nativeUserAgent = await DeviceInfo.getUserAgent()
-      dispatch({
-        type: 'postMessage',
-        content: {
-          type: 'onPushRegistered',
-          data: {
-            token: event.deviceToken,
-            os: Platform.OS,
-            osVersion: Platform.Version,
-            brand: getBrand(),
-            model: getModel(),
-            deviceId: getDeviceId(),
-            appVersion: APP_VERSION,
-            userAgent: `${nativeUserAgent} RepublikApp/${APP_VERSION}`,
-          },
+  Notifications.events().registerRemoteNotificationsRegistered(async event => {
+    const nativeUserAgent = await DeviceInfo.getUserAgent()
+    dispatch({
+      type: 'postMessage',
+      content: {
+        type: 'onPushRegistered',
+        data: {
+          token: event.deviceToken,
+          os: Platform.OS,
+          osVersion: Platform.Version,
+          brand: getBrand(),
+          model: getModel(),
+          deviceId: getDeviceId(),
+          appVersion: APP_VERSION,
+          userAgent: `${nativeUserAgent} RepublikApp/${APP_VERSION}`,
         },
-      })
-    },
-  )
+      },
+    })
+  })
   Notifications.events().registerRemoteNotificationsRegistrationFailed(
-    (event) => {
+    event => {
       console.warn(event)
     },
   )
