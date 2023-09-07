@@ -1,8 +1,15 @@
 import { AudioQueueItem } from './types/AudioQueueItem';
 import { AudioEvent } from './AudioEvent';
 import { useCallback, useEffect, useRef, useState } from "react"
-import TrackPlayer, { Event, State, Track, usePlaybackState, useTrackPlayerEvents } from "react-native-track-player"
-import Logo from '../../assets/images/playlist-logo.png'
+import TrackPlayer, {
+  Event,
+  State,
+  Track,
+  usePlaybackState,
+  useTrackPlayerEvents,
+  PitchAlgorithm,
+} from 'react-native-track-player';
+import Logo from '../../assets/images/playlist-logo.png';
 import useWebViewEvent from '../../lib/useWebViewEvent';
 import useInterval from '../../lib/useInterval';
 import useWebViewHandlers from './hooks/useWebViewHandlers';
@@ -55,6 +62,7 @@ function getTrackFromAudioQueueItem(
     artist: 'Republik',
     artwork: coverImage || image || Logo,
     duration: audioSource.durationMs / 1000,
+    pitchAlgorithm: PitchAlgorithm.Voice,
   }
   return track
 }
