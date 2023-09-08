@@ -31,18 +31,23 @@ rm -rf node_modules/.cache/babel-loader/*
 ```
 
 ### Environment Setup
-Building the app requires a Mac running MacOS Ventura. 
+The app is configured to be built on a Mac with Apple Silicon running MacOS Ventura.  
 
-For React Native Dependencies see: [Setting up the development environment](https://reactnative.dev/docs/environment-setup?package-manager=yarn&guide=native)
+For React Native dependencies see: [Setting up the development environment](https://reactnative.dev/docs/environment-setup?package-manager=yarn&guide=native)
 
 Tested software versions for building the app (the latest iOS build was created on 08.09.23 using these versions):
 - Xcode@14.3.1
 - macOS@13.4.1
 - node@18
  
-To build the current app via Terminal, the Terminal needs to run in Rosetta 2 (Right Click on Terminal App in Finder and under "Get Info" select Rosetta 2).
+To build the current app via Terminal, the Terminal needs to run in Rosetta 2 (right click on the Terminal app in Finder and under "Get Info" select Rosetta 2).
 
-Other Xcode, node or macOS versions might cause issues.
+Other Xcode, Node or macOS versions might cause build issues.
+
+### Additional Setup
+
+- [Publishing with Fastlane](docs/publishing.md)
+- [Private Fonts](docs/fonts.md)
 
 ### Install
 
@@ -51,11 +56,6 @@ yarn
 cd ios
 pod install
 ```
-
-### Additional Setup
-
-- [Publishing with Fastlane](docs/publishing.md)
-- [Private Fonts](docs/fonts.md)
 
 ## Run Dev
 
