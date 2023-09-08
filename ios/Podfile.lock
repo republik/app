@@ -282,9 +282,9 @@ PODS:
   - React-jsinspector (0.68.6)
   - React-logger (0.68.6):
     - glog
-  - react-native-config (1.4.6):
-    - react-native-config/App (= 1.4.6)
-  - react-native-config/App (1.4.6):
+  - react-native-config (1.5.1):
+    - react-native-config/App (= 1.5.1)
+  - react-native-config/App (1.5.1):
     - React-Core
   - react-native-cookies (6.1.0):
     - React-Core
@@ -587,7 +587,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: b4ce4afc5dd9c8fdd2ac59049ccf420f288ecef7
   React-jsinspector: e396d5e56af08fce39f50571726b68a40f1e302d
   React-logger: cec52b3f8fb0be0d47b2cb75dec69de60f2de3b6
-  react-native-config: 7cd105e71d903104e8919261480858940a6b9c0e
+  react-native-config: 86038147314e2e6d10ea9972022aa171e6b1d4d8
   react-native-cookies: 7e14e823f32bd7c868134c7e207c89a46fa28f98
   react-native-get-random-values: a6ea6a8a65dc93e96e24a11105b1a9c8cfe1d72a
   react-native-notifications: 83b4fd4a127a6c918fc846cae90da60f84819e44
