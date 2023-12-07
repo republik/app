@@ -11,8 +11,8 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		A0FD796B46B64D865FC8F97F /* libPods-republikapp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9F48224121A7EF3A1658772D /* libPods-republikapp.a */; };
-		AA4611D77202C9C5737296E6 /* libPods-republikapp-republikappTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8889B7D2EE3AA934D343BA9D /* libPods-republikapp-republikappTests.a */; };
+		B65349FACEF2ABF2B656B458 /* libPods-republikapp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 066E721BBE197AE1333C53F2 /* libPods-republikapp.a */; };
+		DB314B7CFC6D6BDF73FC5CC9 /* libPods-republikapp-republikappTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 77AE3EE252347DB13B01D225 /* libPods-republikapp-republikappTests.a */; };
 		E4C7F4AC2541ACB00036B95E /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E4C7F4AB2541ACB00036B95E /* Launch Screen.storyboard */; };
 		E94126C8257403F300866431 /* GT-America-Standard-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = E94126C5257403F200866431 /* GT-America-Standard-Medium.otf */; };
 		E94126C9257403F300866431 /* GT-America-Standard-Regular-Italic.otf in Resources */ = {isa = PBXBuildFile; fileRef = E94126C6257403F200866431 /* GT-America-Standard-Regular-Italic.otf */; };
@@ -67,6 +67,7 @@
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* republikappTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = republikappTests.m; sourceTree = "<group>"; };
 		029896BEE7374AC9A84B18E8 /* FontAwesome5_Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Regular.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Regular.ttf"; sourceTree = "<group>"; };
+		066E721BBE197AE1333C53F2 /* libPods-republikapp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-republikapp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C0A440D6B26492C93A18ED6 /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* republikapp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = republikapp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = republikapp/AppDelegate.h; sourceTree = "<group>"; };
@@ -74,22 +75,20 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = republikapp/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = republikapp/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = republikapp/main.m; sourceTree = "<group>"; };
-		144B95D7EC645693BEB3C4C7 /* Pods-republikapp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-republikapp.debug.xcconfig"; path = "Target Support Files/Pods-republikapp/Pods-republikapp.debug.xcconfig"; sourceTree = "<group>"; };
-		1781EB5606CC6DC44743015D /* Pods-republikapp-republikappTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-republikapp-republikappTests.release.xcconfig"; path = "Target Support Files/Pods-republikapp-republikappTests/Pods-republikapp-republikappTests.release.xcconfig"; sourceTree = "<group>"; };
 		2D02E47B1E0B4A5D006451C7 /* republikapp-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "republikapp-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D02E4901E0B4A5D006451C7 /* republikapp-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "republikapp-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		55982AAED672F4381B555FB5 /* Pods-republikapp-republikappTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-republikapp-republikappTests.debug.xcconfig"; path = "Target Support Files/Pods-republikapp-republikappTests/Pods-republikapp-republikappTests.debug.xcconfig"; sourceTree = "<group>"; };
+		47122D9A897B1E5680DA281B /* Pods-republikapp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-republikapp.release.xcconfig"; path = "Target Support Files/Pods-republikapp/Pods-republikapp.release.xcconfig"; sourceTree = "<group>"; };
 		63867FD2DF7B4758A0563597 /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
 		67131DE69B554EA4B32F0D3D /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SimpleLineIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; };
+		77AE3EE252347DB13B01D225 /* libPods-republikapp-republikappTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-republikapp-republikappTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7CB78818283247DB81884D4E /* FontAwesome5_Brands.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Brands.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Brands.ttf"; sourceTree = "<group>"; };
-		8889B7D2EE3AA934D343BA9D /* libPods-republikapp-republikappTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-republikapp-republikappTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		9614023070D6F1A0131CF63A /* Pods-republikapp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-republikapp.release.xcconfig"; path = "Target Support Files/Pods-republikapp/Pods-republikapp.release.xcconfig"; sourceTree = "<group>"; };
-		9F48224121A7EF3A1658772D /* libPods-republikapp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-republikapp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9FFC8C1361A841D49DD67997 /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
+		A38C3B29CD120F8F9C5674EC /* Pods-republikapp-republikappTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-republikapp-republikappTests.debug.xcconfig"; path = "Target Support Files/Pods-republikapp-republikappTests/Pods-republikapp-republikappTests.debug.xcconfig"; sourceTree = "<group>"; };
 		B94F92232737403AA5906A92 /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
 		B96138900E6744C9ACA5D43E /* AntDesign.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = AntDesign.ttf; path = "../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf"; sourceTree = "<group>"; };
 		C44CEDE5EBDE4290BA79E943 /* FontAwesome.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
 		C84C3BCBAA4E4C55A290C270 /* Feather.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Feather.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Feather.ttf"; sourceTree = "<group>"; };
+		C87EB2D2CEB4CF74571965B1 /* Pods-republikapp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-republikapp.debug.xcconfig"; path = "Target Support Files/Pods-republikapp/Pods-republikapp.debug.xcconfig"; sourceTree = "<group>"; };
 		D5A82F938EE241838CCDB0DB /* Fontisto.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Fontisto.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Fontisto.ttf"; sourceTree = "<group>"; };
 		DBB0B9879D1D4BB5BFE4A962 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
 		E4A0AA63256E393C0095E291 /* libswiftWebKit.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libswiftWebKit.tbd; path = usr/lib/swift/libswiftWebKit.tbd; sourceTree = SDKROOT; };
@@ -98,6 +97,7 @@
 		E4C7F4AB2541ACB00036B95E /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = "Launch Screen.storyboard"; path = "republikapp/Launch Screen.storyboard"; sourceTree = "<group>"; };
 		E4FA04162535A942002B5393 /* republikapp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = republikapp.entitlements; path = republikapp/republikapp.entitlements; sourceTree = "<group>"; };
 		E6141821538349B6AC6B2B0B /* Entypo.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Entypo.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Entypo.ttf"; sourceTree = "<group>"; };
+		E6BA3D0B6EF064D26F9A879F /* Pods-republikapp-republikappTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-republikapp-republikappTests.release.xcconfig"; path = "Target Support Files/Pods-republikapp-republikappTests/Pods-republikapp-republikappTests.release.xcconfig"; sourceTree = "<group>"; };
 		E83685BB0C494959AE9454F8 /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
 		E94126BD2573FE6200866431 /* libswiftCoreAudio.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libswiftCoreAudio.tbd; path = usr/lib/swift/libswiftCoreAudio.tbd; sourceTree = SDKROOT; };
 		E94126C5257403F200866431 /* GT-America-Standard-Medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "GT-America-Standard-Medium.otf"; path = "../src/assets/fonts/GT-America-Standard-Medium.otf"; sourceTree = "<group>"; };
@@ -114,7 +114,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AA4611D77202C9C5737296E6 /* libPods-republikapp-republikappTests.a in Frameworks */,
+				DB314B7CFC6D6BDF73FC5CC9 /* libPods-republikapp-republikappTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -122,7 +122,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A0FD796B46B64D865FC8F97F /* libPods-republikapp.a in Frameworks */,
+				B65349FACEF2ABF2B656B458 /* libPods-republikapp.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -184,8 +184,8 @@
 				E4A0AA63256E393C0095E291 /* libswiftWebKit.tbd */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
-				9F48224121A7EF3A1658772D /* libPods-republikapp.a */,
-				8889B7D2EE3AA934D343BA9D /* libPods-republikapp-republikappTests.a */,
+				066E721BBE197AE1333C53F2 /* libPods-republikapp.a */,
+				77AE3EE252347DB13B01D225 /* libPods-republikapp-republikappTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -253,10 +253,10 @@
 		F2AB75BFCB5B698E288A965D /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				144B95D7EC645693BEB3C4C7 /* Pods-republikapp.debug.xcconfig */,
-				9614023070D6F1A0131CF63A /* Pods-republikapp.release.xcconfig */,
-				55982AAED672F4381B555FB5 /* Pods-republikapp-republikappTests.debug.xcconfig */,
-				1781EB5606CC6DC44743015D /* Pods-republikapp-republikappTests.release.xcconfig */,
+				C87EB2D2CEB4CF74571965B1 /* Pods-republikapp.debug.xcconfig */,
+				47122D9A897B1E5680DA281B /* Pods-republikapp.release.xcconfig */,
+				A38C3B29CD120F8F9C5674EC /* Pods-republikapp-republikappTests.debug.xcconfig */,
+				E6BA3D0B6EF064D26F9A879F /* Pods-republikapp-republikappTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -268,12 +268,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "republikappTests" */;
 			buildPhases = (
-				E7152DA0A8DA161ECD188439 /* [CP] Check Pods Manifest.lock */,
+				8CDE674737D2B68695DF6C30 /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				21CA49E2261043C84A469258 /* [CP] Copy Pods Resources */,
-				3E162BD6AEA8D41B05578116 /* [CP] Embed Pods Frameworks */,
+				64EA92A5C2AAB1CF6DC1F46D /* [CP] Embed Pods Frameworks */,
+				3AF32C9E70B63F6DB74920A8 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -289,14 +289,14 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "republikapp" */;
 			buildPhases = (
-				FF887ACAA29B24740797E6D5 /* [CP] Check Pods Manifest.lock */,
+				DD097FC41DD2EAE94A40673E /* [CP] Check Pods Manifest.lock */,
 				FD10A7F022414F080027D42C /* Start Packager */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				15F7C38C69D9C9FB8A3427E2 /* [CP] Copy Pods Resources */,
-				0B5C826B37875AF3782E6C47 /* [CP] Embed Pods Frameworks */,
+				EB80B32A8A799EF41453BBC5 /* [CP] Embed Pods Frameworks */,
+				EE800D20AB0A18C05152D970 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 				E48416A3256D7B3A00EF6E34 /* PBXBuildRule */,
@@ -360,8 +360,8 @@
 					};
 					13B07F861A680F5B00A75B9A = {
 						DevelopmentTeam = 7MQXM58QM7;
-						LastSwiftMigration = 1130;
-						ProvisioningStyle = Automatic;
+						LastSwiftMigration = 1430;
+						ProvisioningStyle = Manual;
 					};
 					2D02E47A1E0B4A5D006451C7 = {
 						CreatedOnToolsVersion = 8.2.1;
@@ -446,47 +446,21 @@
 			shellPath = /bin/sh;
 			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
 		};
-		0B5C826B37875AF3782E6C47 /* [CP] Embed Pods Frameworks */ = {
+		2D02E4CB1E0B4B27006451C7 /* Bundle React Native Code And Images */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-republikapp/Pods-republikapp-frameworks.sh",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/Flipper-DoubleConversion/double-conversion.framework/double-conversion",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/Flipper-Glog/glog.framework/glog",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/OpenSSL-Universal/OpenSSL.framework/OpenSSL",
 			);
-			name = "[CP] Embed Pods Frameworks";
+			name = "Bundle React Native Code And Images";
 			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/double-conversion.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/glog.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/OpenSSL.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-republikapp/Pods-republikapp-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
+			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
 		};
-		15F7C38C69D9C9FB8A3427E2 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-republikapp/Pods-republikapp-resources.sh",
-				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/AccessibilityResources.bundle",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AccessibilityResources.bundle",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-republikapp/Pods-republikapp-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		21CA49E2261043C84A469258 /* [CP] Copy Pods Resources */ = {
+		3AF32C9E70B63F6DB74920A8 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -504,21 +478,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-republikapp-republikappTests/Pods-republikapp-republikappTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		2D02E4CB1E0B4B27006451C7 /* Bundle React Native Code And Images */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Bundle React Native Code And Images";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
-		};
-		3E162BD6AEA8D41B05578116 /* [CP] Embed Pods Frameworks */ = {
+		64EA92A5C2AAB1CF6DC1F46D /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -540,7 +500,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-republikapp-republikappTests/Pods-republikapp-republikappTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		E7152DA0A8DA161ECD188439 /* [CP] Check Pods Manifest.lock */ = {
+		8CDE674737D2B68695DF6C30 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -560,6 +520,68 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		DD097FC41DD2EAE94A40673E /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-republikapp-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		EB80B32A8A799EF41453BBC5 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-republikapp/Pods-republikapp-frameworks.sh",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/Flipper-DoubleConversion/double-conversion.framework/double-conversion",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/Flipper-Glog/glog.framework/glog",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/OpenSSL-Universal/OpenSSL.framework/OpenSSL",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/double-conversion.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/glog.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/OpenSSL.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-republikapp/Pods-republikapp-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		EE800D20AB0A18C05152D970 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-republikapp/Pods-republikapp-resources.sh",
+				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/AccessibilityResources.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AccessibilityResources.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-republikapp/Pods-republikapp-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
@@ -598,28 +620,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "export RCT_METRO_PORT=\"${RCT_METRO_PORT:=8081}\"\necho \"export RCT_METRO_PORT=${RCT_METRO_PORT}\" > \"${SRCROOT}/../node_modules/react-native/scripts/.packager.env\"\nif [ -z \"${RCT_NO_LAUNCH_PACKAGER+xxx}\" ] ; then\n  if nc -w 5 -z localhost ${RCT_METRO_PORT} ; then\n    if ! curl -s \"http://localhost:${RCT_METRO_PORT}/status\" | grep -q \"packager-status:running\" ; then\n      echo \"Port ${RCT_METRO_PORT} already in use, packager is either not running or not running correctly\"\n      exit 2\n    fi\n  else\n    open \"$SRCROOT/../node_modules/react-native/scripts/launchPackager.command\" || echo \"Can't start packager automatically\"\n  fi\nfi\n";
-			showEnvVarsInLog = 0;
-		};
-		FF887ACAA29B24740797E6D5 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-republikapp-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -674,7 +674,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 55982AAED672F4381B555FB5 /* Pods-republikapp-republikappTests.debug.xcconfig */;
+			baseConfigurationReference = A38C3B29CD120F8F9C5674EC /* Pods-republikapp-republikappTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -698,7 +698,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 1781EB5606CC6DC44743015D /* Pods-republikapp-republikappTests.release.xcconfig */;
+			baseConfigurationReference = E6BA3D0B6EF064D26F9A879F /* Pods-republikapp-republikappTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
@@ -719,16 +719,19 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 144B95D7EC645693BEB3C4C7 /* Pods-republikapp.debug.xcconfig */;
+			baseConfigurationReference = C87EB2D2CEB4CF74571965B1 /* Pods-republikapp.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = republikapp/republikapp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 203;
-				DEVELOPMENT_TEAM = 7MQXM58QM7;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 214;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 7MQXM58QM7;
 				ENABLE_BITCODE = NO;
+				EXCLUDED_ARCHS = "";
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
@@ -785,6 +788,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = app.republik;
 				PRODUCT_NAME = republikapp;
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match AppStore app.republik";
+				SWIFT_OBJC_BRIDGING_HEADER = "republikapp-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -794,15 +799,19 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 9614023070D6F1A0131CF63A /* Pods-republikapp.release.xcconfig */;
+			baseConfigurationReference = 47122D9A897B1E5680DA281B /* Pods-republikapp.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = republikapp/republikapp.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 203;
-				DEVELOPMENT_TEAM = 7MQXM58QM7;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 214;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 7MQXM58QM7;
+				EXCLUDED_ARCHS = "";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				INFOPLIST_FILE = republikapp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "/usr/lib/swift $(inherited) @executable_path/Frameworks";
@@ -854,6 +863,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = app.republik;
 				PRODUCT_NAME = republikapp;
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match AppStore app.republik";
+				SWIFT_OBJC_BRIDGING_HEADER = "republikapp-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
