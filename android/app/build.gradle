@@ -97,7 +97,7 @@ android {
         applicationId "app.republik"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 289
+        versionCode 297
         versionName "2.2.5"
     }
 
