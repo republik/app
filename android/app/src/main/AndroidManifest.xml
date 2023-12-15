@@ -1,6 +1,5 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="app.republik">
-
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- Chromebook Compatibility see: https://developer.android.com/topic/arc#update_your_apps_manifest_file -->
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
@@ -17,10 +16,6 @@
         android:launchMode="singleTask"
         android:windowSoftInputMode="adjustResize"
         android:exported="true">
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
         <intent-filter android:label="@string/app_name" android:autoVerify="true">
           <action android:name="android.intent.action.VIEW" />
           <category android:name="android.intent.category.DEFAULT" />
@@ -29,14 +24,11 @@
           <data android:scheme="https" android:host="republik.ch" />
           <data android:scheme="https" android:host="republik.love" />
         </intent-filter>
-      </activity>
-      <service
-        android:name="com.wix.reactnativenotifications.fcm.FcmInstanceIdListenerService"
-        android:exported="true">
         <intent-filter>
-            <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
-		  </service>
+      </activity>
       <meta-data
         android:name="com.google.firebase.messaging.default_notification_icon"
         android:resource="@drawable/notification_icon" />
