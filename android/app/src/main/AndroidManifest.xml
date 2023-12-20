@@ -22,6 +22,7 @@
           <category android:name="android.intent.category.BROWSABLE" />
           <data android:scheme="https" android:host="www.republik.ch" />
           <data android:scheme="https" android:host="republik.ch" />
+          <data android:scheme="https" android:host="www.republik.love" />
           <data android:scheme="https" android:host="republik.love" />
         </intent-filter>
         <intent-filter>
@@ -38,14 +39,14 @@
     <!-- Required for external links to open in webview
     ref: https://reactnative.dev/docs/linking#canopenurl
      -->
-    <queries>
-        <intent>
-            <action android:name="android.intent.action.VIEW" />
-            <data android:scheme="https" android:host="*" />
-        </intent>
-        <intent>
-            <action android:name="android.intent.action.SENDTO" />
-            <data android:scheme="mailto"/>
-        </intent>
-    </queries>
+  <queries>
+    <intent>
+      <action android:name="android.intent.action.VIEW" />
+      <data android:scheme="https" android:host="*" />
+    </intent>
+    <intent>
+      <action android:name="android.intent.action.SENDTO" />
+      <data android:scheme="mailto" />
+    </intent>
+  </queries>
 </manifest>
