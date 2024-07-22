@@ -311,7 +311,14 @@ const Web = () => {
             renderError={() => (
               <NetworkError onReload={() => webviewRef.current.reload()} />
             )}
-            originWhitelist={[`${FRONTEND_BASE_URL}*`, 'https://*.stripe.com']}
+            // stripe url's are included to enable prolong
+            // delete once shop.republik.ch is live
+            originWhitelist={[
+              `${FRONTEND_BASE_URL}*`,
+              'https://js.stripe.com',
+              'https://*.stripecdn.com',
+              'https://newassets.hcaptcha.com',
+            ]}
             pullToRefreshEnabled={false}
             allowsFullscreenVideo={true}
             allowsInlineMediaPlayback={true}
