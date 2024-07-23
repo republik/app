@@ -1,6 +1,6 @@
-import { AudioQueueItem } from './types/AudioQueueItem';
-import { AudioEvent } from './AudioEvent';
-import { useCallback, useEffect, useRef, useState } from "react"
+import { AudioQueueItem } from './types/AudioQueueItem'
+import { AudioEvent } from './AudioEvent'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import TrackPlayer, {
   Event,
   State,
@@ -8,12 +8,12 @@ import TrackPlayer, {
   usePlaybackState,
   useTrackPlayerEvents,
   PitchAlgorithm,
-} from 'react-native-track-player';
-import Logo from '../../assets/images/playlist-logo.png';
-import useWebViewEvent from '../../lib/useWebViewEvent';
-import useInterval from '../../lib/useInterval';
-import useWebViewHandlers from './hooks/useWebViewHandlers';
-import { AppState, AppStateStatus, BackHandler, Platform } from 'react-native';
+} from 'react-native-track-player'
+import Logo from '../../assets/images/playlist-logo.png'
+import useWebViewEvent from '../../lib/useWebViewEvent'
+import useInterval from '../../lib/useInterval'
+import useWebViewHandlers from './hooks/useWebViewHandlers'
+import { AppState, AppStateStatus, BackHandler, Platform } from 'react-native'
 
 type AudioObject = {
   item: AudioQueueItem
@@ -89,12 +89,8 @@ const HeadlessAudioPlayer = ({}) => {
   const [isInitialized, setIsInitialized] = useState(false)
   const [playbackRate, setPlaybackRate] = useState(1)
 
-  const {
-    notifyStateSync,
-    notifyQueueAdvance,
-    notifyError,
-    notifyMinimize,
-  } = useWebViewHandlers()
+  const { notifyStateSync, notifyQueueAdvance, notifyError, notifyMinimize } =
+    useWebViewHandlers()
 
   const resetCurrentTrack = async () => {
     lazyInitializedTrack.current = null
@@ -102,10 +98,13 @@ const HeadlessAudioPlayer = ({}) => {
     await TrackPlayer.reset()
   }
 
-  const handleError = (error: Error) => {
-    console.error(error)
-    notifyError(error)
-  }
+  const handleError = useCallback(
+    (error: Error) => {
+      console.error(error)
+      notifyError(error)
+    },
+    [notifyError],
+  )
 
   /**
    * Send all relevant state of the track-player to the web-ui.
@@ -113,18 +112,18 @@ const HeadlessAudioPlayer = ({}) => {
    * lazy initialized track.
    */
   const syncStateWithWebUI = useCallback(async () => {
-    const [track, state, duration, position, playbackRate] = await Promise.all([
-      getCurrentPlayingTrack(),
-      TrackPlayer.getState(),
-      TrackPlayer.getDuration(),
-      TrackPlayer.getPosition(),
-      TrackPlayer.getRate(),
-    ])
+    const [track, state, { duration, position }, playbackRate] =
+      await Promise.all([
+        getCurrentPlayingTrack(),
+        TrackPlayer.getPlaybackState(),
+        TrackPlayer.getProgress(),
+        TrackPlayer.getRate(),
+      ])
 
     if (isInitialized) {
       notifyStateSync({
         itemId: track?.itemId,
-        playerState: state,
+        playerState: state.state,
         duration,
         position,
         playbackRate: Math.round(playbackRate * 100) / 100,
@@ -196,7 +195,7 @@ const HeadlessAudioPlayer = ({}) => {
         handleError(error)
       }
     },
-    [syncStateWithWebUI, isInitialized, playbackRate],
+    [syncStateWithWebUI, isInitialized, playbackRate, handleError],
   )
 
   const handlePause = useCallback(async () => {
@@ -219,7 +218,7 @@ const HeadlessAudioPlayer = ({}) => {
     } catch (error) {
       handleError(error)
     }
-  }, [syncStateWithWebUI])
+  }, [syncStateWithWebUI, handleError])
 
   /**
    * Seek to a specific position in the audio-player.
@@ -240,7 +239,7 @@ const HeadlessAudioPlayer = ({}) => {
         handleError(error)
       }
     },
-    [syncStateWithWebUI, isInitialized],
+    [syncStateWithWebUI, isInitialized, handleError],
   )
 
   /**
@@ -266,7 +265,7 @@ const HeadlessAudioPlayer = ({}) => {
         handleError(error)
       }
     },
-    [syncStateWithWebUI, isInitialized],
+    [syncStateWithWebUI, isInitialized, handleError],
   )
 
   /**
@@ -292,7 +291,7 @@ const HeadlessAudioPlayer = ({}) => {
         handleError(error)
       }
     },
-    [syncStateWithWebUI, isInitialized],
+    [syncStateWithWebUI, isInitialized, handleError],
   )
 
   /**
@@ -308,7 +307,7 @@ const HeadlessAudioPlayer = ({}) => {
         handleError(error)
       }
     },
-    [syncStateWithWebUI],
+    [syncStateWithWebUI, handleError],
   )
 
   useTrackPlayerEvents([Event.PlaybackQueueEnded], async event => {
@@ -319,10 +318,9 @@ const HeadlessAudioPlayer = ({}) => {
        * To remove it from the queue
        */
       case Event.PlaybackQueueEnded:
-        const [queue, position, duration] = await Promise.all([
+        const [queue, { position, duration }] = await Promise.all([
           TrackPlayer.getQueue(),
-          TrackPlayer.getPosition(),
-          TrackPlayer.getDuration(),
+          TrackPlayer.getProgress(),
         ])
 
         // On iOS the queueEnded event is fired when the track just started playing on iOS.
@@ -357,9 +355,9 @@ const HeadlessAudioPlayer = ({}) => {
   // Sync the state with the webview if in a playing state
   useInterval(
     () => syncStateWithWebUI(),
-    [State.Buffering, State.Playing].includes(playerState)
+    [State.Buffering, State.Playing].includes(playerState.state)
       ? SYNC_INTERVAL_WHILE_PLAYING
-      : [State.Connecting].includes(playerState)
+      : [State.Loading].includes(playerState.state)
       ? SYNC_INTERVAL_WHILE_CONNECTING
       : null,
   )
@@ -468,9 +466,9 @@ const HeadlessAudioPlayer = ({}) => {
     return () => {
       subscription.remove()
     }
-  }, [])
+  }, [syncStateWithWebUI])
 
   return null
 }
 
-export default HeadlessAudioPlayer;
+export default HeadlessAudioPlayer
