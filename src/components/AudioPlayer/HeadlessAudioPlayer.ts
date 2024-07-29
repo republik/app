@@ -22,7 +22,7 @@ type AudioObject = {
 }
 
 async function getCurrentPlayingTrack() {
-  const currentTrackIndex = await TrackPlayer.getCurrentTrack()
+  const currentTrackIndex = await TrackPlayer.getActiveTrackIndex()
   if (currentTrackIndex == null) {
     return null
   }
@@ -249,7 +249,7 @@ const HeadlessAudioPlayer = ({}) => {
     async (payload: number) => {
       try {
         if (isInitialized) {
-          const position = await TrackPlayer.getPosition()
+          const { position } = await TrackPlayer.getProgress()
           await TrackPlayer.seekTo(position + payload)
         } else if (lazyInitializedTrack?.current) {
           lazyInitializedTrack.current = {
@@ -275,7 +275,7 @@ const HeadlessAudioPlayer = ({}) => {
     async (payload: number) => {
       try {
         if (isInitialized) {
-          const position = await TrackPlayer.getPosition()
+          const { position } = await TrackPlayer.getProgress()
           await TrackPlayer.seekTo(position - payload)
         } else if (lazyInitializedTrack?.current) {
           lazyInitializedTrack.current = {

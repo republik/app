@@ -8,11 +8,11 @@ module.exports = async function () {
     TrackPlayer.seekTo(e.position),
   )
   TrackPlayer.addEventListener(Event.RemoteJumpForward, async e => {
-    const position = await TrackPlayer.getPosition()
+    const { position } = await TrackPlayer.getProgress()
     TrackPlayer.seekTo(position + e.interval)
   })
   TrackPlayer.addEventListener(Event.RemoteJumpBackward, async e => {
-    const position = await TrackPlayer.getPosition()
+    const { position } = await TrackPlayer.getProgress()
     TrackPlayer.seekTo(position - e.interval)
   })
 }
