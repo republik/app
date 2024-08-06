@@ -3,7 +3,7 @@ import { Animated, StatusBar, Easing, Platform } from 'react-native'
 import {
   getStatusBarHeight,
   isIPhoneWithMonobrow,
-} from 'react-native-status-bar-height'
+} from '../lib/statusBarHeight'
 import changeNavigationBarColor from 'react-native-navigation-bar-color'
 import { getModel } from 'react-native-device-info'
 
