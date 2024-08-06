@@ -3,6 +3,8 @@ import CookieManager from '@react-native-cookies/cookies'
 import { FRONTEND_BASE_URL, CURTAIN_BACKDOOR_PATH } from '../constants'
 import { useGlobalState } from '../GlobalState'
 
+global.Buffer = require('buffer').Buffer
+
 // Requires sharedCookiesEnabled={true} prop to be set on WebView
 const CookieService = () => {
   const { setGlobalState } = useGlobalState()
